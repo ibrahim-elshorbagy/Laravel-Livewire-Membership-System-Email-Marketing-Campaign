@@ -8,16 +8,27 @@ use Livewire\Volt\Component;
 
 new class extends Component
 {
-    public string $name = '';
     public string $email = '';
+    public string $first_name = '';
+    public string $last_name = '';
+    public string $username = '';
+    public string $company = '';
+    public string $country = '';
+    public string $whatsapp = '';
 
     /**
      * Mount the component.
      */
     public function mount(): void
     {
-        $this->name = Auth::user()->name;
-        $this->email = Auth::user()->email;
+        $user = Auth::user();
+        $this->email = $user->email ?? '';
+        $this->username = $user->username ?? '';
+        $this->first_name = $user->first_name ?? '';
+        $this->last_name = $user->last_name ?? '';
+        $this->company = $user->company ?? '';
+        $this->country = $user->country ?? '';
+        $this->whatsapp = $user->whatsapp ?? '';
     }
 
     /**
@@ -28,8 +39,11 @@ new class extends Component
         $user = Auth::user();
 
         $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            'first_name' => ['required', 'string', 'max:50'],
+            'last_name' => ['required', 'string', 'max:50'],
+            'company' => ['nullable', 'string', 'max:50'],
+            'country' => ['nullable', 'string', 'max:50'],
+            'whatsapp' => ['string', 'regex:/^\+?\d{10,13}$/'],
         ]);
 
         $user->fill($validated);
@@ -40,7 +54,11 @@ new class extends Component
 
         $user->save();
 
-        $this->dispatch('profile-updated', name: $user->name);
+        $this->dispatch('profile-updated', name: $user->first_name);
+        $this->dispatch('refresh-user-profile-display', [
+        'image_url' => $user->image_url,
+        'first_name' => $user->first_name,
+        ]);
     }
 
     /**
@@ -71,23 +89,62 @@ new class extends Component
             </h2>
 
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                {{ __("Update your account's profile information and email address.") }}
+                {{ __("Update your account's profile information") }}
             </p>
         </div>
     </header>
 
     <form wire:submit="updateProfileInformation" class="mt-6 space-y-6">
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input wire:model="name" id="name" name="name" type="text" class="block w-full mt-1" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+
+            <div >
+                <x-input-label for="first_name" :value="__('First Name')" />
+                <x-text-input wire:model="first_name" id="first_name" name="first_name" type="text" class="block w-full mt-1" required autocomplete="given-name" />
+                <x-input-error class="mt-2" :messages="$errors->get('first_name')" />
+            </div>
+
+            <div >
+                <x-input-label for="last_name" :value="__('Last Name')" />
+                <x-text-input wire:model="last_name" id="last_name" name="last_name" type="text" class="block w-full mt-1" required autocomplete="family-name" />
+                <x-input-error class="mt-2" :messages="$errors->get('last_name')" />
+            </div>
+
+            <div >
+                <x-input-label for="company" :value="__('Company')" />
+                <x-text-input wire:model="company" id="company" name="company" type="text" class="block w-full mt-1"  autocomplete="organization" />
+                <x-input-error class="mt-2" :messages="$errors->get('company')" />
+            </div>
+
+            <div >
+                <x-input-label for="country" :value="__('Country')" />
+                <x-text-input wire:model="country" id="country" name="country" type="text" class="block w-full mt-1"  autocomplete="country" />
+                <x-input-error class="mt-2" :messages="$errors->get('country')" />
+            </div>
+
+            <div >
+                <x-input-label for="whatsapp" :value="__('WhatsApp')" />
+                <x-text-input wire:model="whatsapp" id="whatsapp" name="whatsapp" type="text" class="block w-full mt-1"  autocomplete="tel" />
+                <x-input-error class="mt-2" :messages="$errors->get('whatsapp')" />
+            </div>
+
         </div>
 
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" name="email" type="email" class="block w-full mt-1" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
+            <div class="flex flex-col gap-1 mb-2">
+                <x-input-label for="email" :value="__('Email')" />
+                <div class="flex items-center mt-1 text-gray-900 dark:text-gray-100">
+                    <i class="fas fa-envelope"></i>
+                    <p class="ms-2">{{ auth()->user()->email }}</p>
+                </div>
+            </div>
 
+            <div class="flex flex-col gap-1">
+                <x-input-label for="username" :value="__('Username')" />
+                <div class="flex items-center mt-1 text-gray-900 dark:text-gray-100">
+                    <i class="fas fa-user"></i>
+                    <p class="ms-2">{{ auth()->user()->username }}</p>
+                </div>
+            </div>
             @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
                 <div>
                     <p class="mt-2 text-sm text-gray-800 dark:text-gray-200">
