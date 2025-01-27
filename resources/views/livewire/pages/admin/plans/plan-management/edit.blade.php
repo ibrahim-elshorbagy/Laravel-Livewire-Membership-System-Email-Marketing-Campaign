@@ -13,15 +13,7 @@
             </x-primary-info-button>
         </div>
     </div>
-    @if ($errors->any())
-        <div class="p-4 bg-red-100 border border-red-300 rounded-md">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <!-- Plan Details -->
         <div class="p-6 border rounded-md border-neutral-300 dark:border-neutral-700">
@@ -70,7 +62,7 @@
         <!-- Features Management -->
         <div class="p-6 border rounded-md border-neutral-300 dark:border-neutral-700">
             <h3 class="mb-4 text-lg font-medium">Features Management</h3>
-            
+
             <!-- Current Features -->
             <div class="mb-6">
                 <h4 class="mb-2 text-sm font-medium">Current Features</h4>

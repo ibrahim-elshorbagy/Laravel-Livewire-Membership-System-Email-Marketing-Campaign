@@ -56,10 +56,10 @@
                             <i class="fa-solid fa-pen-to-square"></i>
                         </x-primary-info-button>
 
-                        <x-primary-danger-button wire:click="deletePlan({{ $plan->id }})"
+                        {{-- <x-primary-danger-button wire:click="deletePlan({{ $plan->id }})"
                             onclick="confirm('Are you sure you want to delete this plan?') || event.stopImmediatePropagation()">
                             <i class="fa-solid fa-trash"></i>
-                        </x-primary-danger-button>
+                        </x-primary-danger-button> --}}
                     </div>
                 </td>
             </tr>

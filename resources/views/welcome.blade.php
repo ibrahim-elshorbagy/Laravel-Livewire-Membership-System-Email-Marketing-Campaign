@@ -1,2 +1,2 @@
-<x-guest-layout>
-</x-guest-layout>
+<x-app-layout>
+</x-app-layout>

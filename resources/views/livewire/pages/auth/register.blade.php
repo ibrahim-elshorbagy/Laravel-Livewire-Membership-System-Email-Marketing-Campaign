@@ -23,22 +23,22 @@ new #[Layout('layouts.guest')] class extends Component
     public function register(): void
     {
         $validated = $this->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'unique:'.User::class],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
-        ]);
+                'first_name' => ['required', 'string', 'max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'username' => ['required', 'string', 'max:255', 'unique:'.User::class],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+                'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            ]);
 
-        $validated['password'] = Hash::make($validated['password']);
-        $validated['image_url'] = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+            $validated['password'] = Hash::make($validated['password']);
+            $validated['image_url'] = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
 
-        event(new Registered($user = User::create($validated)));
+            $user = User::create($validated);
 
-        Auth::login($user);
+            Auth::login($user);
 
-        $this->redirect(route('dashboard', absolute: false), navigate: true);
-    }
+            $this->redirect(route('dashboard', absolute: false), navigate: true);
+        }
 }; ?>
 
 <div class="grid h-screen place-items-center">

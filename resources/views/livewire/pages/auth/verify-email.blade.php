@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('layouts.guest')] class extends Component
+new #[Layout('layouts.app')] class extends Component
 {
     /**
      * Send an email verification notification to the user.
@@ -37,7 +37,8 @@ new #[Layout('layouts.guest')] class extends Component
 
 <div class="flex flex-col p-6 border rounded-md group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
+        {{ __('Welcome! Your account is ready. To complete your registration and access all features, click "Send Verification
+        Email" below to receive a verification link.') }}
     </div>
 
     @if (session('status') == 'verification-link-sent')
@@ -51,8 +52,8 @@ new #[Layout('layouts.guest')] class extends Component
             {{ __('Resend Verification Email') }}
         </x-primary-button>
 
-        <button wire:click="logout" type="submit" class="text-sm text-gray-600 underline rounded-md dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+        {{-- <button wire:click="logout" type="submit" class="text-sm text-gray-600 underline rounded-md dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
             {{ __('Log Out') }}
-        </button>
+        </button> --}}
     </div>
 </div>
