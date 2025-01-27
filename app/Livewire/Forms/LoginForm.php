@@ -51,7 +51,7 @@ class LoginForm extends Form
         }
 
         // Check if user is active
-        if (!$user->is_active) {
+        if (!$user->active) {
             throw ValidationException::withMessages([
                 'form.login' => __('This account is not active.'),
             ]);

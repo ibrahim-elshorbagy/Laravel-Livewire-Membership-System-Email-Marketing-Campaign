@@ -13,6 +13,7 @@
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.4",
         "livewire/volt": "^1.0",
+        "lucasdotvin/laravel-soulbscription": "^4.2",
         "spatie/laravel-permission": "^6.10"
     },
     "require-dev": {

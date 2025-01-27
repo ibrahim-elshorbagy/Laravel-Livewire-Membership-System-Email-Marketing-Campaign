@@ -72,9 +72,8 @@ class Create extends Component
 
         Session::flash('success', 'User created successfully.');
 
-        return redirect()->route('admin.users');
+         return $this->redirect(route('admin.users'), navigate: true);
     }
-
     public function render()
     {
         return view('livewire.pages.admin.user.user-management.create', [

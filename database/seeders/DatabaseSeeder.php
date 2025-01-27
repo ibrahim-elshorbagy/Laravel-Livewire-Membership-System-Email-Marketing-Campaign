@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(PlansSeeder::class);
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $userRole = Role::firstOrCreate(['name' => 'user']);
 
@@ -31,7 +32,8 @@ class DatabaseSeeder extends Seeder
             'username' => 'a',
             'email' => 'a@a.a',
             'password' => bcrypt('a'),
-            'image_url'=>'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+            'image_url'=>'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+            'active' => true
         ]);
         $user->assignRole($adminRole);
 

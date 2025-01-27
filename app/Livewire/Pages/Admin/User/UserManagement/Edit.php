@@ -89,7 +89,8 @@ class Edit extends Component
         }
 
         Session::flash('success', 'User updated successfully.');
-        return redirect()->route('admin.users');
+        return $this->redirect(route('admin.users'), navigate: true);
+
     }
 
     public function render()
