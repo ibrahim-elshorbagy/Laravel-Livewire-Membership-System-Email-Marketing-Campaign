@@ -21,7 +21,6 @@ class Todo extends Component
 
     public $title;
     public $description;
-    public $images;
 
     protected $listeners = [
         'Deleted'
@@ -36,7 +35,6 @@ class Todo extends Component
         $data = $this->validate([
             'title' => 'required|min:3',
             'description' => 'nullable|string',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $data['user_id']=Auth::user()->id;
@@ -50,12 +48,12 @@ class Todo extends Component
             $this->resetPage();
             DB::commit();
 
-        $this->alert('success', 'To do Successfully!', ['position' => 'top-end']);
+        $this->alert('success', 'To do Successfully!', ['position' => 'bottom-end']);
 
         } catch (\Exception $e) {
             DB::rollBack();
 
-            $this->alert('error', $e->getMessage(), ['position' => 'top-end', 'timer' => 15000]);
+            $this->alert('error', $e->getMessage(), ['position' => 'bottom-end', 'timer' => 15000]);
 
         }
 
@@ -76,7 +74,7 @@ class Todo extends Component
 
         // Authorization check before proceeding
         if ($todo->user_id !== Auth::id()) {
-            $this->alert('error', 'Unauthorized action. This To-Do does not belong to you.', ['position' => 'top-end']);
+            $this->alert('error', 'Unauthorized action. This To-Do does not belong to you.', ['position' => 'bottom-end']);
             return;
         }
 
@@ -97,13 +95,13 @@ class Todo extends Component
 
             // Success alert
 
-            $this->alert('success', 'To do Successfully Updated!', ['position' => 'top-end']);
+            $this->alert('success', 'To do Successfully Updated!', ['position' => 'bottom-end']);
 
         } catch (\Exception $e) {
             DB::rollBack();
 
             // Error alert
-            $this->alert('error', $e->getMessage(), ['position' => 'top-end', 'timer' => 15000]);
+            $this->alert('error', $e->getMessage(), ['position' => 'bottom-end', 'timer' => 15000]);
 
         }
     }
@@ -137,7 +135,7 @@ class Todo extends Component
         ]);
 
         if ($validator->fails()) {
-            $this->alert('error', 'Invalid request.', ['position' => 'top-end']);
+            $this->alert('error', 'Invalid request.', ['position' => 'bottom-end']);
             return;
         }
 
@@ -149,7 +147,7 @@ class Todo extends Component
 
             // Authorization check
             if ($todo->user_id !== Auth::id()) {
-                $this->alert('error', 'Unauthorized action. This To-Do does not belong to you.', ['position' => 'top-end']);
+                $this->alert('error', 'Unauthorized action. This To-Do does not belong to you.', ['position' => 'bottom-end']);
                 return;
             }
 
@@ -159,12 +157,12 @@ class Todo extends Component
             DB::commit();
 
             // Success alert
-            $this->alert('success', 'To-Do successfully deleted', ['position' => 'top-end']);
+            $this->alert('success', 'To-Do successfully deleted', ['position' => 'bottom-end']);
         } catch (\Exception $e) {
             DB::rollBack();
 
             // Error alert
-            $this->alert('error', $e->getMessage(), ['position' => 'top-end', 'timer' => 15000]);
+            $this->alert('error', $e->getMessage(), ['position' => 'bottom-end', 'timer' => 15000]);
             }
         }
 
@@ -178,11 +176,11 @@ class Todo extends Component
             $todo->complated = !$todo->complated;
             $todo->save();
             DB::commit();
-            $this->alert('success', 'Successfully toggled!', ['position' => 'top-end']);
+            $this->alert('success', 'Successfully toggled!', ['position' => 'bottom-end']);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->alert('error', $e->getMessage(), ['position' => 'top-end', 'timer' => 15000]);
+            $this->alert('error', $e->getMessage(), ['position' => 'bottom-end', 'timer' => 15000]);
 
         }
     }
@@ -192,7 +190,7 @@ class Todo extends Component
 
     #[Computed()]
     public function list(){
-        return PlayGroundTodo::where('user_id', Auth::user()->id)->where('title', 'like', '%' . $this->search . '%')->with('images')->paginate(5);
+        return PlayGroundTodo::where('user_id', Auth::user()->id)->where('title', 'like', '%' . $this->search . '%')->paginate(5);
     }
 
 

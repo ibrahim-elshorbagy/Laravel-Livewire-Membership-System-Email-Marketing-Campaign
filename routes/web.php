@@ -15,4 +15,10 @@ Route::view('profile', 'profile')
 Route::view('play-ground', 'play-ground')->name('play-ground')
     ->middleware(['auth']);
 
+
+
+
+
+
 require __DIR__.'/auth.php';
+require __DIR__.'/admin.php';

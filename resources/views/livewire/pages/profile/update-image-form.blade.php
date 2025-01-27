@@ -21,7 +21,7 @@ new class extends Component
     public function updateImage(): void
     {
         $this->validate([
-            'image' => ['required', 'image'], // 5MB Max
+            'image' => ['required', 'image'],
         ]);
 
         $user = Auth::user();
@@ -70,8 +70,9 @@ new class extends Component
             <!-- File Input -->
             <div class="relative flex flex-col w-full max-w-sm gap-1 text-on-surface dark:text-on-surface-dark">
                 <label for="fileInput" class="w-fit pl-0.5 text-sm">Upload File</label>
-                <input id="fileInput" type="file" wire:model="image" accept="image/png,image/jpeg,image/webp"
-                    class="w-full max-w-md text-sm overflow-clip rounded-radius bg-surface-alt/50 file:mr-4 file:border-none file:bg-surface-alt file:px-4 file:py-2 file:font-medium file:text-on-surface-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-75 dark:bg-surface-dark-alt/50 dark:file:bg-surface-dark-alt dark:file:text-on-surface-dark-strong dark:focus-visible:outline-primary-dark" />
+                <x-primary-upload-button id="fileInput" type="file" wire:model="image" accept="image/png,image/jpeg,image/webp" />
+                {{-- <input id="fileInput" type="file" wire:model="image" accept="image/png,image/jpeg,image/webp"
+                    class="w-full max-w-md text-sm overflow-clip rounded-radius bg-surface-alt/50 file:mr-4 file:border-none file:bg-surface-alt file:px-4 file:py-2 file:font-medium file:text-on-surface-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-75 dark:bg-surface-dark-alt/50 dark:file:bg-surface-dark-alt dark:file:text-on-surface-dark-strong dark:focus-visible:outline-primary-dark" /> --}}
                 <x-input-error :messages="$errors->get('image')" class="mt-2" />
             </div>
 

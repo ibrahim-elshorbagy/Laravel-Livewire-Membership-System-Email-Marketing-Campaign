@@ -6,6 +6,7 @@ use App\Models\PlayGround\Todo;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,15 +15,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $userRole = Role::firstOrCreate(['name' => 'user']);
 
-        User::factory()->create([
+        User::factory(50)->create()->each(function ($user) use ($userRole) {
+            $user->assignRole($userRole);
+        });
+
+
+
+
+         $user = User::factory()->create([
             'first_name' => 'ibrahim',
             'last_name' => 'elshorbagy',
-            'username' => 'ibrahim',
+            'username' => 'a',
             'email' => 'a@a.a',
             'password' => bcrypt('a'),
+            'image_url'=>'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
         ]);
+        $user->assignRole($adminRole);
 
         Todo::create([
             'user_id' => 1,

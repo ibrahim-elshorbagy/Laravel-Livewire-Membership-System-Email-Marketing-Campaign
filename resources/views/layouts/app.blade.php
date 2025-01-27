@@ -94,6 +94,12 @@
                             <span>Dashboard</span>
                         </x-nav-link>
 
+                        @role('admin')
+                        <x-nav-link :active="request()->routeIs('admin.users')" href="{{ route('admin.users') }}" wire:navigate>
+                            <span>Users</span>
+                        </x-nav-link>
+                        @endrole
+
                         <x-nav-link :active="request()->routeIs('play-ground')" href="{{ route('play-ground') }}"
                             wire:navigate>
                             <i class="fa-solid fa-play fa-spin"></i>
@@ -180,6 +186,20 @@
     @livewireScripts
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <x-livewire-alert::scripts />
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: '{{ session('success') }}',
+                        toast: true,
+                        position: 'bottom-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        // timerProgressBar: true,
+                    });
+        </script>
+    @endif
 </body>
 
 </html>

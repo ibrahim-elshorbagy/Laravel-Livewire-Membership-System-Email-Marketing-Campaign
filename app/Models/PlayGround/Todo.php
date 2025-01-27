@@ -13,7 +13,4 @@ class Todo extends Model
     protected $guarded = ['id'];
 
 
-    public function images(){
-        return $this->hasMany(TodoImage::class);
-    }
 }

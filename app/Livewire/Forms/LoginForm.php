@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
+use App\Models\User;
 
 class LoginForm extends Form
 {
@@ -31,6 +32,30 @@ class LoginForm extends Form
         $this->ensureIsNotRateLimited();
 
         $field = filter_var($this->login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        // Find the user first
+        $user = User::where($field, $this->login)->withTrashed()->first();
+
+        // Check if user exists
+        if (!$user) {
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'form.login' => trans('auth.failed'),
+            ]);
+        }
+
+        // Check if user is soft deleted
+        if ($user->trashed()) {
+            throw ValidationException::withMessages([
+                'form.login' => __('This account has been deleted.'),
+            ]);
+        }
+
+        // Check if user is active
+        if (!$user->is_active) {
+            throw ValidationException::withMessages([
+                'form.login' => __('This account is not active.'),
+            ]);
+        }
 
         if (! Auth::attempt([
             $field => $this->login,

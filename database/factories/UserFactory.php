@@ -28,7 +28,7 @@ class UserFactory extends Factory
             'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'username' => fake()->unique()->userName(),
-            'image_url' => fake()->optional()->imageUrl(),
+            'image_url'=>'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
             'company' => fake()->optional()->company(),
             'country' => fake()->optional()->country(),
             'whatsapp' => fake()->optional()->phoneNumber(),
