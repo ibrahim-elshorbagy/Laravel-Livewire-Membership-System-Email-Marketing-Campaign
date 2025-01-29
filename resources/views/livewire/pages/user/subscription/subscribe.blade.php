@@ -138,7 +138,7 @@
                 `width=${width},height=${height},left=${left},top=${top}`
             );
         }
-    }" @payment-url.window="openPaymentWindow($event.detail.url)">
+    }" @paypalPayment.window="openPaymentWindow($event.detail.url)">
 
     @if($errors->any())
     <div class="p-4 mt-4 bg-red-100 rounded-md dark:bg-red-900/50">
@@ -151,5 +151,5 @@
     @endif
 </div>
 
- 
+
 

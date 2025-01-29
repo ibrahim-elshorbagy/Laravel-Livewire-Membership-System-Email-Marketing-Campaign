@@ -26,7 +26,7 @@ class Transaction extends Component
     public function getPaymentsProperty()
     {
         return Payment::where('user_id', $this->user->id)
-            ->when($this->selectedTab === 'completed', fn($query) => $query->where('status', 'completed'))
+            ->when($this->selectedTab === 'approved', fn($query) => $query->where('status', 'approved'))
             ->when($this->selectedTab === 'pending', fn($query) => $query->where('status', 'pending'))
             ->when($this->selectedTab === 'failed', fn($query) => $query->whereIn('status', ['failed', 'cancelled']))
             ->with(['plan', 'subscription'])

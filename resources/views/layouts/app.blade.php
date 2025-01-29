@@ -139,7 +139,9 @@
                         <x-nav-link :active="request()->routeIs('admin.users')" href="{{ route('admin.users') }}" wire:navigate>
                             <span>Users</span>
                         </x-nav-link>
-
+                        <x-nav-link :active="request()->routeIs('admin.subscripers')" href="{{ route('admin.subscripers') }}" wire:navigate>
+                            <span>Subscripers</span>
+                        </x-nav-link>
                         <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}" wire:navigate>
                             <span>Plans</span>
                         </x-nav-link>
@@ -149,7 +151,7 @@
                         </x-nav-link>
                         @endrole
 
-                        
+
                         {{-- <x-nav-link :active="request()->routeIs('play-ground')" href="{{ route('play-ground') }}"
                             wire:navigate>
                             <i class="fa-solid fa-play fa-spin"></i>

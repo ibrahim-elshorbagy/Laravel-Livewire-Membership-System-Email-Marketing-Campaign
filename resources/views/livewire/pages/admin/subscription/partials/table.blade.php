@@ -1,0 +1,121 @@
+@props([
+'items',
+'search',
+'searchPlaceholder' => 'Search...'
+])
+
+<div>
+    <!-- Search Box -->
+    <div class="flex items-center justify-between mb-4">
+        <div class="w-full">
+            <div class="relative">
+                <x-text-input wire:model.live.debounce.600ms="{{ $search }}" id="{{ $search }}" type="text"
+                    class="w-full py-2 pl-10 pr-20" placeholder="{{ $searchPlaceholder }}" />
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="text-gray-400 fas fa-search"></i>
+                </div>
+                @if($$search)
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <button wire:click="$set('{{ $search }}', '')" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
+        <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
+            <thead class="text-sm bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
+                <tr>
+                    <th class="p-4">Subscriber</th>
+                    <th class="p-4">Plan</th>
+                    <th class="p-4">Start Date</th>
+                    <th class="p-4">Expiration</th>
+                    <th class="p-4">Payment Status</th>
+                    <th class="p-4">Status</th>
+                    <th class="p-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
+                @foreach($items as $subscription)
+                @php
+                $subscriber = $subscription->subscriber;
+                $payment = $this->getSubscriptionPayment($subscription->id);
+                @endphp
+                <tr>
+                    <td class="p-4">
+                        <div class="flex items-center gap-2 w-max">
+                            <img class="object-cover rounded-full size-10"
+                                src="{{ $subscriber->image_url ?? 'default-avatar.png' }}"
+                                alt="{{ $subscriber->name }}" />
+                            <div class="flex flex-col">
+                                <span class="font-medium">{{ $subscriber->first_name }} {{ $subscriber->last_name
+                                    }}</span>
+                                <span class="text-sm text-neutral-500">{{ $subscriber->email }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+                            {{ $subscription->plan->name }}
+                        </span>
+                    </td>
+                    <td class="p-4">{{ $subscription->started_at->format('d/m/Y') }}</td>
+                    <td class="p-4">{{ $subscription->expired_at?->format('d/m/Y') }}</td>
+                    <td class="p-4">
+                        @if($payment)
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full
+                            @switch($payment->status)
+                                @case('approved') text-green-800 bg-green-100 @break
+                                @case('pending') text-yellow-800 bg-yellow-100 @break
+                                @case('failed') text-red-800 bg-red-100 @break
+                                @default text-gray-800 bg-gray-100
+                            @endswitch">
+                            {{ ucfirst($payment->status) }}
+                        </span>
+                        @else
+                        <span class="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full">
+                            No Payment
+                        </span>
+                        @endif
+                    </td>
+                    <td class="p-4">
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full
+                            @if($subscription->suppressed_at) text-purple-800 bg-purple-100
+                            @elseif($subscription->canceled_at) text-red-800 bg-red-100
+                            @elseif($subscription->expired_at?->isPast()) text-orange-800 bg-orange-100
+                            @else text-green-800 bg-green-100 @endif">
+                            @if($subscription->suppressed_at) Suppressed
+                            @elseif($subscription->canceled_at) Canceled
+                            @elseif($subscription->expired_at?->isPast()) Expired
+                            @else Active @endif
+                        </span>
+                    </td>
+                    <td class="p-4">
+                        <div class="flex space-x-2">
+                            <x-primary-info-button href="{{ route('admin.subscriptions.edit', $subscription) }}"
+                                wire:navigate>
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </x-primary-info-button>
+
+                            <x-primary-info-button
+                                onclick="confirm('Are you sure you want to impersonate this user?') || event.stopImmediatePropagation()"
+                                wire:click="impersonateUser({{ $subscriber->id }})">
+                                Login As
+                            </x-primary-info-button>
+                        </div>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-4">
+        {{ $items->links() }}
+    </div>
+</div>

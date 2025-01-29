@@ -40,8 +40,8 @@
 
     <script>
         setTimeout(function() {
-            window.close();
-        }, 20000);
+            window.location.href = "{{ route('welcome') }}";
+        }, 5000);
     </script>
 </body>
 

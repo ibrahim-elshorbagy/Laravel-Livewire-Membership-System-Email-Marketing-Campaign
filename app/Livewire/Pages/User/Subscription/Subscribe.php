@@ -61,12 +61,12 @@ class Subscribe extends Component
 
             DB::commit();
 
-
-            // return redirect()->away($approvalUrl);
             $this->paymentUrl = $approvalUrl;
             $this->alert('success', 'Opening PayPal...');
 
-            $this->dispatch('payment-url', url: $approvalUrl);
+            return redirect()->away($approvalUrl);
+
+            $this->dispatch('paypalPayment', url: $approvalUrl);
         } catch (\Exception $e) {
             DB::rollBack();
             $this->isProcessing = false;

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Payment\Payment;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -56,4 +57,10 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
         ];
     }
+
+    public function payments(){
+        return $this->hasMany(Payment::class);
+    }
+
+
 }

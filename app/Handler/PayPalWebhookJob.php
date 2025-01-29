@@ -127,8 +127,8 @@ class PayPalWebhookJob extends ProcessWebhookJob
                 // Update payment with capture details
                 $payment->update([
                     'subscription_id' => $subscription->id,
-                    'status' => 'completed',
-                    'paid' => true,
+                    'status' => 'approved',
+                    'server_status' => "Hold",
                     'transaction_id' =>  $resource['id'] ?? null,
                 ]);
 

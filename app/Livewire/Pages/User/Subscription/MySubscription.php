@@ -48,7 +48,7 @@ class MySubscription extends Component
             // Get the associated payment
             $payment = Payment::where('user_id', $this->user->id)
                 ->where('subscription_id', $subscription->id)
-                ->where('status', 'completed')
+                ->where('status', 'approved')
                 ->latest()
                 ->first();
 

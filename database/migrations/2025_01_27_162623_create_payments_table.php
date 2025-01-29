@@ -33,12 +33,12 @@ return new class extends Migration
             $table->string('currency')->default('USD');
             $table->enum('status', [
                 'pending',    // Payment initiated but not completed
-                'completed', // Payment successful On gateway
+                'approved', // Payment successful On gateway
                 'failed',    // Payment failed
-                'cancelled'  // Payment cancelled by user
+                'cancelled',  // Payment cancelled by user
+                'refunded'   // Refund initiated
             ])->default('pending');
 
-            $table->boolean('paid')->default(false);
             $table->timestamps();
         });
     }
