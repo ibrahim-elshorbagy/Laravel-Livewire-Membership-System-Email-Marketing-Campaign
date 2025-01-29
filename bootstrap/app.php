@@ -13,7 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
 
-
+            $middleware->validateCsrfTokens(except: [
+                '/paypal/webhook',
+            ]);
             $middleware->alias([
             'role' => RoleMiddleware::class,
 

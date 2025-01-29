@@ -5,13 +5,13 @@
         <!-- Tab buttons -->
         <div class="flex gap-2 mb-5 overflow-x-auto border-b border-neutral-300 dark:border-neutral-700" role="tablist">
             <button x-on:click="selectedTab = 'users'"
-                :class="selectedTab === 'users' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-300'"
+                :class="selectedTab === 'users' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">Users</button>
             <button x-on:click="selectedTab = 'admins'"
-                :class="selectedTab === 'admins' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-300'"
+                :class="selectedTab === 'admins' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">Admins</button>
             <button x-on:click="selectedTab = 'trashed'"
-                :class="selectedTab === 'trashed' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-300'"
+                :class="selectedTab === 'trashed' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">Deleted Users</button>
         </div>
 

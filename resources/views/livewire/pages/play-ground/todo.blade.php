@@ -19,10 +19,10 @@
     </header>
 
     <div
-        class="flex flex-col border rounded-md group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+        class="flex flex-col border group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
 
         {{-- Create Todo Form --}}
-        <div class="w-1/2 p-6 mx-auto">
+        <div class="p-6 md:w-1/2 md:mx-auto">
             <form class="space-y-6">
                 <div class="grid gap-6 mx-auto">
                     {{-- Title Input --}}

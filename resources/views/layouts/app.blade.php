@@ -42,13 +42,44 @@
             </a>
 
             <div class="flex flex-col gap-2 pb-3 overflow-y-auto">
-                <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}" wire:navigate>
-                    <i class="fas fa-th-large"></i>
-                    <span>Dashboard</span>
-                </x-nav-link>
+                        {{-- <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}" wire:navigate>
+                            <i class="fas fa-th-large"></i>
+                            <span>Dashboard</span>
+                        </x-nav-link> --}}
+                        @role('user')
+                        <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}" wire:navigate>
+                            <span>Plans</span>
+                        </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.my-subscription')" href="{{ route('user.my-subscription') }}">
+                            <span>My Subscription</span>
+                        </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.my-transactions')" href="{{ route('user.my-transactions') }}"
+                            wire:navigate>
+                            <span>My Transactions</span>
+                        </x-nav-link>
+                        @endrole
+                        @role('admin')
+                        <x-nav-link :active="request()->routeIs('admin.users')" href="{{ route('admin.users') }}" wire:navigate>
+                            <span>Users</span>
+                        </x-nav-link>
+
+                        <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}" wire:navigate>
+                            <span>Plans</span>
+                        </x-nav-link>
+
+                        <x-nav-link :active="request()->routeIs('admin.payment.paypal')" href="{{ route('admin.payment.paypal') }}"
+                            wire:navigate>
+                            <span>Payment Settings</span>
+                        </x-nav-link>
+                        @endrole
+
+                        {{-- <x-nav-link :active="request()->routeIs('play-ground')" href="{{ route('play-ground') }}" wire:navigate>
+                            <i class="fa-solid fa-play fa-spin"></i>
+                            <span>To Do</span>
+                        </x-nav-link> --}}
             </div>
 
-            @persist('sidebar')
+            {{-- @persist('sidebar')
             <div x-data="{ isExpanded: false }" class="flex flex-col">
                 <button type="button" x-on:click="isExpanded = ! isExpanded"
                     class="flex items-center justify-between rounded-md gap-2 px-2 py-1.5 text-sm font-medium underline-offset-2 focus:outline-none focus-visible:underline"
@@ -68,7 +99,7 @@
                     </li>
                 </ul>
             </div>
-            @endpersist('sidebar')
+            @endpersist('sidebar') --}}
         </nav>
 
         <!-- Main content area -->
@@ -88,12 +119,22 @@
                     <!-- Desktop navigation -->
                     <div class="items-center hidden gap-4 md:flex ">
 
-                        <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
+                        {{-- <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
                             wire:navigate>
                             <i class="fas fa-th-large"></i>
                             <span>Dashboard</span>
+                        </x-nav-link> --}}
+                        @role('user')
+                        <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}" wire:navigate>
+                            <span>Plans</span>
                         </x-nav-link>
-
+                        <x-nav-link :active="request()->routeIs('user.my-subscription')" href="{{ route('user.my-subscription') }}"  >
+                            <span>My Subscription</span>
+                        </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.my-transactions')" href="{{ route('user.my-transactions') }}" wire:navigate>
+                                <span>My Transactions</span>
+                        </x-nav-link>
+                        @endrole
                         @role('admin')
                         <x-nav-link :active="request()->routeIs('admin.users')" href="{{ route('admin.users') }}" wire:navigate>
                             <span>Users</span>
@@ -102,13 +143,18 @@
                         <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}" wire:navigate>
                             <span>Plans</span>
                         </x-nav-link>
+
+                        <x-nav-link :active="request()->routeIs('admin.payment.paypal')" href="{{ route('admin.payment.paypal') }}" wire:navigate>
+                            <span>Payment Settings</span>
+                        </x-nav-link>
                         @endrole
 
-                        <x-nav-link :active="request()->routeIs('play-ground')" href="{{ route('play-ground') }}"
+                        
+                        {{-- <x-nav-link :active="request()->routeIs('play-ground')" href="{{ route('play-ground') }}"
                             wire:navigate>
                             <i class="fa-solid fa-play fa-spin"></i>
                             <span>To Do</span>
-                        </x-nav-link>
+                        </x-nav-link> --}}
 
                     </div>
 

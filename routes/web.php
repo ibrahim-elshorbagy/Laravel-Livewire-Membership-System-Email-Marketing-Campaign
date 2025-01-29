@@ -17,8 +17,11 @@ Route::view('play-ground', 'play-ground')->name('play-ground')
 
 
 
-
+Route::get('/payment/close', function () {
+    return view('payment.close');
+})->name('payment.close');
 
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
+require __DIR__.'/user.php';

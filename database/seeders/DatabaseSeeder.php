@@ -6,6 +6,7 @@ use App\Models\PlayGround\Todo;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use LucasDotVin\Soulbscription\Models\Plan;
 use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
@@ -36,6 +37,19 @@ class DatabaseSeeder extends Seeder
             'active' => true
         ]);
         $user->assignRole($adminRole);
+
+        $user = User::factory()->create([
+            'first_name' => 'ahmed',
+            'last_name' => 'ahmed',
+            'username' => 'u',
+            'email' => 'u@u.u',
+            'password' => bcrypt('u'),
+            'image_url'=>'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+            'active' => true
+        ]);
+        $user->assignRole($userRole);
+        // $user->subscribeTo(Plan::find(1));
+
 
         Todo::create([
             'user_id' => 1,
