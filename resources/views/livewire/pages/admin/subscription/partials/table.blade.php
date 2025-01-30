@@ -99,7 +99,9 @@
                                 wire:navigate>
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </x-primary-info-button>
-
+                            <x-primary-info-button href="{{ route('admin.users.transactions', $subscriber) }}" wire:navigate>
+                                Transactions
+                            </x-primary-info-button>
                             <x-primary-info-button
                                 onclick="confirm('Are you sure you want to impersonate this user?') || event.stopImmediatePropagation()"
                                 wire:click="impersonateUser({{ $subscriber->id }})">

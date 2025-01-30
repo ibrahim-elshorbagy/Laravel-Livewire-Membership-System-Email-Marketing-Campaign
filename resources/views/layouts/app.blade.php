@@ -155,6 +155,10 @@
                         <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}" wire:navigate>
                             <span>Plans</span>
                         </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('admin.payment.transactions')" href="{{ route('admin.payment.transactions') }}"
+                            wire:navigate>
+                            <span>Transactions</span>
+                        </x-nav-link>
 
                         <!-- Dropdown menu -->
                         <x-primary-dropdown label="Settings">

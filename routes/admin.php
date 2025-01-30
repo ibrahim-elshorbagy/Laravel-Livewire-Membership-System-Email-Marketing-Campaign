@@ -8,6 +8,9 @@ use App\Livewire\Pages\Admin\Plans\PlanManagement\Edit as PlanManagementEdit;
 use App\Livewire\Pages\Admin\SiteSettings\SiteSettings;
 use App\Livewire\Pages\Admin\Subscription\Subscripers;
 use App\Livewire\Pages\Admin\Subscription\Subscripers\EditSubscription;
+use App\Livewire\Pages\Admin\Transactions\EditPayment;
+use App\Livewire\Pages\Admin\Transactions\Transactions;
+use App\Livewire\Pages\Admin\Transactions\User\UserTransactions;
 use App\Livewire\Pages\Admin\User\UserManagement;
 use App\Livewire\Pages\Admin\User\UserManagement\Create;
 use App\Livewire\Pages\Admin\User\UserManagement\Edit;
@@ -37,6 +40,11 @@ use Livewire\Volt\Volt;
 
         // Payment Settings
         Route::get('/payment/paypal', PaypalConfig::class)->name('admin.payment.paypal');
+
+        Route::get('/transactions', Transactions::class)->name('admin.payment.transactions');
+        Route::get('/transactions/{payment}/edit',EditPayment::class)->name('admin.transactions.edit');
+        Route::get('/users/{user}/transactions', UserTransactions::class)->name('admin.users.transactions');
+
 
     });
 

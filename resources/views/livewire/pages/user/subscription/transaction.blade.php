@@ -22,6 +22,10 @@
                 :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'pending', 'text-neutral-600 dark:text-neutral-400': selectedTab !== 'pending'}"
                 class="px-4 py-2 text-sm h-min" role="tab">Pending</button>
 
+            <button wire:click="$set('selectedTab', 'refunded')"
+                :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'refunded', 'text-neutral-600 dark:text-neutral-400': selectedTab !== 'refunded'}"
+                class="px-4 py-2 text-sm h-min" role="tab">Refunded</button>
+
             <button wire:click="$set('selectedTab', 'failed')"
                 :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'failed', 'text-neutral-600 dark:text-neutral-400': selectedTab !== 'failed'}"
                 class="px-4 py-2 text-sm h-min" role="tab">Failed/Cancelled</button>

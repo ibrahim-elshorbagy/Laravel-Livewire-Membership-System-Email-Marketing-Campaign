@@ -111,7 +111,9 @@
                                 Unblock
                             </x-primary-create-button>
                             @endif
-
+                            <x-primary-info-button href="{{ route('admin.users.transactions', $user) }}" wire:navigate>
+                                Transactions
+                            </x-primary-info-button>
                             <x-primary-danger-button wire:click="deleteUser({{ $user->id }})"
                                 onclick="confirm('Are you sure you want to delete this user?') || event.stopImmediatePropagation()">
                                 <i class="fa-solid fa-trash"></i>
