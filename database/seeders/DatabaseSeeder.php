@@ -21,9 +21,9 @@ class DatabaseSeeder extends Seeder
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $userRole = Role::firstOrCreate(['name' => 'user']);
 
-        User::factory(50)->create()->each(function ($user) use ($userRole) {
-            $user->assignRole($userRole);
-        });
+        // User::factory(50)->create()->each(function ($user) use ($userRole) {
+        //     $user->assignRole($userRole);
+        // });
 
 
 
@@ -51,6 +51,6 @@ class DatabaseSeeder extends Seeder
         $user->assignRole($userRole);
         // $user->subscribeTo(Plan::find(1));
 
- 
+
     }
 }

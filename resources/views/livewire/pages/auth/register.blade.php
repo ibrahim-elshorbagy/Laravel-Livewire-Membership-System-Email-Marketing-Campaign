@@ -34,6 +34,7 @@ new #[Layout('layouts.app')] class extends Component
             $validated['image_url'] = 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
 
             $user = User::create($validated);
+            $user->assignRole('user');
 
             Auth::login($user);
 

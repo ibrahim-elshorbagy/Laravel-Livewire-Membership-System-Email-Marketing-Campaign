@@ -22,8 +22,13 @@ class Subscribe extends Component
     protected $rules = [
         'selectedPlan' => 'required|exists:plans,id',
     ];
-    protected $listeners = ['proceedWithPayment','cancelPayment',];
-
+    public function hydrate()
+    {
+        $this->listeners = [
+            'proceedWithPayment' => 'proceedWithPayment',
+            'cancelPayment' => 'cancelPayment',
+        ];
+    }
     public function updatedSelectedPlan($value)
     {
         $this->validateOnly('selectedPlan');
@@ -41,7 +46,7 @@ class Subscribe extends Component
             $lastSubscription = $user->lastSubscription();
 
             // Confirm subscription replacement
-           $this->alert('warning', 'Active Subscription', [
+            $this->alert('warning', 'Active Subscription', [
                 'text' => 'You currently have an active subscription. Do you want to replace it with the new plan?',
                 'showConfirmButton' => true,
                 'confirmButtonText' => 'Replace Subscription',

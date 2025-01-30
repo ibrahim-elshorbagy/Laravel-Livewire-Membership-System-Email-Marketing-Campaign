@@ -117,11 +117,11 @@
     <!-- Payment Button -->
     @if($selectedPlan)
     <div class="flex justify-center mt-8">
-        <button wire:click="initiatePayment" wire:loading.attr="disabled"
-            class="px-6 py-3 text-sm font-semibold text-white transition bg-black rounded-lg hover:bg-black/80 dark:bg-orange-500 dark:text-black dark:hover:bg-orange-600">
-            <span wire:loading.remove>Proceed to Payment</span>
-            <span wire:loading>Processing...</span>
-        </button>
+            <button wire:click="initiatePayment" wire:loading.attr="disabled"
+                class="px-6 py-3 text-sm font-semibold text-white transition bg-black rounded-lg hover:bg-black/80 dark:bg-orange-500 dark:text-black dark:hover:bg-orange-600">
+                <span wire:loading.remove>Proceed to Payment</span>
+                <span wire:loading>Processing...</span>
+            </button>
     </div>
     @endif
 

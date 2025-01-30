@@ -117,7 +117,7 @@
                 <div class="container flex items-center justify-between mx-3 h-14">
                     <!-- Site name + Logo -->
                     <div class="flex items-center gap-4">
-                        <a href="{{ route('welcome') }}" class="w-12 text-neutral-600 dark:text-neutral-300"
+                        <a href="{{ route('welcome') }}" class="w-24 text-neutral-600 dark:text-neutral-300"
                             wire:navigate>
                             <x-application-logo />
                         </a>
@@ -175,7 +175,7 @@
                         </x-primary-dropdown>
                         @endrole
 
- 
+
                     </div>
 
                     <!-- Right section -->
