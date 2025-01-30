@@ -12,8 +12,7 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
-Route::view('play-ground', 'play-ground')->name('play-ground')
-    ->middleware(['auth']);
+
 
 
 

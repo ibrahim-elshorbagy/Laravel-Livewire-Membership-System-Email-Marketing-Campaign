@@ -8,14 +8,8 @@
             </div>
 
             <p class="mt-2 text-sm text-pretty">
-                Simply put, this software transformed my workflow! Its intuitive
-                interface and powerful features make tasks a breeze. A game-changer
-                for productivity!
+                Test
             </p>
-
-
-
-
 
         </div>
 </x-app-layout>

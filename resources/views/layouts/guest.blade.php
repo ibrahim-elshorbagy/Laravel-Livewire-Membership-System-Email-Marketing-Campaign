@@ -60,9 +60,9 @@
 
                 <ul x-cloak x-collapse x-show="isExpanded">
                     <li class="px-1 py-0.5 first:mt-2">
-                        <x-nav-link href="{{ route('play-ground') }}" wire:navigate>
+                        <x-nav-link href="{{ route('welcome') }}" wire:navigate>
                             <i class="fa-solid fa-play fa-spin"></i>
-                            <span>To Do</span>
+                            <span>welcome</span>
                         </x-nav-link>
                     </li>
                 </ul>
@@ -90,11 +90,6 @@
                         <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}" wire:navigate>
                             <i class="fas fa-th-large"></i>
                             <span>Dashboard</span>
-                        </x-nav-link>
-
-                        <x-nav-link :active="request()->routeIs('play-ground')" href="{{ route('play-ground') }}" wire:navigate>
-                            <i class="fa-solid fa-play fa-spin"></i>
-                            <span>To Do</span>
                         </x-nav-link>
 
                         {{-- <div x-data="{ isExpanded: false }" class="relative">

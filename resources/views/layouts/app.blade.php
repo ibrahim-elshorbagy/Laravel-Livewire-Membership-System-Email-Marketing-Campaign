@@ -66,15 +66,16 @@
                         <x-nav-link :active="request()->routeIs('admin.subscriptions')" href="{{ route('admin.subscriptions') }}" wire:navigate>
                             <span>Subscriptions</span>
                         </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('admin.payment.transactions')" href="{{ route('admin.payment.transactions') }}"
+                            wire:navigate>
+                            <span>Transactions</span>
+                        </x-nav-link>
                         <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}" wire:navigate>
                             <span>Plans</span>
                         </x-nav-link>
 
                         @endrole
-                        {{-- <x-nav-link :active="request()->routeIs('play-ground')" href="{{ route('play-ground') }}" wire:navigate>
-                            <i class="fa-solid fa-play fa-spin"></i>
-                            <span>To Do</span>
-                        </x-nav-link> --}}
+
             </div>
 
             @role('admin')
@@ -152,12 +153,12 @@
                         <x-nav-link :active="request()->routeIs('admin.subscriptions')" href="{{ route('admin.subscriptions') }}" wire:navigate>
                             <span>Subscriptions</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}" wire:navigate>
-                            <span>Plans</span>
-                        </x-nav-link>
                         <x-nav-link :active="request()->routeIs('admin.payment.transactions')" href="{{ route('admin.payment.transactions') }}"
                             wire:navigate>
                             <span>Transactions</span>
+                        </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}" wire:navigate>
+                            <span>Plans</span>
                         </x-nav-link>
 
                         <!-- Dropdown menu -->
@@ -174,13 +175,7 @@
                         </x-primary-dropdown>
                         @endrole
 
-
-                        {{-- <x-nav-link :active="request()->routeIs('play-ground')" href="{{ route('play-ground') }}"
-                            wire:navigate>
-                            <i class="fa-solid fa-play fa-spin"></i>
-                            <span>To Do</span>
-                        </x-nav-link> --}}
-
+ 
                     </div>
 
                     <!-- Right section -->
