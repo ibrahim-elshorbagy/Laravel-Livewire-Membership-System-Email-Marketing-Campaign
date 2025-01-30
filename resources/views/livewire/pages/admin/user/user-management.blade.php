@@ -1,5 +1,5 @@
 <div
-    class="flex flex-col p-6 border rounded-md group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+    class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <!-- Tabs -->
     <div x-data="{ selectedTab: @entangle('selectedTab') }" class="w-full">
         <!-- Tab buttons -->

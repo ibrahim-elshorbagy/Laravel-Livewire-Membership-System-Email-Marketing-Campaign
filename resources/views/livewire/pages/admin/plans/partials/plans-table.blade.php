@@ -33,17 +33,16 @@
                     ${{ number_format($plan->price, 2) }}
                 </td>
                 <td class="p-4">
-                    <div class="space-y-1">
+                    <div class="space-y-1 text-nowrap">
                         @foreach($plan->features as $feature)
                         <div class="flex items-center gap-2">
                             <span class="text-green-500">
                                 <i class="fas fa-check"></i>
                             </span>
-                            <span>
+                            <span class="">
                                 {{ $feature->name }}
                                 @if($feature->pivot->charges)
-                                ({{ $feature->pivot->charges }} {{ Str::plural($feature->name, $feature->pivot->charges)
-                                }})
+                                ( {{ (int)$feature->pivot->charges }} Limit)
                                 @endif
                             </span>
                         </div>

@@ -7,9 +7,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
+    <link href="{{ $globalSettings['favicon'] }}" rel="icon">
     <title>{{ config('app.name', 'LivewireSaaS') }}</title>
-
+    <meta name="description" content="{{ $globalSettings['meta_description'] }}">
+    <meta name="keywords" content="{{ $globalSettings['meta_keywords'] }}">
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -62,44 +63,49 @@
                         <x-nav-link :active="request()->routeIs('admin.users')" href="{{ route('admin.users') }}" wire:navigate>
                             <span>Users</span>
                         </x-nav-link>
-
+                        <x-nav-link :active="request()->routeIs('admin.subscriptions')" href="{{ route('admin.subscriptions') }}" wire:navigate>
+                            <span>Subscriptions</span>
+                        </x-nav-link>
                         <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}" wire:navigate>
                             <span>Plans</span>
                         </x-nav-link>
 
-                        <x-nav-link :active="request()->routeIs('admin.payment.paypal')" href="{{ route('admin.payment.paypal') }}"
-                            wire:navigate>
-                            <span>Payment Settings</span>
-                        </x-nav-link>
                         @endrole
-
                         {{-- <x-nav-link :active="request()->routeIs('play-ground')" href="{{ route('play-ground') }}" wire:navigate>
                             <i class="fa-solid fa-play fa-spin"></i>
                             <span>To Do</span>
                         </x-nav-link> --}}
             </div>
 
-            {{-- @persist('sidebar')
-            <div x-data="{ isExpanded: false }" class="flex flex-col">
-                <button type="button" x-on:click="isExpanded = ! isExpanded"
-                    class="flex items-center justify-between rounded-md gap-2 px-2 py-1.5 text-sm font-medium underline-offset-2 focus:outline-none focus-visible:underline"
-                    x-bind:class="isExpanded ? 'text-neutral-900 bg-black/10 dark:text-white dark:bg-white/10' :  'text-neutral-600 hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/5'">
-                    <i class="fa-solid fa-user"></i>
-                    <span class="mr-auto text-left">Productivity</span>
-                    <i class="transition-transform fa-solid fa-angle-up"
-                        x-bind:class="isExpanded ? 'rotate-0' : 'rotate-180'" aria-hidden="true"></i>
-                </button>
+            @role('admin')
+                @persist('sidebar')
+                <div x-data="{ isExpanded: false }" class="flex flex-col">
+                    <button type="button" x-on:click="isExpanded = ! isExpanded"
+                        class="flex items-center justify-between rounded-md gap-2 px-2 py-1.5 text-sm font-medium underline-offset-2 focus:outline-none focus-visible:underline"
+                        x-bind:class="isExpanded ? 'text-neutral-900 bg-black/10 dark:text-white dark:bg-white/10' :  'text-neutral-600 hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/5'">
+                        <i class="fa-solid fa-user"></i>
+                        <span class="mr-auto text-left">Settings</span>
+                        <i class="transition-transform fa-solid fa-angle-up"
+                            x-bind:class="isExpanded ? 'rotate-0' : 'rotate-180'" aria-hidden="true"></i>
+                    </button>
 
-                <ul x-cloak x-collapse x-show="isExpanded">
-                    <li class="px-1 py-0.5 first:mt-2">
-                        <x-nav-link href="{{ route('play-ground') }}" wire:navigate>
-                            <i class="fa-solid fa-play fa-spin"></i>
-                            <span>To Do</span>
-                        </x-nav-link>
-                    </li>
-                </ul>
-            </div>
-            @endpersist('sidebar') --}}
+                    <ul x-cloak x-collapse x-show="isExpanded">
+                        <li class="px-1 py-0.5 first:mt-2">
+                            <x-nav-link :active="request()->routeIs('admin.payment.paypal')" href="{{ route('admin.payment.paypal') }}"
+                                wire:navigate>
+                                <span>Payment Settings</span>
+                            </x-nav-link>
+                        </li>
+                        <li class="px-1 py-0.5">
+                            <x-nav-link :active="request()->routeIs('admin.site-settings')" href="{{ route('admin.site-settings') }}"
+                                wire:navigate>
+                                <span>Site Settings</span>
+                            </x-nav-link>
+                        </li>
+                    </ul>
+                </div>
+                @endpersist('sidebar')
+            @endrole
         </nav>
 
         <!-- Main content area -->
@@ -135,20 +141,33 @@
                                 <span>My Transactions</span>
                         </x-nav-link>
                         @endrole
+
+
+
+
                         @role('admin')
                         <x-nav-link :active="request()->routeIs('admin.users')" href="{{ route('admin.users') }}" wire:navigate>
                             <span>Users</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('admin.subscripers')" href="{{ route('admin.subscripers') }}" wire:navigate>
-                            <span>Subscripers</span>
+                        <x-nav-link :active="request()->routeIs('admin.subscriptions')" href="{{ route('admin.subscriptions') }}" wire:navigate>
+                            <span>Subscriptions</span>
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}" wire:navigate>
                             <span>Plans</span>
                         </x-nav-link>
 
-                        <x-nav-link :active="request()->routeIs('admin.payment.paypal')" href="{{ route('admin.payment.paypal') }}" wire:navigate>
-                            <span>Payment Settings</span>
-                        </x-nav-link>
+                        <!-- Dropdown menu -->
+                        <x-primary-dropdown label="Settings">
+                            <x-nav-link :active="request()->routeIs('admin.payment.paypal')" href="{{ route('admin.payment.paypal') }}"
+                                wire:navigate>
+                                <span>Payment Settings</span>
+                            </x-nav-link>
+
+                            <x-nav-link :active="request()->routeIs('admin.site-settings')" href="{{ route('admin.site-settings') }}"
+                                wire:navigate>
+                                <span>Site Settings</span>
+                            </x-nav-link>
+                        </x-primary-dropdown>
                         @endrole
 
 
@@ -163,12 +182,6 @@
                     <!-- Right section -->
                     <div class="flex items-center gap-2">
 
-                        <!-- Mobile menu button  -->
-                        <button x-on:click="sidebarIsOpen = true"
-                            class="md:hidden text-neutral-600 dark:text-neutral-300">
-                            <i class="fas fa-bars"></i>
-                            <span class="sr-only">Open sidebar</span>
-                        </button>
 
                         <x-theme-toggle />
 
@@ -219,6 +232,12 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Mobile menu button  -->
+                    <button x-on:click="sidebarIsOpen = true" class="md:hidden text-neutral-600 dark:text-neutral-300">
+                        <i class="fas fa-bars"></i>
+                        <span class="sr-only">Open sidebar</span>
+                    </button>
                 </div>
             </nav>
 
@@ -230,7 +249,9 @@
             <!-- Footer -->
             <footer
                 class="py-3 text-center border-t border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300">
-                GeMailAPP Co.Ltd. &copy; 2025<br> All rights reserved.
+                {{ $globalSettings['site_name'] }} Co.Ltd. &copy; 2025<br>
+                <a href="mailto:{{ $globalSettings['support_email'] }}" class="hover:underline">{{ $globalSettings['support_email'] }}</a> <br>
+                {{ $globalSettings['support_phone'] }}
             </footer>
         </div>
     </div>
@@ -252,6 +273,16 @@
                     });
         </script>
     @endif
+
+    <script type="application/ld+json">
+        {
+            "@context": "http://schema.org",
+            "@type": "Organization",
+            "name": "GeMailAPP-user",
+            "logo": "images/default-logo.png"
+        }
+    </script>
 </body>
+
 
 </html>

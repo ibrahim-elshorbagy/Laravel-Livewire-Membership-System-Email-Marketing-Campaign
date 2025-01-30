@@ -57,7 +57,7 @@
                                 src="{{ $user->image_url ?? 'default-avatar.png' }}" alt="{{ $user->full_name }}" />
                             <div class="flex flex-col">
                                 <span class="text-neutral-900 dark:text-neutral-100">
-                                    {{ $user->first_name }} {{ $user->last_name }}
+                                    {{ $user->first_name }} {{ $user->last_name }} - ( {{ $user->username }} )
                                 </span>
                                 <span class="text-sm text-neutral-600 opacity-85 dark:text-neutral-400">
                                     {{ $user->email }}

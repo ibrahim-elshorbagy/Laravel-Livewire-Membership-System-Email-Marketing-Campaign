@@ -169,9 +169,9 @@ public function cancelSubscription()
             'suppressed_at' => null,
             'server_status' => 'hold',
         ]);
-        $this->alert('success', 'Subscription cancelled successfully.');
+        $this->alert('success', 'Subscription cancelled successfully.', ['position' => 'bottom-end']);
     } catch (\Exception $e) {
-        $this->alert('error', 'Failed to cancel subscription.');
+        $this->alert('error', 'Failed to cancel subscription.', ['position' => 'bottom-end']);
     }
 }
 
@@ -179,9 +179,9 @@ public function cancelSubscription()
     {
         try {
             $this->subscription->suppress();
-            $this->alert('success', 'Subscription suppressed successfully.');
+            $this->alert('success', 'Subscription suppressed successfully.', ['position' => 'bottom-end']);
         } catch (\Exception $e) {
-            $this->alert('error', 'Failed to suppress subscription.');
+            $this->alert('error', 'Failed to suppress subscription.', ['position' => 'bottom-end']);
         }
     }
 
@@ -192,9 +192,9 @@ public function cancelSubscription()
                 'suppressed_at' => null,
                 'canceled_at' => null,
             ]);
-            $this->alert('success', 'Subscription reactivated successfully.');
+            $this->alert('success', 'Subscription reactivated successfully.', ['position' => 'bottom-end']);
         } catch (\Exception $e) {
-            $this->alert('error', 'Failed to reactivate subscription.');
+            $this->alert('error', 'Failed to reactivate subscription.', ['position' => 'bottom-end']);
         }
     }
 

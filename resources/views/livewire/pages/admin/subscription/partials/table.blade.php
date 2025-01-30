@@ -52,14 +52,13 @@
                                 src="{{ $subscriber->image_url ?? 'default-avatar.png' }}"
                                 alt="{{ $subscriber->name }}" />
                             <div class="flex flex-col">
-                                <span class="font-medium">{{ $subscriber->first_name }} {{ $subscriber->last_name
-                                    }}</span>
+                                <span class="font-medium">{{ $subscriber->first_name }} {{ $subscriber->last_name}} - ( {{ $subscriber->username }} )</span>
                                 <span class="text-sm text-neutral-500">{{ $subscriber->email }}</span>
                             </div>
                         </div>
                     </td>
                     <td class="p-4">
-                        <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+                        <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full text-nowrap">
                             {{ $subscription->plan->name }}
                         </span>
                     </td>
