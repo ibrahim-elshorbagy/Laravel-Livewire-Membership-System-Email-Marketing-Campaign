@@ -120,6 +120,9 @@ class PayPalWebhookJob extends ProcessWebhookJob
                 return;
             }
 
+            if ($payment->user->lastSubscription()) {
+                $payment->user->lastSubscription()->suppress();
+            }
             DB::transaction(function () use ($payment, $resource) {
                 // Create subscription
                 $subscription = $payment->user->subscribeTo($payment->plan);

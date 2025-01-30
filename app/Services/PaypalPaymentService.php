@@ -116,7 +116,7 @@ trait PaypalPaymentService
                     'shipping_preference' => 'NO_SHIPPING',
                     'user_action' => 'PAY_NOW',
                     'return_url' => route('payment.close'),
-                    'cancel_url' => route('payment.close')
+                    'cancel_url' => route('welcome')
                 ]
             ];
 

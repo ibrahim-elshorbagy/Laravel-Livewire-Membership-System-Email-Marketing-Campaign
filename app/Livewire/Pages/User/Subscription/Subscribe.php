@@ -8,6 +8,7 @@ use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use LucasDotVin\Soulbscription\Models\Plan;
+use LucasDotVin\Soulbscription\Models\Subscriber;
 
 class Subscribe extends Component
 {
@@ -21,16 +22,57 @@ class Subscribe extends Component
     protected $rules = [
         'selectedPlan' => 'required|exists:plans,id',
     ];
-
-
+    protected $listeners = ['proceedWithPayment','cancelPayment',];
 
     public function updatedSelectedPlan($value)
     {
         $this->validateOnly('selectedPlan');
     }
+
     public function initiatePayment()
     {
         $this->validate();
+
+        $user = auth()->user();
+
+
+        // Check if user has an active subscription
+        if ($user && $user->lastSubscription()) {
+            $lastSubscription = $user->lastSubscription();
+
+            // Confirm subscription replacement
+           $this->alert('warning', 'Active Subscription', [
+                'text' => 'You currently have an active subscription. Do you want to replace it with the new plan?',
+                'showConfirmButton' => true,
+                'confirmButtonText' => 'Replace Subscription',
+                'confirmButtonColor' => 'bg-blue-600 hover:bg-blue-700',
+                'showCancelButton' => true,
+                'cancelButtonText' => 'Keep Current Plan',
+                'cancelButtonColor' => 'bg-red-500 hover:bg-red-600',
+                'onConfirmed' => 'proceedWithPayment',
+                'onDismissed' => 'cancelPayment',
+                'position' => 'center',
+                'allowOutsideClick' => false,
+                'timer' => null,
+                'customClass' => [
+                    'popup' => 'rounded-xl shadow-2xl border border-gray-200',
+                    'title' => 'text-2xl font-bold text-gray-800',
+                    'content' => 'text-base text-gray-600',
+                    'confirmButton' => 'px-4 py-2 rounded-lg text-white font-semibold transition-colors',
+                    'cancelButton' => 'px-4 py-2 rounded-lg text-white font-semibold transition-colors'
+                ],
+                'width' => '500px',
+            ]);
+
+            return;
+        }
+
+        // If no active subscription, proceed directly
+        $this->proceedWithPayment();
+    }
+
+    public function proceedWithPayment()
+    {
         $this->isProcessing = true;
 
         try {
@@ -53,7 +95,7 @@ class Subscribe extends Component
             ]);
 
             // Create PayPal subscription and get approval URL
-            $approvalUrl = $this->createPayPalPayment($user,$plan,$payment);
+            $approvalUrl = $this->createPayPalPayment($user, $plan, $payment);
 
             if (!$approvalUrl) {
                 throw new \Exception('PayPal approval URL not found');
@@ -65,13 +107,18 @@ class Subscribe extends Component
             $this->alert('success', 'Opening PayPal...');
 
             return redirect()->away($approvalUrl);
-
-            $this->dispatch('paypalPayment', url: $approvalUrl);
         } catch (\Exception $e) {
             DB::rollBack();
             $this->isProcessing = false;
             $this->alert('error', 'Failed to initiate payment: ' . $e->getMessage());
         }
+    }
+
+    public function cancelPayment()
+    {
+        $this->isProcessing = false;
+        $this->selectedPlan = null;
+        $this->alert('info', 'Subscription upgrade cancelled.');
     }
 
     public function render()
