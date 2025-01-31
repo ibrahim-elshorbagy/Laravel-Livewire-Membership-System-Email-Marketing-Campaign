@@ -206,6 +206,6 @@ class SiteSettings extends Component
     public function render()
     {
         return view('livewire.pages.admin.site-settings.site-settings')
-            ->layout('layouts.app');
+            ->layout('layouts.app',['title' => 'Site Settings']);
     }
 }

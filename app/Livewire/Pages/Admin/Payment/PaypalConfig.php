@@ -78,6 +78,6 @@ class PaypalConfig extends Component
 
     public function render()
     {
-        return view('livewire.pages.admin.payment.paypal-config')->layout('layouts.app');
+        return view('livewire.pages.admin.payment.paypal-config')->layout('layouts.app',['title' => 'Payment Configuration']);
     }
 }

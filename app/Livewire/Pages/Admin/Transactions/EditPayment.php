@@ -82,6 +82,6 @@ class EditPayment extends Component
     public function render()
     {
         return view('livewire.pages.admin.transactions.edit-payment')
-            ->layout('layouts.app');
+            ->layout('layouts.app',['title' => 'Edit Payment']);
     }
 }

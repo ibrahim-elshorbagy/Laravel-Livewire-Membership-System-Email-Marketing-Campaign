@@ -71,6 +71,6 @@ class MySubscription extends Component
 
     public function render()
     {
-        return view('livewire.pages.user.subscription.my-subscription')->layout('layouts.app');
+        return view('livewire.pages.user.subscription.my-subscription')->layout('layouts.app',['title' => 'My Subscription']);
     }
 }

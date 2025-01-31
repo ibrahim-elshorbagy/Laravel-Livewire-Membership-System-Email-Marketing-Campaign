@@ -179,6 +179,6 @@ class Transactions extends Component
     public function render()
     {
         return view('livewire.pages.admin.transactions.transactions')
-            ->layout('layouts.app');
+            ->layout('layouts.app',['title' => 'Transactions']);
     }
 }

@@ -138,6 +138,6 @@ class UserTransactions extends Component
     public function render()
     {
         return view('livewire.pages.admin.transactions.user.user-transactions')
-            ->layout('layouts.app');
+            ->layout('layouts.app',['title' => 'User Transactions']);
     }
 }

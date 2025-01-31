@@ -234,6 +234,6 @@ class EditSubscription extends Component
     public function render()
     {
         return view('livewire.pages.admin.subscription.subscripers.edit-subscription')
-            ->layout('layouts.app');
+            ->layout('layouts.app',['title' => 'Edit Subscription']);
     }
 }

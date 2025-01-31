@@ -28,6 +28,6 @@ class PlanManagement extends Component
         return view('livewire.pages.admin.plans.plan-management', [
             'monthlyPlans' => $this->monthlyPlans,
             'yearlyPlans' => $this->yearlyPlans,
-        ])->layout('layouts.app');
+        ])->layout('layouts.app',['title' => 'Plan Management']);
     }
 }

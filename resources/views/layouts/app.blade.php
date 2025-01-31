@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="{{ $globalSettings['favicon'] }}" rel="icon">
-    <title>{{ config('app.name', 'LivewireSaaS') }}</title>
+    <title>{{ config('app.name', 'LivewireSaaS') }}{{ isset($title) ? " - $title" : '' }}</title>
     <meta name="description" content="{{ $globalSettings['meta_description'] }}">
     <meta name="keywords" content="{{ $globalSettings['meta_keywords'] }}">
     <!-- Fonts -->

@@ -179,6 +179,6 @@ class UserManagement extends Component
     public function render()
     {
         return view('livewire.pages.admin.user.user-management')
-            ->layout('layouts.app');
+            ->layout('layouts.app',['title' => 'User Management']);
     }
 }

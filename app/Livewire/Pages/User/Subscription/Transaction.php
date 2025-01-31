@@ -39,6 +39,6 @@ class Transaction extends Component
     {
         return view('livewire.pages.user.subscription.transaction', [
             'payments' => $this->payments,
-        ])->layout('layouts.app');
+        ])->layout('layouts.app',['title' => 'My Transactions']);
     }
 }

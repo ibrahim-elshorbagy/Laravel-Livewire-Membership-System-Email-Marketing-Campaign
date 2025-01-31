@@ -106,6 +106,6 @@ class Edit extends Component
     {
         return view('livewire.pages.admin.user.user-management.edit', [
             'roles' => Role::where('name', '!=', 'super-admin')->get()
-        ])->layout('layouts.app');
+        ])->layout('layouts.app',['title' => 'Edit User']);
     }
 }

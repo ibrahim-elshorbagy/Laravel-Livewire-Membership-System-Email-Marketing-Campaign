@@ -136,6 +136,6 @@ class Edit extends Component
     public function render()
     {
         return view('livewire.pages.admin.plans.plan-management.edit')
-            ->layout('layouts.app');
+            ->layout('layouts.app',['title' => 'Edit Plan']);
     }
 }

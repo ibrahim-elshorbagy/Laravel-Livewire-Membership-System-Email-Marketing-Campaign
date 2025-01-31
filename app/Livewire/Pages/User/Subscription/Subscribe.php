@@ -140,6 +140,6 @@ class Subscribe extends Component
         return view('livewire.pages.user.subscription.subscribe', [
             'monthlyPlans' => $monthlyPlans,
             'yearlyPlans' => $yearlyPlans,
-        ])->layout('layouts.app');
+        ])->layout('layouts.app',['title' => 'Plans']);
     }
 }

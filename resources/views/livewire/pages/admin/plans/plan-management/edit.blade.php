@@ -52,9 +52,9 @@
                 </div> --}}
 
                 <div class="pt-4">
-                    <x-primary-button type="submit">
+                    <x-primary-create-button type="submit">
                         Update Plan
-                    </x-primary-button>
+                    </x-primary-create-button>
                 </div>
             </form>
         </div>
@@ -75,10 +75,10 @@
                             <x-text-input type="number" wire:model.live="features.{{ $featureId }}.limit" class="w-full sm:w-24"
                                 placeholder="Limit" />
                             <div class="flex gap-2">
-                                <x-primary-button wire:click="updateFeatureLimit({{ $featureId }})"
+                                <x-primary-create-button wire:click="updateFeatureLimit({{ $featureId }})"
                                     class="justify-center w-full sm:w-auto" size="sm">
                                     Update
-                                </x-primary-button>
+                                </x-primary-create-button>
                                 <x-danger-button wire:click="detachFeature({{ $featureId }})"
                                     class="justify-center w-full sm:w-auto" size="sm">
                                     Remove

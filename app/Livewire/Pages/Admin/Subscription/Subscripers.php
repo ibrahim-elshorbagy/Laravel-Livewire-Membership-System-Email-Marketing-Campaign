@@ -154,6 +154,6 @@ class Subscripers extends Component
     public function render()
     {
         return view('livewire.pages.admin.subscription.subscripers')
-            ->layout('layouts.app');
+            ->layout('layouts.app',['title' => 'Subscriptions']);
     }
 }
