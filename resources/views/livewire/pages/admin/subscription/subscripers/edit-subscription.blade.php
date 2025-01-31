@@ -134,21 +134,19 @@
                     </p>
                 </div>
 
-                <div class="border-t border-neutral-300 dark:border-neutral-700">
-                    <span class="block mt-3 text-sm font-medium text-gray-700 md:text-lg dark:text-gray-300">Server
-                        Status</span>
-                    <p class="mt-1">
-                        <span
-                            class="px-2 py-1 text-xs font-semibold rounded-full
-                            {{ $server_status === 'running' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100' }}">
-                            {{ ucfirst($server_status) }}
-                        </span>
-                    </p>
+                <div class="flex items-center gap-5 py-4 border-t border-neutral-300 dark:border-neutral-700">
+                    <span class="block text-sm font-medium text-gray-700 md:text-lg dark:text-gray-300">ServerStatus</span>
+                    <span
+                        class="px-2 py-1 text-xs font-semibold rounded-full
+                        {{ $server_status === 'running' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100' }}">
+                        {{ ucfirst($server_status) }}
+                    </span>
+
                 </div>
             </div>
 
         <!-- Action Buttons -->
-        <div class="mt-4 space-y-4">
+        <div class="py-4 space-y-4 border-t border-neutral-300 dark:border-neutral-700">
             <!-- Buttons Grid -->
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2">
                 <!-- Cancel Button -->
@@ -160,15 +158,16 @@
                 </div> --}}
 
                 <!-- Suppress Button -->
+                @if(!$subscription->suppressed_at)
                 <div class="w-full">
                     <x-primary-danger-button class="justify-center w-full" wire:click="suppressSubscription"
                         wire:confirm="Are you sure you want to suppress this subscription?">
                         <span class="text-center">Suppress Subscription</span>
                     </x-primary-danger-button>
                 </div>
-
+                @endif
                 <!-- Reactive Button (Conditional) -->
-                @if($subscription->suppressed_at || $subscription->canceled_at)
+                @if($subscription->suppressed_at)
                 {{-- <div class="w-full col-span-full sm:col-span-2 lg:col-span-1"> --}}
                 <div class="w-full ">
                     <x-primary-create-button class="justify-center w-full" wire:click="reActiveSubscription"

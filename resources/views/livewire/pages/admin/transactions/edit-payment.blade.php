@@ -150,7 +150,7 @@
 
     <!-- Form Actions -->
     <div class="flex justify-end pt-4 mt-6 space-x-3 border-t border-neutral-200 dark:border-neutral-700">
-        <x-secondary-button x-on:click="$dispatch('close')" class="px-4 py-2">
+        <x-secondary-button href="{{ route('admin.payment.transactions') }}" wire:navigate class="px-4 py-2">
             Cancel
         </x-secondary-button>
         <x-primary-create-button type="submit" class="px-4 py-2">

@@ -3,6 +3,7 @@
 namespace App\Livewire\Pages\Admin\Subscription;
 
 use App\Models\Payment\Payment;
+use App\Models\Subscription\Note;
 use Livewire\WithPagination;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -113,6 +114,11 @@ class Subscripers extends Component
             ->first();
     }
 
+    public function getSubscriptionNote($subscriptionId)
+    {
+        return Note::where('subscription_id', $subscriptionId)
+            ->first();
+    }
     public function impersonateUser($userId)
     {
         $user = config('auth.providers.users.model')::find($userId);

@@ -107,9 +107,19 @@
                                 wire:click="impersonateUser({{ $subscriber->id }})">
                                 Login As
                             </x-primary-info-button>
+                            <x-primary-info-button x-on:click="$dispatch('open-modal', 'subscription-note-{{ $subscription->id }}')">
+                                <i class="fa-solid fa-note-sticky"></i>
+                            </x-primary-info-button>
+
+
                         </div>
                     </td>
                 </tr>
+                <!-- Note Modal -->
+                    <x-modal name="subscription-note-{{ $subscription->id }}" :show="false" :maxWidth="'6xl'">
+                        <livewire:pages.admin.subscription.subscription-note :subscription="$subscription"
+                            :wire:key="'note-'.$subscription->id" />
+                    </x-modal>
                 @endforeach
             </tbody>
         </table>
@@ -119,4 +129,5 @@
     <div class="mt-4">
         {{ $items->links() }}
     </div>
+
 </div>
