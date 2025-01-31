@@ -12,7 +12,7 @@
         <h3 class="mb-2 text-lg font-semibold text-gray-700 dark:text-gray-300">Customer</h3>
         <div class="flex items-center gap-2 w-max">
             <img class="object-cover rounded-full size-10" src="{{ $user->image_url ?? 'default-avatar.png' }}"
-                alt="{{ $user->name }}" />
+                alt="{{ $user->first_name }}" />
             <div class="flex flex-col">
                 <span class="font-medium">{{ $user->first_name }} {{ $user->last_name }}</span>
                 <span class="text-sm text-neutral-500">{{ $user->email }}</span>
@@ -126,6 +126,7 @@
                 <div class="space-y-2">
                     <x-input-label for="status" :value="__('Payment Status')" />
                     <x-primary-select-input wire:model="status" id="status" class="w-full">
+                        <option>Select Status</option>
                         <option value="pending"> Pending</option>
                         <option value="approved"> Approved</option>
                         <option value="failed"> Failed</option>

@@ -13,101 +13,118 @@ class PlansSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
+    public function run()
     {
-
         // Features
-        $emailMarketingCampaigns = Feature::create([
-            'consumable'       => true,
-            'name'             => 'Email Marketing Campaigns',
+        $subscribers = Feature::create([
+            'consumable' => true,
+            'quota'      => true,
+            'name' => 'Subscribers Limit',
             'periodicity_type' => PeriodicityType::Month,
-            'periodicity'      => 1,
+            'periodicity' => 1,
         ]);
 
-                // Features
-        $test = Feature::create([
-            'consumable'       => true,
-            'name'             => 'Test',
+        $emailSending = Feature::create([
+            'consumable' => true,
+            'quota'      => true,
+            'name' => 'Email Sending',
             'periodicity_type' => PeriodicityType::Month,
-            'periodicity'      => 1,
+            'periodicity' => 1,
         ]);
+
+
+        // ------------------------------------------------------------------------------------------------
+        // Free Plan
+        $freePlan = Plan::create([
+            'name' => 'Trial',
+            'periodicity_type' => PeriodicityType::Year,
+            'periodicity' => 10,
+            'price' => 0,
+        ]);
+        $freePlan->features()->attach($subscribers, ['charges' => 250]);
+        $freePlan->features()->attach($emailSending, ['charges' => 500]);
 
         // ------------------------------------------------------------------------------------------------
         // Plans bronze
         $bronzeMonthly = Plan::create([
-            'name'             => 'Bronze Monthly',
+            'name' => 'Bronze Monthly',
             'periodicity_type' => PeriodicityType::Month,
-            'periodicity'      => 1,
-            'price'            => 3,
+            'periodicity' => 1,
+            'price' => 9,
         ]);
-        $bronzeMonthly->features()->attach($emailMarketingCampaigns,['charges'=>5]);
+        $bronzeMonthly->features()->attach($subscribers, ['charges' => 1000]);
+        $bronzeMonthly->features()->attach($emailSending, ['charges' => 5000]);
 
         $bronzeYearly = Plan::create([
-            'name'             => 'Bronze Yearly',
+            'name' => 'Bronze Yearly',
             'periodicity_type' => PeriodicityType::Year,
-            'periodicity'      => 1,
-            'price'            => 3 * 12,
+            'periodicity' => 1,
+            'price' => 9 * 12,
         ]);
-        $bronzeYearly->features()->attach($emailMarketingCampaigns,['charges'=>5 * 12]);
+        $bronzeYearly->features()->attach($subscribers, ['charges' => 1000 * 12]);
+        $bronzeYearly->features()->attach($emailSending, ['charges' => 5000 * 12]);
 
         // ------------------------------------------------------------------------------------------------
         // Plans silver
-
         $silverMonthly = Plan::create([
-            'name'             => 'Silver Monthly',
+            'name' => 'Silver Monthly',
             'periodicity_type' => PeriodicityType::Month,
-            'periodicity'      => 1,
-            'price'            => 5,
+            'periodicity' => 1,
+            'price' => 29,
         ]);
-        $silverMonthly->features()->attach($emailMarketingCampaigns,['charges'=>10]);
+        $silverMonthly->features()->attach($subscribers, ['charges' => 5000]);
+        $silverMonthly->features()->attach($emailSending, ['charges' => 20000]);
 
         $silverYearly = Plan::create([
-            'name'             => 'Silver Yearly',
+            'name' => 'Silver Yearly',
             'periodicity_type' => PeriodicityType::Year,
-            'periodicity'      => 1,
-            'price'            => 5 * 12,
+            'periodicity' => 1,
+            'price' => 29 * 12,
         ]);
-        $silverYearly->features()->attach($emailMarketingCampaigns,['charges'=>10 * 12]);
-
+        $silverYearly->features()->attach($subscribers, ['charges' => 5000 * 12]);
+        $silverYearly->features()->attach($emailSending, ['charges' => 20000 * 12]);
 
         // ------------------------------------------------------------------------------------------------
         // Plans golden
-
         $goldenMonthly = Plan::create([
-            'name'             => 'Golden Monthly',
+            'name' => 'Golden Monthly',
             'periodicity_type' => PeriodicityType::Month,
-            'periodicity'      => 1,
-            'price'            => 10,
+            'periodicity' => 1,
+            'price' => 79,
         ]);
-        $goldenMonthly->features()->attach($emailMarketingCampaigns,['charges'=>20]);
+        $goldenMonthly->features()->attach($subscribers, ['charges' => 25000]);
+        $goldenMonthly->features()->attach($emailSending, ['charges' => 50000]);
 
         $goldenYearly = Plan::create([
-            'name'             => 'Golden Yearly',
+            'name' => 'Golden Yearly',
             'periodicity_type' => PeriodicityType::Year,
-            'periodicity'      => 1,
-            'price'            => 10 * 12,
+            'periodicity' => 1,
+            'price' => 79 * 12,
         ]);
-        $goldenYearly->features()->attach($emailMarketingCampaigns,['charges'=>20 * 12]);
-
+        $goldenYearly->features()->attach($subscribers, ['charges' => 25000 * 12]);
+        $goldenYearly->features()->attach($emailSending, ['charges' => 50000 * 12]);
 
         // ------------------------------------------------------------------------------------------------
-        // Plans diamond
-        $diamondMonthly = Plan::create([
-            'name'             => 'Diamond Monthly',
+        // Plans enterprise
+        $enterpriseMonthly = Plan::create([
+            'name' => 'Enterprise Monthly',
             'periodicity_type' => PeriodicityType::Month,
-            'periodicity'      => 1,
-            'price'            => 15,
+            'periodicity' => 1,
+            'price' => 199,
         ]);
-        $diamondMonthly->features()->attach($emailMarketingCampaigns,['charges'=>30]);
+        $enterpriseMonthly->features()->attach($subscribers, ['charges' => 50000]);
+        $enterpriseMonthly->features()->attach($emailSending, ['charges' => 100000]);
 
-        $diamondYearly = Plan::create([
-            'name'             => 'Diamond Yearly',
+        $enterpriseYearly = Plan::create([
+            'name' => 'Enterprise Yearly',
             'periodicity_type' => PeriodicityType::Year,
-            'periodicity'      => 1,
-            'price'            => 15 * 12,
+            'periodicity' => 1,
+            'price' => 199 * 12,
         ]);
-        $diamondYearly->features()->attach($emailMarketingCampaigns,['charges'=>30 * 12]);
-
+        $enterpriseYearly->features()->attach($subscribers, ['charges' => 50000 * 12]);
+        $enterpriseYearly->features()->attach($emailSending, ['charges' => 100000 * 12]);
 
     }
+
+
 }

@@ -6,6 +6,9 @@ use Livewire\Component;
 use LucasDotVin\Soulbscription\Models\Plan;
 use LucasDotVin\Soulbscription\Models\Subscription;
 use App\Models\Payment\Payment;
+use App\Notifications\Paypal\AdminSubscriptionCancelledNotification;
+use App\Notifications\Paypal\AdminSubscriptionReactiveNotification;
+use App\Notifications\Paypal\AdminSubscriptionSuppressNotification;
 use Illuminate\Support\Facades\DB;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Support\Facades\Session;
@@ -42,6 +45,7 @@ class EditSubscription extends Component
     {
         // dd($subscription);
         $this->subscription = Subscription::withoutGlobalScope(SuppressingScope::class)
+            ->with('subscriber')
             ->findOrFail($subscription->id);
 
         $this->payment = Payment::where('subscription_id', $subscription->id)->latest()->first();
@@ -119,8 +123,22 @@ class EditSubscription extends Component
         DB::beginTransaction();
         try {
             if ($this->payment) {
+                // Update existing payment
                 $this->payment->update([
                     'amount' => $this->amount,
+                    'status' => $this->status,
+                ]);
+            } else {
+                // Create new payment record
+                $this->payment = Payment::create([
+                    'user_id' => $this->subscription->subscriber->id,
+                    'plan_id' => $this->subscription->plan_id,
+                    'subscription_id' => $this->subscription->id,
+                    'gateway' => 'cash',
+                    'gateway_subscription_id' => null,
+                    'transaction_id' => null,
+                    'amount' => $this->amount,
+                    'currency' => 'USD',
                     'status' => $this->status,
                 ]);
             }
@@ -157,43 +175,58 @@ class EditSubscription extends Component
             $this->alert('success', 'Subscription details updated successfully.', ['position' => 'bottom-end']);
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->alert('error', 'Failed to update subscription details.', ['position' => 'bottom-end']);
+            $this->alert('error', 'Failed to update subscription details.' . $e->getMessage(), ['position' => 'bottom-end']);
         }
     }
 
-public function cancelSubscription()
-{
-    try {
-        $this->subscription->update([
-            'canceled_at' => now(),
-            'suppressed_at' => null,
-            'server_status' => 'hold',
-        ]);
-        $this->alert('success', 'Subscription cancelled successfully.', ['position' => 'bottom-end']);
-    } catch (\Exception $e) {
-        $this->alert('error', 'Failed to cancel subscription.', ['position' => 'bottom-end']);
+    public function cancelSubscription()
+    {
+        DB::beginTransaction();
+        try {
+            $this->subscription->update([
+                'canceled_at' => now(),
+                'suppressed_at' => null,
+                'server_status' => 'hold',
+            ]);
+            $this->subscription->subscriber->notify(new AdminSubscriptionCancelledNotification($this->subscription));
+            $this->alert('success', 'Subscription cancelled successfully.' , ['position' => 'bottom-end']);
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->alert('error', 'Failed to cancel subscription.'. $e->getMessage(), ['position' => 'bottom-end']);
+        }
+
     }
-}
 
     public function suppressSubscription()
     {
+        DB::beginTransaction();
         try {
             $this->subscription->suppress();
+            $this->subscription->subscriber->notify(new AdminSubscriptionSuppressNotification($this->subscription));
+            DB::commit();
             $this->alert('success', 'Subscription suppressed successfully.', ['position' => 'bottom-end']);
         } catch (\Exception $e) {
-            $this->alert('error', 'Failed to suppress subscription.', ['position' => 'bottom-end']);
+            DB::rollBack();
+            $this->alert('error', 'Failed to suppress subscription.'. $e->getMessage(), ['position' => 'bottom-end']);
         }
     }
 
     public function reActiveSubscription()
     {
+        DB::beginTransaction();
         try {
             $this->subscription->update([
                 'suppressed_at' => null,
                 'canceled_at' => null,
             ]);
+            $this->subscription->subscriber->notify(new AdminSubscriptionReactiveNotification($this->subscription));
+
+            DB::commit();
             $this->alert('success', 'Subscription reactivated successfully.', ['position' => 'bottom-end']);
         } catch (\Exception $e) {
+            DB::rollBack();
             $this->alert('error', 'Failed to reactivate subscription.', ['position' => 'bottom-end']);
         }
     }

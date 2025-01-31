@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use LucasDotVin\Soulbscription\Models\Plan;
 
 new #[Layout('layouts.app')] class extends Component
 {
@@ -35,7 +36,10 @@ new #[Layout('layouts.app')] class extends Component
 
             $user = User::create($validated);
             $user->assignRole('user');
-
+            $trialPlan = Plan::where('name', 'Trial')->first();
+                if ($trialPlan) {
+                $user->subscribeTo($trialPlan);
+            }
             Auth::login($user);
 
             $this->redirect(route('dashboard', absolute: false), navigate: true);

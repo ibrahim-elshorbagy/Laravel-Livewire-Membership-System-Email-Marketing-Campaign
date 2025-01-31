@@ -8,6 +8,7 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Support\Facades\Session;
+use LucasDotVin\Soulbscription\Models\Plan;
 
 class Create extends Component
 {
@@ -70,6 +71,12 @@ class Create extends Component
 
         $user->assignRole($this->selectedRole);
 
+        if ($this->selectedRole === 'user') {
+            $trialPlan = Plan::where('name', 'Trial')->first();
+            if ($trialPlan) {
+                $user->subscribeTo($trialPlan);
+            }
+        }
         Session::flash('success', 'User created successfully.');
 
          return $this->redirect(route('admin.users'), navigate: true);

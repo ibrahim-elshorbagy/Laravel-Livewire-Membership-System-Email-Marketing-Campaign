@@ -9,7 +9,7 @@
             </h2>
             <div class="flex gap-2 mt-4 w-max md:mt-0">
                 <img class="object-cover rounded-full size-10" src="{{ $user->image_url ?? 'default-avatar.png' }}"
-                    alt="{{ $user->name }}" />
+                    alt="{{ $user->first_name }}" />
                 <div class="flex flex-col">
                     <span class="font-medium">{{ $user->first_name }} {{ $user->last_name }} - ( {{ $user->username }} )</span>
                     <span class="text-sm text-neutral-500">{{ $user->email }}</span>

@@ -64,14 +64,14 @@ class Subscripers extends Component
             ->paginate($this->perPage);
     }
 
-    // #[Computed]
-    // public function canceledSubscriptions()
-    // {
-    //     return $this->baseQuery('canceled')
-    //         ->when($this->searchCanceled, $this->searchCallback())
-    //         ->latest()
-    //         ->paginate($this->perPage);
-    // }
+    #[Computed]
+    public function canceledSubscriptions()
+    {
+        return $this->baseQuery('canceled')
+            ->when($this->searchCanceled, $this->searchCallback())
+            ->latest()
+            ->paginate($this->perPage);
+    }
 
     #[Computed]
     public function suppressedSubscriptions()

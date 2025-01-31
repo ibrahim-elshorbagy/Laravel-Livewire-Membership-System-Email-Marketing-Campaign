@@ -134,6 +134,7 @@ class Subscribe extends Component
 
         $yearlyPlans = Plan::with('features')
             ->where('periodicity_type', 'Year')
+            ->where('name', '!=', 'Trial')
             ->get();
 
         return view('livewire.pages.user.subscription.subscribe', [

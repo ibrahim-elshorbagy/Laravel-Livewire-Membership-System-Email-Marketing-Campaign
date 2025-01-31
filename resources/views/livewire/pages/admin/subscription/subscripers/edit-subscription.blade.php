@@ -4,7 +4,7 @@
     <div class="mb-4 sm:mb-6 md:flex md:items-center md:justify-between">
         <div class="flex-1 min-w-0">
             <h2 class="text-xl font-bold leading-7 sm:text-2xl sm:truncate">
-                Edit Subscription for {{ $subscription->subscriber->name }}
+                Edit Subscription for {{ $subscription->subscriber->first_name }} {{ $subscription->subscriber->last_name }}
             </h2>
         </div>
         <div class="flex mt-2 sm:mt-4 md:mt-0 md:ml-4">
@@ -150,12 +150,12 @@
             <!-- Buttons Grid -->
             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2">
                 <!-- Cancel Button -->
-                {{-- <div class="w-full">
+                <div class="w-full">
                     <x-primary-danger-button class="justify-center w-full" wire:click="cancelSubscription"
                         wire:confirm="Are you sure you want to cancel this subscription?">
                         <span class="text-center">Cancel Subscription</span>
                     </x-primary-danger-button>
-                </div> --}}
+                </div>
 
                 <!-- Suppress Button -->
                 @if(!$subscription->suppressed_at)
@@ -167,9 +167,9 @@
                 </div>
                 @endif
                 <!-- Reactive Button (Conditional) -->
-                @if($subscription->suppressed_at)
+                @if($subscription->suppressed_at || $subscription->canceled_at)
                 {{-- <div class="w-full col-span-full sm:col-span-2 lg:col-span-1"> --}}
-                <div class="w-full ">
+                <div class="w-full col-span-full">
                     <x-primary-create-button class="justify-center w-full" wire:click="reActiveSubscription"
                         wire:confirm="Are you sure you want to reactivate this subscription?">
                         <span class="text-center">Reactivate Subscription</span>
@@ -196,9 +196,9 @@
                             Important Note
                         </h3>
                         <div class="mt-2 space-y-2 text-sm text-yellow-700 dark:text-yellow-300">
-                            {{-- <p class="text-xs sm:text-sm text-neutral-500">
-                                - Cancelling stops future renewals, access remains until expiration.
-                            </p> --}}
+                            <p class="text-xs sm:text-sm text-neutral-500">
+                                - Cancelling access remains until expiration.
+                            </p>
                             <p class="text-xs sm:text-sm text-neutral-500">
                                 - Suppressing immediately stops access To all Features.
                             </p>
@@ -362,6 +362,7 @@
                 <div>
                     <x-input-label for="status" :value="__('Payment Status')" />
                     <x-primary-select-input wire:model="status" id="status">
+                        <option>Select Status</option>
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
                         <option value="failed">Failed</option>

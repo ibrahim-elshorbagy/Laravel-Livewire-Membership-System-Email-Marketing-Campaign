@@ -7,9 +7,9 @@
             <button x-on:click="selectedTab = 'all'"
                 :class="selectedTab === 'all' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">All</button>
-            {{-- <button x-on:click="selectedTab = 'canceled'"
+            <button x-on:click="selectedTab = 'canceled'"
                 :class="selectedTab === 'canceled' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
-                class="px-4 py-2 text-sm h-min" role="tab">Canceled</button> --}}
+                class="px-4 py-2 text-sm h-min" role="tab">Canceled</button>
             <button x-on:click="selectedTab = 'suppressed'"
                 :class="selectedTab === 'suppressed' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">Suppressed</button>
@@ -28,13 +28,13 @@
         </div>
 
         <!-- Canceled Tab Content -->
-        {{-- <div x-show="selectedTab === 'canceled'">
+        <div x-show="selectedTab === 'canceled'">
             @include('livewire.pages.admin.subscription.partials.table', [
             'items' => $this->canceledSubscriptions,
             'search' => 'searchCanceled',
             'searchPlaceholder' => 'Search canceled subscriptions...'
             ])
-        </div> --}}
+        </div>
 
         <!-- Suppressed Tab Content -->
         <div x-show="selectedTab === 'suppressed'">

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class() extends Migration {
     /**
      * Run the migrations.
      *
@@ -12,12 +12,18 @@ return new class () extends Migration {
      */
     public function up()
     {
-        Schema::create('feature_plan', function (Blueprint $table) {
+        Schema::create('feature_tickets', function (Blueprint $table) {
             $table->id();
-            $table->decimal('charges', 20, 2)->nullable();
+            $table->decimal('charges')->nullable();
+            $table->timestamp('expired_at')->nullable();
             $table->foreignIdFor(\LucasDotVin\Soulbscription\Models\Feature::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(\LucasDotVin\Soulbscription\Models\Plan::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
+
+            if (config('soulbscription.models.subscriber.uses_uuid')) {
+                $table->uuidMorphs('subscriber');
+            } else {
+                $table->numericMorphs('subscriber');
+            }
         });
     }
 
@@ -28,6 +34,6 @@ return new class () extends Migration {
      */
     public function down()
     {
-        Schema::dropIfExists('feature_plan');
+        Schema::dropIfExists('feature_tickets');
     }
 };

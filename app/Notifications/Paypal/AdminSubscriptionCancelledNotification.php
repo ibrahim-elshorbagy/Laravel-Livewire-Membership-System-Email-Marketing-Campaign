@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class AdminSubscriptionCancelledNotification extends Notification
+class AdminSubscriptionCancelledNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -25,7 +25,7 @@ class AdminSubscriptionCancelledNotification extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $endDate = $this->subscription->created_at->addMonth()->format('F j, Y');
+        $endDate = $this->subscription->expired_at->format('F j, Y');
 
         return (new MailMessage)
             ->subject('Subscription Cancellation')

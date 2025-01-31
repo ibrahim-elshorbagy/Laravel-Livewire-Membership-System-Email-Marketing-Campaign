@@ -49,7 +49,7 @@
                     <td class="p-4">
                         <div class="flex items-center gap-2 w-max">
                             <img class="object-cover rounded-full size-10" src="{{ $subscriber->image_url ?? 'default-avatar.png' }}"
-                                alt="{{ $subscriber->name }}" />
+                                alt="{{ $subscriber->first_name }}" />
                             <div class="flex flex-col">
                                 <span class="font-medium">
                                     {{ $subscriber->first_name }} {{ $subscriber->last_name}} - ( {{ $subscriber->username }} )

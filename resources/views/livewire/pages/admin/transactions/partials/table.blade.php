@@ -48,7 +48,7 @@
                     <td class="p-4">
                         <div class="flex items-center gap-2 w-max">
                             <img class="object-cover rounded-full size-10" src="{{ $user->image_url ?? 'default-avatar.png' }}"
-                                alt="{{ $user->name }}" />
+                                alt="{{ $user->first_name }}" />
                             <div class="flex flex-col">
                                 <span class="font-medium">
                                     {{ $user->first_name }} {{ $user->last_name}} - ( {{ $user->username }} )

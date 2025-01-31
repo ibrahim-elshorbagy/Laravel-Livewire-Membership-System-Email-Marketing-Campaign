@@ -8,6 +8,7 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Session;
+use LucasDotVin\Soulbscription\Models\Plan;
 
 class Edit extends Component
 {
@@ -80,13 +81,21 @@ class Edit extends Component
         if ($this->password) {
             $data['password'] = Hash::make($this->password);
         }
+        $oldRole = $this->user->roles->first()?->name;
 
         $this->user->update($data);
 
         // Update role if changed
-        if ($this->user->roles->first()?->name !== $this->selectedRole) {
-            $this->user->syncRoles([$this->selectedRole]);
+        if ($oldRole !== $this->selectedRole) {$this->user->syncRoles([$this->selectedRole]);
+
+        // If changing to user role and user has no active subscription
+        if ($this->selectedRole === 'user' && !$this->user->lastSubscription()) {
+            $trialPlan = Plan::where('name', 'Trial')->first();
+            if ($trialPlan) {
+                $this->user->subscribeTo($trialPlan);
+            }
         }
+    }
 
         Session::flash('success', 'User updated successfully.');
         return $this->redirect(route('admin.users'), navigate: true);
