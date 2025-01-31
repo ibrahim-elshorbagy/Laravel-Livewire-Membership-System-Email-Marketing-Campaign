@@ -48,11 +48,15 @@
                 <tr>
                     <td class="p-4">
                         <div class="flex items-center gap-2 w-max">
-                            <img class="object-cover rounded-full size-10"
-                                src="{{ $subscriber->image_url ?? 'default-avatar.png' }}"
+                            <img class="object-cover rounded-full size-10" src="{{ $subscriber->image_url ?? 'default-avatar.png' }}"
                                 alt="{{ $subscriber->name }}" />
                             <div class="flex flex-col">
-                                <span class="font-medium">{{ $subscriber->first_name }} {{ $subscriber->last_name}} - ( {{ $subscriber->username }} )</span>
+                                <span class="font-medium">
+                                    {{ $subscriber->first_name }} {{ $subscriber->last_name}} - ( {{ $subscriber->username }} )
+                                    @if($subscriber->deleted_at)
+                                    <span class="text-xs text-red-500">(Soft Delete)</span>
+                                    @endif
+                                </span>
                                 <span class="text-sm text-neutral-500">{{ $subscriber->email }}</span>
                             </div>
                         </div>
@@ -102,11 +106,13 @@
                             <x-primary-info-button href="{{ route('admin.users.transactions', $subscriber) }}" wire:navigate>
                                 Transactions
                             </x-primary-info-button>
+                            @if(!$subscriber->deleted_at)
                             <x-primary-info-button
                                 onclick="confirm('Are you sure you want to impersonate this user?') || event.stopImmediatePropagation()"
                                 wire:click="impersonateUser({{ $subscriber->id }})">
                                 Login As
                             </x-primary-info-button>
+                            @endif
                             <x-primary-info-button x-on:click="$dispatch('open-modal', 'subscription-note-{{ $subscription->id }}')">
                                 <i class="fa-solid fa-note-sticky"></i>
                             </x-primary-info-button>

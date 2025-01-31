@@ -88,7 +88,7 @@
                             </x-primary-create-button>
 
                             <x-primary-danger-button wire:click="forceDeleteUser({{ $user->id }})"
-                                onclick="confirm('Are you sure you want to permanently delete this user? This action cannot be undone.') || event.stopImmediatePropagation()">
+                                onclick="confirm('Are you sure you want to permanently delete this user ? All His Transactions And Subscriptions Will Be Deleted This action cannot be undone.') || event.stopImmediatePropagation()">
                                 Force Delete
                             </x-primary-danger-button>
                             @else

@@ -24,8 +24,12 @@ class AppServiceProvider extends ServiceProvider
     {
         Route::bind('subscription', function ($value) {
             return Subscription::withoutGlobalScope(SuppressingScope::class)
+                ->with(['plan', 'subscriber' => function ($query) {
+                    $query->withTrashed();
+                }])
                 ->findOrFail($value);
         });
+
 
     }
 }

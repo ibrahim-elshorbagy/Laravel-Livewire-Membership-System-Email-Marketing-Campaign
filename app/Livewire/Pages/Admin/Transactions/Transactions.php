@@ -121,7 +121,14 @@ class Transactions extends Component
 
     protected function baseQuery(string $status = 'all')
     {
-        $query = Payment::with(['user', 'plan', 'subscription']);
+        $query = Payment::with([
+            'user' => function ($query) {
+                $query->withTrashed();
+            },
+            'plan',
+            'subscription'
+        ]);
+
 
         return match($status) {
             'pending' => $query->where('status', 'pending'),
@@ -149,15 +156,26 @@ class Transactions extends Component
                 $q->where('transaction_id', 'like', "%$searchTerm%")
                   ->orWhere('amount', 'like', "%$searchTerm%")
                   ->orWhereHas('user', function($userQuery) use ($searchTerm) {
-                      $userQuery->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$searchTerm%")
-                                ->orWhere('email', 'like', "%$searchTerm%")
-                                ->orWhere('username', 'like', '%' . $searchTerm . '%');
-
+                      $userQuery->withTrashed() // Include soft deleted users in search
+                          ->where(function($subQuery) use ($searchTerm) {
+                              $subQuery->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$searchTerm%")
+                                      ->orWhere('email', 'like', "%$searchTerm%")
+                                      ->orWhere('username', 'like', '%' . $searchTerm . '%');
+                          });
                   });
             });
         };
     }
 
+    public function impersonateUser($userId)
+    {
+        $user = config('auth.providers.users.model')::find($userId);
+        if ($user) {
+            session()->put('impersonated_by', auth()->id());
+            auth()->login($user);
+            return redirect()->route('dashboard');
+        }
+    }
     public function render()
     {
         return view('livewire.pages.admin.transactions.transactions')

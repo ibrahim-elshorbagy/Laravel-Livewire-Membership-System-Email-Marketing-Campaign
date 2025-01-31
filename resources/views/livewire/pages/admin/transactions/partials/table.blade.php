@@ -47,15 +47,19 @@
                 <tr>
                     <td class="p-4">
                         <div class="flex items-center gap-2 w-max">
-                            <img class="object-cover rounded-full size-10"
-                                src="{{ $user->image_url ?? 'default-avatar.png' }}" alt="{{ $user->name }}" />
+                            <img class="object-cover rounded-full size-10" src="{{ $user->image_url ?? 'default-avatar.png' }}"
+                                alt="{{ $user->name }}" />
                             <div class="flex flex-col">
-                                <span class="font-medium">{{ $user->first_name }} {{ $user->last_name }} - ( {{ $user->username }} )</span>
+                                <span class="font-medium">
+                                    {{ $user->first_name }} {{ $user->last_name}} - ( {{ $user->username }} )
+                                    @if($user->deleted_at)
+                                    <span class="text-xs text-red-500">(Soft Delete)</span>
+                                    @endif
+                                </span>
                                 <span class="text-sm text-neutral-500">{{ $user->email }}</span>
                             </div>
                         </div>
-                    </td>
-                    <td class="p-4 font-mono text-sm">{{ $payment->transaction_id }}</td>
+                    </td>                    <td class="p-4 font-mono text-sm">{{ $payment->transaction_id }}</td>
                     <td class="p-4">{{ number_format($payment->amount, 2) }} {{ $payment->currency }}</td>
                     <td class="p-4">
                         <span
@@ -86,6 +90,13 @@
                             <x-primary-info-button href="{{ route('admin.users.transactions', $user) }}" wire:navigate>
                                 View Transactions
                             </x-primary-info-button>
+                            @if(!$user->deleted_at)
+                            <x-primary-info-button
+                                onclick="confirm('Are you sure you want to impersonate this user?') || event.stopImmediatePropagation()"
+                                wire:click="impersonateUser({{ $user->id }})">
+                                Login As
+                            </x-primary-info-button>
+                            @endif
                         </div>
                     </td>
                 </tr>

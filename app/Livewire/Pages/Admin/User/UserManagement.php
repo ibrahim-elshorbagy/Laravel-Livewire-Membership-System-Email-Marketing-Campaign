@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Pages\Admin\User;
 
+use App\Models\Payment\Payment;
+use App\Models\Subscription\Note;
 use App\Models\User;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
@@ -9,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Attributes\Computed;
+use LucasDotVin\Soulbscription\Models\Subscription;
+use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
 
 class UserManagement extends Component
 {
@@ -67,8 +71,38 @@ class UserManagement extends Component
     {
         $user = User::onlyTrashed()->find($userId);
         if ($user) {
-            $user->forceDelete();
-            $this->alert('success', 'User permanently deleted.', ['position' => 'bottom-end']);
+            try {
+                DB::beginTransaction();
+
+                // Get all subscriptions for the user
+                $subscriptions = Subscription::withoutGlobalScope(SuppressingScope::class)
+                    ->where('subscriber_id', $userId)
+                    ->get();
+
+                foreach ($subscriptions as $subscription) {
+                    // Delete related payments
+                    Payment::where('subscription_id', $subscription->id)->delete();
+
+                    // Delete subscription notes if you have them
+                    Note::where('subscription_id', $subscription->id)->delete();
+
+                    // Delete the subscription (regular delete since it doesn't use soft deletes)
+                    $subscription->delete();
+                }
+
+                // Delete user's payments
+                Payment::where('user_id', $userId)->delete();
+
+                // Finally, force delete the user (this one uses soft delete)
+                $user->forceDelete();
+
+                DB::commit();
+
+                $this->alert('success', 'User and all related data permanently deleted.', ['position' => 'bottom-end']);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                $this->alert('error', 'Error deleting user: ' . $e->getMessage(), ['position' => 'bottom-end']);
+            }
         }
     }
 

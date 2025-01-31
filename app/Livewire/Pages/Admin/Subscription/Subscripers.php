@@ -94,8 +94,10 @@ class Subscripers extends Component
 
     protected function baseQuery(string $status = 'all')
     {
-        $query = Subscription::with(['plan', 'subscriber'])
-            ->withoutGlobalScope(SuppressingScope::class);
+        $query = Subscription::with(['plan', 'subscriber' => function ($query) {
+            $query->withTrashed();
+        }])
+        ->withoutGlobalScope(SuppressingScope::class);
 
         return match($status) {
             'canceled' => $query->whereNotNull('canceled_at'),
@@ -116,7 +118,8 @@ class Subscripers extends Component
             }};
 
             $query->whereHas('subscriber', function ($q) use ($searchTerm) {
-                $q->where(function ($subQuery) use ($searchTerm) {
+                $q->withTrashed()
+                    ->where(function ($subQuery) use ($searchTerm) {
                     $subQuery->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$searchTerm%")
                         ->orWhere('first_name', 'like', "%$searchTerm%")
                         ->orWhere('last_name', 'like', "%$searchTerm%")
