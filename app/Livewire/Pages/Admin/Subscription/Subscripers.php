@@ -4,6 +4,7 @@ namespace App\Livewire\Pages\Admin\Subscription;
 
 use App\Models\Payment\Payment;
 use App\Models\Subscription\Note;
+use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -32,12 +33,27 @@ class Subscripers extends Component
         'selectedTab' => ['except' => 'all'],
     ];
 
-    public function updating($name, $value)
+    public function updatingSearchAll()
     {
-        if (str_starts_with($name, 'search')) {
-            $this->resetPage();
-        }
+        $this->resetPage();
     }
+
+    public function updatingSearchCanceled()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSearchSuppressed()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSearchExpired()
+    {
+        $this->resetPage();
+    }
+
+
 
     #[Computed]
     public function allSubscriptions()
@@ -100,10 +116,13 @@ class Subscripers extends Component
             }};
 
             $query->whereHas('subscriber', function ($q) use ($searchTerm) {
-                $q->where('first_name', 'like', "%$searchTerm%")
-                  ->orWhere('last_name', 'like', "%$searchTerm%")
-                  ->orWhere('email', 'like', "%$searchTerm%")
-                  ->orWhere('username', 'like', "%$searchTerm%");
+                $q->where(function ($subQuery) use ($searchTerm) {
+                    $subQuery->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$searchTerm%")
+                        ->orWhere('first_name', 'like', "%$searchTerm%")
+                        ->orWhere('last_name', 'like', "%$searchTerm%")
+                        ->orWhere('email', 'like', "%$searchTerm%")
+                        ->orWhere('username', 'like', "%$searchTerm%");
+                });
             });
         };
     }

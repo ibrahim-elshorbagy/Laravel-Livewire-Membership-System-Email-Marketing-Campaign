@@ -5,6 +5,7 @@ namespace App\Livewire\Pages\Admin\User;
 use App\Models\User;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Attributes\Computed;
@@ -97,8 +98,7 @@ class UserManagement extends Component
         return User::role('user')
             ->when($this->search !== '', function ($query) {
                 $query->where(function ($q) {
-                    $q->where('first_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('last_name', 'like', '%' . $this->search . '%')
+                    $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$this->search%")
                         ->orWhere('email', 'like', '%' . $this->search . '%')
                         ->orWhere('username', 'like', '%' . $this->search . '%')
                         ->orWhere('company', 'like', '%' . $this->search . '%');

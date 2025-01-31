@@ -3,6 +3,7 @@
 namespace App\Livewire\Pages\Admin\Transactions;
 
 use App\Models\Payment\Payment;
+use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -33,12 +34,36 @@ class Transactions extends Component
         'selectedTab' => ['except' => 'all'],
     ];
 
-    public function updating($name, $value)
+    public function updatingSearchAll()
     {
-        if (str_starts_with($name, 'search')) {
-            $this->resetPage();
-        }
+        $this->resetPage();
     }
+
+    public function updatingSearchPending()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSearchApproved()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSearchFailed()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSearchCancelled()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSearchRefunded()
+    {
+        $this->resetPage();
+    }
+
 
     #[Computed]
     public function allPayments()
@@ -124,9 +149,10 @@ class Transactions extends Component
                 $q->where('transaction_id', 'like', "%$searchTerm%")
                   ->orWhere('amount', 'like', "%$searchTerm%")
                   ->orWhereHas('user', function($userQuery) use ($searchTerm) {
-                      $userQuery->where('first_name', 'like', "%$searchTerm%")
-                               ->orWhere('last_name', 'like', "%$searchTerm%")
-                               ->orWhere('email', 'like', "%$searchTerm%");
+                      $userQuery->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$searchTerm%")
+                                ->orWhere('email', 'like', "%$searchTerm%")
+                                ->orWhere('username', 'like', '%' . $searchTerm . '%');
+
                   });
             });
         };
