@@ -1,4 +1,4 @@
-<div class="container p-4 mx-auto">
+<div class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <!-- Warning Alert -->
     @if($emailLimit['show'])
     <div class="p-4 mb-6 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800"
@@ -61,7 +61,7 @@
             Delete Selected ({{ count($selectedEmails) }})
         </x-primary-danger-button>
         @endif
-        @if(!$emailLimit['show'])
+        @if(!$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
         <x-primary-info-button href="{{ route('user.emails.create') }}" wire:navigate>
             Add New Emails
         </x-primary-info-button>
@@ -69,47 +69,50 @@
     </div>
 
     <!-- Table -->
-    <div class="overflow-x-auto bg-white rounded-lg shadow dark:bg-neutral-800">
-        <table class="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
-            <thead class="bg-neutral-50 dark:bg-neutral-700">
+    <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
+        <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
+            <thead
+                class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                 <tr>
-                    <th class="p-4 text-left">
+                    <th scope="col" class="p-4">
                         <input type="checkbox" wire:model.live="selectPage" class="rounded">
                     </th>
-                    <th class="p-4 text-xs font-medium text-left uppercase text-neutral-500 dark:text-neutral-400">Email
-                    </th>
-                    <th class="p-4 text-xs font-medium text-left uppercase text-neutral-500 dark:text-neutral-400">
-                        Status</th>
-                    <th class="p-4 text-xs font-medium text-left uppercase text-neutral-500 dark:text-neutral-400">Added
-                    </th>
-                    <th class="p-4 text-xs font-medium text-left uppercase text-neutral-500 dark:text-neutral-400">
-                        Actions</th>
+                    <th scope="col" class="p-4">Email</th>
+                    <th scope="col" class="p-4">Status</th>
+                    <th scope="col" class="p-4">Added</th>
+                    <th scope="col" class="p-4">Actions</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-neutral-200 dark:divide-neutral-700">
+            <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
                 @foreach($emails as $email)
-                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-700">
+                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
                     <td class="p-4">
-                        <input type="checkbox" wire:model.live="selectedEmails" value="{{ $email->id }}"
-                            class="rounded">
+                        <input type="checkbox" wire:model.live="selectedEmails" value="{{ $email->id }}" class="rounded">
                     </td>
-                    <td class="p-4">{{ $email->email }}</td>
                     <td class="p-4">
-                        <span
-                            class="px-2 py-1 text-xs rounded-full {{ $email->active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                        <div class="flex flex-col">
+                            <span class="text-neutral-900 dark:text-neutral-100">
+                                {{ $email->email }}
+                            </span>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <span class="inline-flex overflow-hidden rounded-lg px-1 py-0.5 text-xs font-medium
+                            {{ $email->active ? 'text-green-300 bg-green-300/10' : 'text-red-500 bg-red-500/10' }}">
                             {{ $email->active ? 'Active' : 'Inactive' }}
                         </span>
                     </td>
                     <td class="p-4">{{ $email->created_at->format('M d, Y') }}</td>
                     <td class="p-4">
-                        <div class="flex gap-2">
+                        <div class="flex space-x-2">
                             <button wire:click="toggleStatus({{ $email->id }})"
-                                class="px-3 py-1 text-sm rounded-md {{ $email->active ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
+                                class="inline-flex items-center px-2 py-1 text-xs rounded-md
+                                {{ $email->active ? 'text-red-500 bg-red-500/10 hover:bg-red-500/20' : 'text-green-300 bg-green-300/10 hover:bg-green-300/20' }}">
                                 {{ $email->active ? 'Deactivate' : 'Activate' }}
                             </button>
                             <button wire:click="deleteEmail({{ $email->id }})"
                                 onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
-                                class="px-3 py-1 text-sm text-white bg-red-600 rounded-md hover:bg-red-700">
+                                class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
                                 Delete
                             </button>
                         </div>

@@ -14,6 +14,8 @@ class SubscriptionNote extends Component
     public $note;
     public $content;
 
+    protected $listeners = ['refreshComponent' => '$refresh'];
+
     public function mount($subscription)
     {
         $this->subscription = $subscription;
@@ -31,7 +33,9 @@ class SubscriptionNote extends Component
         ]);
 
         $this->alert('success', 'Note updated successfully', ['position' => 'bottom-end']);
+        $this->dispatch('refreshComponent');
     }
+
 
     public function render()
     {

@@ -5,7 +5,8 @@
         </h2>
 
         <div class="mt-6">
-            <x-primary-textarea wire:model="content" placeholder="Enter note for this subscription..." class="w-full h-96">
+            <x-primary-textarea wire:model.live.debounce.500ms="content" placeholder="Enter note for this subscription..."
+                class="w-full h-96">
             </x-primary-textarea>
         </div>
 

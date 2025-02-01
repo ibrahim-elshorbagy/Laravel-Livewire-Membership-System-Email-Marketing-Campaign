@@ -21,7 +21,7 @@ class EmailListsTable extends Component
     public $selectPage = false;
     public $user;
     public $emailLimit;
-
+    public $currentEmails;
     protected $queryString = [
         'search' => ['except' => ''],
         'perPage' => ['except' => 10],

@@ -61,6 +61,9 @@
                         <x-nav-link :active="request()->routeIs('user.emails.index')" href="{{ route('user.emails.index') }}" wire:navigate>
                             <span>My Emails</span>
                         </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.campaign.form')" href="{{ route('user.campaign.form') }}" wire:navigate>
+                            <span>Email Campaign</span>
+                        </x-nav-link>
                         @endrole
                         @role('admin')
                         <x-nav-link :active="request()->routeIs('admin.users')" href="{{ route('admin.users') }}" wire:navigate>
@@ -147,6 +150,9 @@
                         <x-nav-link :active="request()->routeIs('user.emails.index')" href="{{ route('user.emails.index') }}"
                             wire:navigate>
                             <span>My Emails</span>
+                        </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.campaign.form')" href="{{ route('user.campaign.form') }}" wire:navigate>
+                            <span>Email Campaign</span>
                         </x-nav-link>
                         @endrole
 

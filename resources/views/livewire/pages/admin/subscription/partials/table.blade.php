@@ -124,7 +124,7 @@
                 <!-- Note Modal -->
                     <x-modal name="subscription-note-{{ $subscription->id }}" :show="false" :maxWidth="'6xl'">
                         <livewire:pages.admin.subscription.subscription-note :subscription="$subscription"
-                            :wire:key="'note-'.$subscription->id" />
+                            :wire:key="'note-'.$subscription->id.$subscription->updated_at" />
                     </x-modal>
                 @endforeach
             </tbody>
