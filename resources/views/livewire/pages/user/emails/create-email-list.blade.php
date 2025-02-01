@@ -114,7 +114,7 @@ x-data="{
 
 
     <!-- File Import Section -->
-    <div class="flex gap-2 mb-4">
+    <div class="flex gap-2 mb-4 text-sm md:text-md">
         <!-- Text File Import -->
         <label class="inline-block px-4 py-2 text-white bg-blue-500 rounded cursor-pointer hover:bg-blue-600">
             <input type="file" id="text-file-input" class="hidden" accept=".txt,.csv" @change="processTextFile">
@@ -130,21 +130,24 @@ x-data="{
 
     <!-- Warning Message -->
     <div class="p-4 my-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20">
-        <div class="flex flex-col sm:flex-row">
+        <div class="flex flex-col">
             <!-- Icon -->
-            <div class="flex-shrink-0 sm:mr-3">
-                <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                        clip-rule="evenodd" />
-                </svg>
-            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex-shrink-0 sm:mr-3">
+                    <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
 
-            <!-- Content -->
-            <div class="mt-2 sm:mt-0">
                 <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
                     Important Note
                 </h3>
+            </div>
+            <!-- Content -->
+            <div class="mt-2 sm:mt-0">
+
                 <div class="mt-2 space-y-2 text-sm text-yellow-700 dark:text-neutral-300">
                     <p class="text-xs sm:text-sm">
                         - Enter one email per line or separate emails with commas.
@@ -176,7 +179,7 @@ x-data="{
         <h3 class="mb-2 text-lg font-semibold" x-text="`Preview (${parsedEmails.length} entries)`"></h3>
         <div class="p-4 overflow-y-auto border rounded-lg max-h-96">
             <template x-for="(entry, index) in parsedEmails" :key="index">
-                <div class="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div class="flex items-center justify-between gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <span :class="{ 'text-red-500': !entry.valid }" x-text="entry.value"></span>
                     <button @click="removeEmail(index)" class="text-red-500 hover:text-red-700">
                         ✕

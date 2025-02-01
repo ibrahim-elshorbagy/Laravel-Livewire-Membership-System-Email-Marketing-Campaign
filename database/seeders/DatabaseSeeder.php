@@ -29,8 +29,8 @@ class DatabaseSeeder extends Seeder
 
 
          $user = User::factory()->create([
-            'first_name' => 'ibrahim',
-            'last_name' => 'elshorbagy',
+            'first_name' => 'Administrator',
+            'last_name' => 'admin',
             'username' => 'a',
             'email' => 'a@a.a',
             'password' => bcrypt('a'),
@@ -40,10 +40,10 @@ class DatabaseSeeder extends Seeder
         $user->assignRole($adminRole);
 
         $user = User::factory()->create([
-            'first_name' => 'ahmed',
-            'last_name' => 'ahmed',
+            'first_name' => 'ibrahim',
+            'last_name' => 'elshorbagy',
             'username' => 'u',
-            'email' => 'u@u.u',
+            'email' => 'ibrahim.elshorbagy47@gmail.com',
             'password' => bcrypt('u'),
             'image_url'=>'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
             'active' => true

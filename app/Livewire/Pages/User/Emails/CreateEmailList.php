@@ -21,6 +21,9 @@ class CreateEmailList extends Component
         $this->user = auth()->user();
         $this->remainingQuota = $this->user->balance('Subscribers Limit');
 
+        if ($this->remainingQuota == 0) {
+            return redirect()->route('welcome');
+        }
     }
 
 
