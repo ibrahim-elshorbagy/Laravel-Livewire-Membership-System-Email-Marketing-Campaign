@@ -58,6 +58,9 @@
                             wire:navigate>
                             <span>My Transactions</span>
                         </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.emails.index')" href="{{ route('user.emails.index') }}" wire:navigate>
+                            <span>My Emails</span>
+                        </x-nav-link>
                         @endrole
                         @role('admin')
                         <x-nav-link :active="request()->routeIs('admin.users')" href="{{ route('admin.users') }}" wire:navigate>
@@ -140,6 +143,10 @@
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('user.my-transactions')" href="{{ route('user.my-transactions') }}" wire:navigate>
                                 <span>My Transactions</span>
+                        </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.emails.index')" href="{{ route('user.emails.index') }}"
+                            wire:navigate>
+                            <span>My Emails</span>
                         </x-nav-link>
                         @endrole
 
@@ -281,6 +288,7 @@
             "logo": "images/default-logo.png"
         }
     </script>
+    @stack('scripts')
 </body>
 
 

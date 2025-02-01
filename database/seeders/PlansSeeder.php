@@ -26,7 +26,6 @@ class PlansSeeder extends Seeder
 
         $emailSending = Feature::create([
             'consumable' => true,
-            'quota'      => true,
             'name' => 'Email Sending',
             'periodicity_type' => PeriodicityType::Month,
             'periodicity' => 1,
