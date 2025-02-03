@@ -26,7 +26,7 @@ class MySubscription extends Component
         if ($this->subscription) {
             $this->subscription->started_at = $this->subscription->created_at->toDateTimeString();
             $this->subscription->expired_at = $this->subscription->expired_at->toDateTimeString();
-            $this->subscription->remaining_time = Carbon::now()->diffForHumans($this->subscription->expired_at, [
+            $this->subscription->remaining_time = Carbon::parse($this->subscription->expired_at)->diffForHumans(Carbon::now(), [
                 'parts' => 3,
                 'join' => true,
                 'syntax' => Carbon::DIFF_RELATIVE_TO_NOW,
