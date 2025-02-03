@@ -8,7 +8,7 @@
 
 <div>
     <!-- Search Box -->
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex flex-col items-center justify-between gap-2 mb-4 md:flex-row">
         <div class="mb-4">
             <div class="relative">
                 <x-text-input wire:model.live.debounce.600ms="{{ $search }}" id="search" name="search" type="text"
@@ -111,9 +111,6 @@
                                 Unblock
                             </x-primary-create-button>
                             @endif
-                            <x-primary-info-button href="{{ route('admin.users.transactions', $user) }}" wire:navigate>
-                                Transactions
-                            </x-primary-info-button>
                             <x-primary-danger-button wire:click="deleteUser({{ $user->id }})"
                                 onclick="confirm('Are you sure you want to delete this user?') || event.stopImmediatePropagation()">
                                 <i class="fa-solid fa-trash"></i>

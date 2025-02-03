@@ -122,7 +122,7 @@
                     </td>
                 </tr>
                 <!-- Note Modal -->
-                    <x-modal name="subscription-note-{{ $subscription->id }}" :show="false" :maxWidth="'6xl'">
+                    <x-modal name="subscription-note-{{ $subscription->id }}" :show="false" :maxWidth="'2xl'">
                         <livewire:pages.admin.subscription.subscription-note :subscription="$subscription"
                             :wire:key="'note-'.$subscription->id.$subscription->updated_at" />
                     </x-modal>

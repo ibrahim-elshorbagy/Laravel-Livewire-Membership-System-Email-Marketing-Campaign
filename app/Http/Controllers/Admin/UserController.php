@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class UserController extends Controller
+{
+    public function revertImpersonate()
+    {
+        $adminId = session('impersonated_by');
+
+        // Validate admin ID exists and is an admin
+        $admin = User::findOrFail($adminId);
+        if (!$admin->hasRole('admin')) {
+            abort(403, 'Invalid admin user.');
+        }
+
+        Auth::logout();
+        Auth::login($admin);
+
+        session()->forget('impersonated_by');
+
+        return redirect()->route('welcome');
+    }
+}

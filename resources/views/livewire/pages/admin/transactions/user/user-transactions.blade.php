@@ -1,7 +1,7 @@
 <div
     class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <!-- Header -->
-    <div class="flex flex-col items-center justify-between mb-6 md:flex-row">
+    <div class="flex flex-col items-center justify-between gap-5 mb-6 md:flex-row">
 
         <div class="flex flex-col items-center gap-2 mt-4 w-max md:mt-0">
             <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
@@ -16,8 +16,8 @@
                 </div>
             </div>
         </div>
-        <x-primary-info-button href="{{ route('admin.users') }}" wire:navigate>
-            Back to Users
+        <x-primary-info-button href="{{ route('admin.subscriptions') }}" wire:navigate>
+            Back to Subscribers
         </x-primary-info-button>
     </div>
 

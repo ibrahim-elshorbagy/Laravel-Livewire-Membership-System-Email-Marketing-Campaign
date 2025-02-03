@@ -66,20 +66,23 @@
                         </x-nav-link>
                         @endrole
                         @role('admin')
-                        <x-nav-link :active="request()->routeIs('admin.users')" href="{{ route('admin.users') }}" wire:navigate>
+                        <x-nav-link :active="request()->routeIs('admin.users') ||
+                                                            request()->routeIs('admin.users.create') ||
+                                                            request()->routeIs('admin.users.edit')" href="{{ route('admin.users') }}"
+                            wire:navigate>
                             <span>Users</span>
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('admin.subscriptions')" href="{{ route('admin.subscriptions') }}" wire:navigate>
                             <span>Subscriptions</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('admin.payment.transactions')" href="{{ route('admin.payment.transactions') }}"
-                            wire:navigate>
+                        <x-nav-link :active="request()->routeIs('admin.payment.transactions') ||
+                                                            request()->routeIs('admin.users.transactions')"
+                            href="{{ route('admin.payment.transactions') }}" wire:navigate>
                             <span>Transactions</span>
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}" wire:navigate>
                             <span>Plans</span>
                         </x-nav-link>
-
                         @endrole
 
             </div>
@@ -160,13 +163,16 @@
 
 
                         @role('admin')
-                        <x-nav-link :active="request()->routeIs('admin.users')" href="{{ route('admin.users') }}" wire:navigate>
+                        <x-nav-link :active="request()->routeIs('admin.users') ||
+                                    request()->routeIs('admin.users.create') ||
+                                    request()->routeIs('admin.users.edit')" href="{{ route('admin.users') }}" wire:navigate>
                             <span>Users</span>
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('admin.subscriptions')" href="{{ route('admin.subscriptions') }}" wire:navigate>
                             <span>Subscriptions</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('admin.payment.transactions')" href="{{ route('admin.payment.transactions') }}"
+                        <x-nav-link :active="request()->routeIs('admin.payment.transactions') ||
+                                    request()->routeIs('admin.users.transactions.*')" href="{{ route('admin.payment.transactions') }}"
                             wire:navigate>
                             <span>Transactions</span>
                         </x-nav-link>
@@ -225,7 +231,15 @@
                                         <i class="mr-2 fa-regular fa-user"></i>
                                         Profile
                                     </a>
+
                                     <livewire:pages.auth.logout />
+                                    @if(session()->has('impersonated_by'))
+                                    <a href="{{ route('revert.impersonate') }}"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800">
+                                        <i class="fa-solid fa-backward"></i>
+                                        Back to Admin
+                                    </a>
+                                    @endif
                                     @endauth
 
                                     @guest

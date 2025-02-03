@@ -33,7 +33,7 @@ class SubscriptionNote extends Component
         ]);
 
         $this->alert('success', 'Note updated successfully', ['position' => 'bottom-end']);
-        $this->dispatch('refreshComponent');
+        $this->dispatch('close');
     }
 
 

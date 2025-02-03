@@ -20,7 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
             $middleware->alias([
             'role' => RoleMiddleware::class,
 
-            $middleware->append(GlobalSettingsMiddleware::class)
+            $middleware->append(GlobalSettingsMiddleware::class),
+            'impersonation.check' => \App\Http\Middleware\ImpersonationCheckMiddleware::class,
+
 
         ]);
     })

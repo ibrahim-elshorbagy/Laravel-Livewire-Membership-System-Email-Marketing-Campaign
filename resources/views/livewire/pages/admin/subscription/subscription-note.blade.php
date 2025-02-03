@@ -6,7 +6,7 @@
 
         <div class="mt-6">
             <x-primary-textarea wire:model.live.debounce.500ms="content" placeholder="Enter note for this subscription..."
-                class="w-full h-96">
+                class="w-full h-64">
             </x-primary-textarea>
         </div>
 
@@ -16,7 +16,7 @@
             </x-secondary-button>
 
             <x-primary-create-button type="submit">
-                Update Note
+                Save
             </x-primary-create-button>
         </div>
     </form>

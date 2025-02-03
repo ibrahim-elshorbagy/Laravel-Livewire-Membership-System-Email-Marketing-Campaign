@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Livewire\Pages\Admin\Payment\PaypalConfig;
@@ -17,6 +18,10 @@ use App\Livewire\Pages\Admin\User\UserManagement\Edit;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
+    Route::middleware(['auth', 'impersonation.check'])->group(function () {
+        Route::get('/revert-impersonate', [UserController::class, 'revertImpersonate'])
+            ->name('revert.impersonate');
+    });
     Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 
         // User Management
@@ -43,7 +48,7 @@ use Livewire\Volt\Volt;
 
         Route::get('/transactions', Transactions::class)->name('admin.payment.transactions');
         Route::get('/transactions/{payment}/edit',EditPayment::class)->name('admin.transactions.edit');
-        Route::get('/users/{user}/transactions', UserTransactions::class)->name('admin.users.transactions');
+        Route::get('/transactions/{user}/transaction', UserTransactions::class)->name('admin.users.transactions');
 
 
     });
