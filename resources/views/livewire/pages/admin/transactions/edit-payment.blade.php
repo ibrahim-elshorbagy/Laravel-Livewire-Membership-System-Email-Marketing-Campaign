@@ -32,21 +32,24 @@
     </div>
 
     <!-- Subscription Info -->
-    @if($subscription)
-    <div class="mb-6">
-        <h3 class="mb-2 text-lg font-semibold text-neutral-700 dark:text-neutral-300">Subscription</h3>
-        <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
-            <div class="flex flex-col gap-2">
-                <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                    Period: {{ Carbon\Carbon::parse($subscription->started_at)->format('M d, Y') }} to
-                    {{ Carbon\Carbon::parse($subscription->expired_at)->format('M d, Y') }}
-                </span>
-                <span class="text-sm text-neutral-500 dark:text-neutral-400">
-                    Remaining time: {{ $subscription->remaining_time }}
-                </span>
+    @if($plan->name != "Trial")
+        @if($subscription)
+        <div class="mb-6">
+            <h3 class="mb-2 text-lg font-semibold text-neutral-700 dark:text-neutral-300">Subscription</h3>
+            <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                <div class="flex flex-col gap-2">
+                    <span class="text-sm text-neutral-600 dark:text-neutral-400">
+                        Period: {{ Carbon\Carbon::parse($subscription->started_at)->format('M d, Y') }}
+                        to
+                        {{ Carbon\Carbon::parse($subscription->expired_at)->format('M d, Y') }}
+                    </span>
+                    <span class="text-sm text-neutral-500 dark:text-neutral-400">
+                        Remaining time: {{ $subscription->remaining_time }}
+                    </span>
+                </div>
             </div>
         </div>
-    </div>
+        @endif
     @endif
 
     <!-- Payment Details Form -->
