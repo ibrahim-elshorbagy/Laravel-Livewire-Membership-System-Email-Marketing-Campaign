@@ -14,6 +14,16 @@
         </div>
     </div>
 
+    @if ($errors->any())
+        <div class="p-4 mb-4 text-red-700 bg-red-100 border-l-4 border-red-500">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <!-- Plan Details -->
         <div class="p-4 border rounded-md border-neutral-300 dark:border-neutral-700">
@@ -33,24 +43,6 @@
                     <x-input-error :messages="$errors->get('price')" class="mt-2" />
                 </div>
 
-                <!-- Billing Cycle -->
-                {{-- <div>
-                    <x-input-label for="periodicity" :value="__('Billing Cycle')" />
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <x-text-input wire:model="periodicity" id="periodicity" type="number"
-                                class="block w-full mt-1" />
-                            <x-input-error :messages="$errors->get('periodicity')" class="mt-2" />
-                        </div>
-                        <div>
-                            <x-primary-select-input wire:model="periodicity_type" id="periodicity_type">
-                                <option value="month">Month(s)</option>
-                                <option value="year">Year(s)</option>
-                            </x-primary-select-input>
-                        </div>
-                    </div>
-                </div> --}}
-
                 <div class="pt-4">
                     <x-primary-create-button type="submit">
                         Update Plan
@@ -62,63 +54,18 @@
         <!-- Features Management -->
         <div class="p-4 border rounded-md border-neutral-300 dark:border-neutral-700 sm:p-6">
             <h3 class="mb-4 text-lg font-medium">Features Management</h3>
-
-            <!-- Current Features -->
-            <div class="mb-6">
-                <h4 class="mb-2 text-sm font-medium sm:text-base">Current Features</h4>
-                <div class="space-y-3">
-                    @foreach($features as $featureId => $feature)
-                    <div
-                        class="flex flex-col p-2 border rounded-md border-neutral-300 dark:border-neutral-700 sm:p-3 sm:flex-row sm:items-center sm:justify-between">
-                        <span class="mb-2 text-sm font-medium sm:text-base sm:mb-0 sm:flex-1">{{ $feature['name'] }}</span>
-                        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-                            <x-text-input type="number" wire:model.live="features.{{ $featureId }}.limit" class="w-full sm:w-24"
-                                placeholder="Limit" />
-                            <div class="flex gap-2">
-                                <x-primary-create-button wire:click="updateFeatureLimit({{ $featureId }})"
-                                    class="justify-center w-full sm:w-auto" size="sm">
-                                    Update
-                                </x-primary-create-button>
-                                <x-danger-button wire:click="detachFeature({{ $featureId }})"
-                                    class="justify-center w-full sm:w-auto" size="sm">
-                                    Remove
-                                </x-danger-button>
-                            </div>
-                        </div>
+            <div class="space-y-4">
+                @foreach($features as $feature)
+                <div
+                    class="flex items-center justify-between p-3 border rounded-md border-neutral-300 dark:border-neutral-700">
+                    <x-input-label :value="$feature->name" class="mb-0" />
+                    <div class="w-32">
+                        <x-text-input wire:model="featureLimits.{{ $feature->id }}" type="number" min="0"
+                            placeholder="Limit" class="text-right" step="1" />
                     </div>
-                    @endforeach
                 </div>
+                @endforeach
             </div>
-
-            <!-- Add Feature -->
-            @if(count($availableFeatures) > 0)
-            <div class="p-3 border rounded-md border-neutral-300 dark:border-neutral-700 sm:p-4">
-                <h4 class="mb-3 text-sm font-medium sm:text-base">Add Feature</h4>
-                <form wire:submit.prevent="attachFeature" class="space-y-3">
-                    <div>
-                        <x-input-label for="selectedFeature" :value="__('Select Feature')" class="text-sm sm:text-base" />
-                        <x-primary-select-input wire:model="selectedFeature" id="selectedFeature"
-                            class="w-full mt-1 text-sm sm:text-base">
-                            <option value="">Select a feature</option>
-                            @foreach($availableFeatures as $feature)
-                            <option value="{{ $feature['id'] }}">{{ $feature['name'] }}</option>
-                            @endforeach
-                        </x-primary-select-input>
-                    </div>
-
-                    <div>
-                        <x-input-label for="featureLimit" :value="__('Feature Limit')" class="text-sm sm:text-base" />
-                        <x-text-input wire:model="featureLimit" id="featureLimit" type="number"
-                            class="block w-full mt-1 text-sm sm:text-base" placeholder="Enter limit" />
-                        <x-input-error :messages="$errors->get('featureLimit')" class="mt-2 text-sm" />
-                    </div>
-
-                    <x-primary-button type="submit" class="w-full sm:w-auto">
-                        Add Feature
-                    </x-primary-button>
-                </form>
-            </div>
-            @endif
         </div>
     </div>
 </div>

@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
 use LucasDotVin\Soulbscription\Models\Subscription;
 use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
+use Illuminate\Database\Eloquent\Model;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +31,8 @@ class AppServiceProvider extends ServiceProvider
                 }])
                 ->findOrFail($value);
         });
+
+        Model::unguard();
 
 
     }
