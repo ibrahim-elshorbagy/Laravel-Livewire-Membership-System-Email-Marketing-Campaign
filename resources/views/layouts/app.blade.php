@@ -48,9 +48,9 @@
                             <span>Dashboard</span>
                         </x-nav-link> --}}
                         @role('user')
-                        <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}" wire:navigate>
+                        {{-- <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}" wire:navigate>
                             <span>Plans</span>
-                        </x-nav-link>
+                        </x-nav-link> --}}
                         <x-nav-link :active="request()->routeIs('user.my-subscription')" href="{{ route('user.my-subscription') }}">
                             <span>My Subscription</span>
                         </x-nav-link>
@@ -144,9 +144,9 @@
                             <span>Dashboard</span>
                         </x-nav-link> --}}
                         @role('user')
-                        <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}" wire:navigate>
+                        {{-- <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}" wire:navigate>
                             <span>Plans</span>
-                        </x-nav-link>
+                        </x-nav-link> --}}
                         <x-nav-link :active="request()->routeIs('user.my-subscription')" href="{{ route('user.my-subscription') }}"  >
                             <span>My Subscription</span>
                         </x-nav-link>

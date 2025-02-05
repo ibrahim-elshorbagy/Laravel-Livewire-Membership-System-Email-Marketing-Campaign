@@ -19,9 +19,21 @@ class Subscribe extends Component
     public $paymentUrl;
     public $isProcessing = false;
 
-    protected $rules = [
-        'selectedPlan' => 'required|exists:plans,id',
-    ];
+    protected function rules()
+    {
+        return [
+            'selectedPlan' => [
+                'required',
+                'exists:plans,id',
+                function ($attribute, $value, $fail) {
+                    $currentPlanId = $this->getCurrentPlanId();
+                    if ($currentPlanId === (int)$value) {
+                        $fail("You can't select your current plan.");
+                    }
+                },
+            ],
+        ];
+    }
     public function hydrate()
     {
         $this->listeners = [
@@ -126,8 +138,18 @@ class Subscribe extends Component
         $this->alert('info', 'Subscription upgrade cancelled.');
     }
 
+    public function getCurrentPlanId()
+    {
+        $user = auth()->user();
+        if ($user && $user->lastSubscription()) {
+            return $user->lastSubscription()->plan_id;
+        }
+        return null;
+    }
     public function render()
     {
+        $currentPlanId = $this->getCurrentPlanId();
+
         $monthlyPlans = Plan::with('features')
             ->where('periodicity_type', 'Month')
             ->get();
@@ -140,6 +162,8 @@ class Subscribe extends Component
         return view('livewire.pages.user.subscription.subscribe', [
             'monthlyPlans' => $monthlyPlans,
             'yearlyPlans' => $yearlyPlans,
+            'currentPlanId' => $currentPlanId,
+
         ])->layout('layouts.app',['title' => 'Plans']);
     }
 }

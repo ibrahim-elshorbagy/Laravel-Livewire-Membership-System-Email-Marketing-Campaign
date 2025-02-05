@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\EmailList;
+use LucasDotVin\Soulbscription\Models\Plan;
 
 class EmailListSeeder extends Seeder
 {
@@ -17,6 +18,7 @@ class EmailListSeeder extends Seeder
             // Create a mix of email statuses for each user
 
             $user->assignRole('user');
+            $user->subscribeTo(Plan::where('name', 'Trial')->first());
 
             // Failed emails
             EmailList::factory()

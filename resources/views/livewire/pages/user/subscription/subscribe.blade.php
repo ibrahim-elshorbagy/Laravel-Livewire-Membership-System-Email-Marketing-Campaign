@@ -1,4 +1,5 @@
-<div class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+<div
+    class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <!-- Processing Overlay -->
     {{-- <div wire:loading.flex class="fixed inset-0 z-50 items-center justify-center bg-black bg-opacity-50">
         <div class="p-6 bg-white rounded-lg shadow-xl dark:bg-neutral-800">
@@ -39,6 +40,7 @@
                     {{ $plan->name }}
                 </h3>
 
+
                 <p class="mt-2 text-xs font-medium text-pretty">
                     {{ $plan->description ?? 'Best tools for your needs' }}
                 </p>
@@ -56,12 +58,24 @@
                     @endforeach
                 </ul>
 
-                <button type="button" wire:click="$set('selectedPlan', {{ $plan->id }})" wire:loading.attr="disabled"
-                    @class([ 'mt-12 w-full whitespace-nowrap px-4 py-2 text-center text-sm font-medium tracking-wide transition rounded-lg'
-                    , 'bg-black text-neutral-100 dark:bg-orange-500 dark:text-black'=> $selectedPlan !== $plan->id,
+                <button type="button" @if($currentPlanId===$plan->id)
+                    disabled
+                    class="w-full px-4 py-2 mt-12 text-sm font-medium tracking-wide text-center text-white transition rounded-lg cursor-not-allowed whitespace-nowrap bg-neutral-400"
+                    @else
+                    wire:click="$set('selectedPlan', {{ $plan->id }})"
+                    wire:loading.attr="disabled"
+                    @class([
+                    'mt-12 w-full whitespace-nowrap px-4 py-2 text-center text-sm font-medium tracking-wide transition
+                    rounded-lg',
+                    'bg-black text-neutral-100 dark:bg-orange-500 dark:text-black'=> $selectedPlan !== $plan->id,
                     'bg-green-500 text-white' => $selectedPlan === $plan->id,
-                    ])>
+                    ])
+                    @endif>
+                    @if($currentPlanId === $plan->id)
+                    CURRENT
+                    @else
                     {{ $selectedPlan === $plan->id ? 'Selected' : 'Select Plan' }}
+                    @endif
                 </button>
             </article>
             @endforeach
@@ -102,12 +116,24 @@
                     @endforeach
                 </ul>
 
-                <button type="button" wire:click="$set('selectedPlan', {{ $plan->id }})" wire:loading.attr="disabled"
-                    @class([ 'mt-12 w-full whitespace-nowrap px-4 py-2 text-center text-sm font-medium tracking-wide transition rounded-lg'
-                    , 'bg-black text-neutral-100 dark:bg-orange-500 dark:text-black'=> $selectedPlan !== $plan->id,
+                <button type="button" @if($currentPlanId===$plan->id)
+                    disabled
+                    class="w-full px-4 py-2 mt-12 text-sm font-medium tracking-wide text-center text-white transition rounded-lg cursor-not-allowed whitespace-nowrap bg-neutral-400"
+                    @else
+                    wire:click="$set('selectedPlan', {{ $plan->id }})"
+                    wire:loading.attr="disabled"
+                    @class([
+                    'mt-12 w-full whitespace-nowrap px-4 py-2 text-center text-sm font-medium tracking-wide transition
+                    rounded-lg',
+                    'bg-black text-neutral-100 dark:bg-orange-500 dark:text-black'=> $selectedPlan !== $plan->id,
                     'bg-green-500 text-white' => $selectedPlan === $plan->id,
-                    ])>
+                    ])
+                    @endif>
+                    @if($currentPlanId === $plan->id)
+                    CURRENT
+                    @else
                     {{ $selectedPlan === $plan->id ? 'Selected' : 'Select Plan' }}
+                    @endif
                 </button>
             </article>
             @endforeach
@@ -117,11 +143,11 @@
     <!-- Payment Button -->
     @if($selectedPlan)
     <div class="flex justify-center mt-8">
-            <button wire:click="initiatePayment" wire:loading.attr="disabled"
-                class="px-6 py-3 text-sm font-semibold text-white transition bg-black rounded-lg hover:bg-black/80 dark:bg-orange-500 dark:text-black dark:hover:bg-orange-600">
-                <span wire:loading.remove>Proceed to Payment</span>
-                <span wire:loading>Processing...</span>
-            </button>
+        <button wire:click="initiatePayment" wire:loading.attr="disabled"
+            class="px-6 py-3 text-sm font-semibold text-white transition bg-black rounded-lg hover:bg-black/80 dark:bg-orange-500 dark:text-black dark:hover:bg-orange-600">
+            <span wire:loading.remove>Proceed to Payment</span>
+            <span wire:loading>Processing...</span>
+        </button>
     </div>
     @endif
 
@@ -140,16 +166,5 @@
         }
     }" @paypalPayment.window="openPaymentWindow($event.detail.url)">
 
-    @if($errors->any())
-    <div class="p-4 mt-4 bg-red-100 rounded-md dark:bg-red-900/50">
-        <ul class="text-red-600 list-disc list-inside dark:text-red-400">
-            @foreach($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
+
 </div>
-
-
-

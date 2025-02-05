@@ -2,11 +2,11 @@
     @if($subscription)
     <div class="overflow-hidden bg-neutral-50 dark:bg-neutral-900 rounded-xl">
         <!-- Header with Plan Name -->
-        <div class="px-6 py-8 text-center bg-neutral-700 dark:bg-orange-400">
-            <h2 class="text-2xl font-bold text-white dark:text-black">
+        <div class="px-6 py-8 text-center bg-indigo-500 dark:bg-indigo-700">
+            <h2 class="text-2xl font-bold text-white ">
                 {{ $subscription->plan->name }}
             </h2>
-            <p class="mt-2 text-neutral-200 dark:text-black/75">
+            <p class="mt-2 text-neutral-200 ">
                 Your Active Subscription
             </p>
         </div>
@@ -151,6 +151,26 @@
             </div>
             @endif
         </div>
+
+    </div>
+
+    <div class="flex items-center justify-center my-10">
+        <button wire:navigate href="{{ route('our.plans') }}" class="relative px-6 py-3 text-lg font-semibold text-white transition-all duration-300 ease-in-out
+            bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700
+            rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5
+            overflow-hidden group">
+            <span class="relative z-10 flex items-center">
+                Upgrade
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    class="w-5 h-5 ml-2 transition-transform duration-300 ease-in-out transform group-hover:translate-x-1"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+            </span>
+            <div
+                class="absolute top-0 left-0 w-full h-full transition-transform duration-300 ease-out transform translate-x-full -skew-x-12 bg-white/10 group-hover:translate-x-0">
+            </div>
+        </button>
     </div>
     @else
     <!-- No Subscription State -->
@@ -164,11 +184,29 @@
             You don't have any active subscription at the moment.
         </p>
         <div class="mt-6">
-            <a href="{{ route('our.plans') }}" wire:navigate
-                class="inline-flex items-center px-4 py-2 text-sm font-medium text-white transition bg-black rounded-lg dark:bg-orange-500 dark:text-black hover:bg-black/80 dark:hover:bg-orange-600">
-                View Available Plans
-            </a>
+            <div class="flex items-center justify-center my-10">
+                <button wire:navigate href="{{ route('our.plans') }}" class="relative px-6 py-3 text-lg font-semibold text-white transition-all duration-300 ease-in-out
+                            bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700
+                            rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5
+                            overflow-hidden group">
+                    <span class="relative z-10 flex items-center">
+                        Subscribe Now
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5 ml-2 transition-transform duration-300 ease-in-out transform group-hover:translate-x-1"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                    </span>
+                    <div
+                        class="absolute top-0 left-0 w-full h-full transition-transform duration-300 ease-out transform translate-x-full -skew-x-12 bg-white/10 group-hover:translate-x-0">
+                    </div>
+                </button>
+            </div>
         </div>
     </div>
+
+
     @endif
+
+
 </div>
