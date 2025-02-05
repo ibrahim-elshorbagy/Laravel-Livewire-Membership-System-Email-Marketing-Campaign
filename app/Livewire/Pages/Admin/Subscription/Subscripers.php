@@ -9,6 +9,7 @@ use Livewire\WithPagination;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Attributes\Computed;
+use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
 use LucasDotVin\Soulbscription\Models\Subscription;
 use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
 
@@ -97,7 +98,7 @@ class Subscripers extends Component
         $query = Subscription::with(['plan', 'subscriber' => function ($query) {
             $query->withTrashed();
         }])
-        ->withoutGlobalScope(SuppressingScope::class);
+        ->withoutGlobalScopes([SuppressingScope::class, StartingScope::class]);
 
         return match($status) {
             'canceled' => $query->whereNotNull('canceled_at'),

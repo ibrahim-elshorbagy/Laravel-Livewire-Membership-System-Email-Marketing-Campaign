@@ -31,7 +31,9 @@ use Livewire\Volt\Volt;
 
         // Subscription Management
         Route::get('/subscriptions', Subscripers::class)->name('admin.subscriptions');
-        Route::get('/subscriptions/{subscription:id}/edit', EditSubscription::class)->name('admin.subscriptions.edit');
+        Route::get('/subscriptions/{subscription}/edit', EditSubscription::class)
+            ->name('admin.subscriptions.edit')
+            ->scopeBindings(false);
 
 
         // Plan Management

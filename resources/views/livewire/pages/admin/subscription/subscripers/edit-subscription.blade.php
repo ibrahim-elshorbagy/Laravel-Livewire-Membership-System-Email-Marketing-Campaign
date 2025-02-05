@@ -197,7 +197,7 @@
                         </h3>
                         <div class="mt-2 space-y-2 text-sm text-yellow-700 dark:text-yellow-300">
                             <p class="text-xs sm:text-sm text-neutral-500">
-                                - Cancelling access remains until expiration.
+                                - Cancelling will keep access until the expiration date, but there won't be any grace period.
                             </p>
                             <p class="text-xs sm:text-sm text-neutral-500">
                                 - Suppressing immediately stops access To all Features.
@@ -298,28 +298,37 @@
                 <!-- Start Date -->
                 <div>
                     <x-input-label for="started_at" :value="__('Start Date')" />
-                    <x-text-input wire:model="started_at" id="started_at" type="date" class="block w-full mt-1" />
+                    <x-text-input x-data x-init="flatpickr($el, {
+                            dateFormat: 'Y-m-d',
+                            defaultDate: '{{ $started_at }}',
+                            allowInput: true
+                        })" wire:model="started_at" type="text" class="block w-full mt-1" placeholder="YYYY-MM-DD" />
                     <x-input-error :messages="$errors->get('started_at')" class="mt-2" />
                 </div>
 
                 <!-- Expiration Date -->
                 <div>
                     <x-input-label for="expired_at" :value="__('Expiration Date')" />
-                    <x-text-input wire:model="expired_at" id="expired_at" type="date" class="block w-full mt-1" />
+                    <x-text-input x-data x-init="flatpickr($el, {
+                            dateFormat: 'Y-m-d',
+                            defaultDate: '{{ $expired_at }}',
+                            allowInput: true
+                        })" wire:model="expired_at" type="text" class="block w-full mt-1" placeholder="YYYY-MM-DD" />
                     <x-input-error :messages="$errors->get('expired_at')" class="mt-2" />
                 </div>
 
                 <!-- Grace Period -->
                 <div>
                     <x-input-label for="grace_days_ended_at" :value="__('Grace Period End')" />
-                    <x-text-input wire:model="grace_days_ended_at" id="grace_days_ended_at" type="datetime-local"
-                        class="block w-full mt-1" />
+                    <x-text-input x-data x-init="flatpickr($el, {
+                            dateFormat: 'Y-m-d H:i',
+                            enableTime: true,
+                            time_24hr: true,
+                            defaultDate: '{{ $grace_days_ended_at }}',
+                            allowInput: true
+                        })" wire:model="grace_days_ended_at" type="text" class="block w-full mt-1" placeholder="YYYY-MM-DD HH:MM" />
                     <x-input-error :messages="$errors->get('grace_days_ended_at')" class="mt-2" />
-                    <p class="mt-2 text-xs sm:text-sm text-neutral-500">
-                        Set a date until when the subscription will remain active after expiration.
-                    </p>
                 </div>
-
                 <!-- Server Status -->
                 <div>
                     <x-input-label for="server_status" :value="__('Server Status')" />

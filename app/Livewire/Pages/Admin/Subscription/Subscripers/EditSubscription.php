@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Support\Facades\Session;
 use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
+use Carbon\Carbon;
+use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
 
 class EditSubscription extends Component
 {
@@ -43,10 +45,16 @@ class EditSubscription extends Component
 
     public function mount(Subscription $subscription)
     {
-        // dd($subscription);
-        $this->subscription = Subscription::withoutGlobalScope(SuppressingScope::class)
-            ->with('subscriber')
-            ->findOrFail($subscription->id);
+        // If it's already a model instance, use it directly
+        if ($subscription instanceof Subscription) {
+            $this->subscription = $subscription;
+        } else {
+            // Otherwise, query it without global scopes
+            $this->subscription = Subscription::withoutGlobalScopes([SuppressingScope::class, StartingScope::class])
+                ->with('subscriber')
+                ->findOrFail($subscription);
+        }
+
 
         $this->payment = Payment::where('subscription_id', $subscription->id)->latest()->first();
 
@@ -152,6 +160,7 @@ class EditSubscription extends Component
         }
     }
 
+
     public function updateSubscriptionDetails()
     {
         $this->validate([
@@ -168,6 +177,7 @@ class EditSubscription extends Component
                 'started_at' => $this->started_at,
                 'expired_at' => $this->expired_at,
                 'grace_days_ended_at' => $this->grace_days_ended_at,
+                'suppressed_at' => null,
             ]);
 
             DB::commit();
@@ -187,6 +197,7 @@ class EditSubscription extends Component
                 'canceled_at' => now(),
                 'suppressed_at' => null,
                 'server_status' => 'hold',
+                'grace_days_ended_at' => null,
             ]);
             $this->subscription->subscriber->notify(new AdminSubscriptionCancelledNotification($this->subscription));
             $this->alert('success', 'Subscription cancelled successfully.' , ['position' => 'bottom-end']);

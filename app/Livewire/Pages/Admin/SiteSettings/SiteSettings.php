@@ -31,6 +31,10 @@ class SiteSettings extends Component
     public $meta_description;
     public $meta_keywords;
 
+    // Footer properties
+    public $footer_first_line;
+    public $footer_second_line;
+
     protected $rules = [
         'site_name' => 'required|string|max:255',
         'support_email' => 'required|email',
@@ -40,6 +44,9 @@ class SiteSettings extends Component
         'meta_title' => 'nullable|string|max:255',
         'meta_description' => 'nullable|string|max:500',
         'meta_keywords' => 'nullable|string|max:255',
+
+        'footer_first_line' => 'nullable|string|max:255',
+        'footer_second_line' => 'nullable|string|max:255',
 
     ];
 
@@ -53,6 +60,9 @@ class SiteSettings extends Component
         $this->meta_title = SiteSetting::getValue('meta_title');
         $this->meta_description = SiteSetting::getValue('meta_description');
         $this->meta_keywords = SiteSetting::getValue('meta_keywords');
+
+        $this->footer_first_line = SiteSetting::getValue('footer_first_line');
+        $this->footer_second_line = SiteSetting::getValue('footer_second_line');
 
     }
 
@@ -114,6 +124,9 @@ class SiteSettings extends Component
             SiteSetting::setValue('meta_description', $this->meta_description);
             SiteSetting::setValue('meta_keywords', $this->meta_keywords);
 
+            // Update footer settings
+            SiteSetting::setValue('footer_first_line', $this->footer_first_line);
+            SiteSetting::setValue('footer_second_line', $this->footer_second_line);
 
             // Handle Logo Upload
             if ($this->new_logo) {

@@ -65,9 +65,9 @@
 
         <!-- Submit Button -->
         <div class="flex justify-end">
-            <x-primary-button type="submit">
+            <x-primary-create-button type="submit">
                 Update Configuration
-            </x-primary-button>
+            </x-primary-create-button>
         </div>
     </form>
 </div>

@@ -49,6 +49,10 @@ class GlobalSettingsMiddleware
             'meta_description' => SiteSetting::getValue('meta_description'),
             'meta_keywords' => SiteSetting::getValue('meta_keywords'),
 
+            // Add more settings as needed...
+
+            'footer_first_line' => SiteSetting::getValue('footer_first_line'),
+            'footer_second_line' => SiteSetting::getValue('footer_second_line'),
         ];
     }
 

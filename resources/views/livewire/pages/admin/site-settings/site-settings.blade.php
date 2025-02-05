@@ -107,6 +107,30 @@
                         </p>
                         <x-input-error :messages="$errors->get('meta_keywords')" class="mt-2" />
                     </div>
+                </div>
+
+            </div>
+            <div class="p-6 border rounded-lg border-neutral-200 dark:border-neutral-600">
+                <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
+                    Footer Settings
+                </h3>
+
+                <div class="grid gap-6 md:grid-cols-1">
+
+                    <div>
+                        <x-input-label for="footer_first_line" :value="__('First Line')" />
+                        <x-text-input wire:model="footer_first_line" id="footer_first_line" type="text" class="block w-full mt-1"
+                            placeholder="Enter footer first line" />
+                        <x-input-error :messages="$errors->get('footer_first_line')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="footer_second_line" :value="__('Second Line')" />
+                        <x-text-input wire:model="footer_second_line" id="footer_second_line" type="text" class="block w-full mt-1"
+                            placeholder="Enter footer second line" />
+                        <x-input-error :messages="$errors->get('footer_second_line')" class="mt-2" />
+                    </div>
+                </div>
             </div>
             <div class="flex justify-end">
                 <x-primary-create-button type="submit">

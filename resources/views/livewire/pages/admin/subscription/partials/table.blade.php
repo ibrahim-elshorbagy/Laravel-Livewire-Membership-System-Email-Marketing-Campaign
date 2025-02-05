@@ -70,7 +70,7 @@
                     <td class="p-4">{{ $subscription->expired_at?->format('d/m/Y') }}</td>
                     <td class="p-4">
                         @if($payment)
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full text-nowrap
                             @switch($payment->status)
                                 @case('approved') text-green-800 bg-green-100 @break
                                 @case('pending') text-yellow-800 bg-yellow-100 @break

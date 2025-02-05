@@ -69,7 +69,7 @@
                     <td class="p-4">{{ $user->country }}</td>
                     <td class="p-4">
                         <a href="https://wa.me/{{ $user->whatsapp }}" target="_blank"
-                            class="text-green-500 hover:underline">
+                            class="text-green-500 hover:underline text-nowrap">
                             {{ $user->whatsapp }}
                         </a>
                     </td>

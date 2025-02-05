@@ -59,16 +59,19 @@
                             <span>My Transactions</span>
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('user.emails.index')" href="{{ route('user.emails.index') }}" wire:navigate>
-                            <span>My Emails</span>
+                            <span>Mailing list</span>
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('user.campaign.form')" href="{{ route('user.campaign.form') }}" wire:navigate>
                             <span>Email Campaign</span>
                         </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}" wire:navigate>
+                            <span>Support</span>
+                        </x-nav-link>
                         @endrole
                         @role('admin')
                         <x-nav-link :active="request()->routeIs('admin.users') ||
-                                                            request()->routeIs('admin.users.create') ||
-                                                            request()->routeIs('admin.users.edit')" href="{{ route('admin.users') }}"
+                            request()->routeIs('admin.users.create') ||
+                            request()->routeIs('admin.users.edit')" href="{{ route('admin.users') }}"
                             wire:navigate>
                             <span>Users</span>
                         </x-nav-link>
@@ -152,10 +155,13 @@
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('user.emails.index')" href="{{ route('user.emails.index') }}"
                             wire:navigate>
-                            <span>My Emails</span>
+                            <span>Mailing list</span>
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('user.campaign.form')" href="{{ route('user.campaign.form') }}" wire:navigate>
                             <span>Email Campaign</span>
+                        </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}" wire:navigate>
+                            <span>Support</span>
                         </x-nav-link>
                         @endrole
 
@@ -276,8 +282,8 @@
             <footer
                 class="py-3 text-center border-t border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300">
                 {{ $globalSettings['site_name'] }} Co.Ltd. &copy; 2025<br>
-                <a href="mailto:{{ $globalSettings['support_email'] }}" class="hover:underline">{{ $globalSettings['support_email'] }}</a> <br>
-                {{ $globalSettings['support_phone'] }}
+                <div>{{ $globalSettings['footer_first_line']}}</div>
+                <div>{{ $globalSettings['footer_second_line'] }}</div>
             </footer>
         </div>
     </div>

@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('subscriptions', function (Blueprint $table) {
-            $table->string('server_status')->nullable();
+            if (!Schema::hasColumn('subscriptions', 'server_status')) {
+                $table->string('server_status')->default('running')->after('subscriber_type');
+            }
         });
     }
 
@@ -22,7 +24,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('subscriptions', function (Blueprint $table) {
-            $table->dropColumn('server_status');
+            if (Schema::hasColumn('subscriptions', 'server_status')) {
+                $table->dropColumn('server_status');
+            }
         });
+
     }
 };

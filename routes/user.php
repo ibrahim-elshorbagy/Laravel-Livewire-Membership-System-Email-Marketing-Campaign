@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Pages\User\Support\Support;
 use App\Livewire\Pages\User\Emails\CampaignForm;
 use App\Livewire\Pages\User\Emails\CreateEmailList;
 use App\Livewire\Pages\User\Emails\EmailListsTable;
@@ -21,6 +22,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/campaign-form', CampaignForm::class)->name('user.campaign.form');
     Route::get('/emails', EmailListsTable::class)->name('user.emails.index');
     Route::get('/emails/create', CreateEmailList::class)->name('user.emails.create');
+
+    Route::get('/support', Support::class)->name('user.support');
+
 
 });
 
