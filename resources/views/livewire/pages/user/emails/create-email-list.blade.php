@@ -8,6 +8,7 @@ x-data="{
          error: null,
          textFileInput: null,
          excelFileInput: null,
+         maxEmails: 1500,
 
          init() {
              this.textFileInput = document.getElementById('text-file-input');
@@ -19,19 +20,29 @@ x-data="{
              });
          },
 
-         parseEmails() {
-             this.parsedEmails = this.emailInput
-                 .split(/[\n,;]/)
-                 .map(email => ({
-                     value: email.trim(),
-                     valid: this.validateEmail(email.trim())
-                 }))
-                 .filter(entry => entry.value.length > 0)
-                 .reduce((acc, entry) => {
-                     if (!acc.some(e => e.value === entry.value)) acc.push(entry);
-                     return acc;
-                 }, []);
-         },
+        parseEmails() {
+            let emails = this.emailInput
+            .split(/[\n,;]/)
+            .map(email => ({
+            value: email.trim(),
+            valid: this.validateEmail(email.trim())
+        }))
+        .filter(entry => entry.value.length > 0)
+        .reduce((acc, entry) => {
+            if (!acc.some(e => e.value === entry.value)) acc.push(entry);
+            return acc;
+        }, []);
+
+        if (emails.length > this.maxEmails) {
+            this.error = `Maximum limit of ${this.maxEmails} emails exceeded. Only the first ${this.maxEmails} emails are kept.`;
+            emails = emails.slice(0, this.maxEmails);
+            this.emailInput = emails.map(e => e.value).join('\n');
+        } else {
+            this.error = null;
+        }
+
+        this.parsedEmails = emails;
+},
 
          validateEmail(email) {
              return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -44,6 +55,15 @@ x-data="{
              try {
                  const file = this.textFileInput.files[0];
                  if (!file) return;
+
+
+                const currentCount = this.parsedEmails.length;
+
+                if (currentCount > this.maxEmails) {
+                    this.error = `Cannot add more emails - maximum limit of ${this.maxEmails} reached`;
+                    this.textFileInput.value = null;
+                    return;
+                }
 
                  const reader = new FileReader();
                  reader.onload = (e) => {
@@ -71,6 +91,13 @@ x-data="{
                  const file = this.excelFileInput.files[0];
                  if (!file) return;
 
+
+                 const currentCount = this.parsedEmails.length;
+                 if (currentCount > this.maxEmails) {
+                    this.error = `Cannot add more emails - maximum limit of ${this.maxEmails} reached`;
+                    this.excelFileInput.value = null;
+                    return;
+                 }
                  if (typeof XLSX === 'undefined') {
                      throw new Error('Excel library not loaded');
                  }
@@ -105,13 +132,31 @@ x-data="{
          }
      }" x-effect="parseEmails()">
 
+    <div class="mb-6 md:flex md:items-center md:justify-between">
+            <div class="flex-1 min-w-0">
+                <h2 class="text-2xl font-bold leading-7 sm:text-3xl sm:truncate">
+                    Add New Emails
+                </h2>
+            </div>
+            <div class="flex mt-4 md:mt-0 md:ml-4">
+                <x-primary-info-button
+                    href="{{ route('user.emails.index') }}"
+                    wire:navigate>
+                    Back to Mailing list
+                </x-primary-info-button>
+            </div>
+    </div>
     <!-- Quota Display -->
     <div class="p-4 mb-4 rounded-lg bg-neutral-200 dark:bg-neutral-700">
         <p class="text-sm text-gray-600 dark:text-gray-300">
-            Remaining Quota: <span class="font-bold">{{ $remainingQuota }}</span> emails
+            • Remaining Quota: <span class="font-bold">{{ $remainingQuota }}</span> emails
+            <br>
+            • Maximum per upload: <span class="font-bold" x-text="maxEmails"></span>
+        </p>
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400" x-show="parsedEmails.length > maxEmails">
+            ❗ You've reached the maximum allowed emails per upload
         </p>
     </div>
-
 
     <!-- File Import Section -->
     <div class="flex gap-2 mb-4 text-sm md:text-md">

@@ -8,21 +8,14 @@
             </h2>
         </div>
         <div class="flex mt-4 md:mt-0 md:ml-4">
-            <x-primary-info-button href="{{ route('admin.plans') }}" wire:navigate>
+            <x-primary-info-button
+                href="{{ route('admin.plans', ['tab' => $plan->periodicity_type === 'Year' ? 'yearly' : 'monthly']) }}"
+                wire:navigate>
                 Back to Plans
             </x-primary-info-button>
         </div>
     </div>
 
-    @if ($errors->any())
-        <div class="p-4 mb-4 text-red-700 bg-red-100 border-l-4 border-red-500">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <!-- Plan Details -->

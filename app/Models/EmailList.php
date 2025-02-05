@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Models;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class EmailList extends Model
 {
+    use HasFactory;
     protected $fillable = ['user_id', 'email', 'active'];
 
     public function user()
@@ -13,8 +14,10 @@ class EmailList extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function tracking()
-    {
-        return $this->hasMany(EmailTracking::class);
-    }
+
+
+    protected $casts = [
+        'send_time' => 'datetime',
+    ];
+
 }

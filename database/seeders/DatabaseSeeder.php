@@ -50,7 +50,8 @@ class DatabaseSeeder extends Seeder
         ]);
         $user->assignRole($userRole);
         $user->subscribeTo(Plan::where('name', 'Trial')->first());
-
+        
+        $this->call([EmailListSeeder::class]);
 
     }
 }

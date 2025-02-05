@@ -1,5 +1,20 @@
-<div class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+<div
+    class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <!-- Warning Alert -->
+    <div class="mb-6 md:flex md:items-center md:justify-between">
+            <div class="flex-1 min-w-0">
+                <h2 class="text-2xl font-bold leading-7 sm:text-3xl sm:truncate">
+                    Mailing list
+                </h2>
+            </div>
+            <div class="flex mt-4 md:mt-0 md:ml-4">
+                @if(!$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
+                <x-primary-info-button href="{{ route('user.emails.create') }}" wire:navigate>
+                    Add New Emails
+                </x-primary-info-button>
+                @endif
+            </div>
+        </div>
     @if($emailLimit['show'])
     <div class="p-4 mb-6 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800"
         role="alert">
@@ -33,8 +48,21 @@
             <div class="flex flex-wrap gap-2">
                 <x-primary-select-input wire:model.live="statusFilter" class="w-full sm:w-32">
                     <option value="all">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="FAIL">Failed</option>
+                    <option value="SENT">Sent</option>
+                    <option value="NULL">Empty</option>
+                </x-primary-select-input>
+
+                <x-primary-select-input wire:model.live="sortField" class="w-full sm:w-40">
+                    <option value="email">Sort by Email</option>
+                    <option value="status">Sort by Status</option>
+                    <option value="send_time">Sort by Send Time</option>
+                    <option value="sender_email">Sort by Sender</option>
+                </x-primary-select-input>
+
+                <x-primary-select-input wire:model.live="sortDirection" class="w-full sm:w-32">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
                 </x-primary-select-input>
 
                 <x-primary-select-input wire:model.live="perPage" class="w-full sm:w-32">
@@ -50,22 +78,31 @@
     <!-- Action Buttons -->
     <div class="flex flex-wrap gap-2 mb-6">
         @if(count($selectedEmails) > 0)
-        <x-primary-create-button wire:click="bulkUpdateStatus(true)" class="bg-green-600 hover:bg-green-700">
-            Mark Active
-        </x-primary-create-button>
-        <x-primary-danger-button wire:click="bulkUpdateStatus(false)">
-            Mark Inactive
-        </x-primary-danger-button>
-        <x-primary-danger-button wire:click="bulkDelete"
-            onclick="confirm('Are you sure?') || event.stopImmediatePropagation()">
+        <x-primary-button wire:click="clearStatus('FAIL')" class="bg-yellow-600 hover:bg-yellow-700" wire:confirm="Are you sure you want to clear failed status?">
+            Clear Failed Status ({{ count($selectedEmails) }})
+        </x-primary-button>
+        <x-primary-button wire:click="clearStatus('SENT')" class="bg-blue-600 hover:bg-blue-700" wire:confirm="Are you sure you want to clear sent status?">
+            Clear Sent Status ({{ count($selectedEmails) }})
+        </x-primary-button>
+        <x-primary-button wire:click="clearAllStatus" class="bg-purple-600 hover:bg-purple-700" wire:confirm="Are you sure you want to clear all status?">
+            Clear All Status ({{ count($selectedEmails) }})
+        </x-primary-button>
+        <x-primary-danger-button wire:click="bulkDelete" wire:confirm="Are you sure you want to delete all emails?">
             Delete Selected ({{ count($selectedEmails) }})
         </x-primary-danger-button>
         @endif
-        @if(!$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
-        <x-primary-info-button href="{{ route('user.emails.create') }}" wire:navigate>
-            Add New Emails
-        </x-primary-info-button>
-        @endif
+    </div>
+
+    <!-- Bulk Selection Options -->
+    <div class="mb-4">
+        <label class="inline-flex items-center">
+            <input type="radio" wire:model.live="selectionType" value="page" class="form-radio">
+            <span class="ml-2">Select Current Page</span>
+        </label>
+        <label class="inline-flex items-center ml-6">
+            <input type="radio" wire:model.live="selectionType" value="all" class="form-radio">
+            <span class="ml-2">Select All Records</span>
+        </label>
     </div>
 
     <!-- Table -->
@@ -79,7 +116,9 @@
                     </th>
                     <th scope="col" class="p-4">Email</th>
                     <th scope="col" class="p-4">Status</th>
-                    <th scope="col" class="p-4">Added</th>
+                    <th scope="col" class="p-4">Send Time</th>
+                    <th scope="col" class="p-4">Sender Email</th>
+                    <th scope="col" class="p-4">Log</th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
             </thead>
@@ -87,31 +126,32 @@
                 @foreach($emails as $email)
                 <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
                     <td class="p-4">
-                        <input type="checkbox" wire:model.live="selectedEmails" value="{{ $email->id }}" class="rounded">
+                        <input type="checkbox" wire:model.live="selectedEmails" value="{{ $email->id }}"
+                            class="rounded">
                     </td>
+                    <td class="p-4">{{ $email->email }}</td>
                     <td class="p-4">
-                        <div class="flex flex-col">
-                            <span class="text-neutral-900 dark:text-neutral-100">
-                                {{ $email->email }}
-                            </span>
-                        </div>
-                    </td>
-                    <td class="p-4">
-                        <span class="inline-flex overflow-hidden rounded-lg px-1 py-0.5 text-xs font-medium
-                            {{ $email->active ? 'text-green-300 bg-green-300/10' : 'text-red-500 bg-red-500/10' }}">
-                            {{ $email->active ? 'Active' : 'Inactive' }}
+                        @if($email->status !== 'NULL')
+                        <span
+                            class="inline-flex px-2 py-1 text-xs rounded-full
+                            {{ $email->status === 'SENT' ? 'bg-green-100 text-green-800' :
+                            ($email->status === 'FAIL' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
+                            {{ $email->status }}
                         </span>
+                        @endif
                     </td>
-                    <td class="p-4">{{ $email->created_at->format('M d, Y') }}</td>
+                    <td class="p-4">{{ $email->send_time ? $email->send_time->format('M d, Y H:i') : '-' }}</td>
+                    <td class="p-4">{{ $email->sender_email ?? '-' }}</td>
+                    <td class="p-4">{{ Str::limit($email->log, 30) ?? '-' }}</td>
                     <td class="p-4">
                         <div class="flex space-x-2">
-                            <button wire:click="toggleStatus({{ $email->id }})"
-                                class="inline-flex items-center px-2 py-1 text-xs rounded-md
-                                {{ $email->active ? 'text-red-500 bg-red-500/10 hover:bg-red-500/20' : 'text-green-300 bg-green-300/10 hover:bg-green-300/20' }}">
-                                {{ $email->active ? 'Deactivate' : 'Activate' }}
+                            <button wire:click="clearSingleStatus({{ $email->id }})"
+                                wire:confirm="Are you sure you want to clear this email status?"
+                                class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
+                                Clear Status
                             </button>
-                            <button wire:click="deleteEmail({{ $email->id }})"
-                                onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
+
+                            <button wire:click="deleteEmail({{ $email->id }})" wire:confirm="Are you sure you want to delete this email?"
                                 class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
                                 Delete
                             </button>

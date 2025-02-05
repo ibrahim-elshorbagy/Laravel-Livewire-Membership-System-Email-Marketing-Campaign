@@ -32,6 +32,31 @@ class CreateEmailList extends Component
         try {
             $emailsCount = count($emails);
 
+            // Validate
+            $validator = Validator::make(['emails' => $emails], [
+                'emails' => 'required|array|max:1500',
+                'emails.*' => 'required|email',
+            ]);
+
+            if ($validator->fails()) {
+                $this->alert('error', 'Error in validation', [
+                    'position' => 'bottom-end',
+                    'timer' => 3000,
+                    'toast' => true,
+                ]);
+
+                $messages = $validator->messages()->all();
+                foreach ($messages as $message) {
+                    $this->alert('error', $message, [
+                        'position' => 'bottom-end',
+                        'timer' => 3000,
+                        'toast' => true,
+                    ]);
+                }
+
+                return;
+            }
+
             // Check quota
             if (!$this->user->canConsume('Subscribers Limit', $emailsCount)) {
                 $this->alert('error', 'Not enough quota remaining', [
@@ -79,6 +104,6 @@ class CreateEmailList extends Component
     public function render()
     {
         return view('livewire.pages.user.emails.create-email-list')
-            ->layout('layouts.app', ['title' => 'Add Email List']);
+            ->layout('layouts.app', ['title' => 'Add New Emails']);
     }
 }

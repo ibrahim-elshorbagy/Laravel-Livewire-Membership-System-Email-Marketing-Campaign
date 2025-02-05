@@ -7,7 +7,14 @@ use LucasDotVin\Soulbscription\Models\Plan;
 use LucasDotVin\Soulbscription\Enums\PeriodicityType;
 
 class PlanManagement extends Component
-{    public $selectedTab = 'monthly';
+{
+    public $selectedTab = 'monthly';
+
+    public function mount()
+    {
+        $this->selectedTab = request()->query('tab', 'monthly');
+    }
+
 
     public function getMonthlyPlansProperty()
     {

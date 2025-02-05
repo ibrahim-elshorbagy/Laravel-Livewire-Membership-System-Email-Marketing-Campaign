@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('email')->index();
-            $table->boolean('active')->default(true);
+            $table->enum('status', ['FAIL', 'SENT', 'NULL'])->default('NULL');
+            $table->dateTime('send_time')->nullable();
+            $table->string('sender_email')->nullable();
+            $table->text('log')->nullable();
             $table->timestamps();
 
             $table->index(['user_id', 'email']);
