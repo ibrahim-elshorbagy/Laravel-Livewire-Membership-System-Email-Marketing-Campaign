@@ -9,6 +9,7 @@ use Livewire\WithFileUploads;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Session;
 
 class SiteSettings extends Component
 {
@@ -160,7 +161,11 @@ class SiteSettings extends Component
                 $this->favicon_preview = null; // Clear preview
             }
 
-            $this->alert('success', 'Site settings updated successfully!', ['position' => 'bottom-end']);
+
+            Session::flash('success', 'Site settings updated successfully.');
+            return $this->redirect(route('admin.site-settings'), navigate: true);
+
+
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to update site settings: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
