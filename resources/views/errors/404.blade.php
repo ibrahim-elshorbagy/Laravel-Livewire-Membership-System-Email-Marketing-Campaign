@@ -9,7 +9,7 @@
         <div class="text-center">
             <h1 class="mb-4 text-6xl font-bold">404</h1>
             <p class="mb-8 text-xl text-pretty">
-                Oops! The page you're looking for seems to have wandered off.
+                Page Not Found
             </p>
         </div>
 

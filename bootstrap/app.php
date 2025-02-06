@@ -13,18 +13,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->validateCsrfTokens(except: [
+            '/paypal/webhook',
+        ]);
 
-            $middleware->validateCsrfTokens(except: [
-                '/paypal/webhook',
-            ]);
-            $middleware->alias([
+        $middleware->alias([
             'role' => RoleMiddleware::class,
-
-            $middleware->append(GlobalSettingsMiddleware::class),
             'impersonation.check' => \App\Http\Middleware\ImpersonationCheckMiddleware::class,
-
+            'global.settings' => \App\Http\Middleware\GlobalSettingsMiddleware::class,
 
         ]);
+
+        // Append middleware separately
+        $middleware->append(GlobalSettingsMiddleware::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

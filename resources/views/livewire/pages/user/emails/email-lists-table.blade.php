@@ -2,19 +2,19 @@
     class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <!-- Warning Alert -->
     <div class="mb-6 md:flex md:items-center md:justify-between">
-            <div class="flex-1 min-w-0">
-                <h2 class="text-2xl font-bold leading-7 sm:text-3xl sm:truncate">
-                    Mailing list
-                </h2>
-            </div>
-            <div class="flex mt-4 md:mt-0 md:ml-4">
-                @if(!$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
-                <x-primary-info-button href="{{ route('user.emails.create') }}" wire:navigate>
-                    Add New Emails
-                </x-primary-info-button>
-                @endif
-            </div>
+        <div class="flex-1 min-w-0">
+            <h2 class="text-2xl font-bold leading-7 sm:text-3xl sm:truncate">
+                Mailing list
+            </h2>
         </div>
+        <div class="flex mt-4 md:mt-0 md:ml-4">
+            @if(!$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
+            <x-primary-info-button href="{{ route('user.emails.create') }}" wire:navigate>
+                Add New Emails
+            </x-primary-info-button>
+            @endif
+        </div>
+    </div>
     @if($emailLimit['show'])
     <div class="p-4 mb-6 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800"
         role="alert">
@@ -76,33 +76,67 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="flex flex-wrap gap-2 mb-6">
-        @if(count($selectedEmails) > 0)
-        <x-primary-button wire:click="clearStatus('FAIL')" class="bg-yellow-600 hover:bg-yellow-700" wire:confirm="Are you sure you want to clear failed status?">
-            Clear Failed Status ({{ count($selectedEmails) }})
-        </x-primary-button>
-        <x-primary-button wire:click="clearStatus('SENT')" class="bg-blue-600 hover:bg-blue-700" wire:confirm="Are you sure you want to clear sent status?">
-            Clear Sent Status ({{ count($selectedEmails) }})
-        </x-primary-button>
-        <x-primary-button wire:click="clearAllStatus" class="bg-purple-600 hover:bg-purple-700" wire:confirm="Are you sure you want to clear all status?">
-            Clear All Status ({{ count($selectedEmails) }})
-        </x-primary-button>
-        <x-primary-danger-button wire:click="bulkDelete" wire:confirm="Are you sure you want to delete all emails?">
-            Delete Selected ({{ count($selectedEmails) }})
-        </x-primary-danger-button>
-        @endif
-    </div>
+    <div class="flex flex-col gap-4 mb-6">
 
-    <!-- Bulk Selection Options -->
-    <div class="mb-4">
-        <label class="inline-flex items-center">
-            <input type="radio" wire:model.live="selectionType" value="page" class="form-radio">
-            <span class="ml-2">Select Current Page</span>
-        </label>
-        <label class="inline-flex items-center ml-6">
-            <input type="radio" wire:model.live="selectionType" value="all" class="form-radio">
-            <span class="ml-2">Select All Records</span>
-        </label>
+
+        <div class="flex flex-wrap gap-2">
+            <!-- Per Page Actions -->
+            <div class="w-full mb-2">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Current Page Actions:
+                </span>
+            </div>
+
+            @if(count($selectedEmails) > 0)
+            <x-primary-button wire:click="clearStatus('FAIL')" class="bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600"
+                wire:confirm="Are you sure you want to clear failed status for selected emails?">
+                Clear Failed Status ({{ count($selectedEmails) }})
+            </x-primary-button>
+
+            <x-primary-button wire:click="clearStatus('SENT')" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
+                wire:confirm="Are you sure you want to clear sent status for selected emails?">
+                Clear Sent Status ({{ count($selectedEmails) }})
+            </x-primary-button>
+
+            <x-primary-button wire:click="clearAllStatus" class="bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600"
+                wire:confirm="Are you sure you want to clear all status for selected emails?">
+                Clear All Status ({{ count($selectedEmails) }})
+            </x-primary-button>
+
+            <x-primary-danger-button wire:click="bulkDelete"
+                wire:confirm="Are you sure you want to delete these selected emails?">
+                Delete Selected ({{ count($selectedEmails) }})
+            </x-primary-danger-button>
+            @endif
+
+            <!-- Global Actions -->
+            <div class="w-full h-px my-2 bg-gray-200 dark:bg-gray-700"></div>
+            <div class="w-full">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Global Actions:
+                </span>
+            </div>
+
+            <x-primary-button wire:click="clearAllFailedStatus" class="bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600"
+                wire:confirm="Are you sure you want to clear ALL failed status emails?">
+                Clear All Failed Status
+            </x-primary-button>
+
+            <x-primary-button wire:click="clearAllSentStatus" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
+                wire:confirm="Are you sure you want to clear ALL sent status emails?">
+                Clear All Sent Status
+            </x-primary-button>
+
+            <x-primary-button wire:click="clearAllEmailsStatus" class="bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600"
+                wire:confirm="Are you sure you want to clear ALL email statuses?">
+                Clear All Statuses
+            </x-primary-button>
+
+            <x-primary-danger-button wire:click="deleteAllEmails"
+                wire:confirm="WARNING: This will delete ALL your emails. This action cannot be undone. Are you sure?" class="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600">
+                Delete All Emails
+            </x-primary-danger-button>
+        </div>
     </div>
 
     <!-- Table -->
@@ -132,8 +166,7 @@
                     <td class="p-4">{{ $email->email }}</td>
                     <td class="p-4">
                         @if($email->status !== 'NULL')
-                        <span
-                            class="inline-flex px-2 py-1 text-xs rounded-full
+                        <span class="inline-flex px-2 py-1 text-xs rounded-full
                             {{ $email->status === 'SENT' ? 'bg-green-100 text-green-800' :
                             ($email->status === 'FAIL' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
                             {{ $email->status }}
@@ -151,7 +184,8 @@
                                 Clear Status
                             </button>
 
-                            <button wire:click="deleteEmail({{ $email->id }})" wire:confirm="Are you sure you want to delete this email?"
+                            <button wire:click="deleteEmail({{ $email->id }})"
+                                wire:confirm="Are you sure you want to delete this email?"
                                 class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
                                 Delete
                             </button>

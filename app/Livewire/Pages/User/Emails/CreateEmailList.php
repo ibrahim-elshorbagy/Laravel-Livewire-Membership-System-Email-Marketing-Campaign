@@ -1,21 +1,27 @@
 <?php
+
 namespace App\Livewire\Pages\User\Emails;
 
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use App\Models\EmailList;
+use App\Jobs\ProcessEmailFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
-use Illuminate\Support\Facades\Session;
-use LucasDotVin\Soulbscription\Models\Feature;
 
 class CreateEmailList extends Component
 {
-    use LivewireAlert;
+    use LivewireAlert, WithFileUploads;
 
+    public $file;
     public $emails = [];
     public $remainingQuota = 0;
     public $user;
+    public $processing = false;
+
+    protected $listeners = ['refreshComponent' => '$refresh'];
+
     public function mount()
     {
         $this->user = auth()->user();
@@ -26,80 +32,76 @@ class CreateEmailList extends Component
         }
     }
 
+    public function processFile()
+    {
+        try {
+            $this->validate([
+                'file' => 'required|file',
+            ]);
+
+            $path = $this->file->store('temp-emails');
+
+            ProcessEmailFile::dispatch($path, $this->user->id, $this->remainingQuota);
+
+            $this->alert('success', 'File uploaded successfully, Processing will begin shortly', [
+                'position' => 'bottom-end',
+                'timer' => 10000,
+                'toast' => true,
+            ]);
+
+            $this->file = null;
+            $this->processing = false;
+
+        } catch (\Exception $e) {
+            $this->alert('error', 'Error uploading file: ' . $e->getMessage());
+            $this->processing = false;
+        }
+    }
 
     public function saveEmails($emails)
     {
         try {
             $emailsCount = count($emails);
 
-            // Validate
-            $validator = Validator::make(['emails' => $emails], [
-                'emails' => 'required|array|max:1500',
-                'emails.*' => 'required|email',
-            ]);
-
-            if ($validator->fails()) {
-                $this->alert('error', 'Error in validation', [
-                    'position' => 'bottom-end',
-                    'timer' => 3000,
-                    'toast' => true,
-                ]);
-
-                $messages = $validator->messages()->all();
-                foreach ($messages as $message) {
-                    $this->alert('error', $message, [
-                        'position' => 'bottom-end',
-                        'timer' => 3000,
-                        'toast' => true,
-                    ]);
-                }
-
+            if ($emailsCount === 0) {
+                $this->alert('error', 'No valid emails found');
                 return;
             }
 
-            // Check quota
             if (!$this->user->canConsume('Subscribers Limit', $emailsCount)) {
-                $this->alert('error', 'Not enough quota remaining', [
-                    'position' => 'bottom-end',
-                    'timer' => 3000,
-                    'toast' => true,
-                ]);
+                $this->alert('error', 'Not enough quota remaining');
                 return;
             }
 
             DB::transaction(function() use ($emails) {
-                // Filter out existing emails
-                $existingEmails = EmailList::whereIn('email', $emails)->pluck('email')->toArray();
+                $existingEmails = EmailList::whereIn('email', $emails)
+                    ->pluck('email')
+                    ->toArray();
+
                 $newEmails = array_diff($emails, $existingEmails);
 
-                // Insert only new emails
                 if (!empty($newEmails)) {
-                    EmailList::insert(collect($newEmails)->map(fn($email) => [
-                        'user_id' => $this->user->id,
-                        'email' => $email,
-                        'created_at' => now(),
-                        'updated_at' => now()
-                    ])->toArray());
+                    EmailList::insert(
+                        collect($newEmails)->map(fn($email) => [
+                            'user_id' => $this->user->id,
+                            'email' => $email,
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ])->toArray()
+                    );
 
-                    // Update quota
                     $totalEmailCount = EmailList::where('user_id', $this->user->id)->count();
                     $this->user->setConsumedQuota('Subscribers Limit', (float) $totalEmailCount);
                 }
             });
 
-            Session::flash('success', 'Emails saved successfully.');
-
+            $this->alert('success', 'Emails saved successfully');
             return $this->redirect(route('user.emails.index'), navigate: true);
 
         } catch (\Exception $e) {
-            $this->alert('error', 'An error occurred', [
-                'position' => 'bottom-end',
-                'timer' => 3000,
-                'toast' => true,
-            ]);
+            $this->alert('error', 'An error occurred: ' . $e->getMessage());
         }
     }
-
 
     public function render()
     {

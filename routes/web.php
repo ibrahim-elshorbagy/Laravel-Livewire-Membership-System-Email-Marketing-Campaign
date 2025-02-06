@@ -20,7 +20,9 @@ Route::get('/payment/close', function () {
     return view('payment.close');
 })->name('payment.close');
 
-
+// Route::fallback(function () {
+//     return response()->view('errors.404', [], 404);
+// });
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
 require __DIR__.'/user.php';

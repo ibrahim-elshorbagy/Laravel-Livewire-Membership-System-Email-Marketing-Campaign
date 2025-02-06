@@ -1,178 +1,88 @@
 <div class="p-6 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+    x-data="{
+        emailInput: '',
+        parsedEmails: [],
+        allEmails: [], // New property to store all emails
+        processing: false,
+        error: null,
+        maxDisplayEmails: 1500,
+        totalEmails: 0,
 
-
-x-data="{
-         emailInput: '',
-         parsedEmails: [],
-         processing: false,
-         error: null,
-         textFileInput: null,
-         excelFileInput: null,
-         maxEmails: 1500,
-
-         init() {
-             this.textFileInput = document.getElementById('text-file-input');
-             this.excelFileInput = document.getElementById('excel-file-input');
-
-             window.addEventListener('reset-emails', () => {
-                 this.emailInput = '';
-                 this.parsedEmails = [];
-             });
-         },
+        init() {
+            window.addEventListener('reset-emails', () => {
+                this.emailInput = '';
+                this.parsedEmails = [];
+                this.allEmails = [];
+            });
+        },
 
         parseEmails() {
             let emails = this.emailInput
-            .split(/[\n,;]/)
-            .map(email => ({
-            value: email.trim(),
-            valid: this.validateEmail(email.trim())
-        }))
-        .filter(entry => entry.value.length > 0)
-        .reduce((acc, entry) => {
-            if (!acc.some(e => e.value === entry.value)) acc.push(entry);
-            return acc;
-        }, []);
+                .split(/[\n,;]/)
+                .map(email => ({
+                    value: email.trim(),
+                    valid: this.validateEmail(email.trim())
+                }))
+                .filter(entry => entry.value.length > 0)
+                .reduce((acc, entry) => {
+                    if (!acc.some(e => e.value === entry.value)) acc.push(entry);
+                    return acc;
+                }, []);
 
-        if (emails.length > this.maxEmails) {
-            this.error = `Maximum limit of ${this.maxEmails} emails exceeded. Only the first ${this.maxEmails} emails are kept.`;
-            emails = emails.slice(0, this.maxEmails);
-            this.emailInput = emails.map(e => e.value).join('\n');
-        } else {
-            this.error = null;
+            this.totalEmails = emails.length;
+            this.allEmails = emails; // Store all emails
+
+            if (emails.length > this.maxDisplayEmails) {
+                this.error = `Showing first ${this.maxDisplayEmails} of ${emails.length} emails. All valid emails will be saved.`;
+                this.parsedEmails = emails.slice(0, this.maxDisplayEmails);
+            } else {
+                this.error = null;
+                this.parsedEmails = emails;
+            }
+        },
+
+        validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        },
+
+        async handleFileUpload(event) {
+            this.processing = true;
+            const file = event.target.files[0];
+
+            if (file) {
+                @this.upload('file', file, (uploadedFilename) => {
+                    this.processing = false;
+                    @this.processFile();
+                }, () => {
+                    this.processing = false;
+                    this.error = 'File upload failed';
+                });
+            }
         }
+    }" x-effect="parseEmails()">
 
-        this.parsedEmails = emails;
-},
-
-         validateEmail(email) {
-             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-         },
-
-         async processTextFile() {
-             this.processing = true;
-             this.error = null;
-
-             try {
-                 const file = this.textFileInput.files[0];
-                 if (!file) return;
-
-
-                const currentCount = this.parsedEmails.length;
-
-                if (currentCount > this.maxEmails) {
-                    this.error = `Cannot add more emails - maximum limit of ${this.maxEmails} reached`;
-                    this.textFileInput.value = null;
-                    return;
-                }
-
-                 const reader = new FileReader();
-                 reader.onload = (e) => {
-                     const newEmails = e.target.result
-                         .split(/[\n,;]/)
-                         .map(email => email.trim())
-                         .filter(email => email.length > 0)
-                         .join('\n');
-
-                     this.emailInput += '\n' + newEmails;
-                     this.textFileInput.value = null;
-                 };
-                 reader.readAsText(file);
-             } catch (error) {
-                 this.error = 'Error reading text file: ' + error.message;
-             }
-             this.processing = false;
-         },
-
-         async processExcelFile() {
-             this.processing = true;
-             this.error = null;
-
-             try {
-                 const file = this.excelFileInput.files[0];
-                 if (!file) return;
-
-
-                 const currentCount = this.parsedEmails.length;
-                 if (currentCount > this.maxEmails) {
-                    this.error = `Cannot add more emails - maximum limit of ${this.maxEmails} reached`;
-                    this.excelFileInput.value = null;
-                    return;
-                 }
-                 if (typeof XLSX === 'undefined') {
-                     throw new Error('Excel library not loaded');
-                 }
-
-                 const reader = new FileReader();
-                 reader.onload = (e) => {
-                     const data = new Uint8Array(e.target.result);
-                     const workbook = XLSX.read(data, { type: 'array' });
-                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                     const emails = XLSX.utils.sheet_to_json(sheet)
-                         .flatMap(row => Object.values(row))
-                         .filter(email => typeof email === 'string')
-                         .map(email => email.trim())
-                         .filter(email => email.length > 0)
-                         .join('\n');
-
-                     this.emailInput += '\n' + emails;
-                     this.excelFileInput.value = null;
-                 };
-                 reader.readAsArrayBuffer(file);
-             } catch (error) {
-                 this.error = 'Error processing Excel: ' + error.message;
-             }
-             this.processing = false;
-         },
-
-         removeEmail(index) {
-             this.parsedEmails.splice(index, 1);
-             this.emailInput = this.parsedEmails
-                 .map(e => e.value)
-                 .join('\n');
-         }
-     }" x-effect="parseEmails()">
-
+    <!-- Header Section -->
     <div class="mb-6 md:flex md:items-center md:justify-between">
-            <div class="flex-1 min-w-0">
-                <h2 class="text-2xl font-bold leading-7 sm:text-3xl sm:truncate">
-                    Add New Emails
-                </h2>
-            </div>
-            <div class="flex mt-4 md:mt-0 md:ml-4">
-                <x-primary-info-button
-                    href="{{ route('user.emails.index') }}"
-                    wire:navigate>
-                    Back to Mailing list
-                </x-primary-info-button>
-            </div>
-    </div>
-    <!-- Quota Display -->
-    <div class="p-4 mb-4 rounded-lg bg-neutral-200 dark:bg-neutral-700">
-        <p class="text-sm text-gray-600 dark:text-gray-300">
-            • Remaining Quota: <span class="font-bold">{{ $remainingQuota }}</span> emails
-            <br>
-            • Maximum per upload: <span class="font-bold" x-text="maxEmails"></span>
-        </p>
-        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400" x-show="parsedEmails.length > maxEmails">
-            ❗ You've reached the maximum allowed emails per upload
-        </p>
+        <div class="flex-1 min-w-0">
+            <h2 class="text-2xl font-bold leading-7 sm:text-3xl sm:truncate">
+                Add New Emails
+            </h2>
+        </div>
+        <div class="flex mt-4 md:mt-0 md:ml-4">
+            <x-primary-info-button href="{{ route('user.emails.index') }}" wire:navigate>
+                Back to Mailing list
+            </x-primary-info-button>
+        </div>
     </div>
 
-    <!-- File Import Section -->
-    <div class="flex gap-2 mb-4 text-sm md:text-md">
-        <!-- Text File Import -->
-        <label class="inline-block px-4 py-2 text-white bg-blue-500 rounded cursor-pointer hover:bg-blue-600">
-            <input type="file" id="text-file-input" class="hidden" accept=".txt,.csv" @change="processTextFile">
-            Import Text File
-        </label>
-
-        <!-- Excel File Import -->
-        <label class="inline-block px-4 py-2 text-white bg-green-500 rounded cursor-pointer hover:bg-green-600">
-            <input type="file" id="excel-file-input" class="hidden" accept=".xls,.xlsx" @change="processExcelFile">
-            Import Excel File
-        </label>
+    <div class="p-3 my-4 bg-blue-100 rounded-lg dark:bg-blue-900">
+        <ul class="pl-5 text-sm text-gray-700 list-disc dark:text-gray-200">
+            <li>
+                <i class="mr-2 text-blue-600 fas fa-envelope dark:text-blue-300"></i>
+                Remaining Quota: <span class="font-bold">{{ $remainingQuota }}</span> emails
+            </li>
+        </ul>
     </div>
-
     <!-- Warning Message -->
     <div class="p-4 my-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20">
         <div class="flex flex-col">
@@ -185,39 +95,74 @@ x-data="{
                             clip-rule="evenodd" />
                     </svg>
                 </div>
-
-                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                <h3 class="text-lg font-medium text-yellow-800 dark:text-yellow-200">
                     Important Note
                 </h3>
             </div>
             <!-- Content -->
             <div class="mt-2 sm:mt-0">
-
-                <div class="mt-2 space-y-2 text-sm text-yellow-700 dark:text-neutral-300">
-                    <p class="text-xs sm:text-sm">
+                <div class="mt-2 space-y-2 text-yellow-700 text-md dark:text-neutral-300">
+                    <p >
+                        - Importing will start immediately when importing from  ( file text or Excel file )
+                    </p>
+                    <p >
                         - Enter one email per line or separate emails with commas.
                     </p>
-                    <p class="text-xs sm:text-sm">
+                    <p >
                         - Press <kbd class="text-red-500">Enter</kbd> For new line.
                     </p>
-                    <p class="text-xs sm:text-sm">
+                    <p >
                         - Invalid emails will appear in <span class="text-red-500">red</span>.
                     </p>
-                    <p class="text-xs sm:text-sm">
-                        - You can also import emails from a text or Excel file.
+                    <p >
+                        - Maximum displayed: <span class="font-bold" x-text="maxDisplayEmails"></span> emails
+                    </p>
+                    <p >
+                        - Example of accepted text file format:
+                    </p>
+                    <p class="my-4 text-sm text-gray-600 dark:text-gray-300">
+                        test1@outlook.com -> test1@outlook.com <br>
+                        1. test@outlook.com -> test@outlook.com <br>
+                        2- test@outlook.com -> test@outlook.com <br>
+                        3: test@example.com -> test@example.com <br>
+                        4) test1@email.com -> test1@email.com <br>
                     </p>
                 </div>
             </div>
+
         </div>
     </div>
 
-    <!-- Status Messages -->
-    <div x-show="error" class="mb-2 text-red-500" x-text="error"></div>
-    <div x-show="processing" class="mb-2 text-blue-500">Processing file...</div>
+    <!-- File Import Section -->
+    <div class="flex gap-2 mb-4 text-sm md:text-md">
+        <label class="inline-block px-4 py-2 text-white bg-blue-500 rounded cursor-pointer hover:bg-blue-600">
+            <input type="file" wire:model="file" @change="handleFileUpload" class="hidden"
+                accept=".txt,.csv,.xls,.xlsx">
+            Import File
+        </label>
+    </div>
 
-    <!-- Textarea Input -->
+    <!-- Processing Indicator -->
+    <div x-show="processing" class="p-4 mb-4 text-blue-700 bg-blue-100 rounded-lg dark:bg-blue-900 dark:text-blue-300">
+        <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2 animate-spin" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            Processing file...
+        </div>
+    </div>
+
+    <!-- Error Messages -->
+    <div x-show="error"
+        class="p-4 mb-4 text-yellow-700 bg-yellow-100 rounded-lg dark:bg-yellow-900 dark:text-yellow-300"
+        x-text="error"></div>
+
+    <!-- Manual Input Section -->
     <x-primary-textarea x-model="emailInput" placeholder="Enter emails separated by commas or new lines..."
-        class="w-full h-64"></x-primary-textarea>
+        class="w-full h-64">
+    </x-primary-textarea>
 
     <!-- Preview Section -->
     <div class="mt-4" x-show="parsedEmails.length > 0">
@@ -226,20 +171,18 @@ x-data="{
             <template x-for="(entry, index) in parsedEmails" :key="index">
                 <div class="flex items-center justify-between gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <span :class="{ 'text-red-500': !entry.valid }" x-text="entry.value"></span>
-                    <button @click="removeEmail(index)" class="text-red-500 hover:text-red-700">
-                        ✕
-                    </button>
                 </div>
             </template>
         </div>
 
-        <x-primary-create-button wire:click="saveEmails(parsedEmails.filter(e => e.valid).map(e => e.value))" class="mt-4"
-            x-bind:disabled="parsedEmails.filter(e => e.valid).length === 0">
-            Save <span x-text="parsedEmails.filter(e => e.valid).length"></span> Valid Emails
+        <!-- Save Button -->
+        <x-primary-create-button wire:click="saveEmails(allEmails.filter(e => e.valid).map(e => e.value))" class="mt-4"
+            x-bind:disabled="allEmails.filter(e => e.valid).length === 0">
+            Save <span x-text="allEmails.filter(e => e.valid).length"></span> Valid Emails
         </x-primary-create-button>
     </div>
 </div>
 
-@push('scripts')
+{{-- @push('scripts')
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-@endpush
+@endpush --}}

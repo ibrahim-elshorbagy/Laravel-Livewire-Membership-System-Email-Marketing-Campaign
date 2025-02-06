@@ -43,81 +43,87 @@
             </a>
 
             <div class="flex flex-col gap-2 pb-3 overflow-y-auto">
-                        {{-- <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}" wire:navigate>
-                            <i class="fas fa-th-large"></i>
-                            <span>Dashboard</span>
-                        </x-nav-link> --}}
-                        @role('user')
-                        {{-- <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}" wire:navigate>
-                            <span>Plans</span>
-                        </x-nav-link> --}}
-                        <x-nav-link :active="request()->routeIs('user.my-subscription')" href="{{ route('user.my-subscription') }}">
-                            <span>My Subscription</span>
-                        </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.my-transactions')" href="{{ route('user.my-transactions') }}"
-                            wire:navigate>
-                            <span>My Transactions</span>
-                        </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.emails.index')" href="{{ route('user.emails.index') }}" wire:navigate>
-                            <span>Mailing list</span>
-                        </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.campaign.form')" href="{{ route('user.campaign.form') }}" wire:navigate>
-                            <span>Email Campaign</span>
-                        </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}" wire:navigate>
-                            <span>Support</span>
-                        </x-nav-link>
-                        @endrole
-                        @role('admin')
-                        <x-nav-link :active="request()->routeIs('admin.users') ||
+                {{-- <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
+                    wire:navigate>
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </x-nav-link> --}}
+                @role('user')
+                {{-- <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}"
+                    wire:navigate>
+                    <span>Plans</span>
+                </x-nav-link> --}}
+                <x-nav-link :active="request()->routeIs('user.my-subscription')"
+                    href="{{ route('user.my-subscription') }}">
+                    <span>My Subscription</span>
+                </x-nav-link>
+                <x-nav-link :active="request()->routeIs('user.my-transactions')"
+                    href="{{ route('user.my-transactions') }}" wire:navigate>
+                    <span>My Transactions</span>
+                </x-nav-link>
+                <x-nav-link :active="request()->routeIs('user.emails.index')" href="{{ route('user.emails.index') }}"
+                    wire:navigate>
+                    <span>Mailing list</span>
+                </x-nav-link>
+                <x-nav-link :active="request()->routeIs('user.campaign.form')" href="{{ route('user.campaign.form') }}"
+                    wire:navigate>
+                    <span>Email Campaign</span>
+                </x-nav-link>
+                <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}"
+                    wire:navigate>
+                    <span>Support</span>
+                </x-nav-link>
+                @endrole
+                @role('admin')
+                <x-nav-link :active="request()->routeIs('admin.users') ||
                             request()->routeIs('admin.users.create') ||
-                            request()->routeIs('admin.users.edit')" href="{{ route('admin.users') }}"
-                            wire:navigate>
-                            <span>Users</span>
-                        </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('admin.subscriptions')" href="{{ route('admin.subscriptions') }}" wire:navigate>
-                            <span>Subscriptions</span>
-                        </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('admin.payment.transactions') ||
+                            request()->routeIs('admin.users.edit')" href="{{ route('admin.users') }}" wire:navigate>
+                    <span>Users</span>
+                </x-nav-link>
+                <x-nav-link :active="request()->routeIs('admin.subscriptions')"
+                    href="{{ route('admin.subscriptions') }}" wire:navigate>
+                    <span>Subscriptions</span>
+                </x-nav-link>
+                <x-nav-link :active="request()->routeIs('admin.payment.transactions') ||
                                                             request()->routeIs('admin.users.transactions')"
-                            href="{{ route('admin.payment.transactions') }}" wire:navigate>
-                            <span>Transactions</span>
-                        </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}" wire:navigate>
-                            <span>Plans</span>
-                        </x-nav-link>
-                        @endrole
+                    href="{{ route('admin.payment.transactions') }}" wire:navigate>
+                    <span>Transactions</span>
+                </x-nav-link>
+                <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}" wire:navigate>
+                    <span>Plans</span>
+                </x-nav-link>
+                @endrole
 
             </div>
 
             @role('admin')
-                @persist('sidebar')
-                <div x-data="{ isExpanded: false }" class="flex flex-col">
-                    <button type="button" x-on:click="isExpanded = ! isExpanded"
-                        class="flex items-center justify-between rounded-md gap-2 px-2 py-1.5 text-sm font-medium underline-offset-2 focus:outline-none focus-visible:underline"
-                        x-bind:class="isExpanded ? 'text-neutral-900 bg-black/10 dark:text-white dark:bg-white/10' :  'text-neutral-600 hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/5'">
-                        <i class="fa-solid fa-user"></i>
-                        <span class="mr-auto text-left">Settings</span>
-                        <i class="transition-transform fa-solid fa-angle-up"
-                            x-bind:class="isExpanded ? 'rotate-0' : 'rotate-180'" aria-hidden="true"></i>
-                    </button>
+            @persist('sidebar')
+            <div x-data="{ isExpanded: false }" class="flex flex-col">
+                <button type="button" x-on:click="isExpanded = ! isExpanded"
+                    class="flex items-center justify-between rounded-md gap-2 px-2 py-1.5 text-sm font-medium underline-offset-2 focus:outline-none focus-visible:underline"
+                    x-bind:class="isExpanded ? 'text-neutral-900 bg-black/10 dark:text-white dark:bg-white/10' :  'text-neutral-600 hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/5'">
+                    <i class="fa-solid fa-user"></i>
+                    <span class="mr-auto text-left">Settings</span>
+                    <i class="transition-transform fa-solid fa-angle-up"
+                        x-bind:class="isExpanded ? 'rotate-0' : 'rotate-180'" aria-hidden="true"></i>
+                </button>
 
-                    <ul x-cloak x-collapse x-show="isExpanded">
-                        <li class="px-1 py-0.5 first:mt-2">
-                            <x-nav-link :active="request()->routeIs('admin.payment.paypal')" href="{{ route('admin.payment.paypal') }}"
-                                wire:navigate>
-                                <span>Payment Settings</span>
-                            </x-nav-link>
-                        </li>
-                        <li class="px-1 py-0.5">
-                            <x-nav-link :active="request()->routeIs('admin.site-settings')" href="{{ route('admin.site-settings') }}"
-                                wire:navigate>
-                                <span>Site Settings</span>
-                            </x-nav-link>
-                        </li>
-                    </ul>
-                </div>
-                @endpersist('sidebar')
+                <ul x-cloak x-collapse x-show="isExpanded">
+                    <li class="px-1 py-0.5 first:mt-2">
+                        <x-nav-link :active="request()->routeIs('admin.payment.paypal')"
+                            href="{{ route('admin.payment.paypal') }}" wire:navigate>
+                            <span>Payment Settings</span>
+                        </x-nav-link>
+                    </li>
+                    <li class="px-1 py-0.5">
+                        <x-nav-link :active="request()->routeIs('admin.site-settings')"
+                            href="{{ route('admin.site-settings') }}" wire:navigate>
+                            <span>Site Settings</span>
+                        </x-nav-link>
+                    </li>
+                </ul>
+            </div>
+            @endpersist('sidebar')
             @endrole
         </nav>
 
@@ -136,7 +142,7 @@
                     </div>
 
                     <!-- Desktop navigation -->
-                    <div class="items-center hidden gap-4 md:flex ">
+                    <div class="items-center hidden gap-2 md:flex ">
 
                         {{-- <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
                             wire:navigate>
@@ -144,24 +150,29 @@
                             <span>Dashboard</span>
                         </x-nav-link> --}}
                         @role('user')
-                        {{-- <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}" wire:navigate>
+                        {{-- <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}"
+                            wire:navigate>
                             <span>Plans</span>
                         </x-nav-link> --}}
-                        <x-nav-link :active="request()->routeIs('user.my-subscription')" href="{{ route('user.my-subscription') }}"  >
-                            <span>My Subscription</span>
+                        <x-nav-link :active="request()->routeIs('user.my-subscription')"
+                            href="{{ route('user.my-subscription') }}">
+                            <span class="text-nowrap">My Subscription</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.my-transactions')" href="{{ route('user.my-transactions') }}" wire:navigate>
-                                <span>My Transactions</span>
+                        <x-nav-link :active="request()->routeIs('user.my-transactions')"
+                            href="{{ route('user.my-transactions') }}" wire:navigate>
+                            <span class="text-nowrap">My Transactions</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.emails.index')" href="{{ route('user.emails.index') }}"
+                        <x-nav-link :active="request()->routeIs('user.emails.index')"
+                            href="{{ route('user.emails.index') }}" wire:navigate>
+                            <span class="text-nowrap">Mailing list</span>
+                        </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.campaign.form')"
+                            href="{{ route('user.campaign.form') }}" wire:navigate>
+                            <span class="text-nowrap">Email Campaign</span>
+                        </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}"
                             wire:navigate>
-                            <span>Mailing list</span>
-                        </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.campaign.form')" href="{{ route('user.campaign.form') }}" wire:navigate>
-                            <span>Email Campaign</span>
-                        </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}" wire:navigate>
-                            <span>Support</span>
+                            <span class="text-nowrap">Support</span>
                         </x-nav-link>
                         @endrole
 
@@ -171,30 +182,33 @@
                         @role('admin')
                         <x-nav-link :active="request()->routeIs('admin.users') ||
                                     request()->routeIs('admin.users.create') ||
-                                    request()->routeIs('admin.users.edit')" href="{{ route('admin.users') }}" wire:navigate>
+                                    request()->routeIs('admin.users.edit')" href="{{ route('admin.users') }}"
+                            wire:navigate>
                             <span>Users</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('admin.subscriptions')" href="{{ route('admin.subscriptions') }}" wire:navigate>
+                        <x-nav-link :active="request()->routeIs('admin.subscriptions')"
+                            href="{{ route('admin.subscriptions') }}" wire:navigate>
                             <span>Subscriptions</span>
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('admin.payment.transactions') ||
-                                    request()->routeIs('admin.users.transactions.*')" href="{{ route('admin.payment.transactions') }}"
-                            wire:navigate>
+                                    request()->routeIs('admin.users.transactions.*')"
+                            href="{{ route('admin.payment.transactions') }}" wire:navigate>
                             <span>Transactions</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}" wire:navigate>
+                        <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}"
+                            wire:navigate>
                             <span>Plans</span>
                         </x-nav-link>
 
                         <!-- Dropdown menu -->
                         <x-primary-dropdown label="Settings">
-                            <x-nav-link :active="request()->routeIs('admin.payment.paypal')" href="{{ route('admin.payment.paypal') }}"
-                                wire:navigate>
+                            <x-nav-link :active="request()->routeIs('admin.payment.paypal')"
+                                href="{{ route('admin.payment.paypal') }}" wire:navigate>
                                 <span>Payment Settings</span>
                             </x-nav-link>
 
-                            <x-nav-link :active="request()->routeIs('admin.site-settings')" href="{{ route('admin.site-settings') }}"
-                                wire:navigate>
+                            <x-nav-link :active="request()->routeIs('admin.site-settings')"
+                                href="{{ route('admin.site-settings') }}" wire:navigate>
                                 <span>Site Settings</span>
                             </x-nav-link>
                         </x-primary-dropdown>
@@ -213,8 +227,7 @@
                         <div x-data="{ userDropdownIsOpen: false }" class="relative">
                             @auth
                             <!-- Authenticated user profile -->
-                            <button @click="userDropdownIsOpen = !userDropdownIsOpen"
-                                class="">
+                            <button @click="userDropdownIsOpen = !userDropdownIsOpen" class="">
                                 <livewire:components.auth.user-profile-display />
                             </button>
                             @endauth
@@ -292,8 +305,8 @@
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <x-livewire-alert::scripts />
     @if (session('success'))
-        <script>
-            Swal.fire({
+    <script>
+        Swal.fire({
                         icon: 'success',
                         title: 'Success!',
                         text: '{{ session('success') }}',
@@ -303,7 +316,7 @@
                         timer: 3000,
                         // timerProgressBar: true,
                     });
-        </script>
+    </script>
     @endif
 
     <script type="application/ld+json">

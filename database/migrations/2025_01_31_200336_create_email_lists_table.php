@@ -14,14 +14,19 @@ return new class extends Migration
         Schema::create('email_lists', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('email')->index();
+            $table->string('email');
             $table->enum('status', ['FAIL', 'SENT', 'NULL'])->default('NULL');
             $table->dateTime('send_time')->nullable();
             $table->string('sender_email')->nullable();
             $table->text('log')->nullable();
             $table->timestamps();
 
-            $table->index(['user_id', 'email']);
+            // Add unique composite index
+            $table->unique(['user_id', 'email']);
+
+            // Add indexes for better performance
+            $table->index(['status', 'send_time']);
+            $table->index('email');
         });
     }
 
