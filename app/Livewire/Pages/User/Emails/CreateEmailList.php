@@ -9,6 +9,7 @@ use App\Jobs\ProcessEmailFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Illuminate\Support\Facades\Session;
 
 class CreateEmailList extends Component
 {
@@ -96,6 +97,8 @@ class CreateEmailList extends Component
             });
 
             $this->alert('success', 'Emails saved successfully');
+            Session::flash('success', 'Emails saved successfully.');
+
             return $this->redirect(route('user.emails.index'), navigate: true);
 
         } catch (\Exception $e) {

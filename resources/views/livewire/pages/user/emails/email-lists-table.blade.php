@@ -140,6 +140,14 @@
         </div>
     </div>
 
+    <div class="p-3 my-4 bg-blue-100 rounded-lg dark:bg-blue-900">
+        <ul class="pl-5 text-sm text-gray-700 list-disc dark:text-gray-200">
+            <li>
+                <i class="mr-2 text-blue-600 fas fa-envelope dark:text-blue-300"></i>
+                Total Emails : <span class="font-bold">{{ $totalRecords }}</span> emails
+            </li>
+        </ul>
+    </div>
     <div wire:poll.30000ms="checkPendingJobs">
         @if($pendingJobs['file_processing'] > 0 ||
         $pendingJobs['clear_status'] > 0 ||
@@ -174,7 +182,6 @@
         </div>
         @endif
 
-        <!-- Rest of your existing template -->
     </div>
     <!-- Table -->
     <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
