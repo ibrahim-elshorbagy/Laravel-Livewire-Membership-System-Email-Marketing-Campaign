@@ -20,6 +20,8 @@ class ClearEmailStatus implements ShouldQueue
     protected $isPageAction;
     protected $selectedEmails;
 
+
+
     public function __construct($userId, $status = null, $isPageAction = false, $selectedEmails = [])
     {
         $this->userId = $userId;

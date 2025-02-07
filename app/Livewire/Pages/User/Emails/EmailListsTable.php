@@ -8,6 +8,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\EmailList;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Validation\Rule;
 
@@ -34,6 +35,13 @@ class EmailListsTable extends Component
         'sortField' => ['except' => 'email'],
         'sortDirection' => ['except' => 'asc']
     ];
+        // Add these properties
+    public $pendingJobs = [
+        'file_processing' => 0,
+        'clear_status' => 0,
+        'delete_emails' => 0
+    ];
+
 
     protected function rules()
     {
@@ -88,8 +96,41 @@ class EmailListsTable extends Component
         ]);
 
         $this->emailLimit = $this->checkEmailLimit();
+        $this->checkPendingJobs();
     }
 
+        // Method to check pending jobs
+    public function checkPendingJobs()
+    {
+        try {
+            $this->pendingJobs = [
+                'file_processing' => $this->getPendingJobsCount('ProcessEmailFile'),
+                'clear_status' => $this->getPendingJobsCount('ClearEmailStatus'),
+                'delete_emails' => $this->getPendingJobsCount('DeleteEmails')
+            ];
+        } catch (\Exception $e) {
+            Log::error('Error checking pending jobs', [
+                'user_id' => $this->user->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    // Helper method to count specific job types
+    private function getPendingJobsCount($jobClass)
+    {
+        return DB::table('jobs')
+            ->where('queue', 'high')
+            ->where('payload', 'like', '%' . class_basename($jobClass) . '%')
+            ->where('payload', 'like', '%' . $this->user->id . '%')
+            ->count();
+    }
+
+    public function refreshPendingJobs()
+    {
+        $this->checkPendingJobs();
+        $this->emailLimit = $this->checkEmailLimit();
+    }
     public function updatingSearch()
     {
         $this->validateOnly('search');
@@ -231,7 +272,7 @@ class EmailListsTable extends Component
                     'sender_email' => null,
                     'log' => null
                 ]);
-
+                $this->checkPendingJobs();
                 $this->alert('success', 'Status cleared successfully!', [
                     'position' => 'bottom-end',
                     'timer' => 3000,
@@ -278,7 +319,7 @@ class EmailListsTable extends Component
                     'timer' => 3000,
                     'toast' => true,
                 ]);
-
+                $this->checkPendingJobs();
                 $this->emailLimit = $this->checkEmailLimit();
             });
         } catch (\Exception $e) {
@@ -316,6 +357,7 @@ class EmailListsTable extends Component
 
                 $this->resetSelections();
                 $this->emailLimit = $this->checkEmailLimit();
+                $this->checkPendingJobs();
             });
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to delete emails: ' . $e->getMessage());
@@ -333,13 +375,33 @@ class EmailListsTable extends Component
                 return;
             }
 
-            ClearEmailStatus::dispatch($this->user->id, 'FAIL', false);
+            if ($count < 10000) {
+                // Direct update for smaller number of emails
+                EmailList::where('user_id', $this->user->id)
+                        ->where('status', 'FAIL')
+                        ->update([
+                            'status' => null,
+                            'send_time' => null,
+                            'sender_email' => null,
+                            'log' => null
+                        ]);
 
-            $this->alert('success', "Processing {$count} emails. This may take a while.", [
-                'position' => 'bottom-end',
-                'timer' => 5000,
-                'toast' => true,
-            ]);
+                $this->alert('success', "Cleared {$count} failed status emails successfully.", [
+                    'position' => 'bottom-end',
+                    'timer' => 5000,
+                    'toast' => true,
+                ]);
+            } else {
+                // Use job for larger number of emails
+                ClearEmailStatus::dispatch($this->user->id, 'FAIL', false);
+
+                $this->alert('success', "Processing clearing of {$count} failed status emails. This may take a while.", [
+                    'position' => 'bottom-end',
+                    'timer' => 5000,
+                    'toast' => true,
+                ]);
+                $this->checkPendingJobs();
+            }
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to clear statuses: ' . $e->getMessage());
         }
@@ -357,13 +419,33 @@ class EmailListsTable extends Component
                 return;
             }
 
-            ClearEmailStatus::dispatch($this->user->id, 'SENT', false);
+            if ($count < 10000) {
+                // Direct update for smaller number of emails
+                EmailList::where('user_id', $this->user->id)
+                        ->where('status', 'SENT')
+                        ->update([
+                            'status' => null,
+                            'send_time' => null,
+                            'sender_email' => null,
+                            'log' => null
+                        ]);
 
-            $this->alert('success', "Processing {$count} emails. This may take a while.", [
-                'position' => 'bottom-end',
-                'timer' => 5000,
-                'toast' => true,
-            ]);
+                $this->alert('success', "Cleared {$count} sent status emails successfully.", [
+                    'position' => 'bottom-end',
+                    'timer' => 5000,
+                    'toast' => true,
+                ]);
+            } else {
+                // Use job for larger number of emails
+                ClearEmailStatus::dispatch($this->user->id, 'SENT', false);
+
+                $this->alert('success', "Processing clearing of {$count} sent status emails. This may take a while.", [
+                    'position' => 'bottom-end',
+                    'timer' => 5000,
+                    'toast' => true,
+                ]);
+                $this->checkPendingJobs();
+            }
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to clear statuses: ' . $e->getMessage());
         }
@@ -379,13 +461,33 @@ class EmailListsTable extends Component
                 return;
             }
 
-            ClearEmailStatus::dispatch($this->user->id, null, false);
+            if ($count < 10000) {
+                // Direct update for smaller number of emails
+                EmailList::where('user_id', $this->user->id)
+                        ->update([
+                            'status' => null,
+                            'send_time' => null,
+                            'sender_email' => null,
+                            'log' => null
+                        ]);
 
-            $this->alert('success', "Processing {$count} emails. This may take a while.", [
-                'position' => 'bottom-end',
-                'timer' => 5000,
-                'toast' => true,
-            ]);
+                $this->alert('success', "Cleared status for {$count} emails successfully.", [
+                    'position' => 'bottom-end',
+                    'timer' => 5000,
+                    'toast' => true,
+                ]);
+            } else {
+                // Use job for larger number of emails
+                ClearEmailStatus::dispatch($this->user->id, null, false);
+
+                $this->alert('success', "Processing clearing of status for {$count} emails. This may take a while.", [
+                    'position' => 'bottom-end',
+                    'timer' => 5000,
+                    'toast' => true,
+                ]);
+                $this->checkPendingJobs();
+            }
+
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to clear statuses: ' . $e->getMessage());
         }
@@ -401,14 +503,28 @@ class EmailListsTable extends Component
                 return;
             }
 
-            DeleteEmails::dispatch($this->user->id, false);
 
-
-            $this->alert('success', "Processing deletion of {$count} emails. This may take a while.", [
+            if ($count < 10000) {
+                EmailList::where('user_id', $this->user->id)->delete();
+                            $this->alert('success', "Deleted {$count} emails successfully.", [
                 'position' => 'bottom-end',
                 'timer' => 5000,
                 'toast' => true,
             ]);
+            } else {
+                // Direct deletion for smaller number of emails
+                DeleteEmails::dispatch($this->user->id);
+
+                            $this->alert('success', "Processing deletion of {$count} emails. This may take a while.", [
+                'position' => 'bottom-end',
+                'timer' => 5000,
+                'toast' => true,
+            ]);
+            }
+
+
+            $this->checkPendingJobs();
+            $this->emailLimit = $this->checkEmailLimit();
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to delete emails: ' . $e->getMessage());
         }
@@ -541,7 +657,9 @@ class EmailListsTable extends Component
 
             return view('livewire.pages.user.emails.email-lists-table', [
                 'emails' => $this->emails,
-                'totalRecords' => $this->totalRecords
+                'totalRecords' => $this->totalRecords,
+                'pendingJobs' => $this->pendingJobs
+
             ])->layout('layouts.app', ['title' => 'Email Lists']);
 
     }

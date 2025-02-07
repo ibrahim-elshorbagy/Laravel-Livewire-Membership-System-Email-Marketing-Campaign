@@ -23,7 +23,7 @@ class EmailListSeeder extends Seeder
             // Failed emails
             EmailList::factory()
                 ->failed()
-                ->count(20)
+                ->count(10000)
                 ->create([
                     'user_id' => $user->id
                 ]);
@@ -31,7 +31,7 @@ class EmailListSeeder extends Seeder
             // Sent emails
             EmailList::factory()
                 ->sent()
-                ->count(30)
+                ->count(10000)
                 ->create([
                     'user_id' => $user->id
                 ]);
@@ -46,7 +46,7 @@ class EmailListSeeder extends Seeder
 
             // Random status emails
             EmailList::factory()
-                ->count(350)
+                ->count(10000)
                 ->create([
                     'user_id' => $user->id
                 ]);

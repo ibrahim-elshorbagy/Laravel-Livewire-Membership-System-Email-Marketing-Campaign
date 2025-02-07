@@ -12,14 +12,16 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Storage;
 use Generator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class ProcessEmailFile implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $timeout = 3600; // 1 hour
-    public $tries = 1;
-    public $maxBatchSize = 1000;
+    public $timeout = 7200; // 2 hours
+    public $tries = 5; // Increased retry attempts
+    public $maxBatchSize = 500; // Reduced batch size for better memory management
+    public $backoff = [60, 120, 300, 600]; // Progressive retry delays
 
     protected $filePath;
     protected $userId;
@@ -31,211 +33,245 @@ class ProcessEmailFile implements ShouldQueue
         $this->userId = $userId;
         $this->remainingQuota = $remainingQuota;
         $this->onQueue('high');
-
-
     }
 
+    /**
+     * Read the file in chunks.
+     *
+     * For Excel files we use PHPSpreadsheet’s read filter to load only a subset of rows.
+     * For text files, we process them line by line.
+     */
     private function readFileInChunks($filePath): Generator
     {
-        $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+        $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        $fullPath  = Storage::path($filePath);
 
         if (in_array($extension, ['xlsx', 'xls'])) {
-            // Existing Excel file handling remains the same
-            $reader = IOFactory::createReaderForFile(Storage::path($filePath));
+            // Use chunk reading to avoid high memory usage.
+            $chunkSize = 5000;
+
+            // Create a reader and set it to read data only.
+            $reader = IOFactory::createReaderForFile($fullPath);
             $reader->setReadDataOnly(true);
-            $spreadsheet = $reader->load(Storage::path($filePath));
-            $worksheet = $spreadsheet->getActiveSheet();
 
-            foreach ($worksheet->getRowIterator() as $row) {
-                $cellIterator = $row->getCellIterator();
-                $cellIterator->setIterateOnlyExistingCells(false);
+            // Get worksheet info (including total rows) without loading the full file.
+            $sheetInfo = $reader->listWorksheetInfo($fullPath)[0];
+            $totalRows = $sheetInfo['totalRows'];
 
-                foreach ($cellIterator as $cell) {
-                    $value = trim($cell->getValue());
-                    if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                        yield $value;
+            for ($startRow = 1; $startRow <= $totalRows; $startRow += $chunkSize) {
+                // Create an anonymous read filter for the current chunk.
+                $readFilter = new class($startRow, $startRow + $chunkSize - 1) implements \PhpOffice\PhpSpreadsheet\Reader\IReadFilter {
+                    private $startRow;
+                    private $endRow;
+                    public function __construct($startRow, $endRow)
+                    {
+                        $this->startRow = $startRow;
+                        $this->endRow = $endRow;
+                    }
+                    public function readCell($column, $row, $worksheetName = ''): bool
+                    {
+                        return ($row >= $this->startRow && $row <= $this->endRow);
+                    }
+                };
+
+                $reader->setReadFilter($readFilter);
+
+                try {
+                    $spreadsheet = $reader->load($fullPath);
+                } catch (\Exception $e) {
+                    Log::error('Failed to load spreadsheet chunk', [
+                        'startRow' => $startRow,
+                        'error'    => $e->getMessage()
+                    ]);
+                    continue; // Skip this chunk if an error occurs
+                }
+
+                $worksheet = $spreadsheet->getActiveSheet();
+
+                // Iterate only over the rows in this chunk.
+                foreach ($worksheet->getRowIterator($startRow, $startRow + $chunkSize - 1) as $row) {
+                    $cellIterator = $row->getCellIterator();
+                    $cellIterator->setIterateOnlyExistingCells(false);
+
+                    foreach ($cellIterator as $cell) {
+                        $value = trim((string)$cell->getValue());
+                        if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                            yield $value;
+                        }
                     }
                 }
-            }
 
-            $spreadsheet->disconnectWorksheets();
-            unset($spreadsheet);
+                // Free up memory by disconnecting worksheets and collecting garbage.
+                $spreadsheet->disconnectWorksheets();
+                unset($spreadsheet);
+                gc_collect_cycles();
+            }
         } else {
-        $handle = fopen(Storage::path($filePath), 'r');
-        $lineNumber = 0;
-        $validEmailCount = 0;
-        $invalidEmailCount = 0;
-        $emailFormats = [
-            'numbered' => 0,
-            'plain' => 0
-        ];
-
-        if ($handle === false) {
-            Log::error('Failed to open file', ['path' => $filePath]);
-            return;
-        }
-
-        while (($line = fgets($handle)) !== false) {
-            $lineNumber++;
-
-            // Modified preprocessing: Don't remove leading numbers if they're part of the email
-            $line = trim($line);
-
-            // First, check if there's an email with leading numbers
-            if (preg_match('/^[\d\s*.-:)\-]*(\d+[^\s@]+@[^\s]+\.[^\s]+)$/i', $line, $numberedMatch)) {
-                $potentialEmail = trim($numberedMatch[1]);
-                // Process email with numbers intact
-            } else {
-                // Remove leading numbers only if they're not part of the email
-                $line = preg_replace('/^[\d\s*.-:)\-]+/', '', $line);
-                $line = trim($line);
-
-                // Check for regular emails
-                if (preg_match('/^[-\s]*([^\s]+@[^\s]+\.[^\s]+)$/i', $line, $matches)) {
-                    $potentialEmail = trim($matches[1]);
-                }
+            // For non-excel files, read line-by-line.
+            $handle = fopen($fullPath, 'r');
+            if ($handle === false) {
+                throw new \RuntimeException("Failed to open file: {$filePath}");
             }
-
-            if (isset($potentialEmail) &&
-                strpos($potentialEmail, '@') !== false &&
-                strpos($potentialEmail, '.') !== false &&
-                strlen($potentialEmail) >= 5) {
-
-                // Determine email format
-                $isNumbered = preg_match('/^\d+/', $potentialEmail);
-
-                if ($isNumbered) {
-                    $emailFormats['numbered']++;
-                } else {
-                    $emailFormats['plain']++;
+            try {
+                while (($line = fgets($handle)) !== false) {
+                    $emails = $this->extractEmailsFromLine(trim($line));
+                    foreach ($emails as $email) {
+                        yield $email;
+                    }
                 }
-
-                // Log::info("Valid email found", [
-                //     'line_number' => $lineNumber,
-                //     'email' => $potentialEmail,
-                //     'original_line' => $line,
-                //     'format' => $isNumbered ? 'numbered' : 'plain'
-                // ]);
-
-                yield $potentialEmail;
-                $validEmailCount++;
+            } finally {
+                fclose($handle);
             }
-
-            unset($potentialEmail); // Reset for next iteration
         }
     }
 
+    /**
+     * Extract valid emails from a given line.
+     */
+    private function extractEmailsFromLine(string $line): array
+    {
+        $emails = [];
+        preg_match_all('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $line, $matches);
+        foreach ($matches[0] as $potentialEmail) {
+            if (filter_var($potentialEmail, FILTER_VALIDATE_EMAIL)) {
+                $emails[] = $potentialEmail;
+            }
+        }
+        return $emails;
     }
 
+    /**
+     * Process the email file.
+     */
     public function handle()
     {
+        // Increase memory limit if needed (adjust as necessary).
+        ini_set('memory_limit', '512M');
+
         try {
+            DB::beginTransaction();
+
             $processedCount = 0;
             $batch = [];
-            $totalQuota = $this->remainingQuota;
 
+            // Get current email count for the user.
+            $currentCount   = EmailList::where('user_id', $this->userId)->count();
+            $remainingSpace = max(0, $this->remainingQuota - $currentCount);
+
+            if ($remainingSpace <= 0) {
+                Log::warning('User has already exceeded quota', [
+                    'user_id'       => $this->userId,
+                    'current_count' => $currentCount,
+                    'quota'         => $this->remainingQuota
+                ]);
+                return;
+            }
+
+            // Process each email yielded by the chunk reader.
             foreach ($this->readFileInChunks($this->filePath) as $email) {
-
-                // Check if we've reached the quota before adding new email
-                if ($processedCount >= $totalQuota) {
-                    Log::info('Quota limit reached. Stopping processing.', [
-                        'user_id' => $this->userId,
-                        'processed' => $processedCount,
-                        'quota' => $totalQuota
-                    ]);
+                // Stop if the quota is reached.
+                if ($processedCount >= $remainingSpace) {
                     break;
                 }
 
                 $batch[] = [
-                    'user_id' => $this->userId,
-                    'email' => $email,
+                    'user_id'    => $this->userId,
+                    'email'      => strtolower($email),
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
 
+                // Insert in batches to minimize DB load.
                 if (count($batch) >= $this->maxBatchSize) {
-                    // Check if this batch would exceed the quota
-                    if ($processedCount + count($batch) > $totalQuota) {
-                        // Trim the batch to fit within quota
-                        $remainingSpace = $totalQuota - $processedCount;
-                        $batch = array_slice($batch, 0, $remainingSpace);
-                    }
-
                     $insertedCount = $this->insertBatch($batch);
                     $processedCount += $insertedCount;
                     $batch = [];
 
-                    // Free up memory
-                    gc_collect_cycles();
-
-                    // Double-check quota after insertion
-                    if ($processedCount >= $totalQuota) {
-                        break;
+                    // Update quota and force garbage collection every 5000 processed emails.
+                    if ($processedCount % 5000 === 0) {
+                        $this->updateQuota($currentCount + $processedCount);
+                        gc_collect_cycles();
                     }
                 }
             }
 
-            // Handle remaining batch
+            // Insert any remaining emails.
             if (!empty($batch)) {
-                // Check if remaining batch would exceed quota
-                if ($processedCount + count($batch) > $totalQuota) {
-                    $remainingSpace = $totalQuota - $processedCount;
-                    $batch = array_slice($batch, 0, $remainingSpace);
-                }
-
                 $insertedCount = $this->insertBatch($batch);
                 $processedCount += $insertedCount;
             }
 
-            // Update user's quota
-            $user = \App\Models\User::find($this->userId);
-            $totalEmailCount = EmailList::where('user_id', $this->userId)->count();
-            $user->setConsumedQuota('Subscribers Limit', (float) $totalEmailCount);
+            // Final quota update.
+            $this->updateQuota($currentCount + $processedCount);
 
-            // Clean up
+            DB::commit();
             Storage::delete($this->filePath);
 
-            // Log final results
-            // Log::info('Email processing completed', [
-            //     'user_id' => $this->userId,
-            //     'processed' => $processedCount,
-            //     'quota_limit' => $totalQuota
-            // ]);
-
-        } catch (\Exception $e) {
-            Log::error('Email processing failed: ' . $e->getMessage(), [
-                'user_id' => $this->userId,
-                'processed_count' => $processedCount ?? 0,
-                'error' => $e->getMessage()
+            Log::info('Email processing completed', [
+                'user_id'     => $this->userId,
+                'processed'   => $processedCount,
+                'total_count' => $currentCount + $processedCount,
+                'quota_limit' => $this->remainingQuota
             ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Email processing failed', [
+                'user_id' => $this->userId,
+                'error'   => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine()
+            ]);
+
+            if ($this->attempts() >= $this->tries) {
+                throw $e;
+            }
+
+            // Release back to queue with a delay.
+            $this->release(60);
+        }
+    }
+
+    /**
+     * Insert a batch of emails into the database.
+     */
+    private function insertBatch(array $batch): int
+    {
+        try {
+            // Check if adding this batch would exceed the user’s quota.
+            $currentCount = EmailList::where('user_id', $this->userId)->count();
+            $batchSize    = count($batch);
+
+            if ($currentCount + $batchSize > $this->remainingQuota) {
+                $remainingSpace = max(0, $this->remainingQuota - $currentCount);
+                if ($remainingSpace <= 0) {
+                    return 0;
+                }
+                $batch = array_slice($batch, 0, $remainingSpace);
+            }
+
+            // Using insertOrIgnore to avoid duplicate entries.
+            DB::table('email_lists')->insertOrIgnore($batch);
+            return count($batch);
+        } catch (\Exception $e) {
+            Log::error('Batch insert failed', ['error' => $e->getMessage()]);
             throw $e;
         }
     }
 
-    private function insertBatch(array &$batch): int
+    /**
+     * Update the user quota.
+     */
+    private function updateQuota(int $totalCount): void
     {
         try {
-            // Filter out existing emails
-            $existingEmails = EmailList::whereIn('email', array_column($batch, 'email'))
-                ->pluck('email')
-                ->toArray();
-
-            $newBatch = array_filter($batch, function($item) use ($existingEmails) {
-                return !in_array($item['email'], $existingEmails);
-            });
-
-            if (!empty($newBatch)) {
-                EmailList::insert($newBatch);
-                return count($newBatch);
-            }
-
-            return 0;
+            $user = \App\Models\User::find($this->userId);
+            $user->setConsumedQuota('Subscribers Limit', (float) $totalCount);
         } catch (\Exception $e) {
-            Log::error('Batch insertion failed', [
-                'error' => $e->getMessage(),
-                'batch_size' => count($batch)
+            Log::warning('Failed to update quota', [
+                'error'   => $e->getMessage(),
+                'user_id' => $this->userId,
+                'count'   => $totalCount
             ]);
-            throw $e;
         }
     }
 }

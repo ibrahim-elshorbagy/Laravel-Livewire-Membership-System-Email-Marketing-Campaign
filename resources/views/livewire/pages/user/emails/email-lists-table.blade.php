@@ -15,6 +15,7 @@
             @endif
         </div>
     </div>
+
     @if($emailLimit['show'])
     <div class="p-4 mb-6 text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800"
         role="alert">
@@ -139,6 +140,42 @@
         </div>
     </div>
 
+    <div wire:poll.30000ms="checkPendingJobs">
+        @if($pendingJobs['file_processing'] > 0 ||
+        $pendingJobs['clear_status'] > 0 ||
+        $pendingJobs['delete_emails'] > 0)
+        <div class="flex items-center justify-between p-3 my-4 bg-yellow-100 rounded-lg dark:bg-yellow-900">
+            <div class="flex items-center text-yellow-800 dark:text-yellow-300">
+                <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 01-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                        clip-rule="evenodd" />
+                </svg>
+                <div>
+                    <p class="font-bold">Background Jobs in Progress</p>
+                    <p class="text-sm">
+                        @if($pendingJobs['file_processing'] > 0)
+                        {{ $pendingJobs['file_processing'] }} file processing job(s)
+                        @endif
+                        @if($pendingJobs['clear_status'] > 0)
+                        {{ $pendingJobs['clear_status'] }} status clearing job(s)
+                        @endif
+                        @if($pendingJobs['delete_emails'] > 0)
+                        {{ $pendingJobs['delete_emails'] }} email deletion job(s)
+                        @endif
+                    </p>
+                </div>
+            </div>
+
+            <button wire:click="refreshPendingJobs"
+                class="px-3 py-1 text-xs text-yellow-800 bg-yellow-200 rounded hover:bg-yellow-300">
+                Refresh Status
+            </button>
+        </div>
+        @endif
+
+        <!-- Rest of your existing template -->
+    </div>
     <!-- Table -->
     <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
         <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
