@@ -8,10 +8,12 @@
             </h2>
         </div>
         <div class="flex mt-4 md:mt-0 md:ml-4">
+            @if(!$this->hasActiveJobs())
             @if(!$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
             <x-primary-info-button href="{{ route('user.emails.create') }}" wire:navigate>
                 Add New Emails
             </x-primary-info-button>
+            @endif
             @endif
         </div>
     </div>
@@ -81,6 +83,7 @@
 
 
         <div class="flex flex-wrap gap-2">
+            @if(!$this->hasActiveJobs())
             <!-- Per Page Actions -->
             <div class="w-full mb-2">
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -144,6 +147,12 @@
                 class="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600">
                 Delete All Emails
             </x-primary-danger-button>
+            @else
+            <div class="w-full p-4 text-yellow-800 bg-yellow-100 rounded-lg dark:bg-yellow-900 dark:text-yellow-300">
+                <p class="font-medium">Actions Disabled</p>
+                <p class="text-sm">Please wait for current jobs to complete before starting new ones.</p>
+            </div>
+            @endif
         </div>
     </div>
 
@@ -155,49 +164,56 @@
             </li>
         </ul>
     </div>
-    <div wire:poll.30000ms="checkPendingJobs">
-        @if($pendingJobs['file_processing'] > 0 ||
-        $pendingJobs['clear_status'] > 0 ||
-        $pendingJobs['delete_emails'] > 0)
-        <div class="flex items-center justify-between p-3 my-4 bg-yellow-100 rounded-lg dark:bg-yellow-900">
-            <div class="flex items-center text-yellow-800 dark:text-yellow-300">
-                <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 01-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                        clip-rule="evenodd" />
-                </svg>
-                <div>
-                    <p class="font-bold">Background Jobs in Progress</p>
-                    <p class="text-sm">
-                        @if($pendingJobs['file_processing'] > 0)
-                        {{ $pendingJobs['file_processing'] }} file processing job(s)
-                        @endif
-                        @if($pendingJobs['clear_status'] > 0)
-                        {{ $pendingJobs['clear_status'] }} status clearing job(s)
-                        @endif
-                        @if($pendingJobs['delete_emails'] > 0)
-                        {{ $pendingJobs['delete_emails'] }} email deletion job(s)
-                        @endif
-                    </p>
+
+    <div wire:poll.1000ms="$refresh">
+    @if($queueStatus > 1)
+        <div class="p-4 mb-6 border border-blue-200 rounded-lg bg-blue-50 dark:bg-blue-900 dark:border-blue-800">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="text-blue-600 fas fa-spinner fa-spin dark:text-blue-400"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+                        <i class="mr-1 fas fa-clock"></i> Jobs in Queue
+                    </h3>
+                    <div class="mt-1 text-sm text-blue-700 dark:text-blue-300">
+                        <i class="mr-1 fas fa-info-circle"></i>
+                        Your task is in queue position {{ $queueStatus }}. It will start automatically when
+                        resources are available.
+                    </div>
                 </div>
             </div>
-
-            <button wire:click="refreshPendingJobs"
-                class="px-3 py-1 text-xs text-yellow-800 bg-yellow-200 rounded hover:bg-yellow-300"
-                wire:loading.attr="disabled" wire:target="refreshPendingJobs">
-
-                <span wire:loading.remove wire:target="refreshPendingJobs">
-                    Refresh Status
-                </span>
-
-                <span wire:loading wire:target="refreshPendingJobs">
-                    <i class="fas fa-spinner fa-spin"></i> Processing...
-                </span>
-            </button>
         </div>
         @endif
-
+        @if($jobProgress->isNotEmpty())
+        <div class="mb-6 space-y-4">
+            @foreach($jobProgress as $progress)
+            <div class="p-4 bg-white rounded-lg shadow dark:bg-gray-800">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <i class="mr-1 fas fa-tasks"></i>
+                        {{ ucwords(str_replace('_', ' ', $progress->job_type)) }}
+                    </span>
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <i class="mr-1 fas fa-percentage"></i>
+                        {{ number_format($progress->percentage, 1) }}%
+                    </span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                    <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                        style="width: {{ $progress->percentage }}%"></div>
+                </div>
+                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    <i class="mr-1 fas fa-list-ol"></i>
+                    {{ $progress->processed_items }} / {{ $progress->total_items }} items processed
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @endif
     </div>
+
+
     <!-- Table -->
     <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
         <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">

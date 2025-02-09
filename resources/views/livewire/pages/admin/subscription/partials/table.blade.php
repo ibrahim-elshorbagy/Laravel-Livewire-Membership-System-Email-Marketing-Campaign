@@ -34,7 +34,7 @@
                     <th class="p-4">Plan</th>
                     <th class="p-4">Start Date</th>
                     <th class="p-4">Expiration</th>
-                    <th class="p-4">Payment Status</th>
+                    <th class="p-4 text-nowrap">Payment Status</th>
                     <th class="p-4">Status</th>
                     <th class="p-4">Actions</th>
                 </tr>

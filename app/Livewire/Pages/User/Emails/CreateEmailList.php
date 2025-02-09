@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\EmailList;
 use App\Jobs\ProcessEmailFile;
+use App\Models\JobProgress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -28,11 +29,22 @@ class CreateEmailList extends Component
         $this->user = auth()->user();
         $this->remainingQuota = $this->user->balance('Subscribers Limit');
 
-        if ($this->remainingQuota == 0) {
+        if ($this->remainingQuota == 0 || $this->hasActiveJobs()) {
             return redirect()->route('welcome');
         }
     }
 
+    public function hasActiveJobs()
+    {
+        return DB::table('jobs')
+            ->where('queue', 'high')
+            ->where(function($query) {
+                $query->where('payload', 'like', '%"userId":' . $this->user->id . '%')
+                    ->orWhere('payload', 'like', '%"user_id":' . $this->user->id . '%')
+                    ->orWhere('payload', 'like', '%i:' . $this->user->id . ';%');
+            })
+            ->exists();
+    }
     public function processFile()
     {
         try {
@@ -44,14 +56,11 @@ class CreateEmailList extends Component
 
             ProcessEmailFile::dispatch($path, $this->user->id, $this->remainingQuota);
 
-            $this->alert('success', 'File uploaded successfully, Processing will begin shortly', [
-                'position' => 'bottom-end',
-                'timer' => 10000,
-                'toast' => true,
-            ]);
 
             $this->file = null;
             $this->processing = false;
+            Session::flash('success', 'File uploaded successfully, Processing will begin shortly.');
+            return $this->redirect(route('user.emails.index'), navigate: true);
 
         } catch (\Exception $e) {
             $this->alert('error', 'Error uploading file: ' . $e->getMessage());

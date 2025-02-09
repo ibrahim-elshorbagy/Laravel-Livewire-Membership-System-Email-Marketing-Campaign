@@ -7,6 +7,7 @@ use App\Jobs\DeleteEmails;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\EmailList;
+use App\Models\JobProgress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -96,41 +97,11 @@ class EmailListsTable extends Component
         ]);
 
         $this->emailLimit = $this->checkEmailLimit();
-        $this->checkPendingJobs();
     }
 
         // Method to check pending jobs
-    public function checkPendingJobs()
-    {
-        try {
-            $this->pendingJobs = [
-                'file_processing' => $this->getPendingJobsCount('ProcessEmailFile'),
-                'clear_status' => $this->getPendingJobsCount('ClearEmailStatus'),
-                'delete_emails' => $this->getPendingJobsCount('DeleteEmails')
-            ];
-        } catch (\Exception $e) {
-            Log::error('Error checking pending jobs', [
-                'user_id' => $this->user->id,
-                'error' => $e->getMessage()
-            ]);
-        }
-    }
 
-    // Helper method to count specific job types
-    private function getPendingJobsCount($jobClass)
-    {
-        return DB::table('jobs')
-            ->where('queue', 'high')
-            ->where('payload', 'like', '%' . class_basename($jobClass) . '%')
-            ->where('payload', 'like', '%' . $this->user->id . '%')
-            ->count();
-    }
 
-    public function refreshPendingJobs()
-    {
-        $this->checkPendingJobs();
-        $this->emailLimit = $this->checkEmailLimit();
-    }
     public function updatingSearch()
     {
         $this->validateOnly('search');
@@ -272,7 +243,6 @@ class EmailListsTable extends Component
                     'sender_email' => null,
                     'log' => null
                 ]);
-                $this->checkPendingJobs();
                 $this->alert('success', 'Status cleared successfully!', [
                     'position' => 'bottom-end',
                     'timer' => 3000,
@@ -319,7 +289,6 @@ class EmailListsTable extends Component
                     'timer' => 3000,
                     'toast' => true,
                 ]);
-                $this->checkPendingJobs();
                 $this->emailLimit = $this->checkEmailLimit();
             });
         } catch (\Exception $e) {
@@ -357,7 +326,6 @@ class EmailListsTable extends Component
 
                 $this->resetSelections();
                 $this->emailLimit = $this->checkEmailLimit();
-                $this->checkPendingJobs();
             });
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to delete emails: ' . $e->getMessage());
@@ -400,7 +368,6 @@ class EmailListsTable extends Component
                     'timer' => 5000,
                     'toast' => true,
                 ]);
-                $this->checkPendingJobs();
             }
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to clear statuses: ' . $e->getMessage());
@@ -444,7 +411,6 @@ class EmailListsTable extends Component
                     'timer' => 5000,
                     'toast' => true,
                 ]);
-                $this->checkPendingJobs();
             }
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to clear statuses: ' . $e->getMessage());
@@ -485,7 +451,6 @@ class EmailListsTable extends Component
                     'timer' => 5000,
                     'toast' => true,
                 ]);
-                $this->checkPendingJobs();
             }
 
         } catch (\Exception $e) {
@@ -522,8 +487,6 @@ class EmailListsTable extends Component
             ]);
             }
 
-
-            $this->checkPendingJobs();
             $this->emailLimit = $this->checkEmailLimit();
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to delete emails: ' . $e->getMessage());
@@ -652,13 +615,58 @@ class EmailListsTable extends Component
         }
     }
 
+    public function getJobProgressProperty()
+    {
+        $this->emailLimit = $this->checkEmailLimit();
+        return JobProgress::where('user_id', $this->user->id)
+            ->whereIn('status', ['processing', 'pending'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    public function hasActiveJobs()
+    {
+        return DB::table('jobs')
+            ->where('queue', 'high')
+            ->where(function($query) {
+                $query->where('payload', 'like', '%"userId":' . $this->user->id . '%')
+                    ->orWhere('payload', 'like', '%"user_id":' . $this->user->id . '%')
+                    ->orWhere('payload', 'like', '%i:' . $this->user->id . ';%');
+            })
+            ->exists();
+    }
+
+    public function getQueueStatusProperty()
+    {
+        $allJobs = DB::table('jobs')
+            ->where('queue', 'high')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        foreach ($allJobs as $index => $job) {
+            // Check if this job belongs to the current user
+            if (
+                str_contains($job->payload, '"userId":' . $this->user->id) ||
+                str_contains($job->payload, '"user_id":' . $this->user->id) ||
+                str_contains($job->payload, 'i:' . $this->user->id . ';')
+            ) {
+                // Return position (1-based index)
+                return $index + 1;
+            }
+        }
+
+        return 0; // Return 0 if no jobs found for user
+    }
     public function render()
     {
 
             return view('livewire.pages.user.emails.email-lists-table', [
                 'emails' => $this->emails,
                 'totalRecords' => $this->totalRecords,
-                'pendingJobs' => $this->pendingJobs
+                'pendingJobs' => $this->pendingJobs,
+                'jobProgress' => $this->jobProgress,
+                'queueStatus' => $this->queueStatus
+
 
             ])->layout('layouts.app', ['title' => 'Email Lists']);
 

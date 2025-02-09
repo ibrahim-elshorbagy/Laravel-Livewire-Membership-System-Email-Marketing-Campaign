@@ -1,4 +1,6 @@
 <?php
+
+use App\Models\JobProgress;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
@@ -16,3 +18,7 @@ Schedule::command('queue:work --queue=default,high  --tries=5')
     ->onFailure(function (\Throwable $e) {
         Log::error('Queue worker failed: '.$e->getMessage());
     });
+
+Schedule::call(function () {
+    JobProgress::where('status', 'completed')->delete();
+});

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\EmailList;
+use App\Models\JobProgress;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -13,10 +14,11 @@ use Illuminate\Support\Facades\Storage;
 use Generator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Traits\TracksProgress;
 
 class ProcessEmailFile implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels,TracksProgress;
 
     public $timeout = 7200; // 2 hours
     public $tries = 5; // Increased retry attempts
@@ -145,118 +147,194 @@ class ProcessEmailFile implements ShouldQueue
      */
     public function handle()
     {
-        // Increase memory limit if needed (adjust as necessary).
         ini_set('memory_limit', '512M');
 
         try {
-            DB::beginTransaction();
-
-            $processedCount = 0;
-            $batch = [];
-
-            // Get current email count for the user.
-            $currentCount   = EmailList::where('user_id', $this->userId)->count();
+            // First check remaining quota - This doesn't need a transaction
+            $currentCount = EmailList::where('user_id', $this->userId)->count();
             $remainingSpace = max(0, $this->remainingQuota - $currentCount);
 
             if ($remainingSpace <= 0) {
-                Log::warning('User has already exceeded quota', [
-                    'user_id'       => $this->userId,
-                    'current_count' => $currentCount,
-                    'quota'         => $this->remainingQuota
-                ]);
+                $this->failProgress('User has exceeded quota');
                 return;
             }
 
-            // Process each email yielded by the chunk reader.
+            // Get estimated total but cap it at remaining space
+            $estimatedTotal = $this->getEstimatedTotal();
+            $targetTotal = min($estimatedTotal, $remainingSpace);
+
+            // Initialize progress with the capped total
+            $this->initializeProgress('process_email_file', $this->userId, $targetTotal);
+
+            $processedCount = 0;
+            $batch = [];
+            $totalInserted = 0;
+
             foreach ($this->readFileInChunks($this->filePath) as $email) {
-                // Stop if the quota is reached.
                 if ($processedCount >= $remainingSpace) {
-                    break;
+                    break; // Stop if we hit the quota limit
                 }
 
                 $batch[] = [
-                    'user_id'    => $this->userId,
-                    'email'      => strtolower($email),
+                    'user_id' => $this->userId,
+                    'email' => strtolower($email),
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
 
-                // Insert in batches to minimize DB load.
                 if (count($batch) >= $this->maxBatchSize) {
-                    $insertedCount = $this->insertBatch($batch);
-                    $processedCount += $insertedCount;
-                    $batch = [];
+                    // Process each batch in its own transaction
+                    DB::beginTransaction();
+                    try {
+                        $insertedCount = $this->insertBatch($batch);
+                        $totalInserted += $insertedCount;
+                        $processedCount += count($batch);
 
-                    // Update quota and force garbage collection every 5000 processed emails.
-                    if ($processedCount % 5000 === 0) {
-                        $this->updateQuota($currentCount + $processedCount);
-                        gc_collect_cycles();
+                        // Update quota for this batch
+                        $this->updateQuota($currentCount + $totalInserted);
+
+                        DB::commit();
+
+                        // Update progress based on remaining space
+                        $this->updateProgressWithQuota($processedCount, $targetTotal);
+
+                        $batch = [];
+
+                        if ($processedCount % 5000 === 0) {
+                            gc_collect_cycles();
+                        }
+                    } catch (\Exception $e) {
+                        DB::rollBack();
+                        Log::error('Batch processing failed', [
+                            'error' => $e->getMessage(),
+                            'processed_count' => $processedCount
+                        ]);
+                        // Continue processing next batch instead of failing completely
+                        $batch = [];
+                        continue;
                     }
                 }
             }
 
-            // Insert any remaining emails.
+            // Process any remaining emails in the final batch
             if (!empty($batch)) {
-                $insertedCount = $this->insertBatch($batch);
-                $processedCount += $insertedCount;
+                DB::beginTransaction();
+                try {
+                    $insertedCount = $this->insertBatch($batch);
+                    $totalInserted += $insertedCount;
+                    $processedCount += count($batch);
+
+                    // Final quota update
+                    $this->updateQuota($currentCount + $totalInserted);
+
+                    DB::commit();
+
+                    $this->updateProgressWithQuota($processedCount, $targetTotal);
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    Log::error('Final batch processing failed', [
+                        'error' => $e->getMessage(),
+                        'processed_count' => $processedCount
+                    ]);
+                }
             }
 
-            // Final quota update.
-            $this->updateQuota($currentCount + $processedCount);
-
-            DB::commit();
+            // Clean up and complete
             Storage::delete($this->filePath);
 
-            Log::info('Email processing completed', [
-                'user_id'     => $this->userId,
-                'processed'   => $processedCount,
-                'total_count' => $currentCount + $processedCount,
-                'quota_limit' => $this->remainingQuota
+            // Set final progress
+            $this->jobProgress->update([
+                'total_items' => $processedCount,
+                'processed_items' => $processedCount,
+                'percentage' => 100,
+                'status' => 'completed'
             ]);
+
+            // Add completion message with quota information
+            $this->completeProgressWithQuotaInfo($processedCount, $estimatedTotal, $remainingSpace);
+
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error('Email processing failed', [
-                'user_id' => $this->userId,
-                'error'   => $e->getMessage(),
-                'file'    => $e->getFile(),
-                'line'    => $e->getLine()
+                'error' => $e->getMessage(),
+                'processed_count' => $processedCount ?? 0
             ]);
-
-            if ($this->attempts() >= $this->tries) {
-                throw $e;
-            }
-
-            // Release back to queue with a delay.
-            $this->release(60);
-        }
-    }
-
-    /**
-     * Insert a batch of emails into the database.
-     */
-    private function insertBatch(array $batch): int
-    {
-        try {
-            // Check if adding this batch would exceed the user’s quota.
-            $currentCount = EmailList::where('user_id', $this->userId)->count();
-            $batchSize    = count($batch);
-
-            if ($currentCount + $batchSize > $this->remainingQuota) {
-                $remainingSpace = max(0, $this->remainingQuota - $currentCount);
-                if ($remainingSpace <= 0) {
-                    return 0;
-                }
-                $batch = array_slice($batch, 0, $remainingSpace);
-            }
-
-            // Using insertOrIgnore to avoid duplicate entries.
-            DB::table('email_lists')->insertOrIgnore($batch);
-            return count($batch);
-        } catch (\Exception $e) {
-            Log::error('Batch insert failed', ['error' => $e->getMessage()]);
+            $this->failProgress($e->getMessage());
             throw $e;
         }
     }
+
+    protected function insertBatch(array $batch): int
+    {
+        try {
+            // Using insertOrIgnore to skip duplicates
+            $inserted = DB::table('email_lists')->insertOrIgnore($batch);
+
+            // Log successful batch insertion
+            // Log::info('Batch inserted successfully', [
+            //     'count' => $inserted,
+            //     'batch_size' => count($batch)
+            // ]);
+
+            return $inserted;
+        } catch (\Exception $e) {
+            Log::error('Batch insert failed', [
+                'error' => $e->getMessage(),
+                'batch_size' => count($batch)
+            ]);
+            throw $e;
+        }
+    }
+
+    protected function getEstimatedTotal(): int
+    {
+        $fileSize = Storage::size($this->filePath);
+        $extension = strtolower(pathinfo($this->filePath, PATHINFO_EXTENSION));
+
+        if (in_array($extension, ['xlsx', 'xls'])) {
+            try {
+                $reader = IOFactory::createReaderForFile(Storage::path($this->filePath));
+                $reader->setReadDataOnly(true);
+                $worksheetInfo = $reader->listWorksheetInfo(Storage::path($this->filePath));
+                return $worksheetInfo[0]['totalRows'];
+            } catch (\Exception $e) {
+                Log::warning('Failed to read Excel file info, using size-based estimation', [
+                    'error' => $e->getMessage()
+                ]);
+                return (int) ceil($fileSize / 100);
+            }
+        }
+
+        // For text/CSV files
+        return (int) ceil($fileSize / 30);
+    }
+
+    protected function updateProgressWithQuota(int $processedCount, int $targetTotal)
+    {
+        if ($this->jobProgress) {
+            $this->jobProgress->update([
+                'processed_items' => $processedCount,
+                'total_items' => $targetTotal,
+                'percentage' => min(99, ($processedCount / $targetTotal) * 100),
+                'status' => 'processing'
+            ]);
+        }
+    }
+
+    protected function completeProgressWithQuotaInfo(int $processedCount, int $estimatedTotal, int $remainingSpace)
+    {
+        $message = "Processed {$processedCount} emails";
+
+        if ($estimatedTotal > $remainingSpace) {
+            $skippedCount = $estimatedTotal - $processedCount;
+            $message .= ". {$skippedCount} emails were skipped due to quota limits";
+        }
+
+        $this->jobProgress->update([
+            'status' => 'completed',
+            'error' => $message // Using error field to store informational message
+        ]);
+    }
+
 
     /**
      * Update the user quota.
@@ -266,6 +344,7 @@ class ProcessEmailFile implements ShouldQueue
         try {
             $user = \App\Models\User::find($this->userId);
             $user->setConsumedQuota('Subscribers Limit', (float) $totalCount);
+
         } catch (\Exception $e) {
             Log::warning('Failed to update quota', [
                 'error'   => $e->getMessage(),

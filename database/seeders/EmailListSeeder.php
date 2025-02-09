@@ -12,7 +12,7 @@ class EmailListSeeder extends Seeder
     public function run()
     {
         // Create test users
-        $users = User::factory(2)->create();
+        $users = User::factory(1)->create();
 
         foreach ($users as $user) {
             // Create a mix of email statuses for each user
