@@ -1,22 +1,19 @@
 <?php
-
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
+use Throwable;
 
-Schedule::command('queue:work --queue=default,high --stop-when-empty  --timeout=7200 --tries=5', [])
-    ->everyMinute()
-    ->withoutOverlapping()
+Schedule::command('queue:work --queue=default,high  --tries=5')
+    ->everyFifteenMinutes()
+    ->runInBackground()
+    ->withoutOverlapping(900) // 15 minutes
     ->before(function () {
-        Log::info('Starting default and high queue worker');
+        Log::info('Queue worker starting');
     })
     ->after(function () {
-        Log::info('Queue worker completed successfully');
+        Log::info('Queue worker finished');
     })
-    ->onFailure(function () {
-        Log::error('Queue worker failed to complete');
-    })
-    ->then(function () {
-        Log::info('Closed default and high queue worker');
+    ->onFailure(function (Throwable $e) {  // This is causing the error
+        Log::error('Queue worker failed: '.$e->getMessage());
     });

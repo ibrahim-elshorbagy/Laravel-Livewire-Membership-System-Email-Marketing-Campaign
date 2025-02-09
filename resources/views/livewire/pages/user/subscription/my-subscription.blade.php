@@ -161,7 +161,7 @@
     </div>
 
     <div class="flex items-center justify-center my-10">
-        <button wire:navigate href="{{ route('our.plans') }}" class="relative px-6 py-3 text-lg font-semibold text-white transition-all duration-300 ease-in-out
+        <a  href="{{ route('our.plans') }}" class="relative px-6 py-3 text-lg font-semibold text-white transition-all duration-300 ease-in-out
             bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700
             rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5
             overflow-hidden group">
@@ -177,7 +177,7 @@
             <div
                 class="absolute top-0 left-0 w-full h-full transition-transform duration-300 ease-out transform translate-x-full -skew-x-12 bg-white/10 group-hover:translate-x-0">
             </div>
-        </button>
+        </a>
     </div>
     @else
     <!-- No Subscription State -->
@@ -192,7 +192,7 @@
         </p>
         <div class="mt-6">
             <div class="flex items-center justify-center my-10">
-                <button wire:navigate href="{{ route('our.plans') }}" class="relative px-6 py-3 text-lg font-semibold text-white transition-all duration-300 ease-in-out
+                <a  href="{{ route('our.plans') }}" class="relative px-6 py-3 text-lg font-semibold text-white transition-all duration-300 ease-in-out
                             bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700
                             rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5
                             overflow-hidden group">
@@ -208,7 +208,7 @@
                     <div
                         class="absolute top-0 left-0 w-full h-full transition-transform duration-300 ease-out transform translate-x-full -skew-x-12 bg-white/10 group-hover:translate-x-0">
                     </div>
-                </button>
+                </a>
             </div>
         </div>
     </div>

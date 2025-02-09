@@ -166,5 +166,4 @@
         }
     }" @paypalPayment.window="openPaymentWindow($event.detail.url)">
 
-
 </div>

@@ -63,7 +63,7 @@ class Edit extends Component
 
             DB::commit();
             Session::flash('success', 'Plan updated successfully.');
-            return $this->redirect(route('admin.plans'), navigate: true);
+            return $this->redirect(route('admin.plans',['tab' => $this->plan->periodicity_type === 'Year' ? 'yearly' : 'monthly']), navigate: true);
 
         } catch (\Exception $e) {
             DB::rollBack();

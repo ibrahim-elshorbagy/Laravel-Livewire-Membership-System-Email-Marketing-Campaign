@@ -4,11 +4,14 @@ namespace App\Livewire\Pages\User\Subscription;
 
 use App\Models\Payment\Payment;
 use App\Services\PaypalPaymentService;
+use Illuminate\Database\DeadlockException;
+use Illuminate\Support\Facades\Artisan;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use LucasDotVin\Soulbscription\Models\Plan;
 use LucasDotVin\Soulbscription\Models\Subscriber;
+use Illuminate\Support\Facades\Log;
 
 class Subscribe extends Component
 {
@@ -18,6 +21,11 @@ class Subscribe extends Component
     public $selectedTab = 'monthly';
     public $paymentUrl;
     public $isProcessing = false;
+
+    protected $listeners = [
+        'confirmed' => 'handleConfirmed',
+        'cancelled' => 'handleCancelled'
+    ];
 
     protected function rules()
     {
@@ -34,13 +42,9 @@ class Subscribe extends Component
             ],
         ];
     }
-    public function hydrate()
-    {
-        $this->listeners = [
-            'proceedWithPayment' => 'proceedWithPayment',
-            'cancelPayment' => 'cancelPayment',
-        ];
-    }
+
+
+
     public function updatedSelectedPlan($value)
     {
         $this->validateOnly('selectedPlan');
@@ -49,37 +53,29 @@ class Subscribe extends Component
     public function initiatePayment()
     {
         $this->validate();
-
         $user = auth()->user();
-
 
         // Check if user has an active subscription
         if ($user && $user->lastSubscription() && $user->lastSubscription()->plan->id != 1) {
-            $lastSubscription = $user->lastSubscription();
+            // Log::info('Showing confirmation dialog');
 
-            // Confirm subscription replacement
+            // Show confirmation dialog with correct event handling
             $this->alert('warning', 'Active Subscription', [
-                'text' => 'You currently have an active subscription. Do you want to replace it with the new plan?',
-                'showConfirmButton' => true,
-                'confirmButtonText' => 'Replace Subscription',
-                'confirmButtonColor' => 'bg-blue-600 hover:bg-blue-700',
-                'showCancelButton' => true,
-                'cancelButtonText' => 'Keep Current Plan',
-                'cancelButtonColor' => 'bg-red-500 hover:bg-red-600',
-                'onConfirmed' => 'proceedWithPayment',
-                'onDismissed' => 'cancelPayment',
-                'position' => 'center',
-                'allowOutsideClick' => false,
-                'timer' => null,
-                'customClass' => [
-                    'popup' => 'rounded-xl shadow-2xl border border-gray-200',
-                    'title' => 'text-2xl font-bold text-gray-800',
-                    'content' => 'text-base text-gray-600',
-                    'confirmButton' => 'px-4 py-2 rounded-lg text-white font-semibold transition-colors',
-                    'cancelButton' => 'px-4 py-2 rounded-lg text-white font-semibold transition-colors'
-                ],
-                'width' => '500px',
-            ]);
+                    'title'             => 'Confirm Subscription Change',
+                    'text'              => 'You currently have an active subscription. Do you want to replace it with the new plan?',
+                    'showConfirmButton' => true,
+                    'confirmButtonText' => 'Replace Subscription',
+                    'showCancelButton'  => true,
+                    'cancelButtonText'  => 'Keep Current Plan',
+                    'reverseButtons'    => true,
+                    'position'          => 'center',
+                    'timer'             => null,
+                    'toast'             => false,
+                    'showLoaderOnConfirm' => true,
+                    'allowOutsideClick' => false,
+                    'onConfirmed' => 'confirmed',
+                    'onDismissed' => 'cancelled',
+                ]);
 
             return;
         }
@@ -88,8 +84,24 @@ class Subscribe extends Component
         $this->proceedWithPayment();
     }
 
+        // New method to handle confirmation
+    public function handleConfirmed()
+    {
+        // Log::info('Confirmation received - proceeding with payment');
+        $this->proceedWithPayment();
+    }
+
+    // New method to handle cancellation
+    public function handleCancelled()
+    {
+        // Log::info('Cancellation received');
+        $this->isProcessing = false;
+        $this->selectedPlan = null;
+        $this->alert('info', 'Subscription change cancelled');
+    }
     public function proceedWithPayment()
     {
+        // Log::info('proceedWithPayment called');
         $this->isProcessing = true;
 
         try {
@@ -118,6 +130,7 @@ class Subscribe extends Component
                 throw new \Exception('PayPal approval URL not found');
             }
 
+
             DB::commit();
 
             $this->paymentUrl = $approvalUrl;
@@ -129,13 +142,6 @@ class Subscribe extends Component
             $this->isProcessing = false;
             $this->alert('error', 'Failed to initiate payment: ' . $e->getMessage());
         }
-    }
-
-    public function cancelPayment()
-    {
-        $this->isProcessing = false;
-        $this->selectedPlan = null;
-        $this->alert('info', 'Subscription upgrade cancelled.');
     }
 
     public function getCurrentPlanId()

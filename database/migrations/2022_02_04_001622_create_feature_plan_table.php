@@ -14,7 +14,7 @@ return new class () extends Migration {
     {
         Schema::create('feature_plan', function (Blueprint $table) {
             $table->id();
-            $table->decimal('charges', 20, 2)->nullable();
+            $table->decimal('charges', 65, 0)->nullable();
             $table->foreignIdFor(\LucasDotVin\Soulbscription\Models\Feature::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(\LucasDotVin\Soulbscription\Models\Plan::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
