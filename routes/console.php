@@ -2,7 +2,6 @@
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
-use Throwable;
 
 Schedule::command('queue:work --queue=default,high  --tries=5')
     ->everyFifteenMinutes()
@@ -14,6 +13,6 @@ Schedule::command('queue:work --queue=default,high  --tries=5')
     ->after(function () {
         Log::info('Queue worker finished');
     })
-    ->onFailure(function (Throwable $e) {  // This is causing the error
+    ->onFailure(function (\Throwable $e) {
         Log::error('Queue worker failed: '.$e->getMessage());
     });
