@@ -120,10 +120,11 @@ class PayPalWebhookJob extends ProcessWebhookJob
                 return;
             }
 
-            if ($payment->user->lastSubscription()) {
-                $payment->user->lastSubscription()->suppress();
-            }
+
             DB::transaction(function () use ($payment, $resource) {
+                    if ($payment->user->lastSubscription()) {
+                $payment->user->lastSubscription()->suppress();
+                }
                 // Create subscription
                 $subscription = $payment->user->subscribeTo($payment->plan);
 
@@ -131,7 +132,6 @@ class PayPalWebhookJob extends ProcessWebhookJob
                 $payment->update([
                     'subscription_id' => $subscription->id,
                     'status' => 'approved',
-                    'server_status' => "Hold",
                     'transaction_id' =>  $resource['id'] ?? null,
                 ]);
 

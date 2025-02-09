@@ -54,7 +54,7 @@ class Subscribe extends Component
 
 
         // Check if user has an active subscription
-        if ($user && $user->lastSubscription()) {
+        if ($user && $user->lastSubscription() && $user->lastSubscription()->plan->id != 1) {
             $lastSubscription = $user->lastSubscription();
 
             // Confirm subscription replacement
@@ -156,7 +156,7 @@ class Subscribe extends Component
 
         $yearlyPlans = Plan::with('features')
             ->where('periodicity_type', 'Year')
-            ->where('name', '!=', 'Trial')
+            ->where('id', '!=', 1)
             ->get();
 
         return view('livewire.pages.user.subscription.subscribe', [

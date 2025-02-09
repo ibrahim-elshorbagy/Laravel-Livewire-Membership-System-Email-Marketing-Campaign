@@ -4,27 +4,28 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\Admin\Site\SiteSetting;
 use Illuminate\Support\Facades\View;
 
 class GlobalSettingsMiddleware
 {
-/**
+    private const CACHE_KEY = 'global_settings';
+    private const CACHE_DURATION = 3600; // 1 hour in seconds
+
+    /**
      * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Fetch global settings
-        $globalSettings = $this->getGlobalSettings();
+        // Fetch global settings from cache or database
+        $globalSettings = $this->getCachedGlobalSettings();
 
         // Share settings with all views
         View::share('globalSettings', $globalSettings);
 
-
-        // If it's a Livewire request, you can use a custom method
+        // If it's a Livewire request, share settings
         if (class_exists('\Livewire\Livewire')) {
             $this->shareLivewireSettings($globalSettings);
         }
@@ -33,9 +34,17 @@ class GlobalSettingsMiddleware
     }
 
     /**
-     * Retrieve global settings with caching
-     *
-     * @return array
+     * Get cached global settings
+     */
+    protected function getCachedGlobalSettings(): array
+    {
+        return Cache::remember(self::CACHE_KEY, self::CACHE_DURATION, function () {
+            return $this->getGlobalSettings();
+        });
+    }
+
+    /**
+     * Retrieve global settings
      */
     protected function getGlobalSettings(): array
     {
@@ -69,5 +78,13 @@ class GlobalSettingsMiddleware
                 $component->set($key, $value);
             }
         });
+    }
+
+    /**
+     * Clear the settings cache
+     */
+    public static function clearCache(): void
+    {
+        Cache::forget(self::CACHE_KEY);
     }
 }

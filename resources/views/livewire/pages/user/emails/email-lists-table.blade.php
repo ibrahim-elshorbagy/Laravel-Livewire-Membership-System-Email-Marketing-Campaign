@@ -89,17 +89,20 @@
             </div>
 
             @if(count($selectedEmails) > 0)
-            <x-primary-button wire:click="clearStatus('FAIL')" class="bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600"
+            <x-primary-button wire:click="clearStatus('FAIL')"
+                class="bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600"
                 wire:confirm="Are you sure you want to clear failed status for selected emails?">
                 Clear Failed Status ({{ count($selectedEmails) }})
             </x-primary-button>
 
-            <x-primary-button wire:click="clearStatus('SENT')" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
+            <x-primary-button wire:click="clearStatus('SENT')"
+                class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
                 wire:confirm="Are you sure you want to clear sent status for selected emails?">
                 Clear Sent Status ({{ count($selectedEmails) }})
             </x-primary-button>
 
-            <x-primary-button wire:click="clearAllStatus" class="bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600"
+            <x-primary-button wire:click="clearAllStatus"
+                class="bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600"
                 wire:confirm="Are you sure you want to clear all status for selected emails?">
                 Clear All Status ({{ count($selectedEmails) }})
             </x-primary-button>
@@ -118,23 +121,27 @@
                 </span>
             </div>
 
-            <x-primary-button wire:click="clearAllFailedStatus" class="bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600"
+            <x-primary-button wire:click="clearAllFailedStatus"
+                class="bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600"
                 wire:confirm="Are you sure you want to clear ALL failed status emails?">
                 Clear All Failed Status
             </x-primary-button>
 
-            <x-primary-button wire:click="clearAllSentStatus" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
+            <x-primary-button wire:click="clearAllSentStatus"
+                class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
                 wire:confirm="Are you sure you want to clear ALL sent status emails?">
                 Clear All Sent Status
             </x-primary-button>
 
-            <x-primary-button wire:click="clearAllEmailsStatus" class="bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600"
+            <x-primary-button wire:click="clearAllEmailsStatus"
+                class="bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600"
                 wire:confirm="Are you sure you want to clear ALL email statuses?">
                 Clear All Statuses
             </x-primary-button>
 
             <x-primary-danger-button wire:click="deleteAllEmails"
-                wire:confirm="WARNING: This will delete ALL your emails. This action cannot be undone. Are you sure?" class="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600">
+                wire:confirm="WARNING: This will delete ALL your emails. This action cannot be undone. Are you sure?"
+                class="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600">
                 Delete All Emails
             </x-primary-danger-button>
         </div>
@@ -176,8 +183,16 @@
             </div>
 
             <button wire:click="refreshPendingJobs"
-                class="px-3 py-1 text-xs text-yellow-800 bg-yellow-200 rounded hover:bg-yellow-300">
-                Refresh Status
+                class="px-3 py-1 text-xs text-yellow-800 bg-yellow-200 rounded hover:bg-yellow-300"
+                wire:loading.attr="disabled" wire:target="refreshPendingJobs">
+
+                <span wire:loading.remove wire:target="refreshPendingJobs">
+                    Refresh Status
+                </span>
+
+                <span wire:loading wire:target="refreshPendingJobs">
+                    <i class="fas fa-spinner fa-spin"></i> Processing...
+                </span>
             </button>
         </div>
         @endif

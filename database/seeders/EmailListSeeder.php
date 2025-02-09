@@ -18,7 +18,7 @@ class EmailListSeeder extends Seeder
             // Create a mix of email statuses for each user
 
             $user->assignRole('user');
-            $user->subscribeTo(Plan::where('name', 'Trial')->first());
+            $user->subscribeTo(Plan::find(1));
 
             // Failed emails
             EmailList::factory()

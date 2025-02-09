@@ -14,7 +14,7 @@
         <!-- Subscription Details -->
         <div class="p-6">
             <!-- Price -->
-            @if($subscription->plan->name != "Trial")
+            @if($subscription->plan->id != 1)
             <div class="flex items-baseline justify-center">
                 <span class="text-4xl font-bold text-neutral-900 dark:text-neutral-100">
                     ${{ number_format($subscription->plan->price, 2) }}
@@ -26,7 +26,7 @@
             @endif
             <!-- Subscription Info -->
             <div class="mt-8 space-y-4">
-                @if($subscription->plan->name != "Trial")
+                @if($subscription->plan->id != 1)
                 <!-- Start Date -->
                 <div class="flex items-center justify-between px-4 py-3 bg-white rounded-lg dark:bg-neutral-800">
                     <div class="flex items-center">
@@ -53,7 +53,8 @@
                 <div class="flex items-center justify-between px-4 py-3 bg-white rounded-lg dark:bg-neutral-800">
                     <div class="flex items-center">
                         <i class="fas fa-hourglass-half text-neutral-600 dark:text-neutral-400"></i>
-                        <span class="ml-3 text-sm font-medium text-neutral-900 dark:text-neutral-100">Remaining Time</span>
+                        <span class="ml-3 text-sm font-medium text-neutral-900 dark:text-neutral-100">Remaining
+                            Time</span>
                     </div>
                     <span class="text-sm text-neutral-600 dark:text-neutral-400">
                         {{ $subscription->remaining_time }}
@@ -83,15 +84,17 @@
                         <li class="space-y-2">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center text-sm text-neutral-600 dark:text-neutral-400">
-                                    <svg class="flex-shrink-0 w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    <svg class="flex-shrink-0 w-4 h-4 mr-2 text-green-500" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
                                     </svg>
                                     <span>{{ $feature->name }}</span>
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                                        {{ (int)auth()->user()->balance($feature->name) }} / {{ (int)$feature->pivot->charges }}
+                                        {{ (int)auth()->user()->balance($feature->name) }} / {{
+                                        (int)$feature->pivot->charges }}
                                     </span>
                                 </div>
                             </div>
@@ -108,15 +111,16 @@
                                 ? 'bg-yellow-500'
                                 : 'bg-red-500');
                                 @endphp
-                                <div class="h-2 rounded-full transition-all {{ $colorClass }}" style="width: {{ $percentage }}%">
+                                <div class="h-2 rounded-full transition-all {{ $colorClass }}"
+                                    style="width: {{ $percentage }}%">
                                 </div>
                             </div>
 
                             <!-- Usage Info -->
                             <div class="flex justify-between text-xs">
                                 <span class="text-neutral-500 dark:text-neutral-400">
-                                    @if($percentage <= 0) Limit reached @elseif($percentage <=25) Running low @elseif($percentage <=75)
-                                        Good usage @else Plenty available @endif </span>
+                                    @if($percentage <= 0) Limit reached @elseif($percentage <=25) Running low
+                                        @elseif($percentage <=75) Good usage @else Plenty available @endif </span>
                                         <span
                                             class="font-medium {{ $colorClass === 'bg-green-500' ? 'text-green-600 dark:text-green-400' : ($colorClass === 'bg-yellow-500' ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400') }}">
                                             {{ number_format($percentage, 0) }}%
@@ -129,7 +133,8 @@
             </div>
 
             <!-- Cancel Button -->
-            @if($subscription->canceled_at || $subscription->plan->name != "Trial")
+            @if($subscription->plan->id != 1)
+            @if(is_null($subscription->canceled_at))
             <div class="mt-8">
                 <button wire:click="cancelSubscription" wire:loading.attr="disabled"
                     wire:confirm="Are you sure you want to cancel your subscription?" type="button"
@@ -150,6 +155,7 @@
                 </p>
             </div>
             @endif
+            @endif
         </div>
 
     </div>
@@ -164,7 +170,8 @@
                 <svg xmlns="http://www.w3.org/2000/svg"
                     class="w-5 h-5 ml-2 transition-transform duration-300 ease-in-out transform group-hover:translate-x-1"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
             </span>
             <div
@@ -194,7 +201,8 @@
                         <svg xmlns="http://www.w3.org/2000/svg"
                             class="w-5 h-5 ml-2 transition-transform duration-300 ease-in-out transform group-hover:translate-x-1"
                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
                     </span>
                     <div

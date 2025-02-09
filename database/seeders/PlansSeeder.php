@@ -35,6 +35,7 @@ class PlansSeeder extends Seeder
         // ------------------------------------------------------------------------------------------------
         // Free Plan
         $freePlan = Plan::create([
+            'id'=> 1,
             'name' => 'Trial',
             'periodicity_type' => PeriodicityType::Year,
             'periodicity' => 10,
@@ -46,6 +47,7 @@ class PlansSeeder extends Seeder
         // ------------------------------------------------------------------------------------------------
         // Plans bronze
         $bronzeMonthly = Plan::create([
+            'id'=> 2,
             'name' => 'Bronze Monthly',
             'periodicity_type' => PeriodicityType::Month,
             'periodicity' => 1,
@@ -55,6 +57,7 @@ class PlansSeeder extends Seeder
         $bronzeMonthly->features()->attach($emailSending, ['charges' => 5000]);
 
         $bronzeYearly = Plan::create([
+            'id'=> 3,
             'name' => 'Bronze Yearly',
             'periodicity_type' => PeriodicityType::Year,
             'periodicity' => 1,
@@ -66,6 +69,7 @@ class PlansSeeder extends Seeder
         // ------------------------------------------------------------------------------------------------
         // Plans silver
         $silverMonthly = Plan::create([
+            'id'=> 4,
             'name' => 'Silver Monthly',
             'periodicity_type' => PeriodicityType::Month,
             'periodicity' => 1,
@@ -75,6 +79,7 @@ class PlansSeeder extends Seeder
         $silverMonthly->features()->attach($emailSending, ['charges' => 20000]);
 
         $silverYearly = Plan::create([
+            'id'=> 5,
             'name' => 'Silver Yearly',
             'periodicity_type' => PeriodicityType::Year,
             'periodicity' => 1,
@@ -86,6 +91,7 @@ class PlansSeeder extends Seeder
         // ------------------------------------------------------------------------------------------------
         // Plans golden
         $goldenMonthly = Plan::create([
+            'id'=> 6,
             'name' => 'Golden Monthly',
             'periodicity_type' => PeriodicityType::Month,
             'periodicity' => 1,
@@ -95,6 +101,7 @@ class PlansSeeder extends Seeder
         $goldenMonthly->features()->attach($emailSending, ['charges' => 50000]);
 
         $goldenYearly = Plan::create([
+            'id'=> 7,
             'name' => 'Golden Yearly',
             'periodicity_type' => PeriodicityType::Year,
             'periodicity' => 1,
@@ -106,6 +113,7 @@ class PlansSeeder extends Seeder
         // ------------------------------------------------------------------------------------------------
         // Plans enterprise
         $enterpriseMonthly = Plan::create([
+            'id'=> 8,
             'name' => 'Enterprise Monthly',
             'periodicity_type' => PeriodicityType::Month,
             'periodicity' => 1,
@@ -115,6 +123,7 @@ class PlansSeeder extends Seeder
         $enterpriseMonthly->features()->attach($emailSending, ['charges' => 100000]);
 
         $enterpriseYearly = Plan::create([
+            'id'=> 9,
             'name' => 'Enterprise Yearly',
             'periodicity_type' => PeriodicityType::Year,
             'periodicity' => 1,

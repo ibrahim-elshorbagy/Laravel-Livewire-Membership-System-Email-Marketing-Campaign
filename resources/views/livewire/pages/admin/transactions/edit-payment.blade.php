@@ -1,6 +1,6 @@
-<div class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-6 ">
         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Payment #{{ $payment->id }}</h2>
         <x-primary-info-button href="{{ route('admin.payment.transactions') }}" wire:navigate>
             Back to Payments
@@ -32,27 +32,27 @@
     </div>
 
     <!-- Subscription Info -->
-    @if($plan->name != "Trial")
-        @if($subscription)
-        <div class="mb-6">
-            <h3 class="mb-2 text-lg font-semibold text-neutral-700 dark:text-neutral-300">Subscription</h3>
-            <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
-                <div class="flex flex-col gap-2">
-                    <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                        Period: {{ Carbon\Carbon::parse($subscription->started_at)->format('M d, Y') }}
-                        to
-                        {{ Carbon\Carbon::parse($subscription->expired_at)->format('M d, Y') }}
-                    </span>
-                    <span class="text-sm text-neutral-500 dark:text-neutral-400">
-                        Remaining time: {{ $subscription->remaining_time }}
-                    </span>
-                </div>
+    @if($plan->id != 1)
+    @if($subscription)
+    <div class="mb-6">
+        <h3 class="mb-2 text-lg font-semibold text-neutral-700 dark:text-neutral-300">Subscription</h3>
+        <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+            <div class="flex flex-col gap-2">
+                <span class="text-sm text-neutral-600 dark:text-neutral-400">
+                    Period: {{ Carbon\Carbon::parse($subscription->started_at)->format('M d, Y') }}
+                    to
+                    {{ Carbon\Carbon::parse($subscription->expired_at)->format('M d, Y') }}
+                </span>
+                <span class="text-sm text-neutral-500 dark:text-neutral-400">
+                    Remaining time: {{ $subscription->remaining_time }}
+                </span>
             </div>
         </div>
-        @endif
+    </div>
+    @endif
     @endif
 
-    <!-- Payment Details Form -->
+<!-- Payment Details Form -->
 <form wire:submit.prevent="updatePayment" class="rounded-lg bg-neutral-50 dark:bg-neutral-900">
     <h2 class="mb-6 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
         Update Payment Details
@@ -63,7 +63,8 @@
         <div class="p-4 bg-white border rounded-lg dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
             <h3 class="mb-4 text-sm font-medium text-neutral-500 dark:text-neutral-400">
                 <span class="font-medium">{{ __('Transaction Information') }} </span>
-                <span class="px-2 py-1 ml-2 text-xs font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-100">
+                <span
+                    class="px-2 py-1 ml-2 text-xs font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-100">
                     {{ $payment->gateway }}
                 </span>
             </h3>

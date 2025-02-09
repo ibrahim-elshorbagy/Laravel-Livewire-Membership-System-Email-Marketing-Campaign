@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages\Admin\SiteSettings;
 
+use App\Http\Middleware\GlobalSettingsMiddleware;
 use App\Models\Admin\Site\SiteSetting;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Component;
@@ -160,6 +161,16 @@ class SiteSettings extends Component
                 $this->favicon = $faviconPath;
                 $this->favicon_preview = null; // Clear preview
             }
+
+
+            // Clear the global settings cache
+            GlobalSettingsMiddleware::clearCache();
+
+            // Clear config cache
+            Artisan::call('config:clear');
+
+            // Clear view cache (optional, but recommended when updating site settings)
+            Artisan::call('view:clear');
 
 
             Session::flash('success', 'Site settings updated successfully.');

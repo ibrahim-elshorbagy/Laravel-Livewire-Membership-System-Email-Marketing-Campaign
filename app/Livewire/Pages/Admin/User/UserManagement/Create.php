@@ -72,7 +72,7 @@ class Create extends Component
         $user->assignRole($this->selectedRole);
 
         if ($this->selectedRole === 'user') {
-            $trialPlan = Plan::where('name', 'Trial')->first();
+            $trialPlan = Plan::find(1);
             if ($trialPlan) {
                 $user->subscribeTo($trialPlan);
             }

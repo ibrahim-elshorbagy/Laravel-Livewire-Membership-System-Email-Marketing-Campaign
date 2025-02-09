@@ -87,17 +87,18 @@
                                 {{ $payment->subscription->expired_at?->format('M d, Y') }}
                             </div>
                             @if($payment->subscription->expired_at && $payment->subscription->expired_at->isFuture())
-                                @if($payment->subscription->plan->name != "Trial")
-                                <div class="mt-1 text-xs text-green-600 dark:text-green-400 text-nowrap">
-                                    @if ($payment->subscription)
-                                    Expires in {{ \Carbon\Carbon::parse($payment->subscription->expired_at)->diffForHumans(now(), [
-                                    'parts' => 3,
-                                    'join' => true,
-                                    'syntax' => \Carbon\Carbon::DIFF_RELATIVE_TO_NOW,
-                                    ]) }}
-                                    @endif
-                                </div>
+                            @if($payment->subscription->plan->id != 1)
+                            <div class="mt-1 text-xs text-green-600 dark:text-green-400 text-nowrap">
+                                @if ($payment->subscription)
+                                Expires in {{
+                                \Carbon\Carbon::parse($payment->subscription->expired_at)->diffForHumans(now(), [
+                                'parts' => 3,
+                                'join' => true,
+                                'syntax' => \Carbon\Carbon::DIFF_RELATIVE_TO_NOW,
+                                ]) }}
                                 @endif
+                            </div>
+                            @endif
                             @endif
                         </div>
                         @else

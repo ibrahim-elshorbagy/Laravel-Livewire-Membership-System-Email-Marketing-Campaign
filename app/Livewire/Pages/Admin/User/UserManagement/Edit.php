@@ -90,7 +90,7 @@ class Edit extends Component
 
         // If changing to user role and user has no active subscription
         if ($this->selectedRole === 'user' && !$this->user->lastSubscription()) {
-            $trialPlan = Plan::where('name', 'Trial')->first();
+            $trialPlan = Plan::find(1);
             if ($trialPlan) {
                 $this->user->subscribeTo($trialPlan);
             }
