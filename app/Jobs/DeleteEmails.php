@@ -26,6 +26,12 @@ class DeleteEmails implements ShouldQueue
         $this->isPageAction = $isPageAction;
         $this->selectedEmails = $selectedEmails;
         $this->onQueue('high');
+
+        JobProgress::where('user_id', $this->userId)
+            ->where('job_type', 'delete_emails')
+            ->where('status', 'processing')
+            ->orWhere('status', 'failed')
+            ->delete();
     }
 
     protected function initializeProgress($totalCount)

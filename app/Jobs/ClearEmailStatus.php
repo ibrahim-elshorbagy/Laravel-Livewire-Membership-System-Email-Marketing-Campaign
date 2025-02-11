@@ -2,6 +2,7 @@
 namespace App\Jobs;
 
 use App\Models\EmailList;
+use App\Models\JobProgress;
 use App\Traits\TracksProgress;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,6 +28,12 @@ class ClearEmailStatus implements ShouldQueue
         $this->isPageAction = $isPageAction;
         $this->selectedEmails = $selectedEmails;
         $this->onQueue('high');
+
+        JobProgress::where('user_id', $this->userId)
+            ->where('job_type', 'clear_email_status')
+            ->where('status', 'processing')
+            ->orWhere('status', 'failed')
+            ->delete();
     }
 
     public function handle()

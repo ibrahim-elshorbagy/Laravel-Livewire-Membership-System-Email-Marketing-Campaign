@@ -35,6 +35,13 @@ class ProcessEmailFile implements ShouldQueue
         $this->userId = $userId;
         $this->remainingQuota = $remainingQuota;
         $this->onQueue('high');
+
+        JobProgress::where('user_id', $this->userId)
+            ->where('job_type', 'process_email_file')
+            ->where('status', 'processing')
+            ->orWhere('status', 'failed')
+            ->delete();
+
     }
 
     /**

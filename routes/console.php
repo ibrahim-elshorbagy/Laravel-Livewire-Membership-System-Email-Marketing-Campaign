@@ -3,22 +3,29 @@
 use App\Models\JobProgress;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Queue;
 
-Schedule::command('queue:work --queue=default,high  --tries=5')
-    ->everyFifteenMinutes()
-    ->runInBackground()
-    ->withoutOverlapping(900) // 15 minutes
+
+Schedule::call(function () {
+    Log::info("Cron Works at test_5 ");
+});
+
+Schedule::command('queue:work --queue=default,high --tries=5', [])
+    ->withoutOverlapping(900)
     ->before(function () {
-        Log::info('Queue worker starting');
+        Log::info('Starting default and high queue worker');
     })
     ->after(function () {
-        Log::info('Queue worker finished');
+        Log::info('Queue worker completed successfully');
     })
-    ->onFailure(function (\Throwable $e) {
-        Log::error('Queue worker failed: '.$e->getMessage());
+    ->onFailure(function () {
+        Log::error('Queue worker failed to complete');
+    })
+    ->then(function () {
+        Log::info('Closed default and high queue worker');
     });
+
 
 Schedule::call(function () {
     JobProgress::where('status', 'completed')->delete();
 });
+
