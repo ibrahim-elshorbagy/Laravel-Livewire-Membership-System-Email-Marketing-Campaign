@@ -190,8 +190,12 @@ class ProcessEmailFile implements ShouldQueue
                 ];
 
                 if (count($batch) >= $this->maxBatchSize) {
-                    // Process each batch in its own transaction
-                    DB::beginTransaction();
+                // Adjust batch size if it would exceed remaining quota
+                
+                if (count($batch) + $totalInserted > $remainingSpace) {
+                    $batch = array_slice($batch, 0, $remainingSpace - $totalInserted);
+                }
+                DB::beginTransaction();
                     try {
                         $insertedCount = $this->insertBatch($batch);
                         $totalInserted += $insertedCount;

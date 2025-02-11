@@ -67,7 +67,7 @@ class ClearEmailStatus implements ShouldQueue
                 DB::beginTransaction();
                 try {
                     EmailList::whereIn('id', $chunk->pluck('id'))->update([
-                        'status' => 'NULL',
+                        'status' => null,
                         'send_time' => null,
                         'sender_email' => null,
                         'log' => null

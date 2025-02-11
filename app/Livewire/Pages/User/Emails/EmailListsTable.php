@@ -192,7 +192,7 @@ class EmailListsTable extends Component
                                 ->whereIn('id', $this->selectedEmails);
 
                 $affected = $query->update([
-                    'status' => 'NULL',
+                    'status' => null,
                     'send_time' => null,
                     'sender_email' => null,
                     'log' => null
@@ -238,7 +238,7 @@ class EmailListsTable extends Component
                 }
 
                 $email->update([
-                    'status' => 'NULL',
+                    'status' => null,
                     'send_time' => null,
                     'sender_email' => null,
                     'log' => null
@@ -420,7 +420,9 @@ class EmailListsTable extends Component
     public function clearAllEmailsStatus()
     {
         try {
-            $count = EmailList::where('user_id', $this->user->id)->count();
+            $count = EmailList::where('user_id', $this->user->id)
+            ->where('status', 'SENT')
+            ->Orwhere('status', 'FAIL')->count();
 
             if ($count === 0) {
                 $this->alert('info', 'No emails found.');
@@ -513,7 +515,7 @@ class EmailListsTable extends Component
                 }
 
                 $affected = $query->update([
-                    'status' => 'NULL',
+                    'status' => null,
                     'send_time' => null,
                     'sender_email' => null,
                     'log' => null

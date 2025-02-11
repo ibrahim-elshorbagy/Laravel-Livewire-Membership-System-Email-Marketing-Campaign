@@ -49,7 +49,7 @@ class EmailListFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'status' => 'NULL',
+                'status' => null,
                 'send_time' => null,
                 'sender_email' => null,
                 'log' => null,
