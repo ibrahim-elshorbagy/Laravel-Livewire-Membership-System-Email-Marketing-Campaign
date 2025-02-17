@@ -5,6 +5,7 @@ use App\Livewire\Pages\User\Emails\CampaignForm;
 use App\Livewire\Pages\User\Emails\CampaignList;
 use App\Livewire\Pages\User\Emails\CreateEmailList;
 use App\Livewire\Pages\User\Emails\EmailListsTable;
+use App\Livewire\Pages\User\Server\ServerList;
 use App\Livewire\Pages\User\Subscription\MySubscription;
 use App\Livewire\Pages\User\Subscription\Subscribe;
 use App\Livewire\Pages\User\Subscription\Transaction;
@@ -27,6 +28,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/support', Support::class)->name('user.support');
 
+    Route::get('/my-servers', ServerList::class)->name('user.servers');
 
 });
 

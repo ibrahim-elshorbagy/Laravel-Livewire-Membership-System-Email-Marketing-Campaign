@@ -248,7 +248,7 @@
                         </span>
                         @endif
                     </td>
-                    <td class="p-4">{{ $email->send_time ? $email->send_time->format('M d, Y H:i') : '-' }}</td>
+                    <td class="p-4">{{ $email->send_time ? $email->send_time->format('d / m / Y') : '-' }}</td>
                     <td class="p-4">{{ $email->sender_email ?? '-' }}</td>
                     <td class="p-4">{{ Str::limit($email->log, 30) ?? '-' }}</td>
                     <td class="p-4">

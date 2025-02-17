@@ -69,6 +69,9 @@
                     wire:navigate>
                     <span>Email Campaigns</span>
                 </x-nav-link>
+                <x-nav-link :active="request()->routeIs('user.servers')" href="{{ route('user.servers') }}" wire:navigate>
+                    <span>Servers</span>
+                </x-nav-link>
                 <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}"
                     wire:navigate>
                     <span>Support</span>
@@ -91,6 +94,10 @@
                 </x-nav-link>
                 <x-nav-link :active="request()->routeIs('admin.plans')" href="{{ route('admin.plans') }}" wire:navigate>
                     <span>Plans</span>
+                </x-nav-link>
+
+                <x-nav-link :active="request()->routeIs('admin.servers')" href="{{ route('admin.servers') }}" wire:navigate>
+                    <span>Servers</span>
                 </x-nav-link>
                 @endrole
 
@@ -170,6 +177,9 @@
                             href="{{ route('user.email-campaigns') }}" wire:navigate>
                             <span class="text-nowrap">Email Campaigns</span>
                         </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.servers')" href="{{ route('user.servers') }}" wire:navigate>
+                            <span>Servers</span>
+                        </x-nav-link>
                         <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}"
                             wire:navigate>
                             <span class="text-nowrap">Support</span>
@@ -200,6 +210,9 @@
                             <span>Plans</span>
                         </x-nav-link>
 
+                        <x-nav-link :active="request()->routeIs('admin.servers')" href="{{ route('admin.servers') }}" wire:navigate>
+                            <span>Servers</span>
+                        </x-nav-link>
                         <!-- Dropdown menu -->
                         <x-primary-dropdown label="Settings">
                             <x-nav-link :active="request()->routeIs('admin.payment.paypal')"
@@ -302,7 +315,7 @@
     </div>
 
     @livewireScripts
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script data-navigate-once src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <x-livewire-alert::scripts />
     @if (session('success'))
     <script>

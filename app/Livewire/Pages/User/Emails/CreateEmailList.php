@@ -105,7 +105,6 @@ class CreateEmailList extends Component
                 }
             });
 
-            $this->alert('success', 'Emails saved successfully');
             Session::flash('success', 'Emails saved successfully.');
 
             return $this->redirect(route('user.emails.index'), navigate: true);

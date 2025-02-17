@@ -39,9 +39,9 @@
         <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
             <div class="flex flex-col gap-2">
                 <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                    Period: {{ Carbon\Carbon::parse($subscription->started_at)->format('M d, Y') }}
+                    Period: {{ Carbon\Carbon::parse($subscription->started_at)->format('d / m / Y') }}
                     to
-                    {{ Carbon\Carbon::parse($subscription->expired_at)->format('M d, Y') }}
+                    {{ Carbon\Carbon::parse($subscription->expired_at)->format('d / m / Y') }}
                 </span>
                 <span class="text-sm text-neutral-500 dark:text-neutral-400">
                     Remaining time: {{ $subscription->remaining_time }}

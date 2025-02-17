@@ -6,6 +6,8 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Livewire\Pages\Admin\Payment\PaypalConfig;
 use App\Livewire\Pages\Admin\Plans\PlanManagement;
 use App\Livewire\Pages\Admin\Plans\PlanManagement\Edit as PlanManagementEdit;
+use App\Livewire\Pages\Admin\Server\ServerForm;
+use App\Livewire\Pages\Admin\Server\ServerList;
 use App\Livewire\Pages\Admin\SiteSettings\SiteSettings;
 use App\Livewire\Pages\Admin\Subscription\Subscripers;
 use App\Livewire\Pages\Admin\Subscription\Subscripers\EditSubscription;
@@ -52,6 +54,10 @@ use Livewire\Volt\Volt;
         Route::get('/transactions/{payment}/edit',EditPayment::class)->name('admin.transactions.edit');
         Route::get('/transactions/{user}/transaction', UserTransactions::class)->name('admin.users.transactions');
 
+
+        // Servers
+        Route::get('/servers', ServerList::class)->name('admin.servers');
+        Route::get('/servers/form/{server?}', ServerForm::class)->name('admin.servers.form');
 
     });
 

@@ -83,8 +83,8 @@
                         @if($payment->subscription)
                         <div class="text-sm">
                             <div class="text-neutral-500 text-nowrap">
-                                {{ $payment->subscription->started_at?->format('M d, Y') }} to
-                                {{ $payment->subscription->expired_at?->format('M d, Y') }}
+                                {{ $payment->subscription->started_at?->format('d, M Y') }} to
+                                {{ $payment->subscription->expired_at?->format('d, M Y') }}
                             </div>
                             @if($payment->subscription->expired_at && $payment->subscription->expired_at->isFuture())
                             @if($payment->subscription->plan->id != 1)

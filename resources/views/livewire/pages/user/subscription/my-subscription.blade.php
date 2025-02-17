@@ -34,7 +34,7 @@
                         <span class="ml-3 text-sm font-medium text-neutral-900 dark:text-neutral-100">Start Date</span>
                     </div>
                     <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                        {{ $subscription->started_at->format('M d, Y') }}
+                        {{ $subscription->started_at->format('d, M Y') }}
                     </span>
                 </div>
 
@@ -45,7 +45,7 @@
                         <span class="ml-3 text-sm font-medium text-neutral-900 dark:text-neutral-100">Expiry Date</span>
                     </div>
                     <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                        {{ $subscription->expired_at?->format('M d, Y') ?? 'N/A' }}
+                        {{ $subscription->expired_at?->format('d, M Y') ?? 'N/A' }}
                     </span>
                 </div>
 

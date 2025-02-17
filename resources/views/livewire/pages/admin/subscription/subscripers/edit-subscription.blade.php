@@ -112,13 +112,13 @@
                     <div>
                         <span class="text-sm md:text-mdtext-neutral-600">Started At</span>
                         <p class="text-sm font-medium sm:text-base">
-                            {{ \Carbon\Carbon::parse($started_at)->format('M d, Y') }}
+                            {{ \Carbon\Carbon::parse($started_at)->format('d, M Y') }}
                         </p>
                     </div>
                     <div>
                         <span class="text-sm md:text-mdtext-neutral-600">Expires At</span>
                         <p class="text-sm font-medium sm:text-base">
-                            {{ $expired_at ? \Carbon\Carbon::parse($expired_at)->format('M d, Y') : 'N/A' }}
+                            {{ $expired_at ? \Carbon\Carbon::parse($expired_at)->format('d, M Y') : 'N/A' }}
                         </p>
                     </div>
                 </div>
@@ -129,7 +129,7 @@
                         Set a date until when the subscription will remain active after expiration.
                     </p>
                     <p class="text-sm font-medium sm:text-base">
-                        {{ $grace_days_ended_at ? \Carbon\Carbon::parse($grace_days_ended_at)->format('M d, Y H:i') :
+                        {{ $grace_days_ended_at ? \Carbon\Carbon::parse($grace_days_ended_at)->format('d, M Y H:i') :
                         'N/A' }}
                     </p>
                 </div>

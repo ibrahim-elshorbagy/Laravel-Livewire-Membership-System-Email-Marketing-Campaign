@@ -48,7 +48,7 @@
                     @forelse($payments as $payment)
                     <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
                         <td class="p-4">
-                            {{ $payment->created_at->format('M d, Y H:i') }}
+                            {{ $payment->created_at->format('d / m / Y') }}
                         </td>
                         <td class="p-4">
                             <div class="font-medium text-neutral-900 dark:text-neutral-100">

@@ -52,6 +52,7 @@ class DatabaseSeeder extends Seeder
         $user->subscribeTo(Plan::find(1));
 
         $this->call(EmailCampaignSeeder::class);
+        $this->call(ServerSeeder::class);
 
 
         // $this->call([EmailListSeeder::class]);
