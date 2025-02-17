@@ -53,7 +53,7 @@
                 @foreach($servers as $server)
                 <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
                     <td class="p-4">{{ $server->name }}</td>
-                    <td class="p-4">{{ $server->last_access_time?->format('d / m / Y') ?? 'Never' }}</td>
+                    <td class="p-4">{{ $server->last_access_time?->format('d / m / Y') ?? '' }}</td>
                     <td class="p-4">
                         <span
                             class="px-2 py-1 text-xs font-medium rounded-full

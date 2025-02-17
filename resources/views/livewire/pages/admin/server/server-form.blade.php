@@ -22,12 +22,12 @@
             </div>
 
             <!-- Current Quota -->
-            <div>
+            {{-- <div>
                 <x-input-label for="current_quota" required>Current Quota</x-input-label>
                 <x-text-input wire:model="current_quota" id="current_quota" type="number" class="block w-full mt-1"
                     required />
                 <x-input-error :messages="$errors->get('current_quota')" class="mt-2" />
-            </div>
+            </div> --}}
 
             <!-- Assigned User -->
             <div x-data="{ open: false }" class="relative">
@@ -81,7 +81,8 @@
                 <x-input-error :messages="$errors->get('assigned_to_user_id')" class="mt-2" />
             </div>
 
-            <div>
+            {{-- Last Access Time --}}
+            {{-- <div>
                 <x-input-label for="last_access_time" :value="__('Last Access Time')" />
                 <x-text-input x-data x-init="flatpickr($el, {
                                         dateFormat: 'Y-m-d',
@@ -89,7 +90,7 @@
                                         allowInput: true
                                     })" wire:model="last_access_time" type="text" class="block w-full mt-1" placeholder="YYYY-MM-DD" />
                 <x-input-error :messages="$errors->get('last_access_time')" class="mt-2" />
-             </div>
+             </div> --}}
             <!-- Admin Notes -->
             <div class="lg:col-span-2">
                 <x-input-label for="admin_notes">Admin Notes</x-input-label>

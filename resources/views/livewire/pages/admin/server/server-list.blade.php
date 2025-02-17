@@ -104,7 +104,7 @@
                         <span class="text-neutral-500 dark:text-neutral-400">Not Assigned</span>
                         @endif
                     </td>
-                    <td class="p-4">{{ $server->last_access_time?->format('d / m / Y') ?? 'Never' }}</td>
+                    <td class="p-4">{{ $server->last_access_time?->format('d / m / Y') ?? '' }}</td>
                     <td class="p-4">{{ $server->current_quota }}</td>
                     <td class="p-4">{{ Str::limit($server->admin_notes, 30) }}</td>
                     <td class="p-4">{{ $server->created_at?->format('d / m / Y') }}</td>

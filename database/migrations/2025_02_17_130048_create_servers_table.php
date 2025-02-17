@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->foreignId('assigned_to_user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('last_access_time')->nullable();
-            $table->integer('current_quota');
+            $table->integer('current_quota')->nullable();
             $table->text('admin_notes')->nullable();
             $table->timestamps();
         });

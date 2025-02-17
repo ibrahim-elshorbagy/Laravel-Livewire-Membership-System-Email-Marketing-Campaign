@@ -26,9 +26,9 @@ class ServerForm extends Component
         return [
             'name' => 'required|string|max:255',
             'assigned_to_user_id' => 'nullable|exists:users,id',
-            'current_quota' => 'required|integer|min:0',
+            // 'current_quota' => 'required|integer|min:0',
             'admin_notes' => 'nullable|string',
-            'last_access_time' => 'nullable|date'
+            // 'last_access_time' => 'nullable|date'
         ];
     }
 
