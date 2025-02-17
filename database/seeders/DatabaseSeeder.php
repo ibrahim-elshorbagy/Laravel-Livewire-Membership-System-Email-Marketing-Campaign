@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $userRole = Role::firstOrCreate(['name' => 'user']);
 
-        // User::factory(50)->create()->each(function ($user) use ($userRole) {
+        // User::factory(10000)->create()->each(function ($user) use ($userRole) {
         //     $user->assignRole($userRole);
         // });
 

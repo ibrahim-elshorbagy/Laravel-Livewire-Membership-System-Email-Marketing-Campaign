@@ -44,15 +44,20 @@ class ServerForm extends Component
 
     public function getUsersProperty()
     {
-        return User::role('User')
-            ->when($this->userSearch, function ($query) {
-                $query->where(function($q) {
-                    $q->where('first_name', 'like', '%' . $this->userSearch . '%')
+        $query = User::role('User');
+
+        if ($this->userSearch) {
+            $query->where(function ($q) {
+                $q->where('first_name', 'like', '%' . $this->userSearch . '%')
                     ->orWhere('last_name', 'like', '%' . $this->userSearch . '%')
                     ->orWhere('username', 'like', '%' . $this->userSearch . '%')
                     ->orWhere('email', 'like', '%' . $this->userSearch . '%');
-                });
-            })->get();
+            })->limit(30);
+        } else {
+            $query->limit(30);
+        }
+
+        return $query->get();
     }
     public function saveServer()
     {
