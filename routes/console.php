@@ -9,8 +9,8 @@ Schedule::call(function () {
     Log::info("Cron Works at test_5 ");
 });
 
-Schedule::command('queue:work --queue=default,high --tries=5', [])
-    ->withoutOverlapping(900)
+Schedule::command('queue:work --queue=default,high --tries=5  --max-time=86400', [])
+    ->withoutOverlapping(86400)
     ->before(function () {
         Log::info('Starting default and high queue worker');
     })

@@ -51,6 +51,9 @@ class DatabaseSeeder extends Seeder
         $user->assignRole($userRole);
         $user->subscribeTo(Plan::find(1));
 
+        $this->call(EmailCampaignSeeder::class);
+
+
         // $this->call([EmailListSeeder::class]);
 
     }

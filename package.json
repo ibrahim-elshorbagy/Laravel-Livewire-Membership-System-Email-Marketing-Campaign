@@ -16,6 +16,11 @@
         "vite": "^6.0"
     },
     "dependencies": {
+        "@codemirror/lang-html": "^6.4.9",
+        "@codemirror/state": "^6.5.2",
+        "@codemirror/theme-one-dark": "^6.1.2",
+        "@codemirror/view": "^6.36.2",
+        "codemirror": "^6.0.1",
         "flatpickr": "^4.6.13"
     }
 }
