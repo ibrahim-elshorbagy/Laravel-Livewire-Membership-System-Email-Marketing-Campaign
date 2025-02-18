@@ -65,9 +65,9 @@
                     wire:navigate>
                     <span>Mailing list</span>
                 </x-nav-link>
-                <x-nav-link :active="request()->routeIs('user.email-campaigns')" href="{{ route('user.email-campaigns') }}"
+                <x-nav-link :active="request()->routeIs('user.email-messages')" href="{{ route('user.email-messages') }}"
                     wire:navigate>
-                    <span>Email Campaigns</span>
+                    <span>Messages</span>
                 </x-nav-link>
                 <x-nav-link :active="request()->routeIs('user.servers')" href="{{ route('user.servers') }}" wire:navigate>
                     <span>Servers</span>
@@ -173,9 +173,9 @@
                             href="{{ route('user.emails.index') }}" wire:navigate>
                             <span class="text-nowrap">Mailing list</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.email-campaigns')"
-                            href="{{ route('user.email-campaigns') }}" wire:navigate>
-                            <span class="text-nowrap">Email Campaigns</span>
+                        <x-nav-link :active="request()->routeIs('user.email-messages')"
+                            href="{{ route('user.email-messages') }}" wire:navigate>
+                            <span class="text-nowrap">Messages</span>
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('user.servers')" href="{{ route('user.servers') }}" wire:navigate>
                             <span>Servers</span>

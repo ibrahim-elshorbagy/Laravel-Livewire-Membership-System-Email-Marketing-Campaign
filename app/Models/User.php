@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Email\EmailCampaign;
+use App\Models\Email\EmailMessage;
 use App\Models\Payment\Payment;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -68,8 +68,8 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(EmailList::class);
     }
 
-    public function emailCampaigns()
+    public function emailMessages()
     {
-        return $this->hasMany(EmailCampaign::class);
+        return $this->hasMany(EmailMessage::class);
     }
 }

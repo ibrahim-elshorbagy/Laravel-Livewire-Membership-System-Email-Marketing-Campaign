@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('email_campaigns', function (Blueprint $table) {
+        Schema::create('email_messages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('campaign_title');
+            $table->string('message_title');
             $table->string('email_subject');
             $table->text('message_html');
             $table->text('message_plain_text');
@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('reply_to_email')->nullable();
             $table->enum('sending_status', ['RUN', 'PAUSE'])->default('PAUSE');
             $table->timestamps();
-
         });
     }
 
@@ -31,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('email_campaigns');
+        Schema::dropIfExists('email_messages');
     }
 };

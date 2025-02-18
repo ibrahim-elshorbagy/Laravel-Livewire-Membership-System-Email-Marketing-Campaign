@@ -4,12 +4,12 @@ namespace App\Livewire\Pages\User\Emails;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Email\EmailCampaign;
+use App\Models\Email\EmailMessage;
 use Illuminate\Support\Facades\Auth;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Validation\Rule;
 
-class CampaignList extends Component
+class MessageList extends Component
 {
     use WithPagination, LivewireAlert;
 
@@ -34,13 +34,13 @@ class CampaignList extends Component
     {
         return [
             'search' => 'nullable|string|max:255',
-            'sortField' => ['required', Rule::in(['campaign_title', 'created_at', 'sending_status'])],
+            'sortField' => ['required', Rule::in(['message_title', 'created_at', 'sending_status'])],
             'sortDirection' => ['required', Rule::in(['asc', 'desc'])],
             'perPage' => ['required', 'integer', Rule::in([10, 25, 50])],
             'selectedTemplates' => 'array',
-            'selectedTemplates.*' => 'integer|exists:email_campaigns,id',
+            'selectedTemplates.*' => 'integer|exists:email_messages,id',
             'selectPage' => 'boolean',
-            'templateId' => 'nullable|integer|exists:email_campaigns,id',
+            'templateId' => 'nullable|integer|exists:email_messages,id',
         ];
     }
 
@@ -64,7 +64,7 @@ class CampaignList extends Component
     public function updatedSelectPage($value)
     {
         if ($value) {
-            $this->selectedTemplates = $this->campaigns->pluck('id')->map(fn($id) => (string) $id);
+            $this->selectedTemplates = $this->messages->pluck('id')->map(fn($id) => (string) $id);
         } else {
             $this->selectedTemplates = [];
         }
@@ -76,24 +76,24 @@ class CampaignList extends Component
     {
         $this->templateId = $templateId;
         $this->validate([
-            'templateId' => 'required|integer|exists:email_campaigns,id'
+            'templateId' => 'required|integer|exists:email_messages,id'
         ]);
 
         try {
-            $campaign = EmailCampaign::findOrFail($this->templateId);
+            $message = EmailMessage::findOrFail($this->templateId);
 
-            if ($campaign->user_id !== Auth::id()) {
+            if ($message->user_id !== Auth::id()) {
                 throw new \Exception('Unauthorized access to template.');
             }
 
-            $campaignsCount = Auth::user()->emailCampaigns()->count();
+            $messagesCount = Auth::user()->emailMessages()->count();
 
-            if ($campaignsCount === 1) {
-                $newStatus = $campaign->sending_status === 'RUN' ? 'PAUSE' : 'RUN';
-                $campaign->update(['sending_status' => $newStatus]);
+            if ($messagesCount === 1) {
+                $newStatus = $message->sending_status === 'RUN' ? 'PAUSE' : 'RUN';
+                $message->update(['sending_status' => $newStatus]);
             } else {
-                Auth::user()->emailCampaigns()->update(['sending_status' => 'PAUSE']);
-                $campaign->update(['sending_status' => 'RUN']);
+                Auth::user()->emailMessages()->update(['sending_status' => 'PAUSE']);
+                $message->update(['sending_status' => 'RUN']);
             }
 
             $this->alert('success', 'Template status updated successfully!', ['position' => 'bottom-end']);
@@ -107,17 +107,17 @@ class CampaignList extends Component
     {
         $this->templateId = $templateId;
         $this->validate([
-            'templateId' => 'required|integer|exists:email_campaigns,id'
+            'templateId' => 'required|integer|exists:email_messages,id'
         ]);
 
         try {
-            $campaign = EmailCampaign::findOrFail($this->templateId);
+            $message = EmailMessage::findOrFail($this->templateId);
 
-            if ($campaign->user_id !== Auth::id()) {
+            if ($message->user_id !== Auth::id()) {
                 throw new \Exception('Unauthorized access to template.');
             }
 
-            $campaign->delete();
+            $message->delete();
             $this->alert('success', 'Template deleted successfully!', ['position' => 'bottom-end']);
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to delete template: ' . $e->getMessage(), ['position' => 'bottom-end']);
@@ -129,11 +129,11 @@ class CampaignList extends Component
     {
         $this->validate([
             'selectedTemplates' => 'required|array|min:1',
-            'selectedTemplates.*' => 'integer|exists:email_campaigns,id'
+            'selectedTemplates.*' => 'integer|exists:email_messages,id'
         ]);
 
         try {
-            $unauthorizedTemplates = EmailCampaign::whereIn('id', $this->selectedTemplates)
+            $unauthorizedTemplates = EmailMessage::whereIn('id', $this->selectedTemplates)
                 ->where('user_id', '!=', Auth::id())
                 ->exists();
 
@@ -141,7 +141,7 @@ class CampaignList extends Component
                 throw new \Exception('Unauthorized access to one or more templates.');
             }
 
-            EmailCampaign::whereIn('id', $this->selectedTemplates)
+            EmailMessage::whereIn('id', $this->selectedTemplates)
                 ->where('user_id', Auth::id())
                 ->delete();
 
@@ -153,13 +153,13 @@ class CampaignList extends Component
         }
     }
 
-    // Campaigns property
-    public function getCampaignsProperty()
+    // Messages property
+    public function getMessagesProperty()
     {
-        return EmailCampaign::where('user_id', Auth::id())
+        return EmailMessage::where('user_id', Auth::id())
             ->when($this->search, function ($query) {
                 $query->where(function($q) {
-                    $q->where('campaign_title', 'like', '%' . $this->search . '%')
+                    $q->where('message_title', 'like', '%' . $this->search . '%')
                       ->orWhere('email_subject', 'like', '%' . $this->search . '%');
                 });
             })
@@ -170,8 +170,8 @@ class CampaignList extends Component
     // Render method
     public function render()
     {
-        return view('livewire.pages.user.emails.campaign-list', [
-            'campaigns' => $this->campaigns
-        ])->layout('layouts.app', ['title' => 'Email Campaigns']);
+        return view('livewire.pages.user.emails.message-list', [
+            'messages' => $this->messages
+        ])->layout('layouts.app', ['title' => 'Messages']);
     }
 }

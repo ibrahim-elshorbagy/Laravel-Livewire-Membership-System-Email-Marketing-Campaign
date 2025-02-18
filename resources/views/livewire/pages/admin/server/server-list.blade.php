@@ -104,10 +104,10 @@
                         <span class="text-neutral-500 dark:text-neutral-400">Not Assigned</span>
                         @endif
                     </td>
-                    <td class="p-4">{{ $server->last_access_time?->format('d / m / Y') ?? '' }}</td>
+                    <td class="p-4">{{ $server->last_access_time?->format('d/m/Y h:i:s A')?? '' }}</td>
                     <td class="p-4">{{ $server->current_quota }}</td>
                     <td class="p-4">{{ Str::limit($server->admin_notes, 30) }}</td>
-                    <td class="p-4">{{ $server->created_at?->format('d / m / Y') }}</td>
+                    <td class="p-4">{{ $server->created_at?->format('d/m/Y h:i:s A') }}</td>
                     <td class="p-4">
                         <div class="flex space-x-2">
                             <a href="{{ route('admin.servers.form', $server->id) }}"

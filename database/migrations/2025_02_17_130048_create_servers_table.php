@@ -19,6 +19,8 @@ return new class extends Migration
             $table->integer('current_quota')->nullable();
             $table->text('admin_notes')->nullable();
             $table->timestamps();
+            $table->unique(['name', 'assigned_to_user_id']);
+
         });
     }
 

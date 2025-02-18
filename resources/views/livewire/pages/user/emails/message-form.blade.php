@@ -2,25 +2,25 @@
     class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <header class="flex flex-col items-center justify-between mb-6 md:flex-row">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
-            {{ $campaign_id ? 'Edit Campaign' : 'New Campaign' }}
+            {{ $message_id ? 'Edit Message' : 'New Message' }}
         </h2>
         <div class="mt-4 md:mt-0">
-            <x-primary-info-button href="{{ route('user.email-campaigns') }}" wire:navigate
+            <x-primary-info-button href="{{ route('user.email-messages') }}" wire:navigate
                 class="inline-flex flex-col items-center px-2 py-1 text-xs font-semibold tracking-widest text-white transition duration-150 ease-in-out border rounded-md cursor-pointer md:px-4 md:py-2 text-nowrap bg-sky-600 dark:bg-sky-900 group border-sky-300 dark:border-sky-700 dark:text-sky-300 hover:bg-sky-700 dark:hover:bg-sky-100 focus:bg-sky-700 dark:focus:bg-sky-100 active:bg-sky-900 dark:active:bg-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-sky-800">
-                Back To Email Campaigns
+                Back To Messages
             </x-primary-info-button>
         </div>
     </header>
 
-    <form wire:submit.prevent="saveCampaign" class="space-y-4">
+    <form wire:submit.prevent="saveMessage" class="space-y-4">
         <div class="grid h-full grid-cols-1 gap-6 lg:grid-cols-2">
             <!-- Form Section -->
             <div class="space-y-4 overflow-y-auto ">
                 <div>
-                    <x-input-label for="campaign_title">Campaign Title</x-input-label>
-                    <x-text-input wire:model="campaign_title" id="campaign_title" type="text"
+                    <x-input-label for="message_title">Message Title</x-input-label>
+                    <x-text-input wire:model="message_title" id="message_title" type="text"
                         class="block w-full mt-1" />
-                    <x-input-error :messages="$errors->get('campaign_title')" class="mt-2" />
+                    <x-input-error :messages="$errors->get('message_title')" class="mt-2" />
                 </div>
 
                 <div>
@@ -73,11 +73,11 @@
                 </div> --}}
 
                 <div class="sticky bottom-0 flex justify-end py-4 space-x-3 bg-neutral-50 dark:bg-neutral-900">
-                    <x-secondary-button type="button" wire:navigate href="{{ route('user.email-campaigns') }}">
+                    <x-secondary-button type="button" wire:navigate href="{{ route('user.email-messages') }}">
                         Cancel
                     </x-secondary-button>
                     <x-primary-create-button type="submit">
-                        {{ $campaign_id ? 'Update Campaign' : 'Create Campaign' }}
+                        {{ $message_id ? 'Update  Message' : 'Create Message' }}
                     </x-primary-create-button>
                 </div>
             </div>

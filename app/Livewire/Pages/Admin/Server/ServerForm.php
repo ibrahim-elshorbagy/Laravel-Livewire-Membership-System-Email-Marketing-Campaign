@@ -7,7 +7,7 @@ use App\Models\User;
 use Livewire\Component;
 use Illuminate\Support\Facades\Session;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
-
+use Illuminate\Validation\Rule;
 class ServerForm extends Component
 {
     use LivewireAlert;
@@ -24,11 +24,16 @@ class ServerForm extends Component
     protected function rules()
     {
         return [
-            'name' => 'required|string|max:255',
+            'name' => [
+                'required',
+                'string',
+                'without_space',
+                Rule::unique('servers')->where(function ($query) {
+                    return $query->where('assigned_to_user_id', $this->assigned_to_user_id);
+                })->ignore($this->server_id),
+            ],
             'assigned_to_user_id' => 'nullable|exists:users,id',
-            // 'current_quota' => 'required|integer|min:0',
             'admin_notes' => 'nullable|string',
-            // 'last_access_time' => 'nullable|date'
         ];
     }
 

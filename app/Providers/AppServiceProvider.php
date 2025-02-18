@@ -8,6 +8,7 @@ use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
 use LucasDotVin\Soulbscription\Models\Subscription;
 use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Validator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,6 +35,22 @@ class AppServiceProvider extends ServiceProvider
 
         Model::unguard();
 
+
+        Validator::extend('without_space', function($attr, $value, $parameters, $validator) {
+            // Trim and update the value
+            $trimmedValue = trim($value);
+            $validator->setData(array_merge(
+                $validator->getData(),
+                [$attr => $trimmedValue]
+            ));
+
+            // Verify the trimmed value matches our pattern
+            if (!preg_match('/^[^\s].*[^\s]$|^[^\s]$/u', $trimmedValue)) {
+                $validator->setCustomMessages(['without_space' => 'The :attribute may not contain leading or trailing spaces..']);
+                return false;
+            }
+            return true;
+        });
 
     }
 }

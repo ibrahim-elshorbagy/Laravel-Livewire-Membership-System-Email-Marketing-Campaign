@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Email\EmailCampaign;
+use App\Models\Email\EmailMessage;
 
-class EmailCampaignSeeder extends Seeder
+class EmailMessageSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,9 +14,9 @@ class EmailCampaignSeeder extends Seeder
      */
     public function run()
     {
-        EmailCampaign::create([
+        EmailMessage::create([
             'user_id'          => 2,
-            'campaign_title'   => 'Summer Sale - Up to 50% Off!',
+            'message_title'   => 'Summer Sale - Up to 50% Off!',
             'email_subject'    => "Don't Miss Out on Our Summer Sale!",
             'message_html'     => <<<'HTML'
 <!DOCTYPE html>

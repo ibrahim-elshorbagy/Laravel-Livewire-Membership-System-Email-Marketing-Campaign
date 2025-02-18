@@ -5,7 +5,7 @@ namespace App\Models\Email;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
-class EmailCampaign extends Model
+class EmailMessage extends Model
 {
     protected $guarded = ['id'];
 
