@@ -165,7 +165,7 @@
         </ul>
     </div>
 
-    <div wire:poll.1000ms="$refresh">
+    <div wire:poll.500ms="$refresh">
     @if($queueStatus > 1)
         <div class="p-4 mb-6 border border-blue-200 rounded-lg bg-blue-50 dark:bg-blue-900 dark:border-blue-800">
             <div class="flex items-center">
@@ -201,7 +201,7 @@
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
                     <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-                        style="width: {{ $progress->percentage }}%"></div>
+                        style="width: {{ min($progress->percentage, 100) }}%"></div>
                 </div>
                 <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     <i class="mr-1 fas fa-list-ol"></i>
