@@ -24,6 +24,7 @@ class UserController extends Controller
 
         session()->forget('impersonated_by');
 
+        redirect()->route('welcome');
         return redirect()->route('welcome');
     }
 }

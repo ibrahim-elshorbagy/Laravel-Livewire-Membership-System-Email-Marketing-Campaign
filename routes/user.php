@@ -18,6 +18,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/plans', Subscribe::class)->name('our.plans');
 
+});
+
+Route::middleware(['auth','role:user'])->group(function () {
+
+
     Route::get('/my-subscription', MySubscription::class)->name('user.my-subscription');
     Route::get('/my-transactions', Transaction::class)->name('user.my-transactions');
 
@@ -31,4 +36,3 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/my-servers', ServerList::class)->name('user.servers');
 
 });
-

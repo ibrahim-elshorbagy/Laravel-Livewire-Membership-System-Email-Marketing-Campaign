@@ -7,11 +7,12 @@ use App\Jobs\DeleteEmails;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\EmailList;
-use App\Models\JobProgress;
+use App\Models\EmailListName;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Validation\Rule;
+
 
 class EmailListsTable extends Component
 {
@@ -28,6 +29,15 @@ class EmailListsTable extends Component
     public $user;
     public $emailLimit;
     public $selectedEmailId = null;
+
+
+    public $selectedList = null;
+    public $listName = '';
+    public $editingListId = null;
+
+    public $hasActiveJobsFlag = false;
+    protected $listeners = ['jobStatusUpdated' => 'updateJobStatus'];
+
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -69,6 +79,18 @@ class EmailListsTable extends Component
         ];
     }
 
+    protected function listRules()
+    {
+        return [
+            'listName' => [
+                'required',
+                'string',
+                Rule::unique('email_list_names', 'name')
+                    ->where('user_id', $this->user->id)
+            ],
+        ];
+    }
+
     protected $messages = [
         'selectedEmails.*.exists' => 'One or more selected emails are invalid.',
         'statusFilter.in' => 'Invalid status filter selected.',
@@ -99,43 +121,55 @@ class EmailListsTable extends Component
         $this->emailLimit = $this->checkEmailLimit();
     }
 
-        // Method to check pending jobs
 
+    public function updateJobStatus($status)
+    {
+        $this->hasActiveJobsFlag = $status;
+    }
 
     public function updatingSearch()
     {
+
         $this->validateOnly('search');
         $this->resetPage();
         $this->resetSelections();
+
     }
 
     public function updatedPerPage()
     {
+
         $this->validateOnly('perPage');
         $this->resetPage();
         $this->resetSelections();
+
     }
 
     public function updatedStatusFilter()
     {
+
         $this->validateOnly('statusFilter');
         $this->resetPage();
         $this->resetSelections();
+
     }
 
     public function updatedSortField()
     {
         $this->validateOnly('sortField');
+
     }
 
     public function updatedSortDirection()
     {
         $this->validateOnly('sortDirection');
+
     }
 
     public function updatedSelectionType()
     {
         $this->validateOnly('selectionType');
+
 
         try {
             if ($this->selectionType === 'page') {
@@ -145,9 +179,15 @@ class EmailListsTable extends Component
             }
             $this->validateOnly('selectedEmails');
         } catch (\Exception $e) {
-            $this->alert('error', 'Error updating selection: ' . $e->getMessage());
+            $this->alert('error', 'Error updating selection: ' . $e->getMessage(), ['position' => 'bottom-end']);
             $this->resetSelections();
         }
+    }
+
+    public function updatedSelectedList()
+    {
+        $this->resetPage();
+        $this->resetSelections();
     }
 
     protected function resetSelections()
@@ -158,29 +198,45 @@ class EmailListsTable extends Component
 
     public function getEmailsQueryProperty()
     {
-        try {
-            return EmailList::where('user_id', $this->user->id)
-                ->when($this->search, function ($query) {
-                    $query->where(function($q) {
-                        $q->where('email', 'like', '%'.trim($this->search).'%')
-                          ->orWhere('sender_email', 'like', '%'.trim($this->search).'%')
-                          ->orWhere('status', 'like', '%'.trim($this->search).'%');
-                    });
-                })
-                ->when($this->statusFilter !== 'all', function ($query) {
-                    $query->where('status', $this->statusFilter);
-                })
-                ->orderBy($this->sortField, $this->sortDirection);
-        } catch (\Exception $e) {
-            $this->alert('error', 'Error building query: ' . $e->getMessage());
-            return EmailList::where('user_id', $this->user->id);
+        if (!$this->selectedList) {
+            return EmailList::where('id', 0); // Return empty query if no list selected
         }
+
+        // Start with base query with necessary columns only
+        $query = EmailList::query()
+            ->select(['id', 'email', 'status', 'send_time', 'sender_email', 'log'])
+            ->where('user_id', $this->user->id)
+            ->where('list_id', $this->selectedList);
+
+        // Apply search filters only if search term exists
+        if (trim($this->search)) {
+            $searchTerm = '%' . trim($this->search) . '%';
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('email', 'like', $searchTerm)
+                ->orWhere('sender_email', 'like', $searchTerm)
+                ->orWhere('status', 'like', $searchTerm);
+            });
+        }
+
+        // Apply status filter if not "all"
+        if ($this->statusFilter !== 'all') {
+            $query->where('status', $this->statusFilter);
+        }
+
+        return $query->orderBy($this->sortField, $this->sortDirection);
     }
+
+
 
     public function clearAllStatus()
     {
+        if (!$this->selectedList) {
+            $this->alert('error', 'Please select a list first!', ['position' => 'bottom-end']);
+            return;
+        }
+
         if (empty($this->selectedEmails)) {
-            $this->alert('error', 'Please select emails to update!');
+            $this->alert('error', 'Please select emails to update!', ['position' => 'bottom-end']);
             return;
         }
 
@@ -189,6 +245,7 @@ class EmailListsTable extends Component
         try {
             DB::transaction(function () {
                 $query = EmailList::where('user_id', $this->user->id)
+                                ->where('list_id', $this->selectedList)
                                 ->whereIn('id', $this->selectedEmails);
 
                 $affected = $query->update([
@@ -205,11 +262,11 @@ class EmailListsTable extends Component
                         'toast' => true,
                     ]);
                 } else {
-                    $this->alert('info', 'No emails were updated.');
+                    $this->alert('info', 'No emails were updated.', ['position' => 'bottom-end']);
                 }
             });
         } catch (\Exception $e) {
-            $this->alert('error', 'Failed to clear emails: ' . $e->getMessage());
+            $this->alert('error', 'Failed to clear emails: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
 
         $this->resetSelections();
@@ -281,7 +338,8 @@ class EmailListsTable extends Component
 
                 $email->delete();
                 $totalEmailCount = EmailList::where('user_id', $this->user->id)->count();
-                $this->user->setConsumedQuota('Subscribers Limit', (float) $totalEmailCount);
+                // $this->user->setConsumedQuota('Subscribers Limit', (float) $totalEmailCount);
+                $this->user->forceSetConsumption('Subscribers Limit', (float) $totalEmailCount);
 
 
                 $this->alert('success', 'Email deleted successfully!', [
@@ -292,7 +350,7 @@ class EmailListsTable extends Component
                 $this->emailLimit = $this->checkEmailLimit();
             });
         } catch (\Exception $e) {
-            $this->alert('error', 'Failed to delete email: ' . $e->getMessage());
+            $this->alert('error', 'Failed to delete email: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
 
         $this->selectedEmailId = null;
@@ -301,22 +359,33 @@ class EmailListsTable extends Component
     public function bulkDelete()
     {
         if (empty($this->selectedEmails)) {
-            $this->alert('error', 'Please select emails to delete!');
+            $this->alert('error', 'Please select emails to delete!', ['position' => 'bottom-end']);
             return;
         }
 
-        $this->validate();
+        $this->validate([
+            'selectedEmails' => 'array',
+            'selectedEmails.*' => [
+                'required',
+                Rule::exists('email_lists', 'id')->where(function ($query) {
+                    return $query->where('user_id', auth()->id());
+                }),
+            ],
+        ]);
 
         try {
             DB::transaction(function () {
                 $query = EmailList::where('user_id', $this->user->id)
                                 ->whereIn('id', $this->selectedEmails);
 
+
                 $count = $query->count();
+
                 $query->delete();
 
                 $totalEmailCount = EmailList::where('user_id', $this->user->id)->count();
-                $this->user->setConsumedQuota('Subscribers Limit', (float) $totalEmailCount);
+                // $this->user->setConsumedQuota('Subscribers Limit', (float) $totalEmailCount);
+                $this->user->forceSetConsumption('Subscribers Limit', (float) $totalEmailCount);
 
                 $this->alert('success', "$count emails deleted successfully!", [
                     'position' => 'bottom-end',
@@ -328,58 +397,63 @@ class EmailListsTable extends Component
                 $this->emailLimit = $this->checkEmailLimit();
             });
         } catch (\Exception $e) {
-            $this->alert('error', 'Failed to delete emails: ' . $e->getMessage());
+            $this->alert('error', 'Failed to delete emails: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
     }
     public function clearAllFailedStatus()
     {
+
+        if (!$this->selectedList) {
+            $this->alert('error', 'Please select a list first!', ['position' => 'bottom-end']);
+            return;
+        }
         try {
-            $count = EmailList::where('user_id', $this->user->id)
-                            ->where('status', 'FAIL')
-                            ->count();
+            $query = EmailList::where('user_id', $this->user->id)
+                            ->where('list_id', $this->selectedList)
+                            ->where('status', 'FAIL');
+
+
+            $count = $query->count();
 
             if ($count === 0) {
-                $this->alert('info', 'No failed status emails found.');
+                $this->alert('info', 'No failed status emails found.', ['position' => 'bottom-end']);
                 return;
             }
 
             if ($count < 10000) {
-                // Direct update for smaller number of emails
-                EmailList::where('user_id', $this->user->id)
-                        ->where('status', 'FAIL')
-                        ->update([
-                            'status' => null,
-                            'send_time' => null,
-                            'sender_email' => null,
-                            'log' => null
-                        ]);
-
-                $this->alert('success', "Cleared {$count} failed status emails successfully.", [
-                    'position' => 'bottom-end',
-                    'timer' => 5000,
-                    'toast' => true,
+                $query->update([
+                    'status' => null,
+                    'send_time' => null,
+                    'sender_email' => null,
+                    'log' => null
                 ]);
+
+                $this->alert('success', "Cleared {$count} failed status emails successfully.", ['position' => 'bottom-end']);
             } else {
-                // Use job for larger number of emails
-                ClearEmailStatus::dispatch($this->user->id, 'FAIL', false);
-
-                $this->alert('success', "Processing clearing of {$count} failed status emails. This may take a while.", [
-                    'position' => 'bottom-end',
-                    'timer' => 5000,
-                    'toast' => true,
-                ]);
+                ClearEmailStatus::dispatch($this->user->id, 'FAIL', false, $this->selectedList);
+                $this->alert('success', "Processing clearing of {$count} failed status emails. This may take a while.");
             }
         } catch (\Exception $e) {
-            $this->alert('error', 'Failed to clear statuses: ' . $e->getMessage());
+            $this->alert('error', 'Failed to clear statuses: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
     }
 
     public function clearAllSentStatus()
     {
+
+        if (!$this->selectedList) {
+            $this->alert('error', 'Please select a list first!', ['position' => 'bottom-end']);
+            return;
+        }
+
         try {
-            $count = EmailList::where('user_id', $this->user->id)
-                            ->where('status', 'SENT')
-                            ->count();
+            $query = EmailList::where('user_id', $this->user->id)
+                            ->where('list_id', $this->selectedList)
+                            ->where('status', 'SENT');
+
+
+
+            $count = $query->count();
 
             if ($count === 0) {
                 $this->alert('info', 'No sent status emails found.');
@@ -387,30 +461,17 @@ class EmailListsTable extends Component
             }
 
             if ($count < 10000) {
-                // Direct update for smaller number of emails
-                EmailList::where('user_id', $this->user->id)
-                        ->where('status', 'SENT')
-                        ->update([
-                            'status' => null,
-                            'send_time' => null,
-                            'sender_email' => null,
-                            'log' => null
-                        ]);
-
-                $this->alert('success', "Cleared {$count} sent status emails successfully.", [
-                    'position' => 'bottom-end',
-                    'timer' => 5000,
-                    'toast' => true,
+                $query->update([
+                    'status' => null,
+                    'send_time' => null,
+                    'sender_email' => null,
+                    'log' => null
                 ]);
+
+                $this->alert('success', "Cleared {$count} sent status emails successfully.");
             } else {
-                // Use job for larger number of emails
-                ClearEmailStatus::dispatch($this->user->id, 'SENT', false);
-
-                $this->alert('success', "Processing clearing of {$count} sent status emails. This may take a while.", [
-                    'position' => 'bottom-end',
-                    'timer' => 5000,
-                    'toast' => true,
-                ]);
+                ClearEmailStatus::dispatch($this->user->id, 'SENT', false, $this->selectedList);
+                $this->alert('success', "Processing clearing of {$count} sent status emails. This may take a while.");
             }
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to clear statuses: ' . $e->getMessage());
@@ -419,79 +480,80 @@ class EmailListsTable extends Component
 
     public function clearAllEmailsStatus()
     {
+        if (!$this->selectedList) {
+            $this->alert('error', 'Please select a list first!', ['position' => 'bottom-end']);
+            return;
+        }
         try {
-            $count = EmailList::where('user_id', $this->user->id)
-            ->where('status', 'SENT')
-            ->Orwhere('status', 'FAIL')->count();
+            $query = EmailList::where('user_id', $this->user->id)
+                            ->where(function ($query) {
+                                $query->whereIn('status', ['SENT', 'FAIL'])
+                                    ->orWhere('sender_email', '!=', null)
+                                    ->orWhere('log', '!=', null);
+                            })->where('list_id', $this->selectedList);
+
+
+            $count = $query->count();
 
             if ($count === 0) {
-                $this->alert('info', 'No emails found.');
+                $this->alert('info', 'No emails found.', ['position' => 'bottom-end']);
                 return;
             }
 
             if ($count < 10000) {
-                // Direct update for smaller number of emails
-                EmailList::where('user_id', $this->user->id)
-                        ->update([
-                            'status' => null,
-                            'send_time' => null,
-                            'sender_email' => null,
-                            'log' => null
-                        ]);
-
-                $this->alert('success', "Cleared status for {$count} emails successfully.", [
-                    'position' => 'bottom-end',
-                    'timer' => 5000,
-                    'toast' => true,
+                $query->update([
+                    'status' => null,
+                    'send_time' => null,
+                    'sender_email' => null,
+                    'log' => null
                 ]);
+
+                $this->alert('success', "Cleared status for {$count} emails successfully.", ['position' => 'bottom-end']);
             } else {
-                // Use job for larger number of emails
-                ClearEmailStatus::dispatch($this->user->id, null, false);
-
-                $this->alert('success', "Processing clearing of status for {$count} emails. This may take a while.", [
-                    'position' => 'bottom-end',
-                    'timer' => 5000,
-                    'toast' => true,
-                ]);
+                ClearEmailStatus::dispatch($this->user->id, null, false, $this->selectedList);
+                $this->alert('success', "Processing clearing of status for {$count} emails. This may take a while.", ['position' => 'bottom-end']);
             }
-
         } catch (\Exception $e) {
-            $this->alert('error', 'Failed to clear statuses: ' . $e->getMessage());
+            $this->alert('error', 'Failed to clear statuses: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
     }
 
     public function deleteAllEmails()
     {
+
+        if (!$this->selectedList) {
+            $this->alert('error', 'Please select a list first!', ['position' => 'bottom-end']);
+            return;
+        }
+
         try {
-            $count = EmailList::where('user_id', $this->user->id)->count();
+            $query = EmailList::where('user_id', $this->user->id)->where('list_id', $this->selectedList);
+
+
+
+            $count = $query->count();
 
             if ($count === 0) {
-                $this->alert('info', 'No emails to delete.');
+                $this->alert('info', 'No emails to delete.', ['position' => 'bottom-end']);
                 return;
             }
 
-
             if ($count < 10000) {
-                EmailList::where('user_id', $this->user->id)->delete();
-                            $this->alert('success', "Deleted {$count} emails successfully.", [
-                'position' => 'bottom-end',
-                'timer' => 5000,
-                'toast' => true,
-            ]);
-            } else {
-                // Direct deletion for smaller number of emails
-                DeleteEmails::dispatch($this->user->id);
+                $query->delete();
 
-                            $this->alert('success', "Processing deletion of {$count} emails. This may take a while.", [
-                'position' => 'bottom-end',
-                'timer' => 5000,
-                'toast' => true,
-            ]);
+                $totalEmailCount = EmailList::where('user_id', $this->user->id)->count();
+                // $this->user->setConsumedQuota('Subscribers Limit', (float) $totalEmailCount);
+                $this->user->forceSetConsumption('Subscribers Limit', (float) $totalEmailCount);
+
+                $this->alert('success', "Deleted {$count} emails successfully.", ['position' => 'bottom-end']);
+            } else {
+                DeleteEmails::dispatch($this->user->id, $this->selectedList);
+                $this->alert('success', "Processing deletion of {$count} emails. This may take a while.", ['position' => 'bottom-end']);
             }
 
             $this->emailLimit = $this->checkEmailLimit();
         } catch (\Exception $e) {
-            $this->alert('error', 'Failed to delete emails: ' . $e->getMessage());
+            $this->alert('error', 'Failed to delete emails: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
     }
 
@@ -499,7 +561,7 @@ class EmailListsTable extends Component
     public function clearStatus($status)
     {
         if (empty($this->selectedEmails)) {
-            $this->alert('error', 'Please select emails to update!');
+            $this->alert('error', 'Please select emails to update!', ['position' => 'bottom-end']);
             return;
         }
 
@@ -528,11 +590,11 @@ class EmailListsTable extends Component
                         'toast' => true,
                     ]);
                 } else {
-                    $this->alert('info', 'No emails were updated.');
+                    $this->alert('info', 'No emails were updated.', ['position' => 'bottom-end']);
                 }
             });
         } catch (\Exception $e) {
-            $this->alert('error', 'Failed to clear status: ' . $e->getMessage());
+            $this->alert('error', 'Failed to clear status: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
 
         $this->resetSelections();
@@ -551,7 +613,7 @@ class EmailListsTable extends Component
             }
             $this->validateOnly('selectedEmails');
         } catch (\Exception $e) {
-            $this->alert('error', 'Error updating selection: ' . $e->getMessage());
+            $this->alert('error', 'Error updating selection: ' . $e->getMessage(), ['position' => 'bottom-end']);
             $this->resetSelections();
         }
     }
@@ -575,7 +637,7 @@ class EmailListsTable extends Component
             }
 
             $allowedEmails = (int)$emailFeature->pivot->charges;
-            $currentEmails = EmailList::where('user_id', $this->user->id)->count();
+            $currentEmails = $this->totalEmails;
 
             if ($currentEmails > $allowedEmails) {
                 return [
@@ -599,76 +661,147 @@ class EmailListsTable extends Component
             ];
         }
     }
+
+
+    public function createList()
+    {
+        $this->validate($this->listRules());
+
+
+        try {
+            EmailListName::create([
+                'user_id' => $this->user->id,
+                'name' => $this->listName
+            ]);
+
+            $this->listName = '';
+            $this->dispatch('close-modal', 'create-list');
+            $this->alert('success', 'List created successfully!', ['position' => 'bottom-end']);
+        } catch (\Exception $e) {
+            $this->alert('error', 'Failed to create list.', ['position' => 'bottom-end']);
+        }
+    }
+
+    public function updateList($listId)
+    {
+        $this->validate([
+            'listName' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('email_list_names', 'name')
+                    ->where('user_id', $this->user->id)
+                    ->ignore($listId)
+            ]
+        ]);
+
+        try {
+            EmailListName::where('user_id', $this->user->id)
+                ->findOrFail($listId)
+                ->update(['name' => $this->listName]);
+
+            $this->listName = '';
+            $this->dispatch('close-modal', 'edit-list-'.$listId);
+            $this->alert('success', 'List updated successfully!', ['position' => 'bottom-end']);
+        } catch (\Exception $e) {
+            $this->alert('error', 'Failed to update list.', ['position' => 'bottom-end']);
+        }
+    }
+
+    public function selectList($listId)
+    {
+        if ($this->selectedList !== $listId) {
+            $this->selectedList = $listId;
+            $this->resetPage();
+            $this->resetSelections();
+            $this->dispatch('tabSelected', $listId);
+        }
+    }
+    public function deleteList($listId)
+    {
+        $list = EmailListName::where('user_id', $this->user->id)
+            ->withCount('emails')
+            ->findOrFail($listId);
+
+        if ($list->emails_count > 30000) {
+            // Use job for large lists
+            DeleteEmails::dispatch($this->user->id, $listId);
+            $this->alert('success', "Processing deletion of {$list->emails_count} emails. This may take a while.");
+        } else {
+            $list->delete();
+            $this->alert('success', 'List deleted successfully!');
+        }
+
+        if ($this->selectedList === $listId) {
+            $this->selectedList = null;
+        }
+    }
+
+
+
     public function getTotalRecordsProperty()
     {
         try {
+            if (!$this->selectedList) {
+                return 0;
+            }
             return $this->emailsQuery->count();
         } catch (\Exception $e) {
             return 0;
         }
     }
 
+    public function getTotalEmailsProperty()
+    {
+        return EmailList::where('user_id', $this->user->id)->count();
+    }
+
     public function getEmailsProperty()
     {
-        try {
-            return $this->emailsQuery->paginate($this->perPage);
-        } catch (\Exception $e) {
+        if (!$this->selectedList) {
             return collect([]);
         }
+
+        return $this->emailsQuery->paginate($this->perPage);
     }
 
-    public function getJobProgressProperty()
+
+
+
+
+
+
+
+    public function getListsProperty()
     {
-        $this->emailLimit = $this->checkEmailLimit();
-        return JobProgress::where('user_id', $this->user->id)
-            ->whereIn('status', ['processing', 'pending'])
-            ->orderBy('created_at', 'desc')
+        return EmailListName::where('user_id', $this->user->id)
+            ->withCount('emails')
             ->get();
     }
 
-    public function hasActiveJobs()
+    public function getTotalEmailsCountProperty()
     {
-        return DB::table('jobs')
-            ->where('queue', 'high')
-            ->where(function($query) {
-                $query->where('payload', 'like', '%"userId":' . $this->user->id . '%')
-                    ->orWhere('payload', 'like', '%"user_id":' . $this->user->id . '%')
-                    ->orWhere('payload', 'like', '%i:' . $this->user->id . ';%');
-            })
-            ->exists();
+        return [
+            'total' => EmailList::where('user_id', $this->user->id)->count(),
+            'current_list' => $this->selectedList ? $this->totalRecords : null
+        ];
     }
 
-    public function getQueueStatusProperty()
-    {
-        $allJobs = DB::table('jobs')
-            ->where('queue', 'high')
-            ->orderBy('id', 'asc')
-            ->get();
-
-        foreach ($allJobs as $index => $job) {
-            // Check if this job belongs to the current user
-            if (
-                str_contains($job->payload, '"userId":' . $this->user->id) ||
-                str_contains($job->payload, '"user_id":' . $this->user->id) ||
-                str_contains($job->payload, 'i:' . $this->user->id . ';')
-            ) {
-                // Return position (1-based index)
-                return $index + 1;
-            }
-        }
-
-        return 0; // Return 0 if no jobs found for user
-    }
     public function render()
     {
+            $selectedListName = null;
+            if ($this->selectedList) {
+                $selectedListName = EmailListName::find($this->selectedList)?->name;
+            }
 
             return view('livewire.pages.user.emails.email-lists-table', [
+
                 'emails' => $this->emails,
                 'totalRecords' => $this->totalRecords,
                 'pendingJobs' => $this->pendingJobs,
-                'jobProgress' => $this->jobProgress,
-                'queueStatus' => $this->queueStatus
-
+                'selectedListName' => $selectedListName,
+                'emailsCount' => $this->totalEmailsCount,
+                'hasActiveJobsFlag'  => $this->hasActiveJobsFlag
 
             ])->layout('layouts.app', ['title' => 'Email Lists']);
 

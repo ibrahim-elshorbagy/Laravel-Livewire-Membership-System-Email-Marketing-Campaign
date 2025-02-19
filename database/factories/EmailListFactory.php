@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\EmailList;
 use App\Models\User;
+use App\Models\EmailListName;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class EmailListFactory extends Factory
@@ -13,7 +14,8 @@ class EmailListFactory extends Factory
     public function definition()
     {
         return [
-            'user_id' => User::factory()->create()->id,
+            'user_id' => User::factory(),
+            'list_id' => EmailListName::factory(),
             'email' => $this->faker->unique()->safeEmail(),
             'status' => $this->faker->randomElement(['FAIL', 'SENT', 'NULL']),
             'send_time' => $this->faker->optional(0.7)->dateTimeBetween('-1 month', 'now'),
@@ -22,7 +24,6 @@ class EmailListFactory extends Factory
         ];
     }
 
-    // States for specific testing scenarios
     public function failed()
     {
         return $this->state(function (array $attributes) {
@@ -57,4 +58,3 @@ class EmailListFactory extends Factory
         });
     }
 }
-

@@ -16,13 +16,15 @@ class DeleteEmails implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $userId;
+    protected $listId;
     protected $isPageAction;
     protected $selectedEmails;
     protected $jobProgress;
 
-    public function __construct($userId, $isPageAction = false, $selectedEmails = [])
+    public function __construct($userId, $listId, $isPageAction = false, $selectedEmails = [])
     {
         $this->userId = $userId;
+        $this->listId = $listId;
         $this->isPageAction = $isPageAction;
         $this->selectedEmails = $selectedEmails;
         $this->onQueue('high');
@@ -51,7 +53,9 @@ class DeleteEmails implements ShouldQueue
     {
         try {
             // Get initial count and setup progress
-            $query = EmailList::where('user_id', $this->userId);
+            $query = EmailList::where('user_id', $this->userId)
+                            ->where('list_id', $this->listId);
+
             if ($this->isPageAction && !empty($this->selectedEmails)) {
                 $query->whereIn('id', $this->selectedEmails);
             }
@@ -73,7 +77,10 @@ class DeleteEmails implements ShouldQueue
             $query->chunkById(1000, function ($chunk) use (&$processedCount) {
                 DB::beginTransaction();
                 try {
-                    EmailList::whereIn('id', $chunk->pluck('id'))->delete();
+                    // Make sure to include list_id in the deletion query
+                    EmailList::where('list_id', $this->listId)
+                            ->whereIn('id', $chunk->pluck('id'))
+                            ->delete();
 
                     $processedCount += $chunk->count();
 
@@ -99,10 +106,10 @@ class DeleteEmails implements ShouldQueue
                 // Update quota
                 $totalEmailCount = EmailList::where('user_id', $this->userId)->count();
                 $user = \App\Models\User::find($this->userId);
-                $user->setConsumedQuota('Subscribers Limit', (float) $totalEmailCount);
+                $user->forceSetConsumption('Subscribers Limit', (float) $totalEmailCount);
 
                 // Complete the progress
-                $this->completeProgress("Successfully deleted {$processedCount} emails");
+                $this->completeProgress("Successfully deleted {$processedCount} emails from list {$this->listId}");
             });
 
         } catch (\Exception $e) {
@@ -127,7 +134,5 @@ class DeleteEmails implements ShouldQueue
                 'error' => $message
             ]);
         }
-
-
     }
 }

@@ -8,7 +8,7 @@
             </h2>
         </div>
         <div class="flex mt-4 md:mt-0 md:ml-4">
-            @if(!$this->hasActiveJobs())
+            @if(!$hasActiveJobsFlag)
             @if(!$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
             <x-primary-info-button href="{{ route('user.emails.create') }}" wire:navigate>
                 Add New Emails
@@ -78,12 +78,14 @@
         </div>
     </div>
 
+
+
     <!-- Action Buttons -->
     <div class="flex flex-col gap-4 mb-6">
 
 
         <div class="flex flex-wrap gap-2">
-            @if(!$this->hasActiveJobs())
+            @if(!$hasActiveJobsFlag)
             <!-- Per Page Actions -->
             <div class="w-full mb-2">
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -154,126 +156,271 @@
             </div>
             @endif
         </div>
+
+        <div class="p-4 text-yellow-700 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-md dark:text-neutral-300">
+                - Any Action Will Affect The Selected List Only
+        </div>
     </div>
 
     <div class="p-3 my-4 bg-blue-100 rounded-lg dark:bg-blue-900">
         <ul class="pl-5 text-sm text-gray-700 list-disc dark:text-gray-200">
             <li>
                 <i class="mr-2 text-blue-600 fas fa-envelope dark:text-blue-300"></i>
-                Total Emails : <span class="font-bold">{{ $totalRecords }}</span> emails
+                Total Emails: <span class="font-bold">{{ $emailsCount['total'] }}</span>
+                @if($selectedList)
+                ({{ $emailsCount['current_list'] }} in current list)
+                @endif
             </li>
         </ul>
     </div>
 
-    <div wire:poll.500ms="$refresh">
-    @if($queueStatus > 1)
-        <div class="p-4 mb-6 border border-blue-200 rounded-lg bg-blue-50 dark:bg-blue-900 dark:border-blue-800">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <i class="text-blue-600 fas fa-spinner fa-spin dark:text-blue-400"></i>
-                </div>
-                <div class="ml-3">
-                    <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
-                        <i class="mr-1 fas fa-clock"></i> Jobs in Queue
-                    </h3>
-                    <div class="mt-1 text-sm text-blue-700 dark:text-blue-300">
-                        <i class="mr-1 fas fa-info-circle"></i>
-                        Your task is in queue position {{ $queueStatus }}. It will start automatically when
-                        resources are available.
-                    </div>
-                </div>
+    <livewire:pages.user.emails.partials.job-progress-component />
+
+    <div class="flex flex-col p-3 border rounded-md md:p-6">
+        <!-- List Management -->
+        <div class="mb-6 md:flex md:items-center md:justify-between">
+            <div class="flex-1 min-w-0">
+                <h2 class="text-2xl font-bold leading-7 sm:text-3xl sm:truncate">
+                    Mailing Lists
+                </h2>
+            </div>
+            <div class="flex mt-4 md:mt-0 md:ml-4">
+                <x-primary-create-button x-on:click="$dispatch('open-modal', 'create-list')">
+                    Create New List
+                </x-primary-create-button>
             </div>
         </div>
-        @endif
-        @if($jobProgress->isNotEmpty())
-        <div class="mb-6 space-y-4">
-            @foreach($jobProgress as $progress)
-            <div class="p-4 bg-white rounded-lg shadow dark:bg-gray-800">
-                <div class="flex items-center justify-between mb-1">
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        <i class="mr-1 fas fa-tasks"></i>
-                        {{ ucwords(str_replace('_', ' ', $progress->job_type)) }}
-                    </span>
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        <i class="mr-1 fas fa-percentage"></i>
-                        {{ number_format($progress->percentage, 1) }}%
-                    </span>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                    <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-                        style="width: {{ min($progress->percentage, 100) }}%"></div>
-                </div>
-                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    <i class="mr-1 fas fa-list-ol"></i>
-                    {{ $progress->processed_items }} / {{ $progress->total_items }} items processed
-                </div>
-            </div>
-            @endforeach
-        </div>
-        @endif
-    </div>
+
+        <!-- Tabs -->
+                <div x-data="{
+                                selectedTab: @entangle('selectedList').live,
+                                scrollContainer: null,
+                                isScrollable: false,
+                                hasScrolledToEnd: false,
+                                hasScrolledToStart: true,
+
+                                init() {
+                                    this.scrollContainer = this.$refs.tabsContainer;
+                                    this.checkScroll();
+                                    window.addEventListener('resize', () => this.checkScroll());
+                                    this.scrollContainer.addEventListener('scroll', () => this.checkScroll());
+
+                                    $wire.on('tabSelected', (listId) => {
+                                        this.selectedTab = listId;
+                                    });
+                                },
 
 
-    <!-- Table -->
-    <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
-        <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
-            <thead
-                class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
-                <tr>
-                    <th scope="col" class="p-4">
-                        <input type="checkbox" wire:model.live="selectPage" class="rounded">
-                    </th>
-                    <th scope="col" class="p-4">Email</th>
-                    <th scope="col" class="p-4">Status</th>
-                    <th scope="col" class="p-4">Send Time</th>
-                    <th scope="col" class="p-4">Sender Email</th>
-                    <th scope="col" class="p-4">Log</th>
-                    <th scope="col" class="p-4">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
-                @foreach($emails as $email)
-                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
-                    <td class="p-4">
-                        <input type="checkbox" wire:model.live="selectedEmails" value="{{ $email->id }}"
-                            class="rounded">
-                    </td>
-                    <td class="p-4">{{ $email->email }}</td>
-                    <td class="p-4">
-                        @if($email->status !== 'NULL')
-                        <span class="inline-flex px-2 py-1 text-xs rounded-full
-                            {{ $email->status === 'SENT' ? 'bg-green-100 text-green-800' :
-                            ($email->status === 'FAIL' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
-                            {{ $email->status }}
-                        </span>
+                                checkScroll() {
+                                    if (!this.scrollContainer) return;
+                                    this.isScrollable = this.scrollContainer.scrollWidth > this.scrollContainer.clientWidth;
+                                    this.hasScrolledToStart = this.scrollContainer.scrollLeft <= 0;
+                                    this.hasScrolledToEnd = this.scrollContainer.scrollLeft + this.scrollContainer.clientWidth >= this.scrollContainer.scrollWidth;
+                                },
+
+                                scrollLeft() {
+                                    this.scrollContainer.scrollBy({ left: -200, behavior: 'smooth' });
+                                },
+
+                                scrollRight() {
+                                    this.scrollContainer.scrollBy({ left: 200, behavior: 'smooth' });
+                                }
+                            }">
+                            <div class="relative flex items-center">
+                                <!-- Left Scroll Button -->
+                                <button x-show="isScrollable && !hasScrolledToStart" x-on:click="scrollLeft"
+                                    class="absolute left-0 z-10 p-2 transition-all rounded-full shadow-md text-neutral-600 bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                                    style="transform: translateX(-50%);">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+
+                                <!-- Tabs Container -->
+                                <div x-ref="tabsContainer"
+                                    class="flex gap-2 py-4 overflow-x-auto border-b text-md scrollbar-hide border-neutral-300 dark:border-neutral-700 scroll-smooth"
+                                    style="scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none;">
+                                    @foreach($this->lists as $list)
+                                    <div class="flex items-center px-4 py-2 transition-all rounded-lg text-md group text-nowrap hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                                        :class="{
+                                            'bg-neutral-100 dark:bg-neutral-800 border-b-2 border-neutral-600 dark:border-orange-500': selectedTab == {{ $list->id }},
+                                            'bg-neutral-50 dark:bg-neutral-900': selectedTab != {{ $list->id }}
+                                        }">
+                                        <button type="button" x-on:click="selectedTab = {{ $list->id }}" wire:click.debounce.100ms="selectList({{ $list->id }})"
+                                            class="mr-2 font-medium text-neutral-600 dark:text-neutral-300">
+                                            {{ $list->name }}
+                                            <span class="text-xs text-neutral-500 dark:text-neutral-400">({{ $list->emails_count }})</span>
+                                        </button>
+                                        <div class="flex items-center transition-opacity opacity-0 text-nowrap group-hover:opacity-100">
+                                            <button type="button"
+                                                x-on:click="$wire.set('listName', '{{ $list->name }}'); $dispatch('open-modal', 'edit-list-{{ $list->id }}')"
+                                                class="ml-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" wire:click="deleteList({{ $list->id }})"
+                                                wire:confirm="Are you sure you want to delete this list?"
+                                                class="ml-2 text-neutral-400 hover:text-red-600 dark:hover:text-red-500">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+
+                                <!-- Right Scroll Button -->
+                                <button x-show="isScrollable && !hasScrolledToEnd" x-on:click="scrollRight"
+                                    class="absolute right-0 z-10 p-2 transition-all rounded-full shadow-md text-neutral-600 bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                                    style="transform: translateX(50%);">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+
+
+                <!-- Show emails table only when a list is selected -->
+
+                @if($selectedList)
+                    <div wire:loading.remove wire:target="selectList">
+                        @if($emails->count() > 0)
+                            <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
+                                <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
+                                    <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
+                                        <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
+                                            <thead
+                                                class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
+                                                <tr>
+                                                    <th scope="col" class="p-4">
+                                                        <input type="checkbox" wire:model.live="selectPage" class="rounded">
+                                                    </th>
+                                                    <th scope="col" class="p-4">Email</th>
+                                                    <th scope="col" class="p-4">Status</th>
+                                                    <th scope="col" class="p-4">Send Time</th>
+                                                    <th scope="col" class="p-4">Sender Email</th>
+                                                    <th scope="col" class="p-4">Log</th>
+                                                    <th scope="col" class="p-4">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
+                                                @foreach($emails as $email)
+                                                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                                                    <td class="p-4">
+                                                        <input type="checkbox" wire:model.live="selectedEmails" value="{{ $email->id }}"
+                                                            class="rounded">
+                                                    </td>
+                                                    <td class="p-4">{{ $email->email }}</td>
+                                                    <td class="p-4">
+                                                        @if($email->status !== 'NULL')
+                                                        <span
+                                                            class="inline-flex px-2 py-1 text-xs rounded-full
+                                                                                                                                                                                        {{ $email->status === 'SENT' ? 'bg-green-100 text-green-800' :
+                                                                                                                                                                                        ($email->status === 'FAIL' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
+                                                            {{ $email->status }}
+                                                        </span>
+                                                        @endif
+                                                    </td>
+                                                    <td class="p-4">{{ $email->send_time ? $email->send_time->format('d / m / Y') : '-' }}</td>
+                                                    <td class="p-4">{{ $email->sender_email ?? '-' }}</td>
+                                                    <td class="p-4">{{ Str::limit($email->log, 30) ?? '-' }}</td>
+                                                    <td class="p-4">
+                                                        <div class="flex space-x-2">
+                                                            <button wire:click="clearSingleStatus({{ $email->id }})"
+                                                                wire:confirm="Are you sure you want to clear this email status?"
+                                                                class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
+                                                                Clear Status
+                                                            </button>
+
+                                                            <button wire:click="deleteEmail({{ $email->id }})"
+                                                                wire:confirm="Are you sure you want to delete this email?"
+                                                                class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+
+                                        <!-- Pagination -->
+                                        @if($selectedList && $emails->hasPages())
+                                        <div class="mt-4">
+                                            {{ $emails->links() }}
+                                        </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="p-4 text-center text-gray-500">
+                                No emails found in this list.
+                                @if(!$hasActiveJobsFlag && !$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
+                                    <div class="mt-2">
+                                        <x-primary-info-button href="{{ route('user.emails.create') }}" wire:navigate>
+                                            Add New Emails
+                                        </x-primary-info-button>
+                                    </div>
+                                @endif
+                            </div>
                         @endif
-                    </td>
-                    <td class="p-4">{{ $email->send_time ? $email->send_time->format('d / m / Y') : '-' }}</td>
-                    <td class="p-4">{{ $email->sender_email ?? '-' }}</td>
-                    <td class="p-4">{{ Str::limit($email->log, 30) ?? '-' }}</td>
-                    <td class="p-4">
-                        <div class="flex space-x-2">
-                            <button wire:click="clearSingleStatus({{ $email->id }})"
-                                wire:confirm="Are you sure you want to clear this email status?"
-                                class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
-                                Clear Status
-                            </button>
+                    </div>
 
-                            <button wire:click="deleteEmail({{ $email->id }})"
-                                wire:confirm="Are you sure you want to delete this email?"
-                                class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
-                                Delete
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
+                    <div wire:loading.class.remove="hidden" wire:loading.class='flex' wire:target="selectList"  class="items-center justify-center hidden p-4">
+                        <div class="w-8 h-8 border-4 border-blue-500 rounded-full animate-spin border-t-transparent"></div>
+                    </div>
+                @else
+                    <div class="p-4 text-center text-gray-500">
+                        Please select a list to view emails
+                    </div>
+                @endif
 
-    <!-- Pagination -->
-    <div class="mt-4">
-        {{ $emails->links() }}
+
+
+
+        </div>
+
+        <!-- Modals -->
+        <x-modal name="create-list" maxWidth="md">
+            <div class="p-6">
+                <h2 class="text-lg font-medium">Create New List</h2>
+                <form wire:submit="createList" class="mt-4">
+                    <div>
+                        <x-input-label for="listName" value="List Name" />
+                        <x-text-input wire:model="listName" id="listName" type="text" class="block w-full mt-1" />
+                        <x-input-error :messages="$errors->get('listName')" class="mt-2" />
+                    </div>
+
+                    <div class="flex justify-end mt-6 space-x-3">
+                        <x-secondary-button x-on:click="$dispatch('close-modal', 'create-list')">
+                            Cancel
+                        </x-secondary-button>
+                        <x-primary-button type="submit">
+                            Create
+                        </x-primary-button>
+                    </div>
+                </form>
+            </div>
+        </x-modal>
+
+        <!-- Edit Modals -->
+        @foreach($this->lists as $list)
+        <x-modal name="edit-list-{{ $list->id }}" maxWidth="md">
+            <div class="p-6">
+                <h2 class="text-lg font-medium">Edit List</h2>
+                <form wire:submit="updateList({{ $list->id }})" class="mt-4">
+                    <div>
+                        <x-input-label for="listName" value="List Name" />
+                        <x-text-input wire:model="listName" id="listName" type="text" class="block w-full mt-1" />
+                        <x-input-error :messages="$errors->get('listName')" class="mt-2" />
+                    </div>
+
+                    <div class="flex justify-end mt-6 space-x-3">
+                        <x-secondary-button x-on:click="$dispatch('close-modal', 'edit-list-{{ $list->id }}')">
+                            Cancel
+                        </x-secondary-button>
+                        <x-primary-button type="submit">
+                            Update
+                        </x-primary-button>
+                    </div>
+                </form>
+            </div>
+        </x-modal>
+        @endforeach
     </div>
 </div>

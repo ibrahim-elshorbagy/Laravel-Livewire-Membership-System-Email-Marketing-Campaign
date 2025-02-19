@@ -20,13 +20,15 @@ class ClearEmailStatus implements ShouldQueue
     protected $status;
     protected $isPageAction;
     protected $selectedEmails;
+    protected $listId;
 
-    public function __construct($userId, $status = null, $isPageAction = false, $selectedEmails = [])
+    public function __construct($userId, $status = null, $isPageAction = false, $selectedEmails = [], $listId = null) // Add listId parameter
     {
         $this->userId = $userId;
         $this->status = $status;
         $this->isPageAction = $isPageAction;
         $this->selectedEmails = $selectedEmails;
+        $this->listId = $listId;
         $this->onQueue('high');
 
         JobProgress::where('user_id', $this->userId)
@@ -41,6 +43,11 @@ class ClearEmailStatus implements ShouldQueue
         try {
             // Build the query first to get total count
             $query = EmailList::where('user_id', $this->userId);
+
+            // Add list_id condition if provided
+            if ($this->listId) {
+                $query->where('list_id', $this->listId);
+            }
 
             if ($this->isPageAction && !empty($this->selectedEmails)) {
                 $query->whereIn('id', $this->selectedEmails);
@@ -66,7 +73,13 @@ class ClearEmailStatus implements ShouldQueue
             $query->chunkById(1000, function ($chunk) use (&$processedCount) {
                 DB::beginTransaction();
                 try {
-                    EmailList::whereIn('id', $chunk->pluck('id'))->update([
+                    // Include list_id in the update query if provided
+                    $updateQuery = EmailList::whereIn('id', $chunk->pluck('id'));
+                    if ($this->listId) {
+                        $updateQuery->where('list_id', $this->listId);
+                    }
+
+                    $updateQuery->update([
                         'status' => null,
                         'send_time' => null,
                         'sender_email' => null,
@@ -109,6 +122,9 @@ class ClearEmailStatus implements ShouldQueue
         if ($this->status) {
             $message .= " with status '{$this->status}'";
         }
+        if ($this->listId) {
+            $message .= " in list #{$this->listId}";
+        }
 
         $this->jobProgress->update([
             'status' => 'completed',
@@ -116,6 +132,5 @@ class ClearEmailStatus implements ShouldQueue
             'percentage' => 100,
             'error' => $message
         ]);
-
     }
 }

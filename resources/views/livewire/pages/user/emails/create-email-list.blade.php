@@ -2,7 +2,7 @@
     x-data="{
         emailInput: '',
         parsedEmails: [],
-        allEmails: [], // New property to store all emails
+        allEmails: [],
         processing: false,
         error: null,
         maxDisplayEmails: 1500,
@@ -23,11 +23,15 @@
                     value: email.trim(),
                     valid: this.validateEmail(email.trim())
                 }))
-                .filter(entry => entry.value.length > 0)
-                .reduce((acc, entry) => {
+                .filter(entry => entry.value.length > 0);
+
+            // Only deduplicate if allow_duplicates is false
+            if (!$wire.allow_duplicates) {
+                emails = emails.reduce((acc, entry) => {
                     if (!acc.some(e => e.value === entry.value)) acc.push(entry);
                     return acc;
                 }, []);
+            }
 
             this.totalEmails = emails.length;
             this.allEmails = emails; // Store all emails
@@ -59,7 +63,9 @@
                 });
             }
         }
-    }" x-effect="parseEmails()">
+    }"
+
+    x-effect="parseEmails()">
 
     <!-- Header Section -->
     <div class="mb-6 md:flex md:items-center md:justify-between">
@@ -133,7 +139,33 @@
         </div>
     </div>
 
+    <!-- List Selection -->
+
+
+    <div class="grid items-center grid-cols-1 gap-4 mb-4 sm:grid-cols-2 justify-normal">
+        <div>
+            <x-input-label for="list_id">Select List</x-input-label>
+            <x-primary-select-input wire:model.live="list_id" id="list_id"
+                class="w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                <option value="0">Select a list</option>
+                @foreach($emailLists as $list)
+                <option value="{{ $list->id }}">{{ $list->name }}</option>
+                @endforeach
+            </x-primary-select-input>
+            <x-input-error :messages="$errors->get('list_id')" class="mt-2" />
+        </div>
+
+        <div class="flex items-center">
+            <input type="checkbox" wire:model="allow_duplicates" id="allow_duplicates"
+                class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900">
+            <label for="allow_duplicates" class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                Allow Duplicate Emails
+            </label>
+        </div>
+    </div>
+
     <!-- File Import Section -->
+    @if($list_id != 0)
     <div class="flex gap-2 mb-4 text-sm md:text-md">
         <label class="inline-block px-4 py-2 text-white bg-blue-500 rounded cursor-pointer hover:bg-blue-600">
             <input type="file" wire:model="file" @change="handleFileUpload" class="hidden"
@@ -141,6 +173,13 @@
             Import File
         </label>
     </div>
+    @else
+    <div  class="flex gap-2 mb-4 text-sm md:text-md">
+        <label class="inline-block px-4 py-2 text-white bg-gray-700 rounded cursor-not-allowed hover:bg-gray-700">
+            Import File (Select List First)
+        </label>
+    </div>
+    @endif
 
     <!-- Processing Indicator -->
     <div x-show="processing" class="p-4 mb-4 text-blue-700 bg-blue-100 rounded-lg dark:bg-blue-900 dark:text-blue-300">
@@ -183,6 +222,4 @@
     </div>
 </div>
 
-{{-- @push('scripts')
-<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-@endpush --}}
+

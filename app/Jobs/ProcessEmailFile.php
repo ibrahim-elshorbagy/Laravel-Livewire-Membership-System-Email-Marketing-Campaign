@@ -27,11 +27,17 @@ class ProcessEmailFile implements ShouldQueue
     protected $remainingQuota;
     protected $batchSize = 1000;
 
-    public function __construct($filePath, $userId, $remainingQuota)
+    protected $listId;
+    protected $allowDuplicates;
+
+    public function __construct($filePath, $userId, $remainingQuota, $listId = null, $allowDuplicates = false)
     {
         $this->filePath = $filePath;
         $this->userId = $userId;
         $this->remainingQuota = $remainingQuota;
+        $this->listId = $listId;
+        $this->allowDuplicates = $allowDuplicates;
+
         $this->onQueue('high');
 
         JobProgress::where('user_id', $this->userId)
@@ -83,18 +89,29 @@ class ProcessEmailFile implements ShouldQueue
         $batch = [];
         $processedCount = 0;
         $now = now()->format('Y-m-d H:i:s');
+        $seenEmails = []; // Track emails we've already processed
 
         while (($line = fgets($handle)) !== false) {
             $emails = $this->extractEmailsFromLine(trim($line));
 
             foreach ($emails as $email) {
+                $email = strtolower($email); // Normalize email
+
+                // Skip if we've already seen this email and duplicates aren't allowed
+                if (!$this->allowDuplicates && in_array($email, $seenEmails)) {
+                    continue;
+                }
+
                 if ($processedCount >= $remainingSpace) {
                     break 2;
                 }
 
+                $seenEmails[] = $email; // Add to seen emails
+
                 $batch[] = [
                     'user_id' => $this->userId,
-                    'email' => strtolower($email),
+                    'list_id' => $this->listId,
+                    'email' => $email,
                     'created_at' => $now,
                     'updated_at' => $now
                 ];
@@ -102,6 +119,7 @@ class ProcessEmailFile implements ShouldQueue
                 if (count($batch) >= $this->batchSize) {
                     $processedCount += $this->insertBatchAndUpdateProgress($batch, $remainingSpace, $currentCount, $processedCount);
                     $batch = [];
+                    // Don't reset $seenEmails as we want to track across batches
                 }
             }
         }
@@ -125,6 +143,7 @@ class ProcessEmailFile implements ShouldQueue
         $batch = [];
         $processedCount = 0;
         $now = now()->format('Y-m-d H:i:s');
+        $seenEmails = []; // Track emails we've already processed
 
         foreach ($worksheet->getRowIterator() as $row) {
             if ($processedCount >= $remainingSpace) {
@@ -137,13 +156,23 @@ class ProcessEmailFile implements ShouldQueue
             foreach ($cellIterator as $cell) {
                 $value = trim((string)$cell->getValue());
                 if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                    $email = strtolower($value);
+
+                    // Skip if we've already seen this email and duplicates aren't allowed
+                    if (!$this->allowDuplicates && in_array($email, $seenEmails)) {
+                        continue;
+                    }
+
                     if ($processedCount >= $remainingSpace) {
                         break 2;
                     }
 
+                    $seenEmails[] = $email; // Add to seen emails
+
                     $batch[] = [
                         'user_id' => $this->userId,
-                        'email' => strtolower($value),
+                        'list_id' => $this->listId,
+                        'email' => $email,
                         'created_at' => $now,
                         'updated_at' => $now
                     ];
@@ -151,6 +180,7 @@ class ProcessEmailFile implements ShouldQueue
                     if (count($batch) >= $this->batchSize) {
                         $processedCount += $this->insertBatchAndUpdateProgress($batch, $remainingSpace, $currentCount, $processedCount);
                         $batch = [];
+                        // Don't reset $seenEmails as we want to track across batches
                     }
                 }
             }
@@ -180,18 +210,47 @@ class ProcessEmailFile implements ShouldQueue
 
         DB::beginTransaction();
         try {
-            $inserted = DB::table('email_lists')->insertOrIgnore($batch);
+            if (!$this->allowDuplicates) {
+                // Check for duplicates within the same list
+                $existingEmails = DB::table('email_lists')
+                    ->where('user_id', $this->userId)
+                    ->where('list_id', $this->listId)
+                    ->whereIn('email', array_column($batch, 'email'))
+                    ->pluck('email')
+                    ->toArray();
 
-            if ($inserted > 0) {
-                $this->updateQuota($currentCount + $processedCount + $inserted);
-                $this->updateProgress($processedCount + $inserted);
+                // Filter out existing emails
+                $newBatch = array_filter($batch, function($item) use ($existingEmails) {
+                    return !in_array($item['email'], $existingEmails);
+                });
+
+                $insertCount = 0;
+                if (!empty($newBatch)) {
+                    // Convert to indexed array to avoid issues with array_filter keeping original keys
+                    $newBatch = array_values($newBatch);
+                    DB::table('email_lists')->insert($newBatch);
+                    $insertCount = count($newBatch);
+                }
+            } else {
+                // If duplicates are allowed, insert all
+                DB::table('email_lists')->insert($batch);
+                $insertCount = count($batch);
+            }
+
+            if ($insertCount > 0) {
+                $this->updateQuota($currentCount + $processedCount + $insertCount);
+                $this->updateProgress($processedCount + $insertCount);
             }
 
             DB::commit();
-            return $inserted;
+            return $insertCount; // Return actual number of inserted records
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Batch insert failed', ['error' => $e->getMessage()]);
+            Log::error('Batch insert failed', [
+                'error' => $e->getMessage(),
+                'batch_size' => count($batch),
+                'allow_duplicates' => $this->allowDuplicates
+            ]);
             return 0;
         }
     }

@@ -22,11 +22,14 @@ return new class extends Migration
             $table->timestamps();
 
             // Add unique composite index
-            $table->unique(['user_id', 'email']);
+            // $table->unique(['user_id', 'email']);
 
             // Add indexes for better performance
             $table->index(['status', 'send_time']);
             $table->index('email');
+
+            $table->foreignId('list_id')->nullable()->constrained('email_list_names')->onDelete('cascade');
+
         });
     }
 

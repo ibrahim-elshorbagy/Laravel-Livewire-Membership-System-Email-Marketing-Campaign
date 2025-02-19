@@ -71,7 +71,6 @@
                     <th scope="col" class="p-4">Assigned To</th>
                     <th scope="col" class="p-4">Last Access</th>
                     <th scope="col" class="p-4">Quota</th>
-                    <th scope="col" class="p-4">Admin Notes</th>
                     <th scope="col" class="p-4">Added At</th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
@@ -106,10 +105,17 @@
                     </td>
                     <td class="p-4">{{ $server->last_access_time?->format('d/m/Y h:i:s A')?? '' }}</td>
                     <td class="p-4">{{ $server->current_quota }}</td>
-                    <td class="p-4">{{ Str::limit($server->admin_notes, 30) }}</td>
                     <td class="p-4">{{ $server->created_at?->format('d/m/Y h:i:s A') }}</td>
                     <td class="p-4">
                         <div class="flex space-x-2">
+                            @if($server->admin_notes)
+                                <div class="flex items-center gap-2">
+                                    <button type="button" x-on:click="$dispatch('open-modal', 'view-note-{{ $server->id }}')"
+                                        class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
+                                        <i class="fa-solid fa-note-sticky"></i>
+                                    </button>
+                                </div>
+                                @endif
                             <a href="{{ route('admin.servers.form', $server->id) }}"
                                 class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
                                 Edit
@@ -123,6 +129,29 @@
                         </div>
                     </td>
                 </tr>
+                @if($server->admin_notes)
+                    <x-modal name="view-note-{{ $server->id }}" maxWidth="lg">
+                        <div class="p-6">
+                            <h2 class="text-lg font-medium text-neutral-900 dark:text-neutral-100">
+                                Admin Notes for {{ $server->name }}
+                            </h2>
+
+                            <div class="mt-4 space-y-4">
+                                <div class="p-4 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                                    <div class="prose dark:prose-invert max-w-none">
+                                        {{ $server->admin_notes }}
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end mt-6">
+                                    <x-secondary-button x-on:click="$dispatch('close-modal', 'view-note-{{ $server->id }}')">
+                                        Close
+                                    </x-secondary-button>
+                                </div>
+                            </div>
+                        </div>
+                    </x-modal>
+                    @endif
                 @endforeach
             </tbody>
         </table>

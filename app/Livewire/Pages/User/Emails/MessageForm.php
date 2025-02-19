@@ -65,7 +65,7 @@ class MessageForm extends Component
             return $this->redirect(route('user.email-messages'), navigate: true);
 
         } catch (\Exception $e) {
-            $this->alert('error', 'Failed to save message: ' . $e->getMessage());
+            $this->alert('error', 'Failed to save message: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
     }
 

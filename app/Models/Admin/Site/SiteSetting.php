@@ -27,7 +27,7 @@ class SiteSetting extends Model
 
 
 
-    public static function getLogo(string $default = '/default-logo.png'): string
+    public static function getLogo(string $default = '/images/default-logo.png'): string
     {
         $logoPath = self::getValue('logo');
         return $logoPath ? Storage::url($logoPath) : asset($default);

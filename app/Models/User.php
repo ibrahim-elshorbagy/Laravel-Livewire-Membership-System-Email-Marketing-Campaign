@@ -72,4 +72,32 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(EmailMessage::class);
     }
+
+    public function list()
+    {
+        return $this->belongsTo(EmailListName::class, 'list_id');
+    }
+
+    public function forceSetConsumption($featureName, $amount)
+    {
+        $feature = \LucasDotVin\Soulbscription\Models\Feature::where('name', $featureName)->first();
+
+        if (!$feature) {
+            throw new \Exception("Feature not found: {$featureName}");
+        }
+
+        return \LucasDotVin\Soulbscription\Models\FeatureConsumption::updateOrCreate(
+            [
+                'subscriber_type' => get_class($this),
+                'subscriber_id' => $this->id,
+                'feature_id' => $feature->id
+            ],
+            [
+                'consumption' => (float) $amount,
+                'expired_at' => null,
+                'updated_at' => now()
+            ]
+        );
+    }
+
 }
