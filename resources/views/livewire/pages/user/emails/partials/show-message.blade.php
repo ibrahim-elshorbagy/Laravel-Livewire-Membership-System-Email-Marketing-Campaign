@@ -8,7 +8,7 @@
                 <div class="flex flex-col justify-between gap-4 mb-6 md:flex-row md:items-center">
                     <h2
                         class="text-xl font-bold text-transparent md:text-2xl lg:text-3xl bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-300 bg-clip-text">
-                        {{ $message->message_title }}
+                        {{ $message->email_subject }}
                     </h2>
 
                     <div>
@@ -20,37 +20,6 @@
 
                 <!-- Message Details Grid -->
                 <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    <!-- Message Title Card -->
-                    <div class="w-full p-4 transition-all rounded-lg bg-gray-50 dark:bg-neutral-700 hover:shadow-lg">
-                        <h3 class="mb-2 text-sm text-gray-500 dark:text-gray-300">Message Title</h3>
-                        <p class="text-base text-gray-900 break-words dark:text-gray-100">
-                            {{ $message->message_title }}
-                        </p>
-                    </div>
-
-                    <!-- Email Subject Card -->
-                    <div class="w-full p-4 transition-all rounded-lg bg-gray-50 dark:bg-neutral-700 hover:shadow-lg">
-                        <h3 class="mb-2 text-sm text-gray-500 dark:text-gray-300">Email Subject</h3>
-                        <p class="text-base text-gray-900 break-words dark:text-gray-100">
-                            {{ $message->email_subject }}
-                        </p>
-                    </div>
-
-                    <!-- Sender Name Card -->
-                    <div class="w-full p-4 transition-all rounded-lg bg-gray-50 dark:bg-neutral-700 hover:shadow-lg">
-                        <h3 class="mb-2 text-sm text-gray-500 dark:text-gray-300">Sender Name</h3>
-                        <p class="text-base text-gray-900 break-words dark:text-gray-100">
-                            {{ $message->sender_name ?: 'Not specified' }}
-                        </p>
-                    </div>
-
-                    <!-- Reply To Email Card -->
-                    <div class="w-full p-4 transition-all rounded-lg bg-gray-50 dark:bg-neutral-700 hover:shadow-lg">
-                        <h3 class="mb-2 text-sm text-gray-500 dark:text-gray-300">Reply To Email</h3>
-                        <p class="text-base text-gray-900 break-words dark:text-gray-100">
-                            {{ $message->reply_to_email ?: 'Not specified' }}
-                        </p>
-                    </div>
 
                     <!-- Plain Text Version Card -->
                     <div

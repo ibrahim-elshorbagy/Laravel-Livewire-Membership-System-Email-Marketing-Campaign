@@ -13,23 +13,15 @@ class MessageForm extends Component
     use LivewireAlert;
 
     public $message_id;
-    public $message_title = '';
     public $email_subject = '';
     public $message_html = '';
     public $message_plain_text = '';
-    public $sender_name = '';
-    public $reply_to_email = '';
-    public $sending_status = 'PAUSE';
     public $showPreview = false;
 
     protected $rules = [
-        'message_title'      => 'required|string',
         'email_subject'       => 'required|string',
         'message_html'        => 'nullable|string',
         'message_plain_text'  => 'nullable|string',
-        'sender_name'         => 'nullable|string',
-        'reply_to_email'      => 'nullable|email',
-        'sending_status'      => 'in:RUN,PAUSE'
     ];
 
     public function mount($message = null)

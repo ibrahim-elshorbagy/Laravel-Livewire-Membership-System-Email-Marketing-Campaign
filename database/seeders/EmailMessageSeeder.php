@@ -16,7 +16,6 @@ class EmailMessageSeeder extends Seeder
     {
         EmailMessage::create([
             'user_id'          => 2,
-            'message_title'   => 'Summer Sale - Up to 50% Off!',
             'email_subject'    => "Don't Miss Out on Our Summer Sale!",
             'message_html'     => <<<'HTML'
 <!DOCTYPE html>
@@ -144,9 +143,7 @@ Awesome Store Team
 Awesome Store, 123 Market Street, City, Country
 Unsubscribe: https://awesomestore.com/unsubscribe
 TEXT,
-            'sender_name'      => 'Awesome Store',
-            'reply_to_email'   => 'marketing@awesomestore.com',
-            'sending_status'   => 'PAUSE',
+
         ]);
     }
 }

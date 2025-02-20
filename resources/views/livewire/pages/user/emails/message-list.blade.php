@@ -26,9 +26,7 @@
 
             <div class="flex flex-wrap gap-2">
                 <x-primary-select-input wire:model.live="sortField" class="w-full sm:w-40">
-                    <option value="message_title">Sort by Title</option>
                     <option value="created_at">Sort by Date</option>
-                    <option value="sending_status">Sort by Status</option>
                 </x-primary-select-input>
 
                 <x-primary-select-input wire:model.live="sortDirection" class="w-full sm:w-32">
@@ -65,9 +63,7 @@
                     <th scope="col" class="p-4">
                         <input type="checkbox" wire:model.live="selectPage" class="rounded">
                     </th>
-                    <th scope="col" class="p-4">Title</th>
                     <th scope="col" class="p-4">Subject</th>
-                    <th scope="col" class="p-4">Status</th>
                     <th scope="col" class="p-4">Created At</th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
@@ -79,22 +75,10 @@
                         <input type="checkbox" wire:model.live="selectedTemplates" value="{{ $message->id }}"
                             class="rounded">
                     </td>
-                    <td class="p-4">{{ $message->message_title }}</td>
                     <td class="p-4">{{ $message->email_subject }}</td>
-                    <td class="p-4">
-                        <span
-                            class="inline-flex px-2 py-1 text-xs rounded-full
-                            {{ $message->sending_status === 'RUN' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                            {{ $message->sending_status }}
-                        </span>
-                    </td>
                     <td class="p-4">{{ $message->created_at->format('d / m / Y') }}</td>
                     <td class="p-4">
                         <div class="flex space-x-2">
-                            <button wire:click="setActiveTemplate({{ $message->id }})"
-                                class="inline-flex items-center px-2 py-1 text-xs {{ $message->sending_status === 'RUN' ? 'text-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20' : 'text-green-500 bg-green-500/10 hover:bg-green-500/20' }} rounded-md">
-                                {{ $message->sending_status === 'RUN' ? 'Pause' : 'Run' }}
-                            </button>
 
                             <a href="{{ route('user.emails.message.show', $message->id) }}" wire:navigate
                                 class="inline-flex items-center px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-500/10 hover:bg-purple-500/20">

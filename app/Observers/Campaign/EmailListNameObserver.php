@@ -47,10 +47,10 @@ class EmailListNameObserver
 
             if ($remainingLists === 0 || !$campaign->servers()->exists()) {
                 $campaign->update(['is_active' => false]);
-                Log::info('Campaign deactivated due to email list deletion', [
-                    'campaign_id' => $campaign->id,
-                    'list_id' => $emailList->id
-                ]);
+                // Log::info('Campaign deactivated due to email list deletion', [
+                //     'campaign_id' => $campaign->id,
+                //     'list_id' => $emailList->id
+                // ]);
             }
         }
     }

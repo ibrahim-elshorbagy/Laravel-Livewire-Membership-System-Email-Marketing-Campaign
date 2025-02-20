@@ -42,9 +42,9 @@ class ServerObserver
             ->where('is_active', true)
             ->each(function($campaign) {
                 $campaign->update(['is_active' => false]);
-                Log::info('Campaign deactivated due to server deletion', [
-                    'campaign_id' => $campaign->id
-                ]);
+                // Log::info('Campaign deactivated due to server deletion', [
+                //     'campaign_id' => $campaign->id
+                // ]);
             });
     }
 

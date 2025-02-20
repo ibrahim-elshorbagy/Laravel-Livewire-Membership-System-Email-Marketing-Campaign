@@ -34,7 +34,7 @@ class MessageList extends Component
     {
         return [
             'search' => 'nullable|string|max:255',
-            'sortField' => ['required', Rule::in(['message_title', 'created_at', 'sending_status'])],
+            'sortField' => ['required', Rule::in(['created_at'])],
             'sortDirection' => ['required', Rule::in(['asc', 'desc'])],
             'perPage' => ['required', 'integer', Rule::in([10, 25, 50])],
             'selectedTemplates' => 'array',
@@ -71,36 +71,7 @@ class MessageList extends Component
         $this->validateOnly('selectedTemplates');
     }
 
-    // Method for setting active template
-    public function setActiveTemplate($templateId)
-    {
-        $this->templateId = $templateId;
-        $this->validate([
-            'templateId' => 'required|integer|exists:email_messages,id'
-        ]);
 
-        try {
-            $message = EmailMessage::findOrFail($this->templateId);
-
-            if ($message->user_id !== Auth::id()) {
-                throw new \Exception('Unauthorized access to template.');
-            }
-
-            $messagesCount = Auth::user()->emailMessages()->count();
-
-            if ($messagesCount === 1) {
-                $newStatus = $message->sending_status === 'RUN' ? 'PAUSE' : 'RUN';
-                $message->update(['sending_status' => $newStatus]);
-            } else {
-                Auth::user()->emailMessages()->update(['sending_status' => 'PAUSE']);
-                $message->update(['sending_status' => 'RUN']);
-            }
-
-            $this->alert('success', 'Template status updated successfully!', ['position' => 'bottom-end']);
-        } catch (\Exception $e) {
-            $this->alert('error', 'Failed to update template status: ' . $e->getMessage(), ['position' => 'bottom-end']);
-        }
-    }
 
     // Method for deleting template
     public function deleteTemplate($templateId)
@@ -159,8 +130,7 @@ class MessageList extends Component
         return EmailMessage::where('user_id', Auth::id())
             ->when($this->search, function ($query) {
                 $query->where(function($q) {
-                    $q->where('message_title', 'like', '%' . $this->search . '%')
-                      ->orWhere('email_subject', 'like', '%' . $this->search . '%');
+                    $q->where('email_subject', 'like', '%' . $this->search . '%');
                 });
             })
             ->orderBy($this->sortField, $this->sortDirection)

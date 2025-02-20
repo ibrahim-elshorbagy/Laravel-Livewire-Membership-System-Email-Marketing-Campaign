@@ -72,70 +72,90 @@ class ServerForm extends Component
     }
 
 
-public function saveServer()
-{
-    $validatedData = $this->validate();
+    public function saveServer()
+    {
+        $validatedData = $this->validate();
 
-    try {
-        DB::beginTransaction();
+        try {
+            DB::beginTransaction();
 
-        if ($this->server_id) {
-            $server = Server::findOrFail($this->server_id);
+            if ($this->server_id) {
+                $server = Server::findOrFail($this->server_id);
 
-            // If user assignment has changed
-            if ($this->previous_user_id !== $validatedData['assigned_to_user_id']) {
-                // Get all campaigns using this server for the previous user
-                $affectedCampaigns = Campaign::whereHas('servers', function($query) {
-                    $query->where('server_id', $this->server_id);
-                })
-                ->where('user_id', $this->previous_user_id)
-                ->where('is_active', true)
-                ->get();
+                // If user assignment has changed
+                if ($this->previous_user_id !== $validatedData['assigned_to_user_id']) {
+                    // Base query to get campaigns using this server
+                    $query = Campaign::whereHas('servers', function($query) {
+                        $query->where('server_id', $this->server_id);
+                    });
 
-                // Deactivate affected campaigns and remove server
-                foreach ($affectedCampaigns as $campaign) {
-                    // Deactivate campaign
-                    $campaign->update(['is_active' => false]);
+                    // If setting to null, get all active campaigns
+                    // If reassigning to another user, get only previous user's campaigns
+                    if ($validatedData['assigned_to_user_id'] !== null) {
+                        $query->where('user_id', $this->previous_user_id);
+                    }
 
-                    // Remove server from campaign
-                    $campaign->servers()->detach($this->server_id);
+                    $affectedCampaigns = $query->get();
 
-                    // Session::flash('info', 'Server has been removed from previous user\'s campaigns and campaigns have been deactivated.');
+                    // Deactivate affected campaigns and remove server
+                    foreach ($affectedCampaigns as $campaign) {
+                        $campaign->update(['is_active' => false]);
+                        $campaign->servers()->detach($this->server_id);
+                    }
+
+                    if ($affectedCampaigns->count() > 0) {
+                        Session::flash('info', 'Server has been removed from affected campaigns and they have been deactivated.');
+                    }
                 }
+
+                $server->update($validatedData);
+            } else {
+                Server::create($validatedData);
             }
 
-            $server->update($validatedData);
-        } else {
-            Server::create($validatedData);
+            DB::commit();
+            Session::flash('success', 'Server saved successfully.');
+            return $this->redirect(route('admin.servers'), navigate: true);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->alert('error', 'Failed to save server: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
-
-        DB::commit();
-        Session::flash('success', 'Server saved successfully.');
-        return $this->redirect(route('admin.servers'), navigate: true);
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        $this->alert('error', 'Failed to save server: ' . $e->getMessage(), ['position' => 'bottom-end']);
     }
-}
+
     public function updatedAssignedToUserId($value)
     {
         // If this is an edit and the user is being changed
         if ($this->server_id && $this->previous_user_id !== $value) {
-            // Get count of campaigns using this server for the previous user
-            $campaignCount = CampaignServer::whereHas('campaign', function($query) {
+            // Base query to get count of campaigns using this server
+            $query = Campaign::whereHas('servers', function($query) {
+                $query->where('server_id', $this->server_id);
+            });
+
+            // If setting to null, count all active campaigns
+            // If reassigning to another user, count only previous user's campaigns
+            if ($value !== null) {
                 $query->where('user_id', $this->previous_user_id);
-            })->where('server_id', $this->server_id)->count();
+            }
+
+            $campaignCount = $query->count();
 
             if ($campaignCount > 0) {
-                $this->alert('warning',
-                    "This server is currently used in  campaign by the previous user. " .
-                    "Changing the assignment will remove it from those campaigns.",
-                    ['position' => 'bottom-end', 'timeout' => 7000]
-                );
+                $message = $value === null
+                    ? "This server is currently used in active campaigns. Removing assignment will remove it from campaign."
+                    : "This server is currently used in active campaigns by the previous user. Changing the assignment will remove it from user campaign.";
+
+                $this->alert('warning', $message, [
+                    'position' => 'bottom-end',
+                    'timeout' => 7000
+                ]);
             }
         }
     }
+
+
+
+
     public function render()
     {
         return view('livewire.pages.admin.server.server-form', [
