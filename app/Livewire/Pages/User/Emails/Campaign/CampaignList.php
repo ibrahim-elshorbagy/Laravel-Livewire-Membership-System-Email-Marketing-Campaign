@@ -3,6 +3,8 @@
 namespace App\Livewire\Pages\User\Emails\Campaign;
 
 use App\Models\Campaign\Campaign;
+use App\Models\EmailListName;
+use App\Models\Server;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -49,20 +51,23 @@ class CampaignList extends Component
     {
         $campaign = Campaign::findOrFail($campaignId);
 
-        if (!$campaign->canBeActive()) {
-            $message = [];
+        // Only check when trying to activate
+        if (!$campaign->is_active) {
+            $messages = [];
             if ($campaign->servers()->count() === 0) {
-                $message[] = "No servers assigned";
+                $messages[] = "No servers assigned";
             }
             if ($campaign->emailLists()->count() === 0) {
-                $message[] = "No email lists assigned";
+                $messages[] = "No email lists assigned";
             }
 
-            $this->alert('error', 'Campaign cannot be activated: ' . implode(' and ', $message), [
-                'position' => 'bottom-end',
-                'timer' => 5000
-            ]);
-            return;
+            if (!empty($messages)) {
+                $this->alert('error', 'Campaign cannot be activated: ' . implode(' and ', $messages), [
+                    'position' => 'bottom-end',
+                    'timer' => 5000
+                ]);
+                return;
+            }
         }
 
         $campaign->update(['is_active' => !$campaign->is_active]);
@@ -72,7 +77,7 @@ class CampaignList extends Component
             ['position' => 'bottom-end']
         );
     }
-    
+
     public function getCampaignsProperty()
     {
         return Campaign::with(['message', 'servers', 'emailLists'])
