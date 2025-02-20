@@ -20,6 +20,7 @@ class Subscripers extends Component
     protected $paginationTheme = 'tailwind';
 
     public $searchAll = '';
+    public $searchActive = '';
     public $searchCanceled = '';
     public $searchSuppressed = '';
     public $searchExpired = '';
@@ -28,6 +29,7 @@ class Subscripers extends Component
 
     protected $queryString = [
         'searchAll' => ['except' => ''],
+        'searchActive' => ['except' => ''],
         'searchCanceled' => ['except' => ''],
         'searchSuppressed' => ['except' => ''],
         'searchExpired' => ['except' => ''],
@@ -35,6 +37,11 @@ class Subscripers extends Component
     ];
 
     public function updatingSearchAll()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSearchActive()
     {
         $this->resetPage();
     }
@@ -61,6 +68,21 @@ class Subscripers extends Component
     {
         return $this->baseQuery()
             ->when($this->searchAll, $this->searchCallback())
+            ->latest()
+            ->paginate($this->perPage);
+    }
+
+    #[Computed]
+    public function activeSubscriptions()
+    {
+        return $this->baseQuery('active')
+            ->whereNull('canceled_at')
+            ->whereNull('suppressed_at')
+            ->where(function($query) {
+                $query->whereNull('expired_at')
+                    ->orWhere('expired_at', '>', now());
+            })
+            ->when($this->searchActive, $this->searchCallback())
             ->latest()
             ->paginate($this->perPage);
     }
@@ -104,6 +126,12 @@ class Subscripers extends Component
             'canceled' => $query->whereNotNull('canceled_at'),
             'suppressed' => $query->whereNotNull('suppressed_at'),
             'expired' => $query->whereNotNull('expired_at'),
+            'active' => $query->whereNull('canceled_at')
+                            ->whereNull('suppressed_at')
+                            ->where(function($q) {
+                                $q->whereNull('expired_at')
+                                ->orWhere('expired_at', '>', now());
+                            }),
             default => $query
         };
     }
@@ -115,6 +143,7 @@ class Subscripers extends Component
                 'canceled' => 'searchCanceled',
                 'suppressed' => 'searchSuppressed',
                 'expired' => 'searchExpired',
+                'active' => 'searchActive',
                 default => 'searchAll',
             }};
 
@@ -150,6 +179,23 @@ class Subscripers extends Component
             auth()->login($user);
             return redirect()->route('dashboard');
         }
+    }
+
+    protected function getFeatureDetails($subscription, $featureName)
+    {
+        // Get feature from plan
+        $feature = $subscription->plan->features->where('name', $featureName)->first();
+
+        // Get remaining balance
+        $remaining = $subscription->subscriber->balance($featureName) ?? 0;
+
+        // Get total quota
+        $total = $feature?->pivot->charges;
+
+        return [
+            'remaining' => $remaining,
+            'total' => $total,
+        ];
     }
 
     public function render()

@@ -7,6 +7,9 @@
             <button x-on:click="selectedTab = 'all'"
                 :class="selectedTab === 'all' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">All</button>
+            <button x-on:click="selectedTab = 'active'"
+                        :class="selectedTab === 'active' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
+                        class="px-4 py-2 text-sm h-min" role="tab">Active</button>
             <button x-on:click="selectedTab = 'canceled'"
                 :class="selectedTab === 'canceled' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">Canceled</button>
@@ -25,6 +28,14 @@
             'search' => 'searchAll',
             'searchPlaceholder' => 'Search all subscriptions...'
             ])
+        </div>
+
+        <div x-show="selectedTab === 'active'">
+                @include('livewire.pages.admin.subscription.partials.table', [
+                'items' => $this->activeSubscriptions,
+                'search' => 'searchActive',
+                'searchPlaceholder' => 'Search active subscriptions...'
+                ])
         </div>
 
         <!-- Canceled Tab Content -->

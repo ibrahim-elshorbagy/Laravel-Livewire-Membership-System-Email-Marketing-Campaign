@@ -176,16 +176,18 @@
                 </h2>
             </div>
             <div class="flex gap-2 mt-4 md:mt-0 md:ml-4">
+                <div class="flex gap-2 mt-4 md:mt-0 md:ml-4">
                     @if(!$hasActiveJobsFlag)
-                        @if(!$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
+                        @if(!$emailLimit['show'] && $user->balance('Subscribers Limit') != 0 && !$this->lists->isEmpty())
                         <x-primary-info-button href="{{ route('user.emails.create') }}" wire:navigate>
                             Add New Emails
                         </x-primary-info-button>
                         @endif
                     @endif
-                <x-primary-create-button x-on:click="$dispatch('open-modal', 'create-list')">
-                    Create New List
-                </x-primary-create-button>
+                    <x-primary-create-button x-on:click="$dispatch('open-modal', 'create-list')">
+                        Create New List
+                    </x-primary-create-button>
+                </div>
             </div>
         </div>
 
@@ -253,7 +255,7 @@
                                                 class="ml-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            
+
                                             @if(!$hasActiveJobsFlag)
                                             <button type="button" wire:click="deleteList({{ $list->id }})"
                                                 wire:confirm="Are you sure you want to delete this list?"

@@ -32,6 +32,7 @@
                 <tr>
                     <th class="p-4">Subscriber</th>
                     <th class="p-4">Plan</th>
+                    <th class="p-4">Limits</th>
                     <th class="p-4">Start Date</th>
                     <th class="p-4">Expiration</th>
                     <th class="p-4 text-nowrap">Payment Status</th>
@@ -65,6 +66,46 @@
                         <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full text-nowrap">
                             {{ $subscription->plan->name }}
                         </span>
+                    </td>
+                    <td class="p-4 text-nowrap">
+                        <div class="flex flex-col gap-2 space-y-3">
+
+
+                            <!-- Subscribers Limit -->
+                            @php
+                            $subscribersLimit = $this->getFeatureDetails($subscription, 'Subscribers Limit');
+                            @endphp
+                                <div class="flex items-center justify-between gap-2 mb-1">
+                                    <span class="text-xs text-gray-600 dark:text-gray-400">Subscribers</span>
+                                    @if($subscription->suppressed_at)
+                                    <span class="text-xs text-yellow-600 dark:text-yellow-400">
+                                        Suppressed
+                                    </span>
+                                    @else
+                                    <span class="text-xs font-medium text-gray-900 dark:text-gray-200">
+                                        {{ $subscribersLimit['remaining'] }} / {{ $subscribersLimit['total'] }}
+                                    </span>
+                                    @endif
+                                </div>
+
+                            <!-- Email Sending Limit -->
+                            @php
+                            $emailLimit = $this->getFeatureDetails($subscription, 'Email Sending');
+                            @endphp
+                            <div class="flex items-center justify-between gap-2 mb-1">
+                                <span class="text-xs text-gray-600 dark:text-gray-400">Email Sending</span>
+                                @if($subscription->suppressed_at)
+                                <span class="text-xs text-yellow-600 dark:text-yellow-400">
+                                    Suppressed
+                                </span>
+                                @else
+                                <span class="text-xs font-medium text-gray-900 dark:text-gray-200">
+                                    {{ $emailLimit['remaining'] }} / {{ $emailLimit['total'] }}
+                                </span>
+                                @endif
+                            </div>
+
+                        </div>
                     </td>
                     <td class="p-4">{{ $subscription->started_at->format('d/m/Y') }}</td>
                     <td class="p-4">{{ $subscription->expired_at?->format('d/m/Y') }}</td>
