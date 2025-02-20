@@ -21,9 +21,10 @@ class EmailListSeeder extends Seeder
 
             // Create lists for the user
             $lists = [
-                'Marketing Campaigns' => 15000,
-                'Newsletter Subscribers' => 10000,
+                // 'Marketing Campaigns' => 15000,
+                // 'Newsletter Subscribers' => 10000,
                 'Customer Database' => 5000,
+                'Test' => 2000,
                 // 'Big Test' => 100000,
 
 

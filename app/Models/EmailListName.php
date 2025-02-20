@@ -2,9 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Campaign\Campaign;
+use App\Models\Campaign\CampaignEmailList;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use App\Observers\Campaign\EmailListNameObserver;
 
+#[ObservedBy([EmailListNameObserver::class])]
 class EmailListName extends Model
 {
     use HasFactory;
@@ -19,5 +24,16 @@ class EmailListName extends Model
     public function emails()
     {
         return $this->hasMany(EmailList::class, 'list_id');
+    }
+        public function campaigns()
+    {
+        return $this->hasManyThrough(
+            Campaign::class,
+            CampaignEmailList::class,
+            'email_list_id',
+            'id',
+            'id',
+            'campaign_id'
+        );
     }
 }

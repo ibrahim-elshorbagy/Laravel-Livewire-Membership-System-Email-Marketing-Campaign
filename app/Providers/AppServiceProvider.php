@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Campaign\CampaignEmailList;
+use App\Models\Campaign\CampaignServer;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;

@@ -55,7 +55,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ServerSeeder::class);
 
 
-        $this->call([EmailListSeeder::class]);
+        // $this->call([EmailListSeeder::class]);
 
     }
 }

@@ -40,7 +40,7 @@ class JobProgressComponent extends Component
         // If active jobs remain true, keep poll at 1s; otherwise slow it to 10s
         $this->pollInterval = $activeJobsExist ? 1000 : 10000;
 
-        Log::info('refreshProgress took '.(microtime(true) - $start).' seconds to complete.');
+        // Log::info('refreshProgress took '.(microtime(true) - $start).' seconds to complete.');
     }
 
     protected function checkActiveJobs()

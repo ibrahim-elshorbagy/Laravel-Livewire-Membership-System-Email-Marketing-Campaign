@@ -72,6 +72,9 @@
                 <x-nav-link :active="request()->routeIs('user.servers')" href="{{ route('user.servers') }}" wire:navigate>
                     <span>Servers</span>
                 </x-nav-link>
+                <x-nav-link :active="request()->routeIs('user.campaigns.list')" href="{{ route('user.campaigns.list') }}" wire:navigate>
+                    <span>Campaigns</span>
+                </x-nav-link>
                 <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}"
                     wire:navigate>
                     <span>Support</span>
@@ -179,6 +182,9 @@
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('user.servers')" href="{{ route('user.servers') }}" wire:navigate>
                             <span>Servers</span>
+                        </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.campaigns.list')" href="{{ route('user.campaigns.list') }}" wire:navigate>
+                            <span>Campaigns</span>
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}"
                             wire:navigate>
@@ -317,6 +323,8 @@
     @livewireScripts
     <script data-navigate-once src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <x-livewire-alert::scripts />
+
+
     @if (session('success'))
     <script>
         Swal.fire({
@@ -331,6 +339,22 @@
                     });
     </script>
     @endif
+
+    @if (session('info'))
+    <script>
+        Swal.fire({
+                    icon: 'info',
+                    title: 'Info!',
+                    text: '{{ session('info') }}',
+                    toast: true,
+                    position: 'bottom-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    // timerProgressBar: true,
+                });
+    </script>
+    @endif
+
 
     <script type="application/ld+json">
         {
