@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Add unique composite index
-            // $table->unique(['user_id', 'email']);
+            $table->unique(['user_id', 'list_id', 'email']);
 
             // Add indexes for better performance
             $table->index(['status', 'send_time']);

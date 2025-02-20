@@ -3,15 +3,17 @@
 namespace App\Livewire\Pages\User\Emails\Partials;
 
 use Livewire\Component;
-use Livewire\Attributes\Computed;
 use App\Models\JobProgress;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Computed;
 
 class JobProgressComponent extends Component
 {
     public $user;
-    // Set a default polling interval in milliseconds
-    public $pollInterval = 1000; // 1 second by default
+
+    // default in ms
+    public $pollInterval = 1000;
 
     public function mount()
     {
@@ -19,80 +21,54 @@ class JobProgressComponent extends Component
     }
 
     /**
-     * This method will be called via polling.
-     * It computes job progress, dispatch an event to update the parent,
-     * and adjusts the polling interval.
+     * Called via wire:poll
+     * We only dispatch an event if something actually changed,
+     * to avoid re-rendering the parent for no reason.
      */
-    public function updateJobProgress()
+    public function refreshProgress()
     {
-        $jobProgress = $this->JobProgress; // Computed property below
+        $start = microtime(true);
 
-        // Determine if there are any active jobs.
-        $activeJobsExist = $jobProgress['progress']->isNotEmpty() || $jobProgress['queueStatus'] > 0;
+        $activeJobsExist = $this->checkActiveJobs();
+        // If there's no change in job status, no need to dispatch anything
+        if ($activeJobsExist !== session('active_jobs_flag')) {
+            session(['active_jobs_flag' => $activeJobsExist]);
+            // Tell the parent if anything changed
+            $this->dispatch('jobStatusUpdated', $activeJobsExist);
+        }
 
-        // dispatch the status so that the parent can update its flag.
-        $this->dispatch('jobStatusUpdated', $activeJobsExist);
-
-        // Dynamically adjust polling interval: faster when active, slower when not.
+        // If active jobs remain true, keep poll at 1s; otherwise slow it to 10s
         $this->pollInterval = $activeJobsExist ? 1000 : 10000;
+
+        Log::info('refreshProgress took '.(microtime(true) - $start).' seconds to complete.');
     }
 
-    #[Computed()]
-    public function JobProgress()
+    protected function checkActiveJobs()
+    {
+        // Return TRUE if any are still “processing” or “pending”
+        $countProcessing = JobProgress::where('user_id', $this->user->id)
+            ->whereIn('status', ['processing', 'pending'])
+            ->count();
+
+        // Also check if user is in the queue
+        $queuePosition = $this->queueStatus();
+
+        return ($countProcessing > 0 || $queuePosition > 0);
+    }
+
+    #[Computed]
+    public function progressData()
     {
         return [
-            'progress'    => JobProgress::where('user_id', $this->user->id)
-                                ->whereIn('status', ['processing', 'pending'])
-                                ->orderBy('created_at', 'desc')
-                                ->get(),
-            'emailLimit'  => $this->checkEmailLimit(),
-            'queueStatus' => $this->QueueStatus()
+            'progress' => JobProgress::where('user_id', $this->user->id)
+                ->whereIn('status', ['processing', 'pending'])
+                ->orderBy('created_at', 'desc')
+                ->get(),
+            'queueStatus' => $this->queueStatus(),
         ];
     }
 
-    protected function checkEmailLimit()
-    {
-        try {
-            $subscription = $this->user->subscription;
-            if (!$subscription || !$subscription->plan) {
-                return ['show' => false];
-            }
-
-            $emailFeature = $subscription->plan->features()
-                ->where('name', 'Subscribers Limit')
-                ->first();
-
-            if (!$emailFeature) {
-                return ['show' => false];
-            }
-
-            $allowedEmails = (int)$emailFeature->pivot->charges;
-            $currentEmails = $this->totalEmails; // In the Parent Component
-
-            if ($currentEmails > $allowedEmails) {
-                return [
-                    'show'    => true,
-                    'excess'  => $currentEmails - $allowedEmails,
-                    'allowed' => $allowedEmails,
-                    'current' => $currentEmails
-                ];
-            }
-
-            return [
-                'show'    => false,
-                'allowed' => $allowedEmails,
-                'current' => $currentEmails
-            ];
-        } catch (\Exception $e) {
-            return [
-                'show'    => false,
-                'error'   => true,
-                'message' => 'Unable to check email limit'
-            ];
-        }
-    }
-
-    public function QueueStatus()
+    public function queueStatus()
     {
         $allJobs = DB::table('jobs')
             ->where('queue', 'high')
@@ -100,24 +76,23 @@ class JobProgressComponent extends Component
             ->get();
 
         foreach ($allJobs as $index => $job) {
-            // Check if this job belongs to the current user
             if (
-                str_contains($job->payload, '"userId":' . $this->user->id) ||
-                str_contains($job->payload, '"user_id":' . $this->user->id) ||
-                str_contains($job->payload, 'i:' . $this->user->id . ';')
+                str_contains($job->payload, '"userId":'.$this->user->id) ||
+                str_contains($job->payload, '"user_id":'.$this->user->id) ||
+                str_contains($job->payload, 'i:'.$this->user->id.';')
             ) {
-                // Return position (1-based index)
-                return $index + 1;
+                return $index + 1; // 1-based
             }
         }
 
-        return 0; // Return 0 if no jobs found for user
+        return 0;
     }
 
     public function render()
     {
         return view('livewire.pages.user.emails.partials.job-progress-component', [
-            'pollInterval' => $this->pollInterval
+            'progressData'  => $this->progressData,
+            'pollInterval'  => $this->pollInterval,
         ]);
     }
 }

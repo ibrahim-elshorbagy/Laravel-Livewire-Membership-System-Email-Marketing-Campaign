@@ -13,7 +13,7 @@ class EmailListSeeder extends Seeder
     public function run()
     {
         // Create test users
-        $users = User::factory(2)->create();
+        $users = User::factory(1)->create();
 
         foreach ($users as $user) {
             $user->assignRole('user');
@@ -24,7 +24,7 @@ class EmailListSeeder extends Seeder
                 'Marketing Campaigns' => 15000,
                 'Newsletter Subscribers' => 10000,
                 'Customer Database' => 5000,
-                'Big Test' => 100000,
+                // 'Big Test' => 100000,
 
 
             ];

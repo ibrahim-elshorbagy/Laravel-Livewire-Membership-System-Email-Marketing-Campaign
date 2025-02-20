@@ -2,7 +2,7 @@
     x-data="{
         emailInput: '',
         parsedEmails: [],
-        allEmails: [],
+        allEmails: [], // New property to store all emails
         processing: false,
         error: null,
         maxDisplayEmails: 1500,
@@ -23,15 +23,15 @@
                     value: email.trim(),
                     valid: this.validateEmail(email.trim())
                 }))
-                .filter(entry => entry.value.length > 0);
+                .filter(entry => entry.value.length > 0)
+                .reduce((acc, entry) => {
 
-            // Only deduplicate if allow_duplicates is false
-            if (!$wire.allow_duplicates) {
-                emails = emails.reduce((acc, entry) => {
+
+
                     if (!acc.some(e => e.value === entry.value)) acc.push(entry);
                     return acc;
                 }, []);
-            }
+
 
             this.totalEmails = emails.length;
             this.allEmails = emails; // Store all emails
@@ -63,10 +63,7 @@
                 });
             }
         }
-    }"
-
-    x-effect="parseEmails()">
-
+    }" x-effect="parseEmails()">
     <!-- Header Section -->
     <div class="mb-6 md:flex md:items-center md:justify-between">
         <div class="flex-1 min-w-0">
@@ -155,13 +152,7 @@
             <x-input-error :messages="$errors->get('list_id')" class="mt-2" />
         </div>
 
-        <div class="flex items-center">
-            <input type="checkbox" wire:model="allow_duplicates" id="allow_duplicates"
-                class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900">
-            <label for="allow_duplicates" class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                Allow Duplicate Emails
-            </label>
-        </div>
+
     </div>
 
     <!-- File Import Section -->

@@ -7,15 +7,6 @@
                 Mailing list
             </h2>
         </div>
-        <div class="flex mt-4 md:mt-0 md:ml-4">
-            @if(!$hasActiveJobsFlag)
-            @if(!$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
-            <x-primary-info-button href="{{ route('user.emails.create') }}" wire:navigate>
-                Add New Emails
-            </x-primary-info-button>
-            @endif
-            @endif
-        </div>
     </div>
 
     @if($emailLimit['show'])
@@ -87,13 +78,12 @@
         <div class="flex flex-wrap gap-2">
             @if(!$hasActiveJobsFlag)
             <!-- Per Page Actions -->
+            @if(count($selectedEmails) > 0)
             <div class="w-full mb-2">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span class="font-medium text-gray-700 text-md dark:text-gray-300">
                     Current Page Actions:
                 </span>
             </div>
-
-            @if(count($selectedEmails) > 0)
             <x-primary-button wire:click="clearStatus('FAIL')"
                 class="bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600"
                 wire:confirm="Are you sure you want to clear failed status for selected emails?">
@@ -119,9 +109,8 @@
             @endif
 
             <!-- Global Actions -->
-            <div class="w-full h-px my-2 bg-gray-200 dark:bg-gray-700"></div>
             <div class="w-full">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span class="font-medium text-gray-700 text-md dark:text-gray-300">
                     Global Actions:
                 </span>
             </div>
@@ -149,6 +138,10 @@
                 class="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600">
                 Delete All Emails
             </x-primary-danger-button>
+
+            <div class="w-full p-4 text-yellow-700 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-md dark:text-neutral-300">
+                - Any Action Will Affect The Selected List Only
+            </div>
             @else
             <div class="w-full p-4 text-yellow-800 bg-yellow-100 rounded-lg dark:bg-yellow-900 dark:text-yellow-300">
                 <p class="font-medium">Actions Disabled</p>
@@ -157,9 +150,7 @@
             @endif
         </div>
 
-        <div class="p-4 text-yellow-700 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-md dark:text-neutral-300">
-                - Any Action Will Affect The Selected List Only
-        </div>
+
     </div>
 
     <div class="p-3 my-4 bg-blue-100 rounded-lg dark:bg-blue-900">
@@ -184,7 +175,14 @@
                     Mailing Lists
                 </h2>
             </div>
-            <div class="flex mt-4 md:mt-0 md:ml-4">
+            <div class="flex gap-2 mt-4 md:mt-0 md:ml-4">
+                    @if(!$hasActiveJobsFlag)
+                        @if(!$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
+                        <x-primary-info-button href="{{ route('user.emails.create') }}" wire:navigate>
+                            Add New Emails
+                        </x-primary-info-button>
+                        @endif
+                    @endif
                 <x-primary-create-button x-on:click="$dispatch('open-modal', 'create-list')">
                     Create New List
                 </x-primary-create-button>
@@ -352,7 +350,7 @@
                                 No emails found in this list.
                                 @if(!$hasActiveJobsFlag && !$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
                                     <div class="mt-2">
-                                        <x-primary-info-button href="{{ route('user.emails.create') }}" wire:navigate>
+                                        <x-primary-info-button href="{{ route('user.emails.create', ['list_id' => $selectedList]) }}" wire:navigate>
                                             Add New Emails
                                         </x-primary-info-button>
                                     </div>
@@ -364,9 +362,34 @@
                     <div wire:loading.class.remove="hidden" wire:loading.class='flex' wire:target="selectList"  class="items-center justify-center hidden p-4">
                         <div class="w-8 h-8 border-4 border-blue-500 rounded-full animate-spin border-t-transparent"></div>
                     </div>
-                @else
-                    <div class="p-4 text-center text-gray-500">
-                        Please select a list to view emails
+                    @else
+                    <div class="p-8 text-center">
+                        @if($this->lists->isEmpty())
+                        <!-- No lists exist -->
+                        <div class="flex flex-col items-center gap-4">
+                            <div class="p-4 text-neutral-600 dark:text-neutral-400">
+                                <i class="mb-2 text-4xl fas fa-list-ul"></i>
+                                <h3 class="mt-2 text-lg font-medium">No Mailing Lists Found</h3>
+                                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-500">
+                                    Create your first mailing list to start managing your emails
+                                </p>
+                            </div>
+                            <x-primary-create-button x-on:click="$dispatch('open-modal', 'create-list')" class="mt-2">
+                                <i class="mr-2 fas fa-plus"></i> Create Your First List
+                            </x-primary-create-button>
+                        </div>
+                        @else
+                        <!-- Lists exist but none selected -->
+                        <div class="flex flex-col items-center gap-4">
+                            <div class="p-4 text-neutral-600 dark:text-neutral-400">
+                                <i class="mb-2 text-4xl fas fa-hand-point-up"></i>
+                                <h3 class="mt-2 text-lg font-medium">Select a List</h3>
+                                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-500">
+                                    Please select a list from above to view and manage your emails
+                                </p>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 @endif
 

@@ -111,7 +111,7 @@ class EmailMessageSeeder extends Seeder
       <p>Dear Valued Customer,</p>
       <p>We're excited to announce our biggest summer sale ever! Enjoy discounts up to <strong>50% off</strong> on selected items. Whether you're shopping for trendy apparel, accessories, or home decor, we've got incredible deals waiting for you.</p>
       <div class="cta">
-        <a href="https://awesomestore.com/sale">Shop Now</a>
+        <a>Shop Now</a>
       </div>
       <p>Hurry—this exclusive sale lasts until the end of August. Don’t miss your chance to grab these amazing deals!</p>
       <p>Thank you for being a loyal customer.</p>

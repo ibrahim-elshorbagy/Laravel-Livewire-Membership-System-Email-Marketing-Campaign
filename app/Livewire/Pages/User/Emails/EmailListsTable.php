@@ -124,7 +124,21 @@ class EmailListsTable extends Component
 
     public function updateJobStatus($status)
     {
+        // Micro-debug to see how long it takes
+        $start = microtime(true);
+
+        // Only update & re-render if the status actually changed
+        if ($this->hasActiveJobsFlag === $status) {
+            $this->skipRender(); // <— prevents re-running queries
+            // Log::info('No change to hasActiveJobsFlag, skipping render.');
+            return;
+        }
+
+        // Otherwise, update as normal
         $this->hasActiveJobsFlag = $status;
+
+        $elapsed = microtime(true) - $start;
+        // Log::info('updateJobStatus changed flag to '.($status ? 'true' : 'false').', took '.$elapsed.' seconds');
     }
 
     public function updatingSearch()

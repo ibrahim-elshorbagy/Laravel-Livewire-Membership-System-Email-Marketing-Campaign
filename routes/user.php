@@ -5,6 +5,7 @@ use App\Livewire\Pages\User\Emails\MessageForm;
 use App\Livewire\Pages\User\Emails\MessageList;
 use App\Livewire\Pages\User\Emails\CreateEmailList;
 use App\Livewire\Pages\User\Emails\EmailListsTable;
+use App\Livewire\Pages\User\Emails\Partials\ShowMessage;
 use App\Livewire\Pages\User\Server\ServerList;
 use App\Livewire\Pages\User\Subscription\MySubscription;
 use App\Livewire\Pages\User\Subscription\Subscribe;
@@ -30,6 +31,8 @@ Route::middleware(['auth','role:user'])->group(function () {
     Route::get('/email-messages', MessageList::class)->name('user.email-messages');
     Route::get('/emails', EmailListsTable::class)->name('user.emails.index');
     Route::get('/emails/create', CreateEmailList::class)->name('user.emails.create');
+    Route::get('/email-messages/{message}/show', ShowMessage::class)->name('user.emails.message.show');
+
 
     Route::get('/support', Support::class)->name('user.support');
 

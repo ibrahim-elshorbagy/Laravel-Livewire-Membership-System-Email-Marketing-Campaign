@@ -1,26 +1,14 @@
-<div wire:poll.{{ $pollInterval }}ms="updateJobProgress">
-    @if($this->JobProgress['queueStatus'] > 1)
+<div wire:poll.{{ $pollInterval }}ms="refreshProgress">
+    @if($this->progressData['queueStatus'] > 1)
     <div class="p-4 mb-6 border border-blue-200 rounded-lg bg-blue-50 dark:bg-blue-900 dark:border-blue-800">
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
-                <i class="text-blue-600 fas fa-spinner fa-spin dark:text-blue-400"></i>
-            </div>
-            <div class="ml-3">
-                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
-                    <i class="mr-1 fas fa-clock"></i> Jobs in Queue
-                </h3>
-                <div class="mt-1 text-sm text-blue-700 dark:text-blue-300">
-                    <i class="mr-1 fas fa-info-circle"></i>
-                    Your task is in queue position {{ $this->JobProgress['queueStatus'] }}. It will start automatically
-                    when resources are available.
-                </div>
-            </div>
-        </div>
+        <!-- Show queue message -->
+        <p>Your task is in queue position {{ $progressData['queueStatus'] }}...</p>
     </div>
     @endif
-    @if($this->JobProgress['progress']->isNotEmpty())
+
+    @if($this->progressData['progress']->isNotEmpty())
     <div class="mb-6 space-y-4">
-        @foreach($this->JobProgress['progress'] as $progress)
+        @foreach($this->progressData['progress'] as $progress)
         <div class="p-4 bg-white rounded-lg shadow dark:bg-gray-800">
             <div class="flex items-center justify-between mb-1">
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300">

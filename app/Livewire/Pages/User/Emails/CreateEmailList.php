@@ -26,7 +26,6 @@ class CreateEmailList extends Component
     protected $listeners = ['refreshComponent' => '$refresh'];
 
     public $list_id = null;
-    public $allow_duplicates = false;
     public $emailLists;
 
 
@@ -46,6 +45,15 @@ class CreateEmailList extends Component
         $this->remainingQuota = $this->user->balance('Subscribers Limit');
 
         $this->emailLists = EmailListName::where('user_id', $this->user->id)->get();
+
+        $listId = request()->validate([
+            'list_id' => 'nullable|integer|exists:email_list_names,id'
+        ])['list_id'] ?? null;
+
+        if ($listId) {
+
+                $this->list_id = $listId;
+            }
 
         if ($this->remainingQuota == 0 || $this->hasActiveJobs()) {
             return redirect()->route('welcome');
@@ -78,7 +86,6 @@ class CreateEmailList extends Component
                 $this->user->id,
                 $this->remainingQuota,
                 $this->list_id,
-                $this->allow_duplicates
             );
 
 
@@ -113,7 +120,7 @@ class CreateEmailList extends Component
             }
 
             DB::transaction(function() use ($emails) {
-                $records = collect($emails)->map(fn($email) => [
+                $batch = collect($emails)->map(fn($email) => [
                     'user_id' => $this->user->id,
                     'list_id' => $this->list_id,
                     'email' => $email,
@@ -121,25 +128,10 @@ class CreateEmailList extends Component
                     'updated_at' => now()
                 ])->toArray();
 
-                if (!$this->allow_duplicates) {
-                    // Check for existing emails in this list
-                    $existingEmails = EmailList::where('user_id', $this->user->id)
-                        ->where('list_id', $this->list_id)
-                        ->whereIn('email', $emails)
-                        ->pluck('email')
-                        ->toArray();
+                DB::table('email_lists')->insertOrIgnore($batch);
 
-                    // Filter out existing emails
-                    $records = array_filter($records, function($record) use ($existingEmails) {
-                        return !in_array($record['email'], $existingEmails);
-                    });
-                }
-
-                if (!empty($records)) {
-                    EmailList::insert($records);
-                    $totalEmailCount = EmailList::where('user_id', $this->user->id)->count();
-                    $this->user->setConsumedQuota('Subscribers Limit', (float) $totalEmailCount);
-                }
+                $totalEmailCount = EmailList::where('user_id', $this->user->id)->count();
+                $this->user->setConsumedQuota('Subscribers Limit', (float) $totalEmailCount);
             });
 
             Session::flash('success', 'Emails saved successfully.');

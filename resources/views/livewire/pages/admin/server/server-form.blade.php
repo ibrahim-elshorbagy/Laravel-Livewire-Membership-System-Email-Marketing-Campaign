@@ -5,8 +5,7 @@
             {{ $server_id ? 'Edit Server' : 'New Server' }}
         </h2>
         <div class="mt-4 md:mt-0">
-            <x-primary-info-button href="{{ route('admin.servers') }}" wire:navigate
-                class="inline-flex flex-col items-center px-2 py-1 text-xs font-semibold tracking-widest text-white transition duration-150 ease-in-out border rounded-md cursor-pointer md:px-4 md:py-2 text-nowrap bg-sky-600 dark:bg-sky-900 group border-sky-300 dark:border-sky-700 dark:text-sky-300 hover:bg-sky-700 dark:hover:bg-sky-100 focus:bg-sky-700 dark:focus:bg-sky-100 active:bg-sky-900 dark:active:bg-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-sky-800">
+            <x-primary-info-button href="{{ route('admin.servers') }}" wire:navigate>
                 Back To Servers
             </x-primary-info-button>
         </div>

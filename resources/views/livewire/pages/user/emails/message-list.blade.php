@@ -96,6 +96,11 @@
                                 {{ $message->sending_status === 'RUN' ? 'Pause' : 'Run' }}
                             </button>
 
+                            <a href="{{ route('user.emails.message.show', $message->id) }}" wire:navigate
+                                class="inline-flex items-center px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-500/10 hover:bg-purple-500/20">
+                                View
+                            </a>
+
                             <a href="{{ route('user.emails.message.form', $message->id) }}"
                                 class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
                                 Edit
