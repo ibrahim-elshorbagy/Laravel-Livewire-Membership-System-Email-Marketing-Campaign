@@ -4,6 +4,7 @@ namespace App\Livewire\Pages\Admin\Server;
 
 use App\Models\Server;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -72,10 +73,18 @@ class ServerList extends Component
         ]);
 
         try {
-            Server::whereIn('id', $this->selectedServers)->delete();
+            // Get all selected servers
+            $servers = Server::whereIn('id', $this->selectedServers)->get();
+
+            foreach($servers as $server) {
+                // This will trigger the observer and handle campaign deactivation
+                $server->delete();
+            }
+
             $this->selectedServers = [];
             $this->selectPage = false;
             $this->alert('success', 'Selected servers deleted successfully!', ['position' => 'bottom-end']);
+
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to delete servers: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }

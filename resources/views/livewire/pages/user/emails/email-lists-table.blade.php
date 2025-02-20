@@ -253,11 +253,14 @@
                                                 class="ml-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
                                                 <i class="fas fa-edit"></i>
                                             </button>
+                                            
+                                            @if(!$hasActiveJobsFlag)
                                             <button type="button" wire:click="deleteList({{ $list->id }})"
                                                 wire:confirm="Are you sure you want to delete this list?"
                                                 class="ml-2 text-neutral-400 hover:text-red-600 dark:hover:text-red-500">
                                                 <i class="fas fa-trash"></i>
                                             </button>
+                                            @endif
                                         </div>
                                     </div>
                                     @endforeach

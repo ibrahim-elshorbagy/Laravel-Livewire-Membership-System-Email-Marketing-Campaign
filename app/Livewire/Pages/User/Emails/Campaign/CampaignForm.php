@@ -8,6 +8,7 @@ use App\Models\EmailListName;
 use App\Models\Server;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
@@ -117,7 +118,8 @@ class CampaignForm extends Component
 
             DB::commit();
 
-            $this->alert('success', 'Campaign saved successfully!', ['position' => 'bottom-end']);
+            Session::flash('success', 'Campaign saved successfully.');
+
             return redirect()->route('user.campaigns.list');
 
         } catch (\Exception $e) {
