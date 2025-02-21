@@ -8,6 +8,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\EmailList;
 use App\Models\EmailListName;
+use App\Models\JobProgress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -97,7 +98,7 @@ class EmailListsTable extends Component
 
 
 
-    
+
 
     public function mount()
     {
@@ -115,6 +116,16 @@ class EmailListsTable extends Component
         $this->emailLimit = $this->checkEmailLimit();
         session(['cached_user' => $this->user]);
 
+        $countProcessing = DB::table('jobs')
+            ->where('queue', 'high')
+            ->where(function ($query) {
+                $query->whereRaw("payload LIKE '%\"userId\":{$this->user->id}%'")
+                    ->orWhereRaw("payload LIKE '%\"user_id\":{$this->user->id}%'")
+                    ->orWhereRaw("payload LIKE '%i:{$this->user->id};%'");
+            })
+            ->count();
+
+        $this->hasActiveJobsFlag = $countProcessing > 0 ? true : false ;
     }
 
 
@@ -176,7 +187,24 @@ class EmailListsTable extends Component
 
 
 
+    public function updateJobStatus($status)
+    {
+        // Micro-debug to see how long it takes
+        $start = microtime(true);
 
+        // Only update & re-render if the status actually changed
+        if ($this->hasActiveJobsFlag === $status) {
+            $this->skipRender(); // <— prevents re-running queries
+            // Log::info('No change to hasActiveJobsFlag, skipping render.');
+            return;
+        }
+
+        // Otherwise, update as normal
+        $this->hasActiveJobsFlag = $status;
+
+        $elapsed = microtime(true) - $start;
+        // Log::info('updateJobStatus changed flag to '.($status ? 'true' : 'false').', took '.$elapsed.' seconds');
+    }
 
 
 
@@ -216,30 +244,41 @@ class EmailListsTable extends Component
 
 
 
-    public function deleteEmails($type = 'selected')
+    public function deleteEmails($type = 'selected', $emailId = null)
     {
-        // Validation checks
-        if ($type === 'selected' && empty($this->selectedEmails)) {
-            $this->alert('error', 'Please select emails to delete!', ['position' => 'bottom-end']);
-            return;
-        }
 
-        if ($type === 'all' && !$this->selectedList) {
-            $this->alert('error', 'Please select a list first!', ['position' => 'bottom-end']);
-            return;
-        }
+        // Handle single email deletion
+        if (is_numeric($type)) {
+                $emailId = $type;
+                $type = 'single';
+            }
 
         try {
-            DB::transaction(function () use ($type) {
+            DB::transaction(function () use ($type, $emailId) {
                 // Build the query based on deletion type
                 $query = EmailList::where('user_id', $this->user->id);
 
-                if ($type === 'selected') {
-                    // Delete only selected emails
-                    $query->whereIn('id', $this->selectedEmails);
-                } else {
-                    // Delete all emails in current list
-                    $query->where('list_id', $this->selectedList);
+                switch ($type) {
+                    case 'single':
+                        // Delete single email
+                        $query->where('id', $emailId);
+                        break;
+
+                    case 'selected':
+                        if (empty($this->selectedEmails)) {
+                            $this->alert('error', 'Please select emails to delete!', ['position' => 'bottom-end']);
+                            return;
+                        }
+                        $query->whereIn('id', $this->selectedEmails);
+                        break;
+
+                    case 'all':
+                        if (!$this->selectedList) {
+                            $this->alert('error', 'Please select a list first!', ['position' => 'bottom-end']);
+                            return;
+                        }
+                        $query->where('list_id', $this->selectedList);
+                        break;
                 }
 
                 $count = $query->count();
@@ -266,12 +305,14 @@ class EmailListsTable extends Component
                         EmailList::where('user_id', $this->user->id)->count()
                     );
 
-                    $this->alert('success',
-                        $type === 'selected'
-                            ? "{$count} selected emails deleted successfully!"
-                            : "All emails in list deleted successfully!",
-                        ['position' => 'bottom-end']
-                    );
+                    // Success message based on deletion type
+                    $message = match($type) {
+                        'single' => 'Email deleted successfully!',
+                        'selected' => "{$count} selected emails deleted successfully!",
+                        'all' => "All emails in list deleted successfully!",
+                    };
+
+                    $this->alert('success', $message, ['position' => 'bottom-end']);
                 }
 
                 // Cleanup

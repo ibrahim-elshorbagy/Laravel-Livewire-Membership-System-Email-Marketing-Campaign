@@ -27,7 +27,7 @@ class JobProgressComponent extends Component
      */
     public function refreshProgress()
     {
-        $start = microtime(true);
+        // $start = microtime(true);
 
         $activeJobsExist = $this->checkActiveJobs();
         // If there's no change in job status, no need to dispatch anything
@@ -70,24 +70,17 @@ class JobProgressComponent extends Component
 
     public function queueStatus()
     {
-        $allJobs = DB::table('jobs')
+        $countProcessing = DB::table('jobs')
             ->where('queue', 'high')
-            ->orderBy('id', 'asc')
-            ->get();
+            ->where(function ($query) {
+                $query->whereRaw("payload LIKE '%\"userId\":{$this->user->id}%'")
+                    ->orWhereRaw("payload LIKE '%\"user_id\":{$this->user->id}%'")
+                    ->orWhereRaw("payload LIKE '%i:{$this->user->id};%'");
+            })
+            ->count();
 
-        foreach ($allJobs as $index => $job) {
-            if (
-                str_contains($job->payload, '"userId":'.$this->user->id) ||
-                str_contains($job->payload, '"user_id":'.$this->user->id) ||
-                str_contains($job->payload, 'i:'.$this->user->id.';')
-            ) {
-                return $index + 1; // 1-based
-            }
-        }
-
-        return 0;
+        return $countProcessing > 0 ? $countProcessing : 0;
     }
-
     public function render()
     {
         return view('livewire.pages.user.emails.partials.job-progress-component', [
