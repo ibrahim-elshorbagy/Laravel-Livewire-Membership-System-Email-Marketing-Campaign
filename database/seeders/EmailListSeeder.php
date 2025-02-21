@@ -23,9 +23,9 @@ class EmailListSeeder extends Seeder
             $lists = [
                 // 'Marketing Campaigns' => 15000,
                 // 'Newsletter Subscribers' => 10000,
-                'Customer Database' => 5000,
-                'Test' => 2000,
-                // 'Big Test' => 100000,
+                'Customer Database' => 2,
+                'Test' => 5,
+                'Big Test' => 4,
 
 
             ];
@@ -37,45 +37,15 @@ class EmailListSeeder extends Seeder
                 ]);
 
                 // Distribution of email statuses
-                $failedCount = (int)($emailCount * 0.3); // 30% failed
-                $sentCount = (int)($emailCount * 0.4);   // 40% sent
-                $nullCount = (int)($emailCount * 0.2);   // 20% null
-                $randomCount = $emailCount - ($failedCount + $sentCount + $nullCount); // remaining random
 
                 // Failed emails
                 EmailList::factory()
-                    ->failed()
-                    ->count($failedCount)
+                    ->count($emailCount)
                     ->create([
                         'user_id' => $user->id,
                         'list_id' => $list->id
                     ]);
 
-                // Sent emails
-                EmailList::factory()
-                    ->sent()
-                    ->count($sentCount)
-                    ->create([
-                        'user_id' => $user->id,
-                        'list_id' => $list->id
-                    ]);
-
-                // Null status emails
-                EmailList::factory()
-                    ->nullStatus()
-                    ->count($nullCount)
-                    ->create([
-                        'user_id' => $user->id,
-                        'list_id' => $list->id
-                    ]);
-
-                // Random status emails
-                EmailList::factory()
-                    ->count($randomCount)
-                    ->create([
-                        'user_id' => $user->id,
-                        'list_id' => $list->id
-                    ]);
             }
         }
     }

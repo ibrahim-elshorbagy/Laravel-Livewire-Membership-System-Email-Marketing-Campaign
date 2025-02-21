@@ -14,10 +14,4 @@ class EmailList extends Model
         return $this->belongsTo(User::class);
     }
 
-
-
-    protected $casts = [
-        'send_time' => 'datetime',
-    ];
-
 }

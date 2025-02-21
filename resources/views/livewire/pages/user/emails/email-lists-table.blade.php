@@ -40,19 +40,6 @@
 
             <!-- Filters -->
             <div class="flex flex-wrap gap-2">
-                <x-primary-select-input wire:model.live="statusFilter" class="w-full sm:w-32">
-                    <option value="all">All Status</option>
-                    <option value="FAIL">Failed</option>
-                    <option value="SENT">Sent</option>
-                    <option value="NULL">Empty</option>
-                </x-primary-select-input>
-
-                <x-primary-select-input wire:model.live="sortField" class="w-full sm:w-40">
-                    <option value="email">Sort by Email</option>
-                    <option value="status">Sort by Status</option>
-                    <option value="send_time">Sort by Send Time</option>
-                    <option value="sender_email">Sort by Sender</option>
-                </x-primary-select-input>
 
                 <x-primary-select-input wire:model.live="sortDirection" class="w-full sm:w-32">
                     <option value="asc">Ascending</option>
@@ -71,96 +58,13 @@
 
 
 
-    <!-- Action Buttons -->
-    <div class="flex flex-col gap-4 mb-6">
 
-
-        <div class="flex flex-wrap gap-2">
-            @if(!$hasActiveJobsFlag)
-            <!-- Per Page Actions -->
-            @if(count($selectedEmails) > 0)
-            <div class="w-full mb-2">
-                <span class="font-medium text-gray-700 text-md dark:text-gray-300">
-                    Current Page Actions:
-                </span>
-            </div>
-            <x-primary-button wire:click="clearStatus('FAIL')"
-                class="bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600"
-                wire:confirm="Are you sure you want to clear failed status for selected emails?">
-                Clear Failed Status ({{ count($selectedEmails) }})
-            </x-primary-button>
-
-            <x-primary-button wire:click="clearStatus('SENT')"
-                class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
-                wire:confirm="Are you sure you want to clear sent status for selected emails?">
-                Clear Sent Status ({{ count($selectedEmails) }})
-            </x-primary-button>
-
-            <x-primary-button wire:click="clearAllStatus"
-                class="bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600"
-                wire:confirm="Are you sure you want to clear all status for selected emails?">
-                Clear All Status ({{ count($selectedEmails) }})
-            </x-primary-button>
-
-            <x-primary-danger-button wire:click="bulkDelete"
-                wire:confirm="Are you sure you want to delete these selected emails?">
-                Delete Selected ({{ count($selectedEmails) }})
-            </x-primary-danger-button>
-            @endif
-
-            <!-- Global Actions -->
-            <div class="w-full">
-                <span class="font-medium text-gray-700 text-md dark:text-gray-300">
-                    Global Actions:
-                </span>
-            </div>
-
-            <x-primary-button wire:click="clearAllFailedStatus"
-                class="bg-yellow-600 hover:bg-yellow-700 dark:bg-yellow-700 dark:hover:bg-yellow-600"
-                wire:confirm="Are you sure you want to clear ALL failed status emails?">
-                Clear All Failed Status
-            </x-primary-button>
-
-            <x-primary-button wire:click="clearAllSentStatus"
-                class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600"
-                wire:confirm="Are you sure you want to clear ALL sent status emails?">
-                Clear All Sent Status
-            </x-primary-button>
-
-            <x-primary-button wire:click="clearAllEmailsStatus"
-                class="bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600"
-                wire:confirm="Are you sure you want to clear ALL email statuses?">
-                Clear All Statuses
-            </x-primary-button>
-
-            <x-primary-danger-button wire:click="deleteAllEmails"
-                wire:confirm="WARNING: This will delete ALL your emails. This action cannot be undone. Are you sure?"
-                class="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600">
-                Delete All Emails
-            </x-primary-danger-button>
-
-            <div class="w-full p-4 text-yellow-700 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 text-md dark:text-neutral-300">
-                - Any Action Will Affect The Selected List Only
-            </div>
-            @else
-            <div class="w-full p-4 text-yellow-800 bg-yellow-100 rounded-lg dark:bg-yellow-900 dark:text-yellow-300">
-                <p class="font-medium">Actions Disabled</p>
-                <p class="text-sm">Please wait for current jobs to complete before starting new ones.</p>
-            </div>
-            @endif
-        </div>
-
-
-    </div>
 
     <div class="p-3 my-4 bg-blue-100 rounded-lg dark:bg-blue-900">
         <ul class="pl-5 text-sm text-gray-700 list-disc dark:text-gray-200">
             <li>
                 <i class="mr-2 text-blue-600 fas fa-envelope dark:text-blue-300"></i>
-                Total Emails: <span class="font-bold">{{ $emailsCount['total'] }}</span>
-                @if($selectedList)
-                ({{ $emailsCount['current_list'] }} in current list)
-                @endif
+                Total Emails: <span class="font-bold">{{ $this->lists->sum('emails_count') }}</span>
             </li>
         </ul>
     </div>
@@ -170,29 +74,126 @@
     <div class="flex flex-col p-3 border rounded-md md:p-6">
         <!-- List Management -->
         <div class="mb-6 md:flex md:items-center md:justify-between">
+
+
             <div class="flex-1 min-w-0">
-                <h2 class="text-2xl font-bold leading-7 sm:text-3xl sm:truncate">
+                <h2 class="text-2xl font-bold sm:text-3xl sm:truncate">
                     Mailing Lists
                 </h2>
             </div>
-            <div class="flex gap-2 mt-4 md:mt-0 md:ml-4">
-                <div class="flex gap-2 mt-4 md:mt-0 md:ml-4">
-                    @if(!$hasActiveJobsFlag)
-                        @if(!$emailLimit['show'] && $user->balance('Subscribers Limit') != 0 && !$this->lists->isEmpty())
-                        <x-primary-info-button href="{{ route('user.emails.create') }}" wire:navigate>
-                            Add New Emails
-                        </x-primary-info-button>
+
+
+
+            <!-- Action Buttons -->
+        <div>
+            @if(!$hasActiveJobsFlag)
+            <div class="flex flex-col gap-2 mt-2 sm:flex-row">
+                <!-- Delete Button  -->
+                <div class="relative">
+                    <x-primary-danger-button x-data="{
+                            isDisabled: {{ !$selectedList || ($selectedList && $this->lists->firstWhere('id', $selectedList)?->emails_count == 0) ? 'true' : 'false' }}
+                        }" wire:click="deleteEmails('{{ !empty($selectedEmails) ? 'selected' : 'all' }}')"
+                        wire:confirm="{{ !empty($selectedEmails)
+                            ? 'Are you sure you want to delete ' . count($selectedEmails) . ' selected emails?'
+                            : 'WARNING: This will delete ALL emails in the current list. This action cannot be undone. Are you sure?' }}" x-bind:class="isDisabled ? 'opacity-50 cursor-not-allowed' : ''"
+                        class="w-full text-sm sm:text-base" x-bind:disabled="isDisabled"
+                        @mouseenter="$refs.noteBox.classList.remove('opacity-0')"
+                        @mouseleave="$refs.noteBox.classList.add('opacity-0')">
+                        <div class="flex items-center gap-1 sm:gap-2">
+                            <i class="text-xs sm:text-sm fas fa-trash"></i>
+                            @if(!empty($selectedEmails))
+                            <span class="text-xs sm:text-sm">Delete Selected</span>
+                            <span class="px-1.5 py-0.5 text-xs bg-red-700 rounded-full sm:px-2">
+                                {{ count($selectedEmails) }}
+                            </span>
+                            @else
+                            <span class="text-xs sm:text-sm">Delete All</span>
+                            @if($selectedList)
+                            <span class="px-1.5 py-0.5 text-xs bg-red-700 rounded-full sm:px-2">
+                                {{ $this->lists->firstWhere('id', $selectedList)?->emails_count ?? 0 }}
+                            </span>
+                            @endif
+                            @endif
+                        </div>
+                    </x-primary-danger-button>
+
+                    <!-- Tooltip -->
+                    <div x-ref="noteBox"
+                        class="absolute left-0 z-50 p-2 mt-2 text-xs transition-opacity duration-200 ease-in-out transform bg-white border rounded-lg shadow-lg opacity-0 w-60 sm:w-72 sm:p-3 sm:text-sm dark:bg-neutral-800 dark:border-neutral-700">
+                        @if(!empty($selectedEmails))
+                        <div class="flex items-start gap-1.5 sm:gap-2 text-yellow-600 dark:text-yellow-500">
+                            <i class="mt-0.5 text-xs sm:text-sm fas fa-info-circle"></i>
+                            <div>
+                                <p class="font-medium">Selected Emails Deletion</p>
+                                <p class="mt-0.5 text-xs text-neutral-600 dark:text-neutral-400">
+                                    Delete {{ count($selectedEmails) }} selected emails
+                                </p>
+                            </div>
+                        </div>
+                        @elseif($selectedList && $this->lists->firstWhere('id', $selectedList)?->emails_count != 0)
+                        <div class="flex items-start gap-1.5 sm:gap-2 text-red-600 dark:text-red-500">
+                            <i class="mt-0.5 text-xs sm:text-sm fas fa-exclamation-triangle"></i>
+                            <div>
+                                <p class="font-medium">Warning</p>
+                                <p class="mt-0.5 text-xs text-neutral-600 dark:text-neutral-400">
+                                    Delete all {{ $this->lists->firstWhere('id', $selectedList)?->emails_count ?? 0 }} emails
+                                    from "{{ $this->lists->firstWhere('id', $selectedList)?->name }}"
+                                </p>
+                            </div>
+                        </div>
+                        @elseif($selectedList && $this->lists->firstWhere('id', $selectedList)?->emails_count == 0)
+                        <div class="flex items-start gap-1.5 sm:gap-2 text-yellow-600 dark:text-yellow-500">
+                            <i class="mt-0.5 text-xs sm:text-sm fas fa-exclamation-circle"></i>
+                            <div>
+                                <p class="font-medium">Empty List</p>
+                                <p class="mt-0.5 text-xs text-neutral-600 dark:text-neutral-400">
+                                    No emails to delete
+                                </p>
+                            </div>
+                        </div>
+                        @else
+                        <div class="flex items-start gap-1.5 sm:gap-2 text-blue-600 dark:text-blue-500">
+                            <i class="mt-0.5 text-xs sm:text-sm fas fa-info-circle"></i>
+                            <div>
+                                <p class="font-medium">Select List</p>
+                                <p class="mt-0.5 text-xs text-neutral-600 dark:text-neutral-400">
+                                    Please select a list first
+                                </p>
+                            </div>
+                        </div>
                         @endif
-                    @endif
-                    <x-primary-create-button x-on:click="$dispatch('open-modal', 'create-list')">
-                        Create New List
-                    </x-primary-create-button>
+                    </div>
                 </div>
+
+                <!-- Other Buttons -->
+                @if(!$emailLimit['show'] && $user->balance('Subscribers Limit') != 0 && !$this->lists->isEmpty())
+                <x-primary-info-button class="text-xs sm:text-sm"
+                    href="{{ $selectedList ? route('user.emails.create', ['list_id' => $selectedList]) : route('user.emails.create') }}"
+                    wire:navigate>
+                    <div class="flex items-center gap-2"><i class="mr-1 fas fa-plus"></i> Add Emails</div>
+
+                </x-primary-info-button>
+                @endif
+
+                <x-primary-create-button class="text-xs sm:text-sm" x-on:click="$dispatch('open-modal', 'create-list')">
+
+                    <div class="flex items-center gap-2"><i class="mr-1 fas fa-list"></i> New List</div>
+                </x-primary-create-button>
             </div>
+            @else
+            <div
+                class="w-full p-2 text-xs text-yellow-800 bg-yellow-100 rounded-lg sm:text-sm dark:bg-yellow-900 dark:text-yellow-300">
+                <p class="font-medium">Actions Disabled</p>
+                <p class="mt-0.5">Please wait for current jobs to complete</p>
+            </div>
+            @endif
+        </div>
+
+
         </div>
 
         <!-- Tabs -->
-                <div x-data="{
+        <div x-data="{
                                 selectedTab: @entangle('selectedList').live,
                                 scrollContainer: null,
                                 isScrollable: false,
@@ -226,177 +227,155 @@
                                     this.scrollContainer.scrollBy({ left: 200, behavior: 'smooth' });
                                 }
                             }">
-                            <div class="relative flex items-center">
-                                <!-- Left Scroll Button -->
-                                <button x-show="isScrollable && !hasScrolledToStart" x-on:click="scrollLeft"
-                                    class="absolute left-0 z-10 p-2 transition-all rounded-full shadow-md text-neutral-600 bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                                    style="transform: translateX(-50%);">
-                                    <i class="fas fa-chevron-left"></i>
-                                </button>
+            <div class="relative flex items-center">
+                <!-- Left Scroll Button -->
+                <button x-show="isScrollable && !hasScrolledToStart" x-on:click="scrollLeft"
+                    class="absolute left-0 z-10 p-2 transition-all rounded-full shadow-md text-neutral-600 bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    style="transform: translateX(-50%);">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
 
-                                <!-- Tabs Container -->
-                                <div x-ref="tabsContainer"
-                                    class="flex gap-2 py-4 overflow-x-auto border-b text-md scrollbar-hide border-neutral-300 dark:border-neutral-700 scroll-smooth"
-                                    style="scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none;">
-                                    @foreach($this->lists as $list)
-                                    <div class="flex items-center px-4 py-2 transition-all rounded-lg text-md group text-nowrap hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                                        :class="{
+                <!-- Tabs Container -->
+                <div x-ref="tabsContainer"
+                    class="flex gap-2 py-4 overflow-x-auto border-b text-md scrollbar-hide border-neutral-300 dark:border-neutral-700 scroll-smooth"
+                    style="scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none;">
+                    @foreach($this->lists as $list)
+                    <div class="flex items-center px-4 py-2 transition-all rounded-lg text-md group text-nowrap hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                        :class="{
                                             'bg-neutral-100 dark:bg-neutral-800 border-b-2 border-neutral-600 dark:border-orange-500': selectedTab == {{ $list->id }},
                                             'bg-neutral-50 dark:bg-neutral-900': selectedTab != {{ $list->id }}
                                         }">
-                                        <button type="button" x-on:click="selectedTab = {{ $list->id }}" wire:click.debounce.100ms="selectList({{ $list->id }})"
-                                            class="mr-2 font-medium text-neutral-600 dark:text-neutral-300">
-                                            {{ $list->name }}
-                                            <span class="text-xs text-neutral-500 dark:text-neutral-400">({{ $list->emails_count }})</span>
+                        <button type="button" x-on:click="selectedTab = {{ $list->id }}"
+                            wire:click.debounce.100ms="selectList({{ $list->id }})"
+                            class="mr-2 font-medium text-neutral-600 dark:text-neutral-300">
+                            {{ $list->name }}
+                            <span class="text-xs text-neutral-500 dark:text-neutral-400">({{ $list->emails_count
+                                }})</span>
+                        </button>
+                        <div class="flex items-center transition-opacity opacity-0 text-nowrap group-hover:opacity-100">
+                            <button type="button"
+                                x-on:click="$wire.set('listName', '{{ $list->name }}'); $dispatch('open-modal', 'edit-list-{{ $list->id }}')"
+                                class="ml-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
+                                <i class="fas fa-edit"></i>
+                            </button>
+
+                            @if(!$hasActiveJobsFlag)
+                            <button type="button" wire:click="deleteEmails('{{'selected'}}')"
+                                wire:confirm="Are you sure you want to delete this list?"
+                                class="ml-2 text-neutral-400 hover:text-red-600 dark:hover:text-red-500">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+
+                <!-- Right Scroll Button -->
+                <button x-show="isScrollable && !hasScrolledToEnd" x-on:click="scrollRight"
+                    class="absolute right-0 z-10 p-2 transition-all rounded-full shadow-md text-neutral-600 bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                    style="transform: translateX(50%);">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+
+            <!-- Show emails table only when a list is selected -->
+
+            @if($selectedList)
+            <div wire:loading.remove wire:target="selectList">
+                @if($emails->count() > 0)
+                <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
+                    <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
+                        <thead
+                            class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
+                            <tr>
+                                <th scope="col" class="p-4">
+                                    <input type="checkbox" wire:model.live="selectPage" class="rounded">
+                                </th>
+                                <th scope="col" class="p-4">Email</th>
+                                <th scope="col" class="p-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
+                            @foreach($emails as $email)
+                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                                <td class="p-4">
+                                    <input type="checkbox" wire:model.live="selectedEmails" value="{{ $email->id }}"
+                                        class="rounded">
+                                </td>
+                                <td class="p-4">{{ $email->email }}</td>
+                                <td class="p-4">
+                                    <div class="flex space-x-2">
+
+                                        <button wire:click="deleteEmail({{ $email->id }})"
+                                            wire:confirm="Are you sure you want to delete this email?"
+                                            class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
+                                            Delete
                                         </button>
-                                        <div class="flex items-center transition-opacity opacity-0 text-nowrap group-hover:opacity-100">
-                                            <button type="button"
-                                                x-on:click="$wire.set('listName', '{{ $list->name }}'); $dispatch('open-modal', 'edit-list-{{ $list->id }}')"
-                                                class="ml-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-
-                                            @if(!$hasActiveJobsFlag)
-                                            <button type="button" wire:click="deleteList({{ $list->id }})"
-                                                wire:confirm="Are you sure you want to delete this list?"
-                                                class="ml-2 text-neutral-400 hover:text-red-600 dark:hover:text-red-500">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                            @endif
-                                        </div>
                                     </div>
-                                    @endforeach
-                                </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
 
-                                <!-- Right Scroll Button -->
-                                <button x-show="isScrollable && !hasScrolledToEnd" x-on:click="scrollRight"
-                                    class="absolute right-0 z-10 p-2 transition-all rounded-full shadow-md text-neutral-600 bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-                                    style="transform: translateX(50%);">
-                                    <i class="fas fa-chevron-right"></i>
-                                </button>
-                            </div>
-
-
-                <!-- Show emails table only when a list is selected -->
-
-                @if($selectedList)
-                    <div wire:loading.remove wire:target="selectList">
-                        @if($emails->count() > 0)
-                            <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
-                                <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
-                                    <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
-                                        <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
-                                            <thead
-                                                class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
-                                                <tr>
-                                                    <th scope="col" class="p-4">
-                                                        <input type="checkbox" wire:model.live="selectPage" class="rounded">
-                                                    </th>
-                                                    <th scope="col" class="p-4">Email</th>
-                                                    <th scope="col" class="p-4">Status</th>
-                                                    <th scope="col" class="p-4">Send Time</th>
-                                                    <th scope="col" class="p-4">Sender Email</th>
-                                                    <th scope="col" class="p-4">Log</th>
-                                                    <th scope="col" class="p-4">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
-                                                @foreach($emails as $email)
-                                                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
-                                                    <td class="p-4">
-                                                        <input type="checkbox" wire:model.live="selectedEmails" value="{{ $email->id }}"
-                                                            class="rounded">
-                                                    </td>
-                                                    <td class="p-4">{{ $email->email }}</td>
-                                                    <td class="p-4">
-                                                        @if($email->status !== 'NULL')
-                                                        <span
-                                                            class="inline-flex px-2 py-1 text-xs rounded-full
-                                                                                                                                                                                        {{ $email->status === 'SENT' ? 'bg-green-100 text-green-800' :
-                                                                                                                                                                                        ($email->status === 'FAIL' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
-                                                            {{ $email->status }}
-                                                        </span>
-                                                        @endif
-                                                    </td>
-                                                    <td class="p-4">{{ $email->send_time ? $email->send_time->format('d / m / Y') : '-' }}</td>
-                                                    <td class="p-4">{{ $email->sender_email ?? '-' }}</td>
-                                                    <td class="p-4">{{ Str::limit($email->log, 30) ?? '-' }}</td>
-                                                    <td class="p-4">
-                                                        <div class="flex space-x-2">
-                                                            <button wire:click="clearSingleStatus({{ $email->id }})"
-                                                                wire:confirm="Are you sure you want to clear this email status?"
-                                                                class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
-                                                                Clear Status
-                                                            </button>
-
-                                                            <button wire:click="deleteEmail({{ $email->id }})"
-                                                                wire:confirm="Are you sure you want to delete this email?"
-                                                                class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
-                                                                Delete
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-
-                                        <!-- Pagination -->
-                                        @if($selectedList && $emails->hasPages())
-                                        <div class="mt-4">
-                                            {{ $emails->links() }}
-                                        </div>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @else
-                            <div class="p-4 text-center text-gray-500">
-                                No emails found in this list.
-                                @if(!$hasActiveJobsFlag && !$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
-                                    <div class="mt-2">
-                                        <x-primary-info-button href="{{ route('user.emails.create', ['list_id' => $selectedList]) }}" wire:navigate>
-                                            Add New Emails
-                                        </x-primary-info-button>
-                                    </div>
-                                @endif
-                            </div>
-                        @endif
+                    <!-- Pagination -->
+                    @if($selectedList && $emails->hasPages())
+                    <div class="mt-4">
+                        {{ $emails->links() }}
                     </div>
-
-                    <div wire:loading.class.remove="hidden" wire:loading.class='flex' wire:target="selectList"  class="items-center justify-center hidden p-4">
-                        <div class="w-8 h-8 border-4 border-blue-500 rounded-full animate-spin border-t-transparent"></div>
+                    @endif
+                </div>
+                @else
+                <div class="p-4 text-center text-gray-500">
+                    No emails found in this list.
+                    @if(!$hasActiveJobsFlag && !$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
+                    <div class="mt-2">
+                        <x-primary-info-button href="{{ route('user.emails.create', ['list_id' => $selectedList]) }}"
+                            wire:navigate>
+                            Add New Emails
+                        </x-primary-info-button>
                     </div>
-                    @else
-                    <div class="p-8 text-center">
-                        @if($this->lists->isEmpty())
-                        <!-- No lists exist -->
-                        <div class="flex flex-col items-center gap-4">
-                            <div class="p-4 text-neutral-600 dark:text-neutral-400">
-                                <i class="mb-2 text-4xl fas fa-list-ul"></i>
-                                <h3 class="mt-2 text-lg font-medium">No Mailing Lists Found</h3>
-                                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-500">
-                                    Create your first mailing list to start managing your emails
-                                </p>
-                            </div>
-                            <x-primary-create-button x-on:click="$dispatch('open-modal', 'create-list')" class="mt-2">
-                                <i class="mr-2 fas fa-plus"></i> Create Your First List
-                            </x-primary-create-button>
-                        </div>
-                        @else
-                        <!-- Lists exist but none selected -->
-                        <div class="flex flex-col items-center gap-4">
-                            <div class="p-4 text-neutral-600 dark:text-neutral-400">
-                                <i class="mb-2 text-4xl fas fa-hand-point-up"></i>
-                                <h3 class="mt-2 text-lg font-medium">Select a List</h3>
-                                <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-500">
-                                    Please select a list from above to view and manage your emails
-                                </p>
-                            </div>
-                        </div>
-                        @endif
-                    </div>
+                    @endif
+                </div>
                 @endif
+            </div>
+
+            <div wire:loading.class.remove="hidden" wire:loading.class='flex' wire:target="selectList"
+                class="items-center justify-center hidden p-4">
+                <div class="w-8 h-8 border-4 border-blue-500 rounded-full animate-spin border-t-transparent"></div>
+            </div>
+            @else
+            <div class="p-8 text-center">
+                @if($this->lists->isEmpty())
+                <!-- No lists exist -->
+                <div class="flex flex-col items-center gap-4">
+                    <div class="p-4 text-neutral-600 dark:text-neutral-400">
+                        <i class="mb-2 text-4xl fas fa-list-ul"></i>
+                        <h3 class="mt-2 text-lg font-medium">No Mailing Lists Found</h3>
+                        <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-500">
+                            Create your first mailing list to start managing your emails
+                        </p>
+                    </div>
+                    <x-primary-create-button x-on:click="$dispatch('open-modal', 'create-list')" class="mt-2">
+                        <i class="mr-2 fas fa-plus"></i> Create Your First List
+                    </x-primary-create-button>
+                </div>
+                @else
+                <!-- Lists exist but none selected -->
+                <div class="flex flex-col items-center gap-4">
+                    <div class="p-4 text-neutral-600 dark:text-neutral-400">
+                        <i class="mb-2 text-4xl fas fa-hand-point-up"></i>
+                        <h3 class="mt-2 text-lg font-medium">Select a List</h3>
+                        <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-500">
+                            Please select a list from above to view and manage your emails
+                        </p>
+                    </div>
+                </div>
+                @endif
+            </div>
+            @endif
 
 
 

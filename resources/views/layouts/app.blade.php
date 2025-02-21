@@ -55,11 +55,11 @@
                 </x-nav-link> --}}
                 <x-nav-link :active="request()->routeIs('user.my-subscription')"
                     href="{{ route('user.my-subscription') }}">
-                    <span>My Subscription</span>
+                    <span>Subscription</span>
                 </x-nav-link>
                 <x-nav-link :active="request()->routeIs('user.my-transactions')"
                     href="{{ route('user.my-transactions') }}" wire:navigate>
-                    <span>My Transactions</span>
+                    <span>Transactions</span>
                 </x-nav-link>
                 <x-nav-link :active="request()->routeIs('user.emails.index')" href="{{ route('user.emails.index') }}"
                     wire:navigate>
@@ -166,11 +166,11 @@
                         </x-nav-link> --}}
                         <x-nav-link :active="request()->routeIs('user.my-subscription')"
                             href="{{ route('user.my-subscription') }}">
-                            <span class="text-nowrap">My Subscription</span>
+                            <span class="text-nowrap">Subscription</span>
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('user.my-transactions')"
                             href="{{ route('user.my-transactions') }}" wire:navigate>
-                            <span class="text-nowrap">My Transactions</span>
+                            <span class="text-nowrap">Transactions</span>
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('user.emails.index')"
                             href="{{ route('user.emails.index') }}" wire:navigate>
@@ -306,7 +306,7 @@
             </nav>
 
             <!-- Main content -->
-            <main class="container flex-1 p-4 mx-auto">
+            <main class="container flex-1 p-2 mx-auto md:p-4">
                 {{ $slot }}
             </main>
 

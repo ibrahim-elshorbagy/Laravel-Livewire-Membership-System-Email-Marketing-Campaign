@@ -15,18 +15,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('email');
-            $table->enum('status', ['FAIL', 'SENT', 'NULL'])->default('NULL')->nullable();
-            $table->dateTime('send_time')->nullable();
-            $table->string('sender_email')->nullable();
-            $table->text('log')->nullable();
             $table->timestamps();
 
             // Add unique composite index
             $table->unique(['user_id', 'list_id', 'email']);
 
             // Add indexes for better performance
-            $table->index(['status', 'send_time']);
-            $table->index('email');
+            $table->index(['email', 'user_id']);
+
 
             $table->foreignId('list_id')->nullable()->constrained('email_list_names')->onDelete('cascade');
 
