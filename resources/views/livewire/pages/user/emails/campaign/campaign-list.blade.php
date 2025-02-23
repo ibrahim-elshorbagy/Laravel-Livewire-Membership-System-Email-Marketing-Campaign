@@ -127,7 +127,10 @@
                                             @endif
                                         </div>
 
-
+                            <a href="{{ route('user.campaigns.progress', $campaign) }}" wire:navigate
+                                class="inline-flex items-center px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-900/10 hover:bg-purple-500/20">
+                                <i class="mr-1 fas fa-chart-line"></i> Progress
+                            </a>
 
                             <a href="{{ route('user.campaigns.form', $campaign->id) }}" wire:navigate
                                 class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">

@@ -4,6 +4,7 @@ namespace App\Livewire\Pages\User\Emails;
 
 
 use App\Jobs\DeleteEmails;
+use App\Models\Campaign\EmailHistory;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\EmailList;
@@ -226,6 +227,10 @@ class EmailListsTable extends Component
         // Start with base query with necessary columns only
         $query = EmailList::query()
             ->select(['id', 'email'])
+            ->with(['history' => function($query) {
+                $query->with('campaign:id,title')
+                    ->orderBy('sent_time', 'desc');
+            }])
             ->where('user_id', $this->user->id)
             ->where('list_id', $this->selectedList);
 
@@ -325,9 +330,72 @@ class EmailListsTable extends Component
     }
 
 
+    // -------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // Email History
 
+    public $historyId;
+    public $emailId;
 
+    public function deleteHistory($historyId)
+    {
+        try {
+            $this->historyId = $historyId;
 
+            $this->validate([
+                'historyId' => [
+                    'required',
+                    'integer',
+                    Rule::exists('email_histories', 'id')
+                ],
+            ]);
+
+            $history = EmailHistory::findOrFail($this->historyId);
+            $history->delete();
+
+            $this->alert('success', 'History record deleted successfully!', [
+                'position' => 'bottom-end',
+            ]);
+
+        } catch (\Exception $e) {
+            $this->alert('error', 'Failed to delete history record!', [
+                'position' => 'bottom-end',
+            ]);
+        }
+    }
+
+    public function deleteAllHistory($emailId)
+    {
+        try {
+            $this->emailId = $emailId;
+            $this->validate([
+                'emailId' => [
+                    'required',
+                    'integer',
+                    Rule::exists('email_lists', 'id')
+                ],
+            ]);
+
+            $count = EmailHistory::where('email_id', $this->emailId)->count();
+
+            if ($count === 0) {
+                $this->alert('info', 'No history records to delete!', [
+                    'position' => 'bottom-end',
+                ]);
+                return;
+            }
+
+            EmailHistory::where('email_id', $this->emailId)->delete();
+
+            $this->alert('success', "{$count} history records deleted successfully!", [
+                'position' => 'bottom-end',
+            ]);
+
+        } catch (\Exception $e) {
+            $this->alert('error', 'Failed to delete history records!', [
+                'position' => 'bottom-end',
+            ]);
+        }
+    }
 
 
 

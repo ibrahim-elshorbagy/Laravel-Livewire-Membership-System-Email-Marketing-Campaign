@@ -260,7 +260,7 @@
                             </button>
 
                             @if(!$hasActiveJobsFlag)
-                            <button type="button" wire:click="deleteEmails('{{'selected'}}')"
+                            <button type="button" wire:click="deleteList({{ $list->id }})"
                                 wire:confirm="Are you sure you want to delete this list?"
                                 class="ml-2 text-neutral-400 hover:text-red-600 dark:hover:text-red-500">
                                 <i class="fas fa-trash"></i>
@@ -290,7 +290,7 @@
                         <thead
                             class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                             <tr>
-                                <th scope="col" class="p-4">
+                                <th scope="col" class="w-10 p-4">
                                     <input type="checkbox" wire:model.live="selectPage" class="rounded">
                                 </th>
                                 <th scope="col" class="p-4">Email</th>
@@ -304,7 +304,95 @@
                                     <input type="checkbox" wire:model.live="selectedEmails" value="{{ $email->id }}"
                                         class="rounded">
                                 </td>
-                                <td class="p-4">{{ $email->email }}</td>
+
+
+                                <td class="p-4">
+                                    <div x-data="{ isExpanded: false }" class="w-full">
+                                        <div class="flex items-center justify-between">
+                                            <span>{{ $email->email }}</span>
+                                            <div class="flex items-center gap-2">
+                                                @if($email->history->count() > 0)
+                                                <!-- Delete All History Button -->
+                                                <button wire:click="deleteAllHistory({{ $email->id }})"
+                                                    wire:confirm="Are you sure you want to delete all history records?"
+                                                    class="px-2 py-1 text-xs text-red-500 transition-colors rounded-md hover:bg-red-50 dark:hover:bg-red-900/20">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                                @endif
+
+                                                <!-- View History Button - Always visible -->
+                                                <button type="button" x-on:click="isExpanded = !isExpanded"
+                                                    class="flex items-center gap-2 px-2 py-1 text-xs transition-colors rounded-md text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+                                                    @if($email->history->count() > 0)
+                                                    <span
+                                                        class="px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400">
+                                                        {{ $email->history->count() }}
+                                                    </span>
+                                                    History
+                                                    @else
+                                                    <span class="flex items-center gap-1">
+                                                        <i class="text-xs text-red-500 fas fa-info-circle"></i>
+                                                        No History
+                                                    </span>
+                                                    @endif
+                                                    <i class="transition-transform duration-200 fas fa-chevron-down "
+                                                        :class="{'rotate-180': isExpanded}"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- History Records -->
+                                        <div x-show="isExpanded" x-collapse class="mt-2">
+                                            @if($email->history->count() > 0)
+                                            <div class="space-y-2">
+                                                @foreach($email->history->sortByDesc('sent_time') as $record)
+                                                <div class="relative group p-3 text-sm rounded-lg {{ $record->status === 'sent'
+                                                            ? 'bg-green-100 dark:bg-green-900/30'
+                                                            : 'bg-red-100 dark:bg-red-900/30' }}">
+
+                                                    <!-- Delete Single History Button -->
+                                                    <button wire:click="deleteHistory({{ $record->id }})"
+                                                        wire:confirm="Are you sure you want to delete this record?"
+                                                        class="absolute p-1.5 opacity-0 top-2 right-2 px-2 py-1 text-xs text-red-500 transition-colors rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 group-hover:opacity-100">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+
+                                                    <div class="flex items-center justify-between">
+                                                        <div class="flex items-center space-x-2">
+                                                            @if($record->status === 'sent')
+                                                            <i class="text-green-600 dark:text-green-400 fas fa-check-circle"></i>
+                                                            @else
+                                                            <i class="text-red-600 dark:text-red-400 fas fa-exclamation-circle"></i>
+                                                            @endif
+                                                            <span class="font-medium">Campaign: {{ $record->campaign->title }}</span>
+                                                        </div>
+                                                        <div class="flex items-center gap-2 mr-10">
+                                                            <span class="px-2 py-0.5 text-xs font-medium rounded-full
+                                                                        {{ $record->status === 'sent'
+                                                                            ? 'bg-green-200 text-green-800 dark:bg-green-900 dark:text-green-300'
+                                                                            : 'bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-300'
+                                                                        }}">
+                                                                {{ ucfirst($record->status) }}
+                                                            </span>
+                                                            <span class="text-xs text-neutral-500 dark:text-neutral-400">
+                                                                {{ $record->sent_time->format('d M, Y H:i:s') }} -
+                                                                {{ $record->sent_time->diffForHumans() }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                            @else
+                                            <div class="p-4 text-sm text-center rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                                                <i class="mb-2 text-2xl text-neutral-400 dark:text-neutral-600 fas fa-inbox"></i>
+                                                <p class="text-neutral-600 dark:text-neutral-400">No sending history available</p>
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
+
                                 <td class="p-4">
                                     <div class="flex space-x-2">
 

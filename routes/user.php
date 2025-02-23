@@ -50,6 +50,8 @@ Route::middleware(['auth','role:user'])->group(function () {
     //Campaigns
     Route::get('/campaigns', CampaignList::class)->name('user.campaigns.list');
     Route::get('/campaigns/form/{campaign?}', CampaignForm::class)->name('user.campaigns.form');
+    Route::get('/campaigns/{campaign}/progress', App\Livewire\Pages\User\Emails\Campaign\Progress::class)
+        ->name('user.campaigns.progress');
 
 
     //Support
