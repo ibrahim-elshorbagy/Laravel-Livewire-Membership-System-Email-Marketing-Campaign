@@ -22,7 +22,7 @@ class EmailSystemSeeder extends Seeder
 
         // Define lists with their email counts
         $lists = [
-            'Customer Database' => 10000,
+            'Customer Database' => 20,
             'Newsletter' => 3,
             'Promotional' => 3
         ];

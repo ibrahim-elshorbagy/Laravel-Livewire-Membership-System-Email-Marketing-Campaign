@@ -1,0 +1,398 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Campaign\Campaign;
+use App\Models\Campaign\EmailHistory;
+use App\Models\EmailList;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Exception;
+
+class EmailGatewayController extends Controller
+{
+    protected $apiPassword = '6Sb8E3cGG2bS1a';
+    protected $batchSize = 4;
+
+    public function getDetails(Request $request)
+    {
+        try {
+
+
+
+
+            // Validate request
+            $validator = Validator::make($request->all(), [
+                'serverid' => 'required|exists:servers,id',
+                'username' => 'required|string|exists:users,username',
+                'pass' => 'required|string'
+            ], [
+                'serverid.required' => 'Server ID is required',
+                'serverid.exists' => 'Invalid server ID',
+                'username.required' => 'Username is required',
+                'username.exists' => 'Invalid username',
+                'pass.required' => 'Password is required'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => 'Validation failed',
+                    'errors' => $validator->errors(),
+                    'server' => [
+                        'id' => $request->serverid ?? null
+                    ]
+                ], 422);
+            }
+
+            Log::info('API Access Attempt', [
+                'timestamp' => now()->format('Y-m-d H:i:s'),
+                'ip' => $request->ip(),
+                'origin' => $request->header('Origin'),
+                'user_agent' => $request->header('User-Agent'),
+                'username' => $request->username,
+                'serverid' => $request->serverid
+            ]);
+
+            // Check API pass
+            if ($request->pass !== $this->apiPassword) {
+                return response()->json([
+                    'error' => 'Authentication failed',
+                    'message' => 'Invalid API credentials',
+                    'server' => [
+                        'id' => $request->serverid
+                    ]
+                ], 401);
+            }
+
+            // Find and validate user
+            $user = User::where('username', $request->username)->first();
+
+            if (!$user->active) {
+                return response()->json([
+                    'error' => 'Account inactive',
+                    'message' => 'User account is currently inactive',
+                    'server' => [
+                        'id' => $request->serverid
+                    ]
+                ], 403);
+            }
+
+            // Validate subscription
+            $subscription = $user->lastSubscription();
+            if (!$subscription) {
+                return response()->json([
+                    'error' => 'No subscription',
+                    'message' => 'Active subscription required',
+                    'server' => [
+                        'id' => $request->serverid
+                    ]
+                ], 403);
+            }
+
+            // Check if can consume batch size
+            if (!$user->canConsume('Email Sending', $this->batchSize)) {
+                return response()->json([
+                    'error' => 'Quota exceeded',
+                    'message' => 'Email sending limit reached',
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->first_name . ' ' . $user->last_name,
+                        'email' => $user->email,
+                        'remaining_quota' => $user->balance('Email Sending'),
+                    ],
+                    'server' => [
+                        'id' => $request->serverid
+                    ]
+                ], 403);
+            }
+
+            // Validate server assignment
+            $server = $user->servers()
+                ->where('id', $request->serverid)
+                ->first();
+
+            if (!$server) {
+                return response()->json([
+                    'error' => 'Server not found',
+                    'message' => 'Server not assigned to user',
+                    'server' => [
+                        'id' => $request->serverid
+                    ]
+                ], 404);
+            }
+
+            // Get active campaign
+            $campaign = Campaign::whereHas('servers', function($query) use ($request) {
+                $query->where('server_id', $request->serverid);
+            })
+            ->where('is_active', true)
+            ->with(['message', 'emailLists'])
+            ->first();
+
+            if (!$campaign) {
+                return response()->json([
+                    'error' => 'No active campaign',
+                    'message' => 'No active campaign found for this server',
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->first_name . ' ' . $user->last_name,
+                        'email' => $user->email,
+                        'remaining_quota' => $user->balance('Email Sending'),
+                    ],
+                    'server' => [
+                        'id' => $server->id,
+                        'name' => $server->name
+                    ]
+                ], 404);
+            }
+
+            // Check if campaign has lists
+            if ($campaign->emailLists->isEmpty()) {
+                return response()->json([
+                    'error' => 'Invalid campaign configuration',
+                    'message' => 'Campaign has no email lists attached',
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->first_name . ' ' . $user->last_name,
+                        'email' => $user->email,
+                        'remaining_quota' => $user->balance('Email Sending'),
+                    ],
+                    'server' => [
+                        'id' => $server->id,
+                        'name' => $server->name
+                    ],
+                    'campaign' => [
+                        'id' => $campaign->id,
+                        'title' => $campaign->title
+                    ]
+                ], 400);
+            }
+
+            // Process emails
+            try {
+                $result = $this->processEmails($campaign, $user);
+                $emailsToSend = $result['emails'];
+                $summary = $result['summary'];
+
+                if (empty($emailsToSend)) {
+                    if ($summary['remaining_emails'] === 0) {
+                        return response()->json([
+                            'status' => 'completed',
+                            'message' => 'Campaign completed - all emails processed',
+                            'user' => [
+                                'id' => $user->id,
+                                'name' => $user->first_name . ' ' . $user->last_name,
+                                'email' => $user->email,
+                                'remaining_quota' => $user->balance('Email Sending'),
+                            ],
+                            'server' => [
+                                'id' => $server->id,
+                                'name' => $server->name,
+                                'quota' => $server->current_quota,
+                            ],
+                            'campaign' => [
+                                'id' => $campaign->id,
+                                'title' => $campaign->title,
+                                'message' => [
+                                    'subject' => $campaign->message->email_subject,
+                                    'html_content' => $campaign->message->message_html,
+                                    'plain_text' => $campaign->message->message_plain_text,
+                                    'sender_name' => $campaign->message->sender_name,
+                                    'reply_to' => $campaign->message->reply_to_email,
+                                ],
+                                'processing_summary' => $summary,
+
+                            ]
+                        ], 200);
+                    }
+
+                    return response()->json([
+                        'status' => 'no_emails',
+                        'message' => 'No emails available for current batch',
+                        'user' => [
+                            'id' => $user->id,
+                            'name' => $user->first_name . ' ' . $user->last_name,
+                            'email' => $user->email,
+                            'remaining_quota' => $user->balance('Email Sending'),
+                        ],
+                        'server' => [
+                            'id' => $server->id,
+                            'name' => $server->name,
+                            'quota' => $server->current_quota,
+                        ],
+                        'campaign' => [
+                            'id' => $campaign->id,
+                            'title' => $campaign->title,
+                            'message' => [
+                                'subject' => $campaign->message->email_subject,
+                                'html_content' => $campaign->message->message_html,
+                                'plain_text' => $campaign->message->message_plain_text,
+                                'sender_name' => $campaign->message->sender_name,
+                                'reply_to' => $campaign->message->reply_to_email,
+                            ],
+                            'processing_summary' => $summary,
+
+                        ]
+                    ], 200);
+                }
+
+                // Return success response
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Batch retrieved successfully',
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->first_name . ' ' . $user->last_name,
+                        'email' => $user->email,
+                        'remaining_quota' => $user->balance('Email Sending'),
+                    ],
+                    'server' => [
+                        'id' => $server->id,
+                        'name' => $server->name,
+                        'quota' => $server->current_quota,
+                    ],
+                    'campaign' => [
+                        'id' => $campaign->id,
+                        'title' => $campaign->title,
+                        'message' => [
+                            'subject' => $campaign->message->email_subject,
+                            'html_content' => $campaign->message->message_html,
+                            'plain_text' => $campaign->message->message_plain_text,
+                            'sender_name' => $campaign->message->sender_name,
+                            'reply_to' => $campaign->message->reply_to_email,
+                        ],
+                        'processing_summary' => $summary,
+
+                    ],
+                    'emails' => $emailsToSend,
+                ]);
+
+            } catch (Exception $e) {
+                Log::error('Email processing failed', [
+                    'error' => $e->getMessage(),
+                    'campaign_id' => $campaign->id,
+                    'user_id' => $user->id
+                ]);
+
+                return response()->json([
+                    'error' => 'Processing error',
+                    'message' => $e->getMessage(),
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->first_name . ' ' . $user->last_name,
+                        'email' => $user->email,
+                        'remaining_quota' => $user->balance('Email Sending'),
+                    ],
+                    'server' => [
+                        'id' => $server->id,
+                        'name' => $server->name,
+                        'quota' => $server->current_quota,
+                    ],
+                    'campaign' => [
+                        'id' => $campaign->id,
+                        'title' => $campaign->title,
+                        'processing_summary' => $summary ?? null
+                    ]
+                ], 500);
+            }
+
+        } catch (Exception $e) {
+            Log::error('API request failed', [
+                'error' => $e->getMessage(),
+                'request' => $request->all()
+            ]);
+
+            return response()->json([
+                'error' => 'System error',
+                'message' => $e->getMessage(),
+                'server' => [
+                    'id' => $request->serverid ?? null
+                ]
+            ], 500);
+        }
+    }
+
+    protected function processEmails($campaign, $user)
+    {
+        $emailsToSend = [];
+
+        // Get campaign totals
+        $totalCampaignEmails = EmailList::whereIn('list_id', $campaign->emailLists->pluck('id'))->count();
+        $totalProcessedEmails = EmailHistory::where('campaign_id', $campaign->id)->count();
+        $remainingEmails = $totalCampaignEmails - $totalProcessedEmails;
+
+        $processingSummary = [
+            'total_emails' => $totalCampaignEmails,
+            'processed_emails' => $totalProcessedEmails,
+            'remaining_emails' => $remainingEmails,
+            'completion_percentage' => $totalCampaignEmails > 0
+                ? round(($totalProcessedEmails / $totalCampaignEmails) * 100, 2)
+                : 0
+        ];
+
+        foreach ($campaign->emailLists as $list) {
+            if (count($emailsToSend) >= $this->batchSize) break;
+
+            $remainingInBatch = $this->batchSize - count($emailsToSend);
+
+            $unsentEmails = EmailList::where('list_id', $list->id)
+                ->whereNotExists(function($query) use ($campaign) {
+                    $query->select(DB::raw(1))
+                        ->from('email_histories')
+                        ->whereColumn('email_histories.email_id', 'email_lists.id')
+                        ->where('email_histories.campaign_id', $campaign->id);
+                })
+                ->limit($remainingInBatch)
+                ->get();
+
+            foreach ($unsentEmails as $email) {
+                if (count($emailsToSend) >= $this->batchSize) break;
+
+                DB::beginTransaction();
+                try {
+                    EmailHistory::create([
+                        'email_id' => $email->id,
+                        'campaign_id' => $campaign->id,
+                        'status' => 'sent',
+                        'sent_time' => Carbon::now(),
+                    ]);
+
+                    $emailsToSend[] = [
+                        'email' => $email->email,
+                        'sent_time' => Carbon::now()->format('Y-m-d H:i:s'),
+                    ];
+
+                    DB::commit();
+                } catch (Exception $e) {
+                    DB::rollBack();
+                    Log::error("Failed to process email", [
+                        'email_id' => $email->id,
+                        'list_id' => $list->id,
+                        'error' => $e->getMessage()
+                    ]);
+                    throw new Exception("Failed to process email ID: {$email->id} in list: {$list->id}");
+                }
+            }
+        }
+
+        // Consume quota for exactly the number of emails sent
+        if (count($emailsToSend) > 0) {
+            $user->consume('Email Sending', (float) count($emailsToSend));
+
+            // Update summary with new batch
+            $processingSummary['processed_emails'] += count($emailsToSend);
+            $processingSummary['remaining_emails'] -= count($emailsToSend);
+            $processingSummary['completion_percentage'] = round(($processingSummary['processed_emails'] / $totalCampaignEmails) * 100, 2);
+        }
+
+        return [
+            'emails' => $emailsToSend,
+            'summary' => $processingSummary
+        ];
+    }
+}

@@ -30,17 +30,31 @@ class DeleteHistoryRecords implements ShouldQueue
     public function handle()
     {
         try {
+            // Build initial query
             $query = EmailHistory::where('campaign_id', $this->campaignId);
 
             if ($this->type === 'selected') {
                 $query->whereIn('id', $this->selectedRecords);
             }
 
+            $totalCount = $query->count();
+
+            if ($totalCount === 0) {
+                // Log::info('No history records to delete', [
+                //     'campaign_id' => $this->campaignId,
+                //     'type' => $this->type
+                // ]);
+                return;
+            }
+
             // Process deletion in chunks
-            $query->chunk(1000, function ($records) {
+            $query->chunkById(1000, function ($chunk) {
                 DB::beginTransaction();
                 try {
-                    EmailHistory::whereIn('id', $records->pluck('id'))->delete();
+                    EmailHistory::where('campaign_id', $this->campaignId)
+                        ->whereIn('id', $chunk->pluck('id'))
+                        ->delete();
+
                     DB::commit();
                 } catch (\Exception $e) {
                     DB::rollBack();
@@ -48,12 +62,20 @@ class DeleteHistoryRecords implements ShouldQueue
                 }
             });
 
+            // Log::info('Successfully deleted history records', [
+            //     'campaign_id' => $this->campaignId,
+            //     'type' => $this->type,
+            //     'total_deleted' => $totalCount
+            // ]);
+
         } catch (\Exception $e) {
             Log::error('Error in DeleteHistoryRecords job: ' . $e->getMessage(), [
                 'campaign_id' => $this->campaignId,
-                'type' => $this->type
+                'type' => $this->type,
+                'error' => $e->getMessage()
             ]);
             throw $e;
         }
     }
+
 }

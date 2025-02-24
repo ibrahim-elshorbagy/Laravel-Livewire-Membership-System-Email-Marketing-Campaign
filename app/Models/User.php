@@ -100,4 +100,10 @@ class User extends Authenticatable implements MustVerifyEmail
         );
     }
 
+
+    public function servers()
+    {
+        return $this->hasMany(Server::class, 'assigned_to_user_id');
+    }
+
 }

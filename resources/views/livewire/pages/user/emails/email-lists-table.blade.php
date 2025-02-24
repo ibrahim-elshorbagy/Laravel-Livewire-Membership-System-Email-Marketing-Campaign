@@ -299,7 +299,7 @@
                         </thead>
                         <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
                             @foreach($emails as $email)
-                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800" wire:key="email-row-{{ $email->id }}">
                                 <td class="p-4">
                                     <input type="checkbox" wire:model.live="selectedEmails" value="{{ $email->id }}"
                                         class="rounded">
@@ -417,7 +417,11 @@
                 </div>
                 @else
                 <div class="p-4 text-center text-gray-500">
+                    @if($search)
+                    No emails match your search " {{ $search }} " in this list.
+                    @else
                     No emails found in this list.
+                    @endif
                     @if(!$hasActiveJobsFlag && !$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
                     <div class="mt-2">
                         <x-primary-info-button href="{{ route('user.emails.create', ['list_id' => $selectedList]) }}"
