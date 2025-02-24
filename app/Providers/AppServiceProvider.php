@@ -38,21 +38,26 @@ class AppServiceProvider extends ServiceProvider
         Model::unguard();
 
 
-        Validator::extend('without_space', function($attr, $value, $parameters, $validator) {
-            // Trim and update the value
-            $trimmedValue = trim($value);
-            $validator->setData(array_merge(
-                $validator->getData(),
-                [$attr => $trimmedValue]
-            ));
+    Validator::extend('without_space', function($attr, $value, $parameters, $validator) {
+        // Remove all spaces from the value
+        $processedValue = str_replace(' ', '', $value);
+        
+        // Update the value in the validator
+        $validator->setData(array_merge(
+            $validator->getData(),
+            [$attr => $processedValue]
+        ));
 
-            // Verify the trimmed value matches our pattern
-            if (!preg_match('/^[^\s].*[^\s]$|^[^\s]$/u', $trimmedValue)) {
-                $validator->setCustomMessages(['without_space' => 'The :attribute may not contain leading or trailing spaces..']);
-                return false;
-            }
-            return true;
-        });
+        // Check if the value contains only alphanumeric characters
+        if (!preg_match('/^[a-zA-Z0-9]+$/', $processedValue)) {
+            $validator->setCustomMessages([
+                'without_space' => 'The :attribute must contain only letters and numbers (BackupServer1).'
+            ]);
+            return false;
+        }
+
+        return true;
+    });
 
     }
 }

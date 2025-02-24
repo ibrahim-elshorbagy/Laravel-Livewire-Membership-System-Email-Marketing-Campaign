@@ -18,17 +18,43 @@ class EmailGatewayController extends Controller
 {
     protected $apiPassword = '6Sb8E3cGG2bS1a';
     protected $batchSize = 4;
+    protected $allowedUserAgents = [
+        'Google-Apps-Script',
+    ];
+
+    protected function checkUserAgent(Request $request)
+    {
+        $userAgent = $request->header('User-Agent');
+        
+        foreach ($this->allowedUserAgents as $allowed) {
+            if (strpos($userAgent, $allowed) !== false) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
 
     public function getDetails(Request $request)
     {
         try {
 
+            // if (!$this->checkUserAgent($request)) {
+            //     return response()->json([
+            //         'error' => 'Access Denied',
+            //         'message' => 'Invalid User-Agent',
+            //         'user_agent' => $request->header('User-Agent'),
+            //         'server' => [
+            //             'id' => $request->serverid ?? null
+            //         ]
+            //     ], 403);
+            // }
 
 
 
             // Validate request
             $validator = Validator::make($request->all(), [
-                'serverid' => 'required|exists:servers,id',
+                'serverid' => 'required|exists:servers,name',
                 'username' => 'required|string|exists:users,username',
                 'pass' => 'required|string'
             ], [
@@ -49,14 +75,14 @@ class EmailGatewayController extends Controller
                 ], 422);
             }
 
-            Log::info('API Access Attempt', [
-                'timestamp' => now()->format('Y-m-d H:i:s'),
-                'ip' => $request->ip(),
-                'origin' => $request->header('Origin'),
-                'user_agent' => $request->header('User-Agent'),
-                'username' => $request->username,
-                'serverid' => $request->serverid
-            ]);
+            // Log::info('API Access Attempt', [
+            //     'timestamp' => now()->format('Y-m-d H:i:s'),
+            //     'ip' => $request->ip(),
+            //     'origin' => $request->header('Origin'),
+            //     'user_agent' => $request->header('User-Agent'),
+            //     'username' => $request->username,
+            //     'serverid' => $request->serverid
+            // ]);
 
             // Check API pass
             if ($request->pass !== $this->apiPassword) {
@@ -113,7 +139,7 @@ class EmailGatewayController extends Controller
 
             // Validate server assignment
             $server = $user->servers()
-                ->where('id', $request->serverid)
+                ->where('name', $request->serverid)
                 ->first();
 
             if (!$server) {
@@ -184,6 +210,7 @@ class EmailGatewayController extends Controller
                         return response()->json([
                             'status' => 'completed',
                             'message' => 'Campaign completed - all emails processed',
+                            'referer' => $request->server('HTTP_REFERER'),
                             'user' => [
                                 'id' => $user->id,
                                 'name' => $user->first_name . ' ' . $user->last_name,
@@ -193,14 +220,14 @@ class EmailGatewayController extends Controller
                             'server' => [
                                 'id' => $server->id,
                                 'name' => $server->name,
-                                'quota' => $server->current_quota,
                             ],
                             'campaign' => [
                                 'id' => $campaign->id,
                                 'title' => $campaign->title,
                                 'message' => [
                                     'subject' => $campaign->message->email_subject,
-                                    'html_content' => $campaign->message->message_html,
+                                    'html_content' => html_entity_decode($campaign->message->message_html),
+
                                     'plain_text' => $campaign->message->message_plain_text,
                                     'sender_name' => $campaign->message->sender_name,
                                     'reply_to' => $campaign->message->reply_to_email,
@@ -214,6 +241,7 @@ class EmailGatewayController extends Controller
                     return response()->json([
                         'status' => 'no_emails',
                         'message' => 'No emails available for current batch',
+                        'referer' => $request->server('HTTP_REFERER'),
                         'user' => [
                             'id' => $user->id,
                             'name' => $user->first_name . ' ' . $user->last_name,
@@ -223,14 +251,14 @@ class EmailGatewayController extends Controller
                         'server' => [
                             'id' => $server->id,
                             'name' => $server->name,
-                            'quota' => $server->current_quota,
-                        ],
+                            ],
                         'campaign' => [
                             'id' => $campaign->id,
                             'title' => $campaign->title,
                             'message' => [
                                 'subject' => $campaign->message->email_subject,
-                                'html_content' => $campaign->message->message_html,
+                                'html_content' => html_entity_decode($campaign->message->message_html),
+
                                 'plain_text' => $campaign->message->message_plain_text,
                                 'sender_name' => $campaign->message->sender_name,
                                 'reply_to' => $campaign->message->reply_to_email,
@@ -245,6 +273,7 @@ class EmailGatewayController extends Controller
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Batch retrieved successfully',
+                    'referer' => $request->server('HTTP_REFERER'), 
                     'user' => [
                         'id' => $user->id,
                         'name' => $user->first_name . ' ' . $user->last_name,
@@ -254,14 +283,14 @@ class EmailGatewayController extends Controller
                     'server' => [
                         'id' => $server->id,
                         'name' => $server->name,
-                        'quota' => $server->current_quota,
                     ],
                     'campaign' => [
                         'id' => $campaign->id,
                         'title' => $campaign->title,
                         'message' => [
                             'subject' => $campaign->message->email_subject,
-                            'html_content' => $campaign->message->message_html,
+                            'html_content' => html_entity_decode($campaign->message->message_html),
+
                             'plain_text' => $campaign->message->message_plain_text,
                             'sender_name' => $campaign->message->sender_name,
                             'reply_to' => $campaign->message->reply_to_email,
@@ -291,7 +320,6 @@ class EmailGatewayController extends Controller
                     'server' => [
                         'id' => $server->id,
                         'name' => $server->name,
-                        'quota' => $server->current_quota,
                     ],
                     'campaign' => [
                         'id' => $campaign->id,
@@ -363,6 +391,7 @@ class EmailGatewayController extends Controller
                     ]);
 
                     $emailsToSend[] = [
+                        'id' => $email->id,
                         'email' => $email->email,
                         'sent_time' => Carbon::now()->format('Y-m-d H:i:s'),
                     ];

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('servers', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->unique();;
             $table->foreignId('assigned_to_user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('last_access_time')->nullable();
             $table->integer('current_quota')->nullable();

@@ -11,7 +11,7 @@ class ServerSeeder extends Seeder
     {
         $servers = [
             [
-                'name' => 'Production Server 1',
+                'name' => 'ProductionServer',
                 'assigned_to_user_id' => 2,
                 'last_access_time' => now(),
                 'current_quota' => 75,
@@ -20,7 +20,7 @@ class ServerSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Development Server 1',
+                'name' => 'DevelopmentServer',
                 'assigned_to_user_id' => 2,
                 'last_access_time' => now()->subDays(2),
                 'current_quota' => 45,
@@ -29,7 +29,7 @@ class ServerSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Testing Server 1',
+                'name' => 'TestingServer',
                 'assigned_to_user_id' => 2,
                 'last_access_time' => now()->subDays(1),
                 'current_quota' => 60,
@@ -38,7 +38,7 @@ class ServerSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Backup Server 1',
+                'name' => 'BackupServer',
                 'assigned_to_user_id' => 2,
                 'last_access_time' => now()->subHours(12),
                 'current_quota' => 30,
