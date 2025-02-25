@@ -22,7 +22,19 @@
         </div>
         @endif
     </header>
-
+<div class="mb-6">
+    <div
+        class="p-4 text-sm text-yellow-800 border border-yellow-200 rounded-lg bg-yellow-50 dark:bg-yellow-900/50 dark:border-yellow-700 dark:text-yellow-400">
+        <div class="flex items-center gap-2">
+            <i class="text-lg fas fa-exclamation-triangle"></i>
+            <p class="font-medium">Note:</p>
+        </div>
+        <p class="mt-2 ml-6">
+            Deleting an email from the sending list will resend your advertising message to that email again as long as
+            the email is stored in the mailing list.
+        </p>
+    </div>
+</div>
     <!-- Search and Filters -->
     <div class="mb-6">
         <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">

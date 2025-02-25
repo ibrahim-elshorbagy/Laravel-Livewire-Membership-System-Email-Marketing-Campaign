@@ -432,7 +432,13 @@ class EmailGatewayController extends Controller
             );
 
             if ($processingSummary['remaining_emails'] === 0) {
-                $campaign->update(['status' => 'Completed']);
+                DB::transaction(function() use ($campaign) {
+                    // Update campaign status
+                    $campaign->update(['status' => 'Completed']);
+
+                    // Detach all servers from the campaign
+                    $campaign->servers()->detach();
+                });
             }
         }
 
