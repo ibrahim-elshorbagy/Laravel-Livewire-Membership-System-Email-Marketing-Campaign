@@ -89,16 +89,18 @@
 
                             <div class="flex items-center space-x-2">
                                         <div class="relative" x-data="{ showTooltip: false }">
-                                            <button wire:click="toggleActive({{ $campaign->id }})" @if(!$campaign->canBeActive()) disabled @endif
-                                                @mouseenter="showTooltip = true"
-                                                @mouseleave="showTooltip = false"
+                                            <button wire:click="toggleActive({{ $campaign->id }})" @if(!$campaign->canBeModified()) disabled @endif
                                                 class="inline-flex items-center px-2 py-1 text-xs rounded-md
-                                                {{ $campaign->is_active ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-500' }}
-                                                {{ !$campaign->canBeActive() ? 'opacity-50 cursor-not-allowed' : 'hover:bg-opacity-20' }}">
-                                                <i class="mr-1 fas {{ $campaign->is_active ? 'fa-check-circle' : 'fa-times-circle' }}"></i>
-                                                {{ $campaign->is_active ? 'Active' : 'Inactive' }}
+                                                {{ $campaign->status === 'Sending' ? 'bg-green-500/10 text-green-500' :
+                                                ($campaign->status === 'Completed' ? 'bg-blue-500/10 text-blue-500' : 'bg-gray-500/10 text-gray-500') }}
+                                                {{ !$campaign->canBeActive() || !$campaign->canBeModified() ? 'opacity-50 cursor-not-allowed' :
+                                                'hover:bg-opacity-20' }}">
+                                                <i class="mr-1 fas {{
+                                                    $campaign->status === 'Sending' ? 'fa-play-circle' :
+                                                    ($campaign->status === 'Completed' ? 'fa-check-circle' : 'fa-pause-circle')
+                                                }}"></i>
+                                                {{ $campaign->status }}
                                             </button>
-
                                             @if(!$campaign->canBeActive())
                                             <!-- Tooltip -->
                                             <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200"

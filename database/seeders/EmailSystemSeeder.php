@@ -35,19 +35,19 @@ class EmailSystemSeeder extends Seeder
             [
                 'title' => 'Welcome Series',
                 'message_id' => 1,
-                'is_active' => true,
+                'status' => 'Sending',
                 'server_id' => array_shift($availableServers)
             ],
             [
                 'title' => 'Product Updates',
                 'message_id' => 1,
-                'is_active' => false,
+                'status' => 'Completed',
                 'server_id' => array_shift($availableServers)
             ],
             [
                 'title' => 'Monthly Newsletter',
                 'message_id' => 1,
-                'is_active' => true,
+                'status' => 'Pause',
                 'server_id' => array_shift($availableServers)
             ]
         ];
@@ -58,7 +58,7 @@ class EmailSystemSeeder extends Seeder
                 'user_id' => 2,
                 'title' => $campaign['title'],
                 'message_id' => $campaign['message_id'],
-                'is_active' => $campaign['is_active']
+                'status' => $campaign['status']
             ]);
 
             // Attach single server to campaign

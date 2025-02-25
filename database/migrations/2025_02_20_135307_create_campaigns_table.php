@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->foreignId('message_id')->constrained('email_messages')->onDelete('cascade');
-            $table->boolean('is_active')->default(false);
+            $table->enum('status', ['Sending', 'Pause', 'Completed'])->default('Pause');
 
             $table->timestamps();
         });

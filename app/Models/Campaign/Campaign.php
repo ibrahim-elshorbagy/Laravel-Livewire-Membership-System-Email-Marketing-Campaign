@@ -32,13 +32,23 @@ class Campaign extends Model
         return $this->belongsToMany(EmailListName::class, 'campaign_email_lists', 'campaign_id', 'email_list_id');
     }
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
 
+    const STATUS_SENDING = 'Sending';
+    const STATUS_PAUSE = 'Pause';
+    const STATUS_COMPLETED = 'Completed';
+
+
+    public function canBeModified()
+    {
+        return $this->status !== self::STATUS_COMPLETED;
+    }
+
+    // Update canBeActive method
     public function canBeActive()
     {
-        return $this->servers()->count() > 0 && $this->emailLists()->count() > 0;
+        return $this->status !== self::STATUS_COMPLETED &&
+            $this->servers()->count() > 0 &&
+            $this->emailLists()->count() > 0;
     }
-    
+
 }

@@ -25,13 +25,13 @@ class EmailGatewayController extends Controller
     protected function checkUserAgent(Request $request)
     {
         $userAgent = $request->header('User-Agent');
-        
+
         foreach ($this->allowedUserAgents as $allowed) {
             if (strpos($userAgent, $allowed) !== false) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -68,7 +68,7 @@ class EmailGatewayController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'error' => 'Validation failed',
-                    'errors' => $validator->errors(),
+                    'message' => implode(', ', $validator->errors()->all()),
                     'server' => [
                         'id' => $request->serverid ?? null
                     ]
@@ -153,10 +153,10 @@ class EmailGatewayController extends Controller
             }
 
             // Get active campaign
-            $campaign = Campaign::whereHas('servers', function($query) use ($request) {
-                $query->where('server_id', $request->serverid);
+            $campaign = Campaign::whereHas('servers', function($query) use ($server) {
+                $query->where('server_id', $server->id);
             })
-            ->where('is_active', true)
+            ->where('status', 'Sending')
             ->with(['message', 'emailLists'])
             ->first();
 
@@ -273,7 +273,7 @@ class EmailGatewayController extends Controller
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Batch retrieved successfully',
-                    'referer' => $request->server('HTTP_REFERER'), 
+                    'referer' => $request->server('HTTP_REFERER'),
                     'user' => [
                         'id' => $user->id,
                         'name' => $user->first_name . ' ' . $user->last_name,
@@ -349,21 +349,32 @@ class EmailGatewayController extends Controller
     {
         $emailsToSend = [];
 
-        // Get campaign totals
+        // Get campaign totals - More accurate counting
         $totalCampaignEmails = EmailList::whereIn('list_id', $campaign->emailLists->pluck('id'))->count();
-        $totalProcessedEmails = EmailHistory::where('campaign_id', $campaign->id)->count();
-        $remainingEmails = $totalCampaignEmails - $totalProcessedEmails;
+
+        // Only count valid email histories
+        $totalProcessedEmails = EmailHistory::where('campaign_id', $campaign->id)
+            ->whereIn('email_id', function($query) use ($campaign) {
+                $query->select('id')
+                    ->from('email_lists')
+                    ->whereIn('list_id', $campaign->emailLists->pluck('id'));
+            })
+            ->count();
+
+        // Ensure we don't have negative numbers
+        $remainingEmails = max(0, $totalCampaignEmails - $totalProcessedEmails);
 
         $processingSummary = [
             'total_emails' => $totalCampaignEmails,
-            'processed_emails' => $totalProcessedEmails,
+            'processed_emails' => min($totalProcessedEmails, $totalCampaignEmails), // Don't exceed total
             'remaining_emails' => $remainingEmails,
             'completion_percentage' => $totalCampaignEmails > 0
-                ? round(($totalProcessedEmails / $totalCampaignEmails) * 100, 2)
+                ? min(100, round(($totalProcessedEmails / $totalCampaignEmails) * 100, 2))
                 : 0
         ];
 
-        foreach ($campaign->emailLists as $list) {
+                foreach ($campaign->emailLists as $list) {
+
             if (count($emailsToSend) >= $this->batchSize) break;
 
             $remainingInBatch = $this->batchSize - count($emailsToSend);
@@ -409,14 +420,20 @@ class EmailGatewayController extends Controller
             }
         }
 
-        // Consume quota for exactly the number of emails sent
+        // Update summary with new batch - with safeguards
         if (count($emailsToSend) > 0) {
             $user->consume('Email Sending', (float) count($emailsToSend));
 
-            // Update summary with new batch
-            $processingSummary['processed_emails'] += count($emailsToSend);
-            $processingSummary['remaining_emails'] -= count($emailsToSend);
-            $processingSummary['completion_percentage'] = round(($processingSummary['processed_emails'] / $totalCampaignEmails) * 100, 2);
+            $newProcessedEmails = $processingSummary['processed_emails'] + count($emailsToSend);
+            $processingSummary['processed_emails'] = min($newProcessedEmails, $totalCampaignEmails);
+            $processingSummary['remaining_emails'] = max(0, $totalCampaignEmails - $newProcessedEmails);
+            $processingSummary['completion_percentage'] = min(100,
+                round(($processingSummary['processed_emails'] / $totalCampaignEmails) * 100, 2)
+            );
+
+            if ($processingSummary['remaining_emails'] === 0) {
+                $campaign->update(['status' => 'Completed']);
+            }
         }
 
         return [

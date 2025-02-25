@@ -99,7 +99,9 @@ class ServerForm extends Component
 
                     // Deactivate affected campaigns and remove server
                     foreach ($affectedCampaigns as $campaign) {
-                        $campaign->update(['is_active' => false]);
+                        if ($campaign->status === Campaign::STATUS_SENDING) {
+                            $campaign->update(['status' => Campaign::STATUS_PAUSE]);
+                        }
                         $campaign->servers()->detach($this->server_id);
                     }
 

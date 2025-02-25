@@ -31,10 +31,10 @@ class CampaignForm extends Component
     {
         return [
             'title' => 'required|string|max:255',
-            'message_id' => 'required|exists:email_messages,id',
-            'selectedServers' => 'required|array|min:1',
+            'message_id' => 'nullable|exists:email_messages,id',
+            'selectedServers' => 'nullable|array',
             'selectedServers.*' => 'exists:servers,id',
-            'selectedLists' => 'required|array|min:1',
+            'selectedLists' => 'nullable|array',
             'selectedLists.*' => 'exists:email_list_names,id',
         ];
     }
@@ -116,6 +116,11 @@ class CampaignForm extends Component
             $campaign->servers()->sync($this->selectedServers);
             $campaign->emailLists()->sync($this->selectedLists);
 
+            // Simple check: if campaign is sending and has no servers or lists, pause it
+            if ($campaign->status === 'Sending' &&
+                (empty($this->selectedServers) || empty($this->selectedLists))) {
+                $campaign->update(['status' => 'Pause']);
+            }
             DB::commit();
 
             Session::flash('success', 'Campaign saved successfully.');

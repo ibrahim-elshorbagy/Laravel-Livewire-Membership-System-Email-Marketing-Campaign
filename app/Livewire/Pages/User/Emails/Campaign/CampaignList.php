@@ -51,8 +51,15 @@ class CampaignList extends Component
     {
         $campaign = Campaign::findOrFail($campaignId);
 
+        if (!$campaign->canBeModified()) {
+            $this->alert('error', 'Completed campaigns cannot be modified', [
+                'position' => 'bottom-end'
+            ]);
+            return;
+        }
+
         // Only check when trying to activate
-        if (!$campaign->is_active) {
+        if ($campaign->status === Campaign::STATUS_PAUSE) {
             $messages = [];
             if ($campaign->servers()->count() === 0) {
                 $messages[] = "No servers assigned";
@@ -63,19 +70,19 @@ class CampaignList extends Component
 
             if (!empty($messages)) {
                 $this->alert('error', 'Campaign cannot be activated: ' . implode(' and ', $messages), [
-                    'position' => 'bottom-end',
-                    'timer' => 5000
+                    'position' => 'bottom-end'
                 ]);
                 return;
             }
+
+            $campaign->update(['status' => Campaign::STATUS_SENDING]);
+            $message = 'Campaign started successfully!';
+        } else {
+            $campaign->update(['status' => Campaign::STATUS_PAUSE]);
+            $message = 'Campaign paused successfully!';
         }
 
-        $campaign->update(['is_active' => !$campaign->is_active]);
-
-        $this->alert('success',
-            $campaign->is_active ? 'Campaign activated successfully!' : 'Campaign deactivated successfully!',
-            ['position' => 'bottom-end']
-        );
+        $this->alert('success', $message, ['position' => 'bottom-end']);
     }
 
     public function getCampaignsProperty()
