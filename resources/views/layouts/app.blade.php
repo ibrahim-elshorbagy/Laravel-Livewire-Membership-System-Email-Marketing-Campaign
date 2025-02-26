@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
-    x-data="{ darkMode: localStorage.getItem('dark') === 'true'}"
-    x-init="$watch('darkMode', val => localStorage.setItem('dark', val))" x-bind:class="{ 'dark': darkMode }">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="initThemeHandler()" x-init="init()"
+    x-bind:class="{ 'dark': darkMode }">
 
 <head>
     <meta charset="utf-8">
@@ -306,7 +305,7 @@
             </nav>
 
             <!-- Main content -->
-            <main class="flex-1 p-2 md:mx-4">
+            <main class="flex-1 p-2 my-4 md:mx-4">
                 {{ $slot }}
             </main>
 

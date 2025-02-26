@@ -156,6 +156,7 @@ class EmailGatewayController extends Controller
 
             $server->update([
                 'current_quota' => $request->quota,
+                'last_access_time'=> Carbon::now(),
             ]);
             // Get active campaign
             $campaign = Campaign::whereHas('servers', function($query) use ($server) {
