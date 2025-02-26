@@ -41,17 +41,17 @@ class AppServiceProvider extends ServiceProvider
     Validator::extend('without_space', function($attr, $value, $parameters, $validator) {
         // Remove all spaces from the value
         $processedValue = str_replace(' ', '', $value);
-        
+
         // Update the value in the validator
         $validator->setData(array_merge(
             $validator->getData(),
             [$attr => $processedValue]
         ));
 
-        // Check if the value contains only alphanumeric characters
-        if (!preg_match('/^[a-zA-Z0-9]+$/', $processedValue)) {
+        // Check if the value contains only English letters, dots, and hyphens
+        if (!preg_match('/^[a-zA-Z.-]+$/', $processedValue)) {
             $validator->setCustomMessages([
-                'without_space' => 'The :attribute must contain only letters and numbers (BackupServer1).'
+                'without_space' => 'The :attribute must contain only English letters, . , and -'
             ]);
             return false;
         }

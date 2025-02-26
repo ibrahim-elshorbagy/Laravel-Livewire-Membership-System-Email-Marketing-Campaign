@@ -27,22 +27,22 @@
 </head>
 
 <body class="font-sans antialiased">
-    <div x-data="{ sidebarIsOpen: false }" class="relative flex flex-col w-full md:flex-row">
+    <div x-data="{ sidebarIsOpen: false }" >
 
         <!-- Mobile sidebar overlay -->
-        <div x-cloak x-show="sidebarIsOpen" class="fixed inset-0 z-20 bg-neutral-950/10 backdrop-blur-sm md:hidden"
+        <div x-cloak x-show="sidebarIsOpen" class="fixed inset-0 z-20 backdrop-blur-sm bg-neutral-950/10 md:hidden"
             aria-hidden="true" x-on:click="sidebarIsOpen = false" x-transition.opacity></div>
 
         <!-- Mobile sidebar -->
         <nav x-cloak
-            class="fixed left-0 z-30 flex flex-col p-4 transition-transform duration-300 border-r h-svh w-60 shrink-0 border-neutral-300 bg-neutral-50 md:hidden md:w-64 md:translate-x-0 dark:border-neutral-700 dark:bg-neutral-900"
+            class="flex fixed left-0 z-30 flex-col p-4 w-60 border-r transition-transform duration-300 h-svh shrink-0 border-neutral-300 bg-neutral-50 md:hidden md:w-64 md:translate-x-0 dark:border-neutral-700 dark:bg-neutral-900"
             x-bind:class="sidebarIsOpen ? 'translate-x-0' : '-translate-x-60'">
-            <a href="{{ route('welcome') }}" class="w-12 mb-4 ml-2 text-2xl font-bold text-neutral-900 dark:text-white"
+            <a href="{{ route('welcome') }}" class="mb-4 ml-2 w-12 text-2xl font-bold text-neutral-900 dark:text-white"
                 wire:navigate>
                 <x-application-logo />
             </a>
 
-            <div class="flex flex-col gap-2 pb-3 overflow-y-auto">
+            <div class="flex overflow-y-auto flex-col gap-2 pb-3">
                 {{-- <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
                     wire:navigate>
                     <i class="fas fa-th-large"></i>
@@ -110,7 +110,7 @@
             @persist('sidebar')
             <div x-data="{ isExpanded: false }" class="flex flex-col">
                 <button type="button" x-on:click="isExpanded = ! isExpanded"
-                    class="flex items-center justify-between rounded-md gap-2 px-2 py-1.5 text-sm font-medium underline-offset-2 focus:outline-none focus-visible:underline"
+                    class="flex gap-2 justify-between items-center px-2 py-1.5 text-sm font-medium rounded-md underline-offset-2 focus:outline-none focus-visible:underline"
                     x-bind:class="isExpanded ? 'text-neutral-900 bg-black/10 dark:text-white dark:bg-white/10' :  'text-neutral-600 hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/5'">
                     <i class="fa-solid fa-user"></i>
                     <span class="mr-auto text-left">Settings</span>
@@ -141,10 +141,10 @@
         <div class="flex flex-col flex-1 min-h-screen bg-white dark:bg-neutral-950">
             <!-- Top navigation -->
             <nav
-                class="sticky top-0 z-10 flex items-center py-1 border-b justify-evenly border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900">
-                <div class="container flex items-center justify-between mx-3 h-14">
+                class="flex sticky top-0 z-10 justify-evenly items-center py-1 border-b border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900">
+                <div class="container flex justify-between items-center mx-3 h-14">
                     <!-- Site name + Logo -->
-                    <div class="flex items-center gap-4">
+                    <div class="flex gap-4 items-center">
                         <a href="{{ route('welcome') }}" class="w-24 text-neutral-600 dark:text-neutral-300"
                             wire:navigate>
                             <x-application-logo />
@@ -152,7 +152,7 @@
                     </div>
 
                     <!-- Desktop navigation -->
-                    <div class="items-center hidden gap-2 md:flex ">
+                    <div class="hidden gap-2 items-center md:flex">
 
                         {{-- <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
                             wire:navigate>
@@ -237,7 +237,7 @@
                     </div>
 
                     <!-- Right section -->
-                    <div class="flex items-center gap-2">
+                    <div class="flex gap-2 items-center">
 
 
                         <x-theme-toggle />
@@ -254,14 +254,14 @@
                             @guest
                             <!-- Guest user options -->
                             <button @click="userDropdownIsOpen = !userDropdownIsOpen"
-                                class="flex items-center gap-2 p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/5 dark:text-white">
+                                class="flex gap-2 items-center p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/5 dark:text-white">
                                 <i class="fa-solid fa-user"></i>
                             </button>
                             @endguest
 
                             <!-- Dropdown menu -->
                             <div x-cloak x-show="userDropdownIsOpen" @click.outside="userDropdownIsOpen = false"
-                                class="absolute right-0 z-20 w-48 mt-2 bg-white border rounded-md shadow-lg dark:bg-neutral-900 dark:border-neutral-700">
+                                class="absolute right-0 z-20 mt-2 w-48 bg-white rounded-md border shadow-lg dark:bg-neutral-900 dark:border-neutral-700">
                                 <div class="py-1">
                                     @auth
                                     <a href="{{ route('profile') }}" wire:navigate
@@ -306,13 +306,13 @@
             </nav>
 
             <!-- Main content -->
-            <main class="container flex-1 p-2 mx-auto md:p-4">
+            <main class="flex-1 p-2 md:mx-4">
                 {{ $slot }}
             </main>
 
             <!-- Footer -->
             <footer
-                class="py-3 text-center border-t border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300">
+                class="py-3 mt-auto text-center border-t border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300">
                 {{ $globalSettings['site_name'] }} Co.Ltd. &copy; 2025<br>
                 <div>{{ $globalSettings['footer_first_line']}}</div>
                 <div>{{ $globalSettings['footer_second_line'] }}</div>

@@ -27,8 +27,8 @@
 
     <!-- Table -->
     <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
-        <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
-            <thead class="text-sm bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
+        <table class="w-full text-xs text-left text-neutral-600 dark:text-neutral-400">
+            <thead class="text-xs bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                 <tr>
                     <th class="p-4">Subscriber</th>
                     <th class="p-4">Plan</th>
@@ -68,14 +68,14 @@
                         </span>
                     </td>
                     <td class="p-4 text-nowrap">
-                        <div class="flex flex-col gap-2 space-y-3">
+                        <div class="flex flex-col gap-2">
 
 
                             <!-- Subscribers Limit -->
                             @php
                             $subscribersLimit = $this->getFeatureDetails($subscription, 'Subscribers Limit');
                             @endphp
-                                <div class="flex items-center justify-between gap-2 mb-1">
+                                <div class="flex flex-col items-center justify-between gap-2 mb-1">
                                     <span class="text-xs text-gray-600 dark:text-gray-400">Subscribers</span>
                                     @if($subscription->suppressed_at)
                                     <span class="text-xs text-yellow-600 dark:text-yellow-400">
@@ -92,7 +92,7 @@
                             @php
                             $emailLimit = $this->getFeatureDetails($subscription, 'Email Sending');
                             @endphp
-                            <div class="flex items-center justify-between gap-2 mb-1">
+                            <div class="flex flex-col items-center justify-between gap-2 mb-1">
                                 <span class="text-xs text-gray-600 dark:text-gray-400">Email Sending</span>
                                 @if($subscription->suppressed_at)
                                 <span class="text-xs text-yellow-600 dark:text-yellow-400">

@@ -56,13 +56,15 @@ class EmailGatewayController extends Controller
             $validator = Validator::make($request->all(), [
                 'serverid' => 'required|exists:servers,name',
                 'username' => 'required|string|exists:users,username',
-                'pass' => 'required|string'
+                'pass' => 'required|string',
+                'quota'=>'required'
             ], [
                 'serverid.required' => 'Server ID is required',
                 'serverid.exists' => 'Invalid server ID',
                 'username.required' => 'Username is required',
                 'username.exists' => 'Invalid username',
-                'pass.required' => 'Password is required'
+                'pass.required' => 'Password is required',
+                'quota.required' => 'Quota is required'
             ]);
 
             if ($validator->fails()) {
@@ -152,6 +154,9 @@ class EmailGatewayController extends Controller
                 ], 404);
             }
 
+            $server->update([
+                'current_quota' => $request->quota,
+            ]);
             // Get active campaign
             $campaign = Campaign::whereHas('servers', function($query) use ($server) {
                 $query->where('server_id', $server->id);
@@ -172,7 +177,9 @@ class EmailGatewayController extends Controller
                     ],
                     'server' => [
                         'id' => $server->id,
-                        'name' => $server->name
+                        'name' => $server->name,
+                        'quota' => $server->current_quota,
+
                     ]
                 ], 404);
             }
@@ -190,7 +197,9 @@ class EmailGatewayController extends Controller
                     ],
                     'server' => [
                         'id' => $server->id,
-                        'name' => $server->name
+                        'name' => $server->name,
+                        'quota' => $server->current_quota,
+
                     ],
                     'campaign' => [
                         'id' => $campaign->id,
@@ -198,6 +207,9 @@ class EmailGatewayController extends Controller
                     ]
                 ], 400);
             }
+
+
+
 
             // Process emails
             try {
@@ -220,6 +232,7 @@ class EmailGatewayController extends Controller
                             'server' => [
                                 'id' => $server->id,
                                 'name' => $server->name,
+                                'quota' => $server->current_quota,
                             ],
                             'campaign' => [
                                 'id' => $campaign->id,
@@ -251,6 +264,8 @@ class EmailGatewayController extends Controller
                         'server' => [
                             'id' => $server->id,
                             'name' => $server->name,
+                            'quota' => $server->current_quota,
+
                             ],
                         'campaign' => [
                             'id' => $campaign->id,
@@ -283,6 +298,8 @@ class EmailGatewayController extends Controller
                     'server' => [
                         'id' => $server->id,
                         'name' => $server->name,
+                        'quota' => $server->current_quota,
+
                     ],
                     'campaign' => [
                         'id' => $campaign->id,
@@ -320,6 +337,8 @@ class EmailGatewayController extends Controller
                     'server' => [
                         'id' => $server->id,
                         'name' => $server->name,
+                        'quota' => $server->current_quota,
+
                     ],
                     'campaign' => [
                         'id' => $campaign->id,
