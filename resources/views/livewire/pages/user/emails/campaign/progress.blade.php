@@ -1,6 +1,6 @@
 <div
-    class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
-    <header class="flex flex-col items-center justify-between mb-6 md:flex-row">
+    class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+    <header class="flex flex-col justify-between items-center mb-6 md:flex-row">
         <div>
             <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
                 Campaign Progress: {{ $campaign->title }}
@@ -24,8 +24,8 @@
     </header>
 <div class="mb-6">
     <div
-        class="p-4 text-sm text-yellow-800 border border-yellow-200 rounded-lg bg-yellow-50 dark:bg-yellow-900/50 dark:border-yellow-700 dark:text-yellow-400">
-        <div class="flex items-center gap-2">
+        class="p-4 text-sm text-yellow-800 bg-yellow-50 rounded-lg border border-yellow-200 dark:bg-yellow-900/50 dark:border-yellow-700 dark:text-yellow-400">
+        <div class="flex gap-2 items-center">
             <i class="text-lg fas fa-exclamation-triangle"></i>
             <p class="font-medium">Note:</p>
         </div>
@@ -40,8 +40,8 @@
         <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
             <div class="relative flex-1">
                 <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search by email..."
-                    class="w-full pl-10" />
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    class="pl-10 w-full" />
+                <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </div>
             </div>
@@ -97,7 +97,7 @@
                             {{ ucfirst($record->status) }}
                         </span>
                     </td>
-                    <td class="p-4">{{ $record->sent_time->format('M d, Y H:i:s') }}</td>
+                    <td class="p-4">{{ $record->sent_time->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->format('d M, Y h:i:s A') }}</td>
                     <td class="p-4">
                         <button wire:click="deleteRecord({{ $record->id }})" wire:confirm="Are you sure?"
                             class="px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">

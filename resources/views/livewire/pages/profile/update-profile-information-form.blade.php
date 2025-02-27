@@ -15,6 +15,7 @@ new class extends Component
     public string $company = '';
     public string $country = '';
     public string $whatsapp = '';
+    public string $timezone = '';
 
     /**
      * Mount the component.
@@ -29,6 +30,7 @@ new class extends Component
         $this->company = $user->company ?? '';
         $this->country = $user->country ?? '';
         $this->whatsapp = $user->whatsapp ?? '';
+        $this->timezone = $user->timezone ?? config('app.timezone');
     }
 
     /**
@@ -44,6 +46,7 @@ new class extends Component
             'company' => ['nullable', 'string', 'max:50'],
             'country' => ['nullable', 'string', 'max:50'],
             'whatsapp' => ['string', 'regex:/^\+?\d{10,13}$/'],
+            'timezone' => ['required', 'string', 'timezone'],
         ]);
 
         $user->fill($validated);
@@ -81,7 +84,7 @@ new class extends Component
 }; ?>
 
 <section>
-    <header class="flex items-center gap-5">
+    <header class="flex gap-5 items-center">
         <i class="fa-solid fa-info fa-2xl"></i>
         <div>
             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -99,33 +102,46 @@ new class extends Component
 
             <div >
                 <x-input-label for="first_name" :value="__('First Name')" />
-                <x-text-input wire:model="first_name" id="first_name" name="first_name" type="text" class="block w-full mt-1" required autocomplete="given-name" />
+                <x-text-input wire:model="first_name" id="first_name" name="first_name" type="text" class="block mt-1 w-full" required autocomplete="given-name" />
                 <x-input-error class="mt-2" :messages="$errors->get('first_name')" />
             </div>
 
             <div >
                 <x-input-label for="last_name" :value="__('Last Name')" />
-                <x-text-input wire:model="last_name" id="last_name" name="last_name" type="text" class="block w-full mt-1" required autocomplete="family-name" />
+                <x-text-input wire:model="last_name" id="last_name" name="last_name" type="text" class="block mt-1 w-full" required autocomplete="family-name" />
                 <x-input-error class="mt-2" :messages="$errors->get('last_name')" />
             </div>
 
             <div >
                 <x-input-label for="company" :value="__('Company')" />
-                <x-text-input wire:model="company" id="company" name="company" type="text" class="block w-full mt-1"  autocomplete="organization" />
+                <x-text-input wire:model="company" id="company" name="company" type="text" class="block mt-1 w-full"  autocomplete="organization" />
                 <x-input-error class="mt-2" :messages="$errors->get('company')" />
             </div>
 
             <div >
                 <x-input-label for="country" :value="__('Country')" />
-                <x-text-input wire:model="country" id="country" name="country" type="text" class="block w-full mt-1"  autocomplete="country" />
+                <x-text-input wire:model="country" id="country" name="country" type="text" class="block mt-1 w-full"  autocomplete="country" />
                 <x-input-error class="mt-2" :messages="$errors->get('country')" />
             </div>
 
             <div >
                 <x-input-label for="whatsapp" :value="__('WhatsApp')" />
-                <x-text-input wire:model="whatsapp" id="whatsapp" name="whatsapp" type="text" class="block w-full mt-1"  autocomplete="tel" />
+                <x-text-input placeholder="+01096325697" wire:model="whatsapp" id="whatsapp" name="whatsapp" type="text" class="block mt-1 w-full"  autocomplete="tel" />
                 <x-input-error class="mt-2" :messages="$errors->get('whatsapp')" />
             </div>
+
+            @role('user')
+            <div>
+                <x-input-label for="timezone" :value="__('Timezone')" />
+                <x-primary-select-input wire:model="timezone" id="timezone" name="timezone"
+                    class="block mt-1 w-full rounded-md border-neutral-300 dark:border-neutral-600 dark:bg-neutral-900/50 dark:text-white focus:border-sky-500 focus:ring-sky-500">
+                    @foreach(timezone_identifiers_list() as $tz)
+                        <option value="{{ $tz }}">{{ $tz }}</option>
+                    @endforeach
+                </x-primary-select-input>
+                <x-input-error class="mt-2" :messages="$errors->get('timezone')" />
+            </div>
+            @endrole
 
         </div>
 
@@ -164,7 +180,7 @@ new class extends Component
             @endif
         </div>
 
-        <div class="flex items-center gap-4">
+        <div class="flex gap-4 items-center">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 
             <x-action-message class="me-3" on="profile-updated">

@@ -58,6 +58,9 @@ class GlobalSettingsMiddleware
             'meta_description' => SiteSetting::getValue('meta_description'),
             'meta_keywords' => SiteSetting::getValue('meta_keywords'),
 
+            'APP_TIMEZONE' => SiteSetting::getValue('APP_TIMEZONE'),
+
+
             // Add more settings as needed...
 
             'footer_first_line' => SiteSetting::getValue('footer_first_line'),

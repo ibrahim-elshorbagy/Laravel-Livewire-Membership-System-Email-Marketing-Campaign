@@ -1,13 +1,13 @@
 <div
-    class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
-    <header class="flex flex-col items-center justify-between mb-6 md:flex-row">
+    class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+    <header class="flex flex-col justify-between items-center mb-6 md:flex-row">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
             Messages
         </h2>
         <div class="mt-4 md:mt-0">
 
             <a href="{{ route('user.emails.message.form') }}"
-                class="inline-flex flex-col items-center px-2 py-1 text-xs font-semibold tracking-widest text-white transition duration-150 ease-in-out border rounded-md cursor-pointer md:px-4 md:py-2 text-nowrap bg-sky-600 dark:bg-sky-900 group border-sky-300 dark:border-sky-700 dark:text-sky-300 hover:bg-sky-700 dark:hover:bg-sky-100 focus:bg-sky-700 dark:focus:bg-sky-100 active:bg-sky-900 dark:active:bg-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-sky-800">
+                class="inline-flex flex-col items-center px-2 py-1 text-xs font-semibold tracking-widest text-white bg-sky-600 rounded-md border border-sky-300 transition duration-150 ease-in-out cursor-pointer md:px-4 md:py-2 text-nowrap dark:bg-sky-900 group dark:border-sky-700 dark:text-sky-300 hover:bg-sky-700 dark:hover:bg-sky-100 focus:bg-sky-700 dark:focus:bg-sky-100 active:bg-sky-900 dark:active:bg-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-sky-800">
                 Create New Message
             </a>
         </div>
@@ -18,8 +18,8 @@
         <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
             <div class="relative flex-1">
                 <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search Messages..."
-                    class="w-full pl-10" />
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    class="pl-10 w-full" />
+                <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </div>
             </div>
@@ -43,7 +43,7 @@
         </div>
     </div>
 
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex justify-between items-center mb-4">
         <div class="flex items-center space-x-4">
             @if(count($selectedTemplates) > 0)
             <span class="text-sm font-medium">{{ count($selectedTemplates) }} items selected</span>
@@ -55,7 +55,7 @@
         </div>
     </div>
     <!-- Table -->
-    <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
+    <div class="overflow-hidden overflow-x-auto w-full rounded-lg">
         <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
             <thead
                 class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
@@ -76,7 +76,7 @@
                             class="rounded">
                     </td>
                     <td class="p-4">{{ $message->email_subject }}</td>
-                    <td class="p-4">{{ $message->created_at->format('d / m / Y') }}</td>
+                    <td class="p-4">{{ $message->created_at->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->format('d / m / Y') }}</td>
                     <td class="p-4">
                         <div class="flex space-x-2">
 

@@ -23,6 +23,7 @@ class SiteSettings extends Component
     public $favicon;
     public $new_logo;
     public $new_favicon;
+    public $APP_TIMEZONE;
 
     // New properties for image previews
     public $logo_preview;
@@ -46,10 +47,9 @@ class SiteSettings extends Component
         'meta_title' => 'nullable|string|max:255',
         'meta_description' => 'nullable|string|max:500',
         'meta_keywords' => 'nullable|string|max:255',
-
+        'APP_TIMEZONE' => 'required|string',
         'footer_first_line' => 'nullable|string|max:255',
         'footer_second_line' => 'nullable|string|max:255',
-
     ];
 
     public function mount()
@@ -62,10 +62,9 @@ class SiteSettings extends Component
         $this->meta_title = SiteSetting::getValue('meta_title');
         $this->meta_description = SiteSetting::getValue('meta_description');
         $this->meta_keywords = SiteSetting::getValue('meta_keywords');
-
+        $this->APP_TIMEZONE = SiteSetting::getValue('APP_TIMEZONE');
         $this->footer_first_line = SiteSetting::getValue('footer_first_line');
         $this->footer_second_line = SiteSetting::getValue('footer_second_line');
-
     }
 
     // Preview logo
@@ -115,6 +114,12 @@ class SiteSettings extends Component
                     'env_keys' => [
                         'SUPPORT_PHONE' => 'app.support_phone'
                     ]
+                ],
+                'APP_TIMEZONE' => [
+                    'value' => $this->APP_TIMEZONE,
+                    'env_keys' => [
+                        'APP_TIMEZONE' => 'app.timezone'
+                    ]
                 ]
             ];
 
@@ -125,6 +130,7 @@ class SiteSettings extends Component
 
             SiteSetting::setValue('meta_description', $this->meta_description);
             SiteSetting::setValue('meta_keywords', $this->meta_keywords);
+            SiteSetting::setValue('APP_TIMEZONE', $this->APP_TIMEZONE);
 
             // Update footer settings
             SiteSetting::setValue('footer_first_line', $this->footer_first_line);
