@@ -104,10 +104,10 @@
                         @endif
                     </td>
                     <td class="p-4">{{
-                        $server->last_access_time?->timezone($globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i:s A')??
+                        $server->last_access_time?->format('d/m/Y h:i:s A')??
                         '' }}</td>
                     <td class="p-4">{{ $server->current_quota }}</td>
-                    <td class="p-4">{{ $server->created_at?->timezone($globalSettings['APP_TIMEZONE'])->format('d/m/Y
+                    <td class="p-4">{{ $server->created_at?->format('d/m/Y
                         h:i:s A') }}</td>
                     <td class="p-4">
                         <div class="flex space-x-2">
