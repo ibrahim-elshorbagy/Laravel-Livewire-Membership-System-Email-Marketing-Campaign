@@ -57,7 +57,7 @@ class EmailGatewayController extends Controller
                 'serverid' => 'required|exists:servers,name',
                 'username' => 'required|string|exists:users,username',
                 'pass' => 'required|string',
-                'quota'=>'required'
+                'quota'=>'required|integer'
             ], [
                 'serverid.required' => 'Server ID is required',
                 'serverid.exists' => 'Invalid server ID',
@@ -71,6 +71,7 @@ class EmailGatewayController extends Controller
                 return response()->json([
                     'error' => 'Validation failed',
                     'message' => implode(', ', $validator->errors()->all()),
+                    'error_number'=> 1,
                     'server' => [
                         'id' => $request->serverid ?? null
                     ]
@@ -91,6 +92,7 @@ class EmailGatewayController extends Controller
                 return response()->json([
                     'error' => 'Authentication failed',
                     'message' => 'Invalid API credentials',
+                    'error_number'=> 2,
                     'server' => [
                         'id' => $request->serverid
                     ]
@@ -104,6 +106,7 @@ class EmailGatewayController extends Controller
                 return response()->json([
                     'error' => 'Account inactive',
                     'message' => 'User account is currently inactive',
+                    'error_number'=> 3,
                     'server' => [
                         'id' => $request->serverid
                     ]
@@ -116,6 +119,7 @@ class EmailGatewayController extends Controller
                 return response()->json([
                     'error' => 'No subscription',
                     'message' => 'Active subscription required',
+                    'error_number'=> 4,
                     'server' => [
                         'id' => $request->serverid
                     ]
@@ -127,6 +131,7 @@ class EmailGatewayController extends Controller
                 return response()->json([
                     'error' => 'Quota exceeded',
                     'message' => 'Email sending limit reached',
+                    'error_number'=> 5,
                     'user' => [
                         'id' => $user->id,
                         'name' => $user->first_name . ' ' . $user->last_name,
@@ -148,6 +153,7 @@ class EmailGatewayController extends Controller
                 return response()->json([
                     'error' => 'Server not found',
                     'message' => 'Server not assigned to user',
+                    'error_number'=> 6,
                     'server' => [
                         'id' => $request->serverid
                     ]
@@ -170,6 +176,7 @@ class EmailGatewayController extends Controller
                 return response()->json([
                     'error' => 'No active campaign',
                     'message' => 'No active campaign found for this server',
+                    'error_number'=> 7,
                     'user' => [
                         'id' => $user->id,
                         'name' => $user->first_name . ' ' . $user->last_name,
@@ -190,6 +197,7 @@ class EmailGatewayController extends Controller
                 return response()->json([
                     'error' => 'Invalid campaign configuration',
                     'message' => 'Campaign has no email lists attached',
+                    'error_number'=> 8,
                     'user' => [
                         'id' => $user->id,
                         'name' => $user->first_name . ' ' . $user->last_name,

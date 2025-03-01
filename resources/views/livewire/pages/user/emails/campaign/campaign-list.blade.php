@@ -46,14 +46,14 @@
     <div class="overflow-hidden overflow-x-auto w-full rounded-lg">
         <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
             <thead
-                class="text-[10px] xl:text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
+                class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                 <tr>
                     <th scope="col" class="p-4">#</th>
                     <th scope="col" class="p-4">Title</th>
                     <th scope="col" class="p-4">Message</th>
-                    <th scope="col" class="p-4">Progress</th>
                     <th scope="col" class="p-4">Servers</th>
                     <th scope="col" class="p-4">Email Lists</th>
+                    <th scope="col" class="p-4">Progress</th>
                     <th scope="col" class="p-4">Created At</th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
@@ -61,26 +61,13 @@
             <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
                 @foreach($campaigns as $index => $campaign)
                 <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
-                    <td class="p-4 text-nowrap text-[10px] xl:text-xs">{{ $campaigns->firstItem() + $index }}</td>
-                    <td class="p-4 text-nowrap text-[10px] xl:text-xs">{{ $campaign->title }}</td>
-                    <td class="p-4 text-nowrap text-[10px] xl:text-xs">{{ $campaign->message->message_title }}</td>
-                    <td class="p-4 text-nowrap">
-                        @php
-                        $totalEmails = $campaign->emailLists->flatMap(function($list) {
-                        return $list->emails;
-                        })->count();
-                        $sentEmails = $campaign->emailHistories()->where('status', 'sent')->count();
-                        $percentage = $totalEmails > 0 ? round(($sentEmails / $totalEmails) * 100, 1) : 0;
-                        @endphp
-                        <span
-                            class="px-2 py-1 text-[10px] xl:text-xs rounded-full {{ $percentage == 100 ? 'bg-blue-500/10 text-blue-500 ' : 'bg-green-500/10 text-green-500' }}">
-                            {{ $percentage }}% ({{ $sentEmails }}/{{ $totalEmails }})
-                        </span>
-                    </td>
+                    <td class="p-4 text-nowrap">{{ $campaigns->firstItem() + $index }}</td>
+                    <td class="p-4 text-nowrap">{{ $campaign->title }}</td>
+                    <td class="p-4 text-nowrap">{{ $campaign->message->message_title }}</td>
                     <td class="p-4">
                         <div class="flex flex-wrap gap-1 text-nowrap">
                             @foreach($campaign->servers as $server)
-                            <span class="px-2 py-1 text-[10px] xl:text-xs text-blue-500 rounded-full bg-blue-500/10">
+                            <span class="px-2 py-1 text-xs text-blue-500 rounded-full bg-blue-500/10">
                                 {{ $server->name }}
                             </span>
                             @endforeach
@@ -89,13 +76,28 @@
                     <td class="p-4">
                         <div class="flex flex-wrap gap-1 text-nowrap">
                             @foreach($campaign->emailLists as $list)
-                            <span class="px-2 py-1 text-[10px] xl:text-xs text-green-500 rounded-full bg-green-500/10">
+                            <span class="px-2 py-1 text-xs text-green-500 rounded-full bg-green-500/10">
                                 {{ $list->name }}
                             </span>
                             @endforeach
                         </div>
                     </td>
-                    <td class="p-4 text-nowrap text-[10px] xl:text-xs">{{ $campaign->created_at->format('d/m/Y h:i A') }}</td>
+                    <td class="p-4 text-nowrap">
+                        @php
+                        $totalEmails = $campaign->emailLists->sum(function($list) {
+                        return $list->pivot->email_count;
+                        });
+                        $sentEmails = $campaign->emailHistories()->where('status', 'sent')->count();
+                        $percentage = $totalEmails > 0 ? round(($sentEmails / $totalEmails) * 100, 1) : 0;
+                        @endphp
+                        <a href="{{ route('user.campaigns.progress', $campaign) }}" wire:navigate>
+                            <span
+                                class="px-2 py-1 text-xs rounded-full {{ $percentage == 100 ? 'bg-green-500/10 text-green-500' : 'bg-blue-500/10 text-blue-500' }}">
+                                {{ $percentage }}% ({{ $sentEmails }}/{{ $totalEmails }})
+                            </span>
+                        </a>
+                    </td>
+                    <td class="p-4 text-nowrap">{{ $campaign->created_at->format('d/m/Y h:i A') }}</td>
                     <td class="p-4">
                         <div class="flex space-x-2">
 
@@ -104,7 +106,7 @@
                             <div class="flex items-center space-x-2">
                                         <div class="relative" x-data="{ showTooltip: false }">
                                             <button wire:click="toggleActive({{ $campaign->id }})" @if(!$campaign->canBeModified()) disabled @endif
-                                                class="inline-flex items-center px-2 py-1 text-[10px] xl:text-xs rounded-md
+                                                class="inline-flex items-center px-2 py-1 text-xs rounded-md
                                                 {{ $campaign->status === 'Sending' ? 'bg-green-500/10 text-green-500' :
                                                 ($campaign->status === 'Completed' ? 'bg-blue-500/10 text-blue-500' : 'bg-gray-500/10 text-gray-500') }}
                                                 {{ !$campaign->canBeActive() || !$campaign->canBeModified() ? 'opacity-50 cursor-not-allowed' :
@@ -121,11 +123,11 @@
                                                 x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
                                                 x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
                                                 x-transition:leave-end="opacity-0 translate-y-1"
-                                                class="absolute bottom-full left-1/2 z-10 px-3 py-2 mb-2 w-max text-[10px] xl:text-xs text-white rounded-lg shadow-lg -translate-x-1/2 bg-neutral-900"
+                                                class="absolute bottom-full left-1/2 z-10 px-3 py-2 mb-2 w-max text-sm text-white rounded-lg shadow-lg -translate-x-1/2 bg-neutral-900"
                                                 role="tooltip">
                                                 <div class="flex items-center space-x-1">
                                                     <i class="text-yellow-500 fas fa-exclamation-triangle"></i>
-                                                    <span class="text-[10px] xl:text-xs">
+                                                    <span>
                                                         @if($campaign->servers()->count() === 0 && $campaign->emailLists()->count() === 0)
                                                         No servers and email lists assigned
                                                         @elseif($campaign->servers()->count() === 0)
@@ -143,19 +145,19 @@
                                             @endif
                                         </div>
 
-                            <a href="{{ route('user.campaigns.progress', $campaign) }}" wire:navigate
-                                class="inline-flex items-center px-2 py-1 text-[10px] xl:text-xs text-purple-500 rounded-md bg-purple-900/10 hover:bg-purple-500/20">
+                            {{-- <a href="{{ route('user.campaigns.progress', $campaign) }}" wire:navigate
+                                class="inline-flex items-center px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-900/10 hover:bg-purple-500/20">
                                 <i class="mr-1 fas fa-chart-line"></i> Progress
-                            </a>
+                            </a> --}}
 
                             <a href="{{ route('user.campaigns.form', $campaign->id) }}" wire:navigate
-                                class="inline-flex items-center px-2 py-1 text-[10px] xl:text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
+                                class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
                                 <i class="mr-1 fas fa-edit"></i>
                             </a>
 
                             <button wire:click="deleteCampaign({{ $campaign->id }})"
                                 wire:confirm="Are you sure you want to delete this campaign?"
-                                class="inline-flex items-center px-2 py-1 text-[10px] xl:text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
+                                class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
                                 <i class="mr-1 fas fa-trash"></i>
                             </button>
                         </div>
