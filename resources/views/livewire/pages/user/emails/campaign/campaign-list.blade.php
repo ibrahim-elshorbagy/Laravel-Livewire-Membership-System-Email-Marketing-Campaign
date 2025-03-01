@@ -51,9 +51,9 @@
                     <th scope="col" class="p-4">#</th>
                     <th scope="col" class="p-4">Title</th>
                     <th scope="col" class="p-4">Message</th>
-                    <th scope="col" class="p-4">Progress</th>
                     <th scope="col" class="p-4">Servers</th>
                     <th scope="col" class="p-4">Email Lists</th>
+                    <th scope="col" class="p-4">Progress</th>
                     <th scope="col" class="p-4">Created At</th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
@@ -64,18 +64,6 @@
                     <td class="p-4 text-nowrap">{{ $campaigns->firstItem() + $index }}</td>
                     <td class="p-4 text-nowrap">{{ $campaign->title }}</td>
                     <td class="p-4 text-nowrap">{{ $campaign->message->message_title }}</td>
-                    <td class="p-4 text-nowrap">
-                        @php
-                            $totalEmails = $campaign->emailLists->flatMap(function($list) {
-                                return $list->emails;
-                            })->count();
-                            $sentEmails = $campaign->emailHistories()->where('status', 'sent')->count();
-                            $percentage = $totalEmails > 0 ? round(($sentEmails / $totalEmails) * 100, 1) : 0;
-                        @endphp
-                        <span class="px-2 py-1 text-xs rounded-full {{ $percentage == 100 ? 'bg-green-500/10 text-green-500' : 'bg-blue-500/10 text-blue-500' }}">
-                            {{ $percentage }}% ({{ $sentEmails }}/{{ $totalEmails }})
-                        </span>
-                    </td>
                     <td class="p-4">
                         <div class="flex flex-wrap gap-1 text-nowrap">
                             @foreach($campaign->servers as $server)
@@ -93,6 +81,21 @@
                             </span>
                             @endforeach
                         </div>
+                    </td>
+                    <td class="p-4 text-nowrap">
+                        @php
+                        $totalEmails = $campaign->emailLists->flatMap(function($list) {
+                        return $list->emails;
+                        })->count();
+                        $sentEmails = $campaign->emailHistories()->where('status', 'sent')->count();
+                        $percentage = $totalEmails > 0 ? round(($sentEmails / $totalEmails) * 100, 1) : 0;
+                        @endphp
+                        <a href="{{ route('user.campaigns.progress', $campaign) }}" wire:navigate >
+                            <span
+                                class="px-2 py-1 text-xs rounded-full {{ $percentage == 100 ? 'bg-green-500/10 text-green-500' : 'bg-blue-500/10 text-blue-500' }}">
+                                {{ $percentage }}% ({{ $sentEmails }}/{{ $totalEmails }})
+                            </span>
+                        </a>
                     </td>
                     <td class="p-4 text-nowrap">{{ $campaign->created_at->format('d/m/Y h:i A') }}</td>
                     <td class="p-4">
@@ -142,10 +145,10 @@
                                             @endif
                                         </div>
 
-                            <a href="{{ route('user.campaigns.progress', $campaign) }}" wire:navigate
+                            {{-- <a href="{{ route('user.campaigns.progress', $campaign) }}" wire:navigate
                                 class="inline-flex items-center px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-900/10 hover:bg-purple-500/20">
                                 <i class="mr-1 fas fa-chart-line"></i> Progress
-                            </a>
+                            </a> --}}
 
                             <a href="{{ route('user.campaigns.form', $campaign->id) }}" wire:navigate
                                 class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
