@@ -1,6 +1,6 @@
 <div
-    class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
-    <header class="flex flex-col items-center justify-between mb-6 md:flex-row">
+    class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+    <header class="flex flex-col justify-between items-center mb-6 md:flex-row">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
             My Campaigns
         </h2>
@@ -16,8 +16,8 @@
         <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
             <div class="relative flex-1">
                 <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search campaigns..."
-                    class="w-full pl-10" />
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    class="pl-10 w-full" />
+                <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </div>
             </div>
@@ -43,14 +43,15 @@
     </div>
 
     <!-- Table -->
-    <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
+    <div class="overflow-hidden overflow-x-auto w-full rounded-lg">
         <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
             <thead
-                class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
+                class="text-[10px] xl:text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                 <tr>
                     <th scope="col" class="p-4">#</th>
                     <th scope="col" class="p-4">Title</th>
                     <th scope="col" class="p-4">Message</th>
+                    <th scope="col" class="p-4">Progress</th>
                     <th scope="col" class="p-4">Servers</th>
                     <th scope="col" class="p-4">Email Lists</th>
                     <th scope="col" class="p-4">Created At</th>
@@ -60,13 +61,26 @@
             <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
                 @foreach($campaigns as $index => $campaign)
                 <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
-                    <td class="p-4 text-nowrap">{{ $campaigns->firstItem() + $index }}</td>
-                    <td class="p-4 text-nowrap">{{ $campaign->title }}</td>
-                    <td class="p-4 text-nowrap">{{ $campaign->message->message_title }}</td>
+                    <td class="p-4 text-nowrap text-[10px] xl:text-xs">{{ $campaigns->firstItem() + $index }}</td>
+                    <td class="p-4 text-nowrap text-[10px] xl:text-xs">{{ $campaign->title }}</td>
+                    <td class="p-4 text-nowrap text-[10px] xl:text-xs">{{ $campaign->message->message_title }}</td>
+                    <td class="p-4 text-nowrap">
+                        @php
+                        $totalEmails = $campaign->emailLists->flatMap(function($list) {
+                        return $list->emails;
+                        })->count();
+                        $sentEmails = $campaign->emailHistories()->where('status', 'sent')->count();
+                        $percentage = $totalEmails > 0 ? round(($sentEmails / $totalEmails) * 100, 1) : 0;
+                        @endphp
+                        <span
+                            class="px-2 py-1 text-[10px] xl:text-xs rounded-full {{ $percentage == 100 ? 'bg-blue-500/10 text-blue-500 ' : 'bg-green-500/10 text-green-500' }}">
+                            {{ $percentage }}% ({{ $sentEmails }}/{{ $totalEmails }})
+                        </span>
+                    </td>
                     <td class="p-4">
                         <div class="flex flex-wrap gap-1 text-nowrap">
                             @foreach($campaign->servers as $server)
-                            <span class="px-2 py-1 text-xs text-blue-500 rounded-full bg-blue-500/10">
+                            <span class="px-2 py-1 text-[10px] xl:text-xs text-blue-500 rounded-full bg-blue-500/10">
                                 {{ $server->name }}
                             </span>
                             @endforeach
@@ -75,13 +89,13 @@
                     <td class="p-4">
                         <div class="flex flex-wrap gap-1 text-nowrap">
                             @foreach($campaign->emailLists as $list)
-                            <span class="px-2 py-1 text-xs text-green-500 rounded-full bg-green-500/10">
+                            <span class="px-2 py-1 text-[10px] xl:text-xs text-green-500 rounded-full bg-green-500/10">
                                 {{ $list->name }}
                             </span>
                             @endforeach
                         </div>
                     </td>
-                    <td class="p-4 text-nowrap">{{ $campaign->created_at->format('d/m/Y h:i A') }}</td>
+                    <td class="p-4 text-nowrap text-[10px] xl:text-xs">{{ $campaign->created_at->format('d/m/Y h:i A') }}</td>
                     <td class="p-4">
                         <div class="flex space-x-2">
 
@@ -90,7 +104,7 @@
                             <div class="flex items-center space-x-2">
                                         <div class="relative" x-data="{ showTooltip: false }">
                                             <button wire:click="toggleActive({{ $campaign->id }})" @if(!$campaign->canBeModified()) disabled @endif
-                                                class="inline-flex items-center px-2 py-1 text-xs rounded-md
+                                                class="inline-flex items-center px-2 py-1 text-[10px] xl:text-xs rounded-md
                                                 {{ $campaign->status === 'Sending' ? 'bg-green-500/10 text-green-500' :
                                                 ($campaign->status === 'Completed' ? 'bg-blue-500/10 text-blue-500' : 'bg-gray-500/10 text-gray-500') }}
                                                 {{ !$campaign->canBeActive() || !$campaign->canBeModified() ? 'opacity-50 cursor-not-allowed' :
@@ -107,11 +121,11 @@
                                                 x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
                                                 x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
                                                 x-transition:leave-end="opacity-0 translate-y-1"
-                                                class="absolute z-10 px-3 py-2 mb-2 text-sm text-white -translate-x-1/2 rounded-lg shadow-lg bottom-full left-1/2 w-max bg-neutral-900"
+                                                class="absolute bottom-full left-1/2 z-10 px-3 py-2 mb-2 w-max text-[10px] xl:text-xs text-white rounded-lg shadow-lg -translate-x-1/2 bg-neutral-900"
                                                 role="tooltip">
                                                 <div class="flex items-center space-x-1">
                                                     <i class="text-yellow-500 fas fa-exclamation-triangle"></i>
-                                                    <span>
+                                                    <span class="text-[10px] xl:text-xs">
                                                         @if($campaign->servers()->count() === 0 && $campaign->emailLists()->count() === 0)
                                                         No servers and email lists assigned
                                                         @elseif($campaign->servers()->count() === 0)
@@ -123,26 +137,26 @@
                                                 </div>
                                                 <!-- Arrow -->
                                                 <div
-                                                    class="absolute w-0 h-0 -translate-x-1/2 border-t-8 border-l-8 border-r-8 left-1/2 top-full border-l-transparent border-r-transparent border-neutral-900">
+                                                    class="absolute top-full left-1/2 w-0 h-0 border-t-8 border-r-8 border-l-8 -translate-x-1/2 border-l-transparent border-r-transparent border-neutral-900">
                                                 </div>
                                             </div>
                                             @endif
                                         </div>
 
                             <a href="{{ route('user.campaigns.progress', $campaign) }}" wire:navigate
-                                class="inline-flex items-center px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-900/10 hover:bg-purple-500/20">
+                                class="inline-flex items-center px-2 py-1 text-[10px] xl:text-xs text-purple-500 rounded-md bg-purple-900/10 hover:bg-purple-500/20">
                                 <i class="mr-1 fas fa-chart-line"></i> Progress
                             </a>
 
                             <a href="{{ route('user.campaigns.form', $campaign->id) }}" wire:navigate
-                                class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
-                                <i class="mr-1 fas fa-edit"></i> Edit
+                                class="inline-flex items-center px-2 py-1 text-[10px] xl:text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
+                                <i class="mr-1 fas fa-edit"></i>
                             </a>
 
                             <button wire:click="deleteCampaign({{ $campaign->id }})"
                                 wire:confirm="Are you sure you want to delete this campaign?"
-                                class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
-                                <i class="mr-1 fas fa-trash"></i> Delete
+                                class="inline-flex items-center px-2 py-1 text-[10px] xl:text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
+                                <i class="mr-1 fas fa-trash"></i>
                             </button>
                         </div>
                     </td>

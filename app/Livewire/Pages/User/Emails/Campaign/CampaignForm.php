@@ -59,15 +59,16 @@ class CampaignForm extends Component
     public function getAvailableServersProperty()
     {
         return Server::where('assigned_to_user_id', Auth::id())
-            ->whereNotIn('id', function($query) {
-                $query->select('server_id')
-                    ->from('campaign_servers')
-                    ->whereNotIn('campaign_id', [$this->campaign_id ?? 0]);
-            })
             ->when($this->serverSearch, function($query) {
                 $query->where('name', 'like', '%' . $this->serverSearch . '%');
             })
-            ->get();
+            ->get()
+            ->map(function($server) {
+                $server->is_used = $server->campaignServers()
+                    ->where('campaign_id', '!=', $this->campaign_id ?? 0)
+                    ->exists();
+                return $server;
+            });
     }
 
     public function getAvailableListsProperty()
@@ -95,6 +96,20 @@ class CampaignForm extends Component
     public function saveCampaign()
     {
         $this->validate();
+
+        // Check if any selected servers are already in use
+        $usedServers = Server::whereIn('id', $this->selectedServers)
+            ->get()
+            ->filter(function($server) {
+                return $server->campaignServers()
+                    ->where('campaign_id', '!=', $this->campaign_id ?? 0)
+                    ->exists();
+            });
+
+        if ($usedServers->isNotEmpty()) {
+            $this->alert('error', 'Some selected servers are already in use by other campaigns.', ['position' => 'bottom-end']);
+            return;
+        }
 
         try {
             DB::beginTransaction();

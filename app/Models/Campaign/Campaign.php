@@ -51,4 +51,8 @@ class Campaign extends Model
             $this->emailLists()->count() > 0;
     }
 
+    public function emailHistories()
+    {
+        return $this->hasMany(EmailHistory::class);
+    }
 }

@@ -1,6 +1,6 @@
 <div
-    class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
-    <header class="flex flex-col items-center justify-between mb-6 md:flex-row">
+    class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+    <header class="flex flex-col justify-between items-center mb-6 md:flex-row">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
             {{ $campaign_id ? 'Edit Campaign' : 'New Campaign' }}
         </h2>
@@ -15,7 +15,7 @@
         <!-- Title -->
         <div>
             <x-input-label for="title" required>Campaign Title</x-input-label>
-            <x-text-input wire:model="title" id="title" type="text" class="block w-full mt-1" required />
+            <x-text-input wire:model="title" id="title" type="text" class="block mt-1 w-full" required />
             <x-input-error :messages="$errors->get('title')" class="mt-2" />
         </div>
 
@@ -24,7 +24,7 @@
             <x-input-label for="message" required>Email Message</x-input-label>
             <div class="mt-1">
                 <button type="button" @click="open = !open"
-                    class="w-full px-4 py-2 text-left border rounded-md shadow-sm dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    class="px-4 py-2 w-full text-left rounded-md border shadow-sm dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
                     @if($message_id && $availableMessages->firstWhere('id', $message_id))
                     {{ $availableMessages->firstWhere('id', $message_id)->message_title }}
                     @else
@@ -33,13 +33,13 @@
                 </button>
 
                 <div x-show="open" @click.outside="open = false"
-                    class="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg dark:bg-neutral-800">
+                    class="absolute z-50 mt-1 w-full bg-white rounded-md shadow-lg dark:bg-neutral-800">
                     <div class="p-2">
                         <input type="text" wire:model.live="messageSearch"
-                            class="w-full px-3 py-2 border rounded-md dark:bg-neutral-700 dark:border-neutral-600"
+                            class="px-3 py-2 w-full rounded-md border dark:bg-neutral-700 dark:border-neutral-600"
                             placeholder="Search messages...">
 
-                        <div class="mt-2 overflow-y-auto max-h-48">
+                        <div class="overflow-y-auto mt-2 max-h-48">
                             @foreach($availableMessages as $message)
                             <div class="px-3 py-2 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700
                                 {{ $message_id == $message->id ? 'bg-sky-50 dark:bg-sky-900' : '' }}"
@@ -62,7 +62,7 @@
             <x-input-label for="servers" required>Select Servers</x-input-label>
             <div class="mt-1">
                 <button type="button" @click="open = !open"
-                    class="w-full px-4 py-2 text-left border rounded-md shadow-sm dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    class="px-4 py-2 w-full text-left rounded-md border shadow-sm dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
                     {{ count($selectedServers) }} server(s) selected
                 </button>
 
@@ -83,19 +83,30 @@
                 @endif
 
                 <div x-show="open" @click.outside="open = false"
-                    class="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg dark:bg-neutral-800">
+                    class="absolute z-50 mt-1 w-full bg-white rounded-md shadow-lg dark:bg-neutral-800">
                     <div class="p-2">
                         <input type="text" wire:model.live="serverSearch"
-                            class="w-full px-3 py-2 border rounded-md dark:bg-neutral-700 dark:border-neutral-600"
+                            class="px-3 py-2 w-full rounded-md border dark:bg-neutral-700 dark:border-neutral-600"
                             placeholder="Search servers...">
 
-                        <div class="mt-2 overflow-y-auto max-h-48">
+                        <div class="overflow-y-auto mt-2 max-h-48">
                             @foreach($availableServers as $server)
                             <label
-                                class="flex items-center px-3 py-2 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700">
-                                <input type="checkbox" wire:model.live="selectedServers" value="{{ $server->id }}"
-                                    class="rounded border-neutral-300 dark:border-neutral-700">
-                                <span class="ml-2">{{ $server->name }}</span>
+                                class="flex justify-between items-center px-3 py-2 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700">
+                                <div class="flex items-center">
+                                    <input type="checkbox" wire:model.live="selectedServers" value="{{ $server->id }}"
+                                        {{ $server->is_used ? 'disabled' : '' }}
+                                    class="rounded border-neutral-300 dark:border-neutral-700 {{ $server->is_used ?
+                                    'opacity-50 cursor-not-allowed' : '' }}">
+                                    <span class="ml-2 {{ $server->is_used ? 'opacity-50' : '' }}">{{ $server->name
+                                        }}</span>
+                                </div>
+                                @if($server->is_used)
+                                <span
+                                    class="px-2 py-1 text-xs text-amber-700 bg-amber-100 rounded-full dark:bg-amber-900 dark:text-amber-300">
+                                    Used in another campaign
+                                </span>
+                                @endif
                             </label>
                             @endforeach
                         </div>
@@ -110,7 +121,7 @@
             <x-input-label for="lists" required>Select Email Lists</x-input-label>
             <div class="mt-1">
                 <button type="button" @click="open = !open"
-                    class="w-full px-4 py-2 text-left border rounded-md shadow-sm dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                    class="px-4 py-2 w-full text-left rounded-md border shadow-sm dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
                     {{ count($selectedLists) }} list(s) selected
                 </button>
 
@@ -132,13 +143,13 @@
                 @endif
 
                 <div x-show="open" @click.outside="open = false"
-                    class="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg dark:bg-neutral-800">
+                    class="absolute z-50 mt-1 w-full bg-white rounded-md shadow-lg dark:bg-neutral-800">
                     <div class="p-2">
                         <input type="text" wire:model.live="listSearch"
-                            class="w-full px-3 py-2 border rounded-md dark:bg-neutral-700 dark:border-neutral-600"
+                            class="px-3 py-2 w-full rounded-md border dark:bg-neutral-700 dark:border-neutral-600"
                             placeholder="Search lists...">
 
-                        <div class="mt-2 overflow-y-auto max-h-48">
+                        <div class="overflow-y-auto mt-2 max-h-48">
                             @foreach($availableLists as $list)
                             <label
                                 class="flex items-center px-3 py-2 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700">
