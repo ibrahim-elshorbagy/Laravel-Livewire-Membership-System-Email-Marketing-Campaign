@@ -130,6 +130,12 @@
                             <span>Site Settings</span>
                         </x-nav-link>
                     </li>
+                    <li class="px-1 py-0.5">
+                        <x-nav-link :active="request()->routeIs('admin.site-api-errors')" href="{{ route('admin.site-api-errors') }}"
+                            wire:navigate>
+                            <span>Api Errors</span>
+                        </x-nav-link>
+                    </li>
                 </ul>
             </div>
             @endpersist('sidebar')
@@ -228,6 +234,10 @@
                             <x-nav-link :active="request()->routeIs('admin.site-settings')"
                                 href="{{ route('admin.site-settings') }}" wire:navigate>
                                 <span>Site Settings</span>
+                            </x-nav-link>
+
+                            <x-nav-link :active="request()->routeIs('admin.site-api-errors')" href="{{ route('admin.site-api-errors') }}" wire:navigate>
+                                <span>Api Errors</span>
                             </x-nav-link>
                         </x-primary-dropdown>
                         @endrole

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin\Site\ApiError;
+use App\Models\Admin\Site\SiteSetting;
 use App\Models\User;
 use App\Models\Campaign\Campaign;
 use App\Models\Campaign\EmailHistory;
 use App\Models\EmailList;
+use App\Models\Server;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -43,6 +46,7 @@ class EmailGatewayController extends Controller
             //     return response()->json([
             //         'error' => 'Access Denied',
             //         'message' => 'Invalid User-Agent',
+            //         'error_number'=> 1,
             //         'user_agent' => $request->header('User-Agent'),
             //         'server' => [
             //             'id' => $request->serverid ?? null
@@ -50,28 +54,55 @@ class EmailGatewayController extends Controller
             //     ], 403);
             // }
 
+            $maintenance = SiteSetting::getValue('maintenance');
+
+            if ($maintenance) {
+                $apiError = ApiError::create([
+                    'serverid' => $request->serverid ?? null,
+                    'error_data' => [
+                        'error' => 'Maintenance Mode',
+                        'message' => 'System is currently under maintenance',
+                        'error_number' => 2
+                    ]
+                ]);
+
+                return response()->json([
+                    'error' => 'Maintenance Mode',
+                    'message' => 'System is currently under maintenance',
+                    'error_number'=> 2,
+                    'server' => [
+                        'id' => $request->serverid ?? null
+                    ]
+                ], 503);
+            }
 
 
             // Validate request
             $validator = Validator::make($request->all(), [
                 'serverid' => 'required|exists:servers,name',
-                'username' => 'required|string|exists:users,username',
                 'pass' => 'required|string',
                 'quota'=>'required|integer'
             ], [
                 'serverid.required' => 'Server ID is required',
                 'serverid.exists' => 'Invalid server ID',
-                'username.required' => 'Username is required',
-                'username.exists' => 'Invalid username',
                 'pass.required' => 'Password is required',
                 'quota.required' => 'Quota is required'
             ]);
 
             if ($validator->fails()) {
+                $apiError = ApiError::create([
+                    'serverid' => $request->serverid ?? null,
+                    'error_data' => [
+                        'error' => 'Validation failed',
+                        'message' => implode(', ', $validator->errors()->all()),
+                        'error_number' => 3
+                    ]
+                ]);
+
                 return response()->json([
                     'error' => 'Validation failed',
                     'message' => implode(', ', $validator->errors()->all()),
-                    'error_number'=> 1,
+                    'error_number'=> 3,
                     'server' => [
                         'id' => $request->serverid ?? null
                     ]
@@ -83,30 +114,52 @@ class EmailGatewayController extends Controller
             //     'ip' => $request->ip(),
             //     'origin' => $request->header('Origin'),
             //     'user_agent' => $request->header('User-Agent'),
-            //     'username' => $request->username,
             //     'serverid' => $request->serverid
             // ]);
 
             // Check API pass
             if ($request->pass !== $this->apiPassword) {
+                $apiError = ApiError::create([
+                    'serverid' => $request->serverid,
+                    'error_data' => [
+                        'error' => 'Authentication failed',
+                        'message' => 'Invalid API credentials',
+                        'error_number' => 4
+                    ]
+                ]);
+
                 return response()->json([
                     'error' => 'Authentication failed',
                     'message' => 'Invalid API credentials',
-                    'error_number'=> 2,
+                    'error_number'=> 4,
                     'server' => [
                         'id' => $request->serverid
                     ]
                 ], 401);
             }
 
+
+
+            // Validate server assignment
+            $server = Server::where('name', $request->serverid)->first();
+
             // Find and validate user
-            $user = User::where('username', $request->username)->first();
+            $user = User::where('id', $server->assigned_to_user_id)->first();
 
             if (!$user->active) {
+                $apiError = ApiError::create([
+                    'serverid' => $request->serverid,
+                    'error_data' => [
+                        'error' => 'Account inactive',
+                        'message' => 'User account is currently inactive',
+                        'error_number' => 5
+                    ]
+                ]);
+
                 return response()->json([
                     'error' => 'Account inactive',
                     'message' => 'User account is currently inactive',
-                    'error_number'=> 3,
+                    'error_number'=> 5,
                     'server' => [
                         'id' => $request->serverid
                     ]
@@ -116,10 +169,19 @@ class EmailGatewayController extends Controller
             // Validate subscription
             $subscription = $user->lastSubscription();
             if (!$subscription) {
+                $apiError = ApiError::create([
+                    'serverid' => $request->serverid,
+                    'error_data' => [
+                        'error' => 'No subscription',
+                        'message' => 'Active subscription required',
+                        'error_number' => 6
+                    ]
+                ]);
+
                 return response()->json([
                     'error' => 'No subscription',
                     'message' => 'Active subscription required',
-                    'error_number'=> 4,
+                    'error_number'=> 6,
                     'server' => [
                         'id' => $request->serverid
                     ]
@@ -128,15 +190,24 @@ class EmailGatewayController extends Controller
 
             // Check if can consume batch size
             if (!$user->canConsume('Email Sending', $this->batchSize)) {
+                $apiError = ApiError::create([
+                    'serverid' => $request->serverid,
+                    'error_data' => [
+                        'error' => 'Quota exceeded',
+                        'message' => 'Email sending limit reached',
+                        'error_number' => 7
+                    ]
+                ]);
+
                 return response()->json([
                     'error' => 'Quota exceeded',
                     'message' => 'Email sending limit reached',
-                    'error_number'=> 5,
+                    'error_number'=> 7,
                     'user' => [
                         'id' => $user->id,
                         'name' => $user->first_name . ' ' . $user->last_name,
                         'email' => $user->email,
-                        'remaining_quota' => $user->balance('Email Sending'),
+                        'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
                     ],
                     'server' => [
                         'id' => $request->serverid
@@ -144,26 +215,7 @@ class EmailGatewayController extends Controller
                 ], 403);
             }
 
-            // Validate server assignment
-            $server = $user->servers()
-                ->where('name', $request->serverid)
-                ->first();
 
-            if (!$server) {
-                return response()->json([
-                    'error' => 'Server not found',
-                    'message' => 'Server not assigned to user',
-                    'error_number'=> 6,
-                    'server' => [
-                        'id' => $request->serverid
-                    ]
-                ], 404);
-            }
-
-            $server->update([
-                'current_quota' => $request->quota,
-                'last_access_time'=> Carbon::now(),
-            ]);
             // Get active campaign
             $campaign = Campaign::whereHas('servers', function($query) use ($server) {
                 $query->where('server_id', $server->id);
@@ -173,52 +225,38 @@ class EmailGatewayController extends Controller
             ->first();
 
             if (!$campaign) {
+                $apiError = ApiError::create([
+                    'serverid' => $request->serverid,
+                    'error_data' => [
+                        'error' => 'No active campaign',
+                        'message' => 'No active campaign found for this server',
+                        'error_number' => 8
+                    ]
+                ]);
+
                 return response()->json([
                     'error' => 'No active campaign',
                     'message' => 'No active campaign found for this server',
-                    'error_number'=> 7,
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => $user->first_name . ' ' . $user->last_name,
-                        'email' => $user->email,
-                        'remaining_quota' => $user->balance('Email Sending'),
-                    ],
-                    'server' => [
-                        'id' => $server->id,
-                        'name' => $server->name,
-                        'quota' => $server->current_quota,
-
-                    ]
-                ], 404);
-            }
-
-            // Check if campaign has lists
-            if ($campaign->emailLists->isEmpty()) {
-                return response()->json([
-                    'error' => 'Invalid campaign configuration',
-                    'message' => 'Campaign has no email lists attached',
                     'error_number'=> 8,
                     'user' => [
                         'id' => $user->id,
                         'name' => $user->first_name . ' ' . $user->last_name,
                         'email' => $user->email,
-                        'remaining_quota' => $user->balance('Email Sending'),
+                        'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
                     ],
                     'server' => [
                         'id' => $server->id,
                         'name' => $server->name,
-                        'quota' => $server->current_quota,
+                        'PreSendServerQuota' => $server->current_quota,
 
-                    ],
-                    'campaign' => [
-                        'id' => $campaign->id,
-                        'title' => $campaign->title
                     ]
-                ], 400);
+                ], 404);
             }
 
-
-
+            $server->update([
+                'current_quota' => $request->quota,
+                'last_access_time'=> Carbon::now(),
+            ]);
 
             // Process emails
             try {
@@ -227,70 +265,33 @@ class EmailGatewayController extends Controller
                 $summary = $result['summary'];
 
                 if (empty($emailsToSend)) {
-                    if ($summary['remaining_emails'] === 0) {
-                        return response()->json([
-                            'status' => 'completed',
-                            'message' => 'Campaign completed - all emails processed',
-                            'referer' => $request->server('HTTP_REFERER'),
-                            'user' => [
-                                'id' => $user->id,
-                                'name' => $user->first_name . ' ' . $user->last_name,
-                                'email' => $user->email,
-                                'remaining_quota' => $user->balance('Email Sending'),
-                            ],
-                            'server' => [
-                                'id' => $server->id,
-                                'name' => $server->name,
-                                'quota' => $server->current_quota,
-                            ],
-                            'campaign' => [
-                                'id' => $campaign->id,
-                                'title' => $campaign->title,
-                                'message' => [
-                                    'subject' => $campaign->message->email_subject,
-                                    'html_content' => html_entity_decode($campaign->message->message_html),
 
-                                    'plain_text' => $campaign->message->message_plain_text,
-                                    'sender_name' => $campaign->message->sender_name,
-                                    'reply_to' => $campaign->message->reply_to_email,
-                                ],
-                                'processing_summary' => $summary,
-
-                            ]
-                        ], 200);
-                    }
+                $apiError = ApiError::create([
+                    'serverid' => $request->serverid,
+                    'error_data' => [
+                        'error' => 'No Emails avaiable',
+                        'message' =>  "No emails found for this server's campaign ",
+                        'error_number' => 9
+                    ]
+                ]);
 
                     return response()->json([
-                        'status' => 'no_emails',
-                        'message' => 'No emails available for current batch',
+                        'error' => 'No Emails avaiable',
+                        'message' => "No emails found for this server's campaign ",
+                        'error_number'=> 9,
                         'referer' => $request->server('HTTP_REFERER'),
                         'user' => [
                             'id' => $user->id,
                             'name' => $user->first_name . ' ' . $user->last_name,
                             'email' => $user->email,
-                            'remaining_quota' => $user->balance('Email Sending'),
+                            'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
                         ],
                         'server' => [
                             'id' => $server->id,
                             'name' => $server->name,
-                            'quota' => $server->current_quota,
-
+                            'PreSendServerQuota' => $server->current_quota,
                             ],
-                        'campaign' => [
-                            'id' => $campaign->id,
-                            'title' => $campaign->title,
-                            'message' => [
-                                'subject' => $campaign->message->email_subject,
-                                'html_content' => html_entity_decode($campaign->message->message_html),
-
-                                'plain_text' => $campaign->message->message_plain_text,
-                                'sender_name' => $campaign->message->sender_name,
-                                'reply_to' => $campaign->message->reply_to_email,
-                            ],
-                            'processing_summary' => $summary,
-
-                        ]
-                    ], 200);
+                    ], 404);
                 }
 
                 // Return success response
@@ -302,12 +303,12 @@ class EmailGatewayController extends Controller
                         'id' => $user->id,
                         'name' => $user->first_name . ' ' . $user->last_name,
                         'email' => $user->email,
-                        'remaining_quota' => $user->balance('Email Sending'),
+                        'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
                     ],
                     'server' => [
                         'id' => $server->id,
                         'name' => $server->name,
-                        'quota' => $server->current_quota,
+                        'PreSendServerQuota' => $server->current_quota,
 
                     ],
                     'campaign' => [
@@ -341,12 +342,12 @@ class EmailGatewayController extends Controller
                         'id' => $user->id,
                         'name' => $user->first_name . ' ' . $user->last_name,
                         'email' => $user->email,
-                        'remaining_quota' => $user->balance('Email Sending'),
+                        'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
                     ],
                     'server' => [
                         'id' => $server->id,
                         'name' => $server->name,
-                        'quota' => $server->current_quota,
+                        'PreSendServerQuota' => $server->current_quota,
 
                     ],
                     'campaign' => [
@@ -381,13 +382,7 @@ class EmailGatewayController extends Controller
         $totalCampaignEmails = EmailList::whereIn('list_id', $campaign->emailLists->pluck('id'))->count();
 
         // Only count valid email histories
-        $totalProcessedEmails = EmailHistory::where('campaign_id', $campaign->id)
-            ->whereIn('email_id', function($query) use ($campaign) {
-                $query->select('id')
-                    ->from('email_lists')
-                    ->whereIn('list_id', $campaign->emailLists->pluck('id'));
-            })
-            ->count();
+        $totalProcessedEmails = EmailHistory::where('campaign_id', $campaign->id)->count();
 
         // Ensure we don't have negative numbers
         $remainingEmails = max(0, $totalCampaignEmails - $totalProcessedEmails);
@@ -401,7 +396,7 @@ class EmailGatewayController extends Controller
                 : 0
         ];
 
-                foreach ($campaign->emailLists as $list) {
+        foreach ($campaign->emailLists as $list) {
 
             if (count($emailsToSend) >= $this->batchSize) break;
 

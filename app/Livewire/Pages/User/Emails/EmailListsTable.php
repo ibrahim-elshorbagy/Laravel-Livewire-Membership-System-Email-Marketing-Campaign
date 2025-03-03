@@ -228,7 +228,7 @@ class EmailListsTable extends Component
         $query = EmailList::query()
             ->select(['id', 'email'])
             ->with(['history' => function($query) {
-                $query->with('campaign:id,title')
+                $query->with(['campaign:id,message_id', 'campaign.message:id,email_subject'])
                     ->orderBy('sent_time', 'desc');
             }])
             ->where('user_id', $this->user->id)

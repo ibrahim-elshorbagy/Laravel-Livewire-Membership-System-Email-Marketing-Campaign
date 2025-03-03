@@ -94,7 +94,7 @@
                             isDisabled: {{ !$selectedList || ($selectedList && $this->lists->firstWhere('id', $selectedList)?->emails_count == 0) ? 'true' : 'false' }}
                         }"
                             wire:click="deleteEmails('{{ !empty($selectedEmails) ? 'selected' : 'all' }}')"
-                        
+
                             wire:confirm="{{ !empty($selectedEmails)
                             ? 'Are you sure you want to delete ' . count($selectedEmails) . ' selected emails?'
                             : 'WARNING: This will delete ALL emails in the current list. This action cannot be undone. Are you sure?' }}"
@@ -379,7 +379,7 @@
                                                                 class="text-red-600 dark:text-red-400 fas fa-exclamation-circle"></i>
                                                             @endif
                                                             <span class="font-medium">Campaign: {{
-                                                                $record->campaign->title }}</span>
+                                                                $record->campaign?->message?->email_subject }}</span>
                                                         </div>
                                                         <div class="flex gap-2 items-center mr-10">
                                                             <span class="px-2 py-0.5 text-xs font-medium rounded-full

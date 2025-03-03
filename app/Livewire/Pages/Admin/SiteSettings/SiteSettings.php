@@ -24,7 +24,7 @@ class SiteSettings extends Component
     public $new_logo;
     public $new_favicon;
     public $APP_TIMEZONE;
-
+    public $maintenance;
     // New properties for image previews
     public $logo_preview;
     public $favicon_preview;
@@ -38,6 +38,7 @@ class SiteSettings extends Component
     public $footer_first_line;
     public $footer_second_line;
 
+
     protected $rules = [
         'site_name' => 'required|string|max:255',
         'support_email' => 'required|email',
@@ -50,6 +51,7 @@ class SiteSettings extends Component
         'APP_TIMEZONE' => 'required|string',
         'footer_first_line' => 'nullable|string|max:255',
         'footer_second_line' => 'nullable|string|max:255',
+        'maintenance' => 'nullable|boolean',
     ];
 
     public function mount()
@@ -65,6 +67,7 @@ class SiteSettings extends Component
         $this->APP_TIMEZONE = SiteSetting::getValue('APP_TIMEZONE');
         $this->footer_first_line = SiteSetting::getValue('footer_first_line');
         $this->footer_second_line = SiteSetting::getValue('footer_second_line');
+        $this->maintenance = SiteSetting::getValue('maintenance');
     }
 
     // Preview logo
@@ -131,6 +134,7 @@ class SiteSettings extends Component
             SiteSetting::setValue('meta_description', $this->meta_description);
             SiteSetting::setValue('meta_keywords', $this->meta_keywords);
             SiteSetting::setValue('APP_TIMEZONE', $this->APP_TIMEZONE);
+            SiteSetting::setValue('maintenance', $this->maintenance);
 
             // Update footer settings
             SiteSetting::setValue('footer_first_line', $this->footer_first_line);
