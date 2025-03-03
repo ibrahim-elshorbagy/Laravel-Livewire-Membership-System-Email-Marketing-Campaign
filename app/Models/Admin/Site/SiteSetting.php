@@ -13,7 +13,14 @@ class SiteSetting extends Model
     public static function getValue($property, $default = null)
     {
         $setting = self::where('property', $property)->first();
-        return $setting ? $setting->value : $default;
+        $value = $setting ? $setting->value : $default;
+        
+        // Special handling for maintenance mode
+        if ($property === 'maintenance') {
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        }
+        
+        return $value;
     }
 
     // Helper method to set a setting value

@@ -141,7 +141,10 @@
                     <div>
                         <label for="maintenance"
                             class="inline-flex gap-3 justify-between items-center px-4 py-1.5 rounded-lg min-w-52 bg-neutral-100 dark:bg-neutral-800">
-                            <input id="maintenance" wire:model="maintenance" type="checkbox" class="sr-only peer" role="switch" :checked="maintenance" />
+
+
+                            <input id="maintenance" wire:model="maintenance" type="checkbox" class="sr-only peer" role="switch" />
+
                             <span class="text-sm font-medium trancking-wide text-neutral-600 peer-checked:text-neutral-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-neutral-400 dark:peer-checked:text-neutral-100">Maintenance Mode</span>
                             <div class="relative h-6 w-11 after:h-5 after:w-5 peer-checked:after:translate-x-5 rounded-full bg-white after:absolute after:bottom-0 after:left-[0.0625rem] after:top-0 after:my-auto after:rounded-full after:bg-neutral-600 after:transition-all after:content-[''] peer-checked:bg-green-500 peer-checked:after:bg-neutral-100 peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-neutral-800 peer-focus:peer-checked:outline-black peer-active:outline-offset-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:border-neutral-700 dark:bg-neutral-950 dark:after:bg-neutral-400 dark:peer-checked:bg-orange-500 dark:peer-checked:after:bg-black dark:peer-focus:outline-neutral-300 dark:peer-focus:peer-checked:outline-orange-500"
                                 aria-hidden="true"></div>

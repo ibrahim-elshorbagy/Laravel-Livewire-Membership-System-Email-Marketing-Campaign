@@ -54,6 +54,7 @@ class SiteSettings extends Component
         'maintenance' => 'nullable|boolean',
     ];
 
+
     public function mount()
     {
         $this->site_name = config('app.name');
