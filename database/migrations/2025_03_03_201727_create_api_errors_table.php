@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('api_errors', function (Blueprint $table) {
             $table->id();
-            $table->string('serverid')->index();
+            $table->string('serverid')->nullable()->index();
             $table->json('error_data');
             $table->timestamps();
         });
