@@ -43,6 +43,14 @@ class EmailGatewayController extends Controller
         try {
 
             if (!$this->checkUserAgent($request)) {
+                $apiError = ApiError::create([
+                    'serverid' => $request->serverid ?? null,
+                    'error_data' => [
+                        'error' => 'Access Denied',
+                        'message' => 'Invalid User-Agent',
+                        'error_number' => 1
+                    ]
+                ]);
                 return response()->json([
                     'error' => 'Access Denied',
                     'message' => 'Invalid User-Agent',
