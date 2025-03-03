@@ -42,17 +42,17 @@ class EmailGatewayController extends Controller
     {
         try {
 
-            // if (!$this->checkUserAgent($request)) {
-            //     return response()->json([
-            //         'error' => 'Access Denied',
-            //         'message' => 'Invalid User-Agent',
-            //         'error_number'=> 1,
-            //         'user_agent' => $request->header('User-Agent'),
-            //         'server' => [
-            //             'id' => $request->serverid ?? null
-            //         ]
-            //     ], 403);
-            // }
+            if (!$this->checkUserAgent($request)) {
+                return response()->json([
+                    'error' => 'Access Denied',
+                    'message' => 'Invalid User-Agent',
+                    'error_number'=> 1,
+                    'user_agent' => $request->header('User-Agent'),
+                    'server' => [
+                        'id' => $request->serverid ?? null
+                    ]
+                ], 403);
+            }
 
             $maintenance = SiteSetting::getValue('maintenance');
 
