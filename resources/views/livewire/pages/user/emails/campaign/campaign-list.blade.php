@@ -4,7 +4,15 @@
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
             My Campaigns
         </h2>
-        <div class="mt-4 md:mt-0">
+        <div class="flex mt-4 space-x-2 md:mt-0">
+            <x-primary-info-button wire:click="$refresh" x-data="{ spinning: false }"
+                @click="spinning = true; setTimeout(() => spinning = false, 1000)">
+                <div class='flex items-start'>
+                    <i class="mr-1 mt-.5 fas fa-sync-alt" :class="{ 'animate-spin': spinning }"></i>
+                    Refresh
+                </div>
+
+            </x-primary-info-button>
             <x-primary-info-button href="{{ route('user.campaigns.form') }}" wire:navigate>
                 New Campaign
             </x-primary-info-button>
@@ -90,12 +98,19 @@
                         $sentEmails = $campaign->emailHistories()->where('status', 'sent')->count();
                         $percentage = $totalEmails > 0 ? round(($sentEmails / $totalEmails) * 100, 1) : 0;
                         @endphp
-                        <a href="{{ route('user.campaigns.progress', $campaign) }}" wire:navigate >
-                            <span
-                                class="px-2 py-1 text-xs rounded-full {{ $percentage == 100 ? 'bg-green-500/10 text-green-500' : 'bg-blue-500/10 text-blue-500' }}">
-                                {{ $percentage }}% ({{ $sentEmails }}/{{ $totalEmails }})
-                            </span>
-                        </a>
+                        <div class="flex items-center space-x-2">
+                            <a href="{{ route('user.campaigns.progress', $campaign) }}" wire:navigate>
+                                <span
+                                    class="px-2 py-1 text-xs rounded-full {{ $percentage == 100 ? 'bg-green-500/10 text-green-500' : 'bg-blue-500/10 text-blue-500' }}">
+                                    {{ $percentage }}% ({{ $sentEmails }}/{{ $totalEmails }})
+                                </span>
+                            </a>
+                            <button wire:click="$refresh" x-data="{ spinning: false }"
+                                @click="spinning = true; setTimeout(() => spinning = false, 1000)"
+                                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                <i class="text-xs fas fa-sync-alt" :class="{ 'animate-spin': spinning }"></i>
+                            </button>
+                        </div>
                     </td>
                     <td class="p-4 text-nowrap">{{ $campaign->created_at->format('d/m/Y h:i A') }}</td>
                     <td class="p-4">
@@ -150,10 +165,12 @@
                                 <i class="mr-1 fas fa-chart-line"></i> Progress
                             </a> --}}
 
+                            @if($campaign->status != 'Completed')
                             <a href="{{ route('user.campaigns.form', $campaign->id) }}" wire:navigate
                                 class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
                                 <i class="mr-1 fas fa-edit"></i>
                             </a>
+                            @endif
 
                             <button wire:click="deleteCampaign({{ $campaign->id }})"
                                 wire:confirm="Are you sure you want to delete this campaign?"

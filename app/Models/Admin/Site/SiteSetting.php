@@ -14,12 +14,12 @@ class SiteSetting extends Model
     {
         $setting = self::where('property', $property)->first();
         $value = $setting ? $setting->value : $default;
-        
+
         // Special handling for maintenance mode
-        if ($property === 'maintenance') {
+        if ($property === 'maintenance' || $property === 'our_devices') {
             return filter_var($value, FILTER_VALIDATE_BOOLEAN);
         }
-        
+
         return $value;
     }
 
