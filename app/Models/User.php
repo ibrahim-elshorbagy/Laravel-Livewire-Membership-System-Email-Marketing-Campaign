@@ -47,6 +47,14 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
+     * Get the user's unsubscribe information.
+     */
+    public function userInfo()
+    {
+        return $this->hasOne(UserInfo::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

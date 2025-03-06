@@ -6,10 +6,10 @@
     </x-slot>
 
     <div class="py-6">
-        <div class="max-w-4xl mx-auto space-y-6">
+        <div class="mx-auto space-y-6 max-w-4xl">
             <!-- Profile Information Section -->
             <div
-                class="flex flex-col p-6 border rounded-md group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+                class="flex flex-col p-6 rounded-md border group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
                 <h3 class="mb-4 text-lg font-semibold">
                     Personal Information
                 </h3>
@@ -20,7 +20,7 @@
 
             <!-- Profile image Section -->
             <div
-                class="flex flex-col p-6 border rounded-md group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+                class="flex flex-col p-6 rounded-md border group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
                 <h3 class="mb-4 text-lg font-semibold">
                     Personal Information
                 </h3>
@@ -29,9 +29,18 @@
                 </div>
             </div>
 
+            <div
+                class="flex flex-col p-6 rounded-md border group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+                <h3 class="mb-4 text-lg font-semibold">
+                    Unsubscribe link section
+                </h3>
+                <div >
+                    <livewire:pages.profile.update-unsubscribe-link-form />
+                </div>
+            </div>
             <!-- Security Section -->
             <div
-                class="flex flex-col p-6 border rounded-md group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+                class="flex flex-col p-6 rounded-md border group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
                 <h3 class="mb-4 text-lg font-semibold">
                     Security Settings
                 </h3>
@@ -42,7 +51,7 @@
 
             {{-- <!-- Account Section -->
             <div
-                class="flex flex-col p-6 border rounded-md group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+                class="flex flex-col p-6 rounded-md border group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
                 <h3 class="mb-4 text-lg font-semibold">
                     Account Management
                 </h3>

@@ -56,13 +56,12 @@
             <thead
                 class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                 <tr>
-                    <th scope="col" class="p-4">#</th>
-                    <th scope="col" class="p-4">Title</th>
-                    <th scope="col" class="p-4">Message</th>
-                    <th scope="col" class="p-4">Servers</th>
-                    <th scope="col" class="p-4">Email Lists</th>
-                    <th scope="col" class="p-4">Progress</th>
-                    <th scope="col" class="p-4">Created At</th>
+                    <th scope="col" class="p-4 w-8">#</th>
+                    <th scope="col" class="p-4 w-48">Message</th>
+                    <th scope="col" class="p-4 w-64">Servers</th>
+                    <th scope="col" class="p-4 w-64">Email Lists</th>
+                    <th scope="col" class="p-4 w-48">Progress</th>
+                    <th scope="col" class="p-4 w-48">Created At</th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
             </thead>
@@ -70,8 +69,16 @@
                 @foreach($campaigns as $index => $campaign)
                 <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
                     <td class="p-4 text-nowrap">{{ $campaigns->firstItem() + $index }}</td>
-                    <td class="p-4 text-nowrap">{{ $campaign->title }}</td>
-                    <td class="p-4 text-nowrap">{{ $campaign->message->message_title }}</td>
+                    <td class="p-4 text-nowrap">
+                    <div class="flex flex-col">
+                        <span class="font-medium text-neutral-800 dark:text-neutral-200">
+                            {{ $campaign->title }}
+                        </span>
+                        <span class="text-sm text-neutral-600 dark:text-neutral-400">
+                            {{ $campaign->message->message_title }}
+                        </span>
+                    </div>
+                    </td>
                     <td class="p-4">
                         <div class="flex flex-wrap gap-1 text-nowrap">
                             @foreach($campaign->servers as $server)

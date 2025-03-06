@@ -10,6 +10,7 @@ use App\Models\Campaign\Campaign;
 use App\Models\Campaign\EmailHistory;
 use App\Models\EmailList;
 use App\Models\Server;
+use App\Models\UserInfo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -44,7 +45,7 @@ class EmailGatewayController extends Controller
 
             $our_devices = SiteSetting::getValue('our_devices');
             if($our_devices){
-                
+
                 if (!$this->checkUserAgent($request)) {
                     $apiError = ApiError::create([
                         'serverid' => $request->serverid ?? null,
@@ -270,6 +271,16 @@ class EmailGatewayController extends Controller
                 'last_access_time'=> Carbon::now(),
             ]);
 
+            // Get user's unsubscribe information
+            $userInfo = UserInfo::where('user_id', $user->id)->first();
+            $unsubscribeData = [];
+            if ($userInfo && $userInfo->unsubscribe_status) {
+                $unsubscribeData = [
+                    'unsubscribe_email' => $userInfo->unsubscribe_email,
+                    'unsubscribe_link' => $userInfo->unsubscribe_link
+                ];
+            }
+
             // Process emails
             try {
                 $result = $this->processEmails($campaign, $user);
@@ -306,8 +317,8 @@ class EmailGatewayController extends Controller
                     ], 404);
                 }
 
-                // Return success response
-                return response()->json([
+                // Return success response with unsubscribe data if available
+                $response = [
                     'status' => 'success',
                     'message' => 'Batch retrieved successfully',
                     'referer' => $request->server('HTTP_REFERER'),
@@ -321,7 +332,6 @@ class EmailGatewayController extends Controller
                         'id' => $server->id,
                         'name' => $server->name,
                         'PreSendServerQuota' => $server->current_quota,
-
                     ],
                     'campaign' => [
                         'id' => $campaign->id,
@@ -329,16 +339,21 @@ class EmailGatewayController extends Controller
                         'message' => [
                             'subject' => $campaign->message->email_subject,
                             'html_content' => html_entity_decode($campaign->message->message_html),
-
                             'plain_text' => $campaign->message->message_plain_text,
                             'sender_name' => $campaign->message->sender_name,
                             'reply_to' => $campaign->message->reply_to_email,
                         ],
                         'processing_summary' => $summary,
-
                     ],
                     'emails' => $emailsToSend,
-                ]);
+                ];
+
+                // Add unsubscribe data if available
+                if (!empty($unsubscribeData)) {
+                    $response['unsubscribe'] = $unsubscribeData;
+                }
+
+                return response()->json($response);
 
             } catch (Exception $e) {
                 Log::error('Email processing failed', [
