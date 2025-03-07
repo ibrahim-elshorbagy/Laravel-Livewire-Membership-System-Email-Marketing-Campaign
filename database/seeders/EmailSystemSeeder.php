@@ -23,8 +23,8 @@ class EmailSystemSeeder extends Seeder
         // Define lists with their email counts
         $lists = [
             'Customer Database' => 20,
-            'Newsletter' => 3,
-            'Promotional' => 3
+            'Newsletter' => 3000,
+            'Promotional' => 20000,
         ];
 
         // Available servers (from your ServerSeeder)
@@ -41,13 +41,13 @@ class EmailSystemSeeder extends Seeder
             [
                 'title' => 'Product Updates',
                 'message_id' => 1,
-                'status' => 'Completed',
+                'status' => 'Sending',
                 'server_id' => array_shift($availableServers)
             ],
             [
                 'title' => 'Monthly Newsletter',
                 'message_id' => 1,
-                'status' => 'Pause',
+                'status' => 'Sending',
                 'server_id' => array_shift($availableServers)
             ]
         ];

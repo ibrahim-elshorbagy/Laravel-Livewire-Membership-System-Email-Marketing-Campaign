@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin\Site\ApiError;
+use App\Models\Admin\Site\ApiRequest;
 use App\Models\Admin\Site\SiteSetting;
 use App\Models\User;
 use App\Models\Campaign\Campaign;
@@ -26,6 +27,8 @@ class EmailGatewayController extends Controller
         'Google-Apps-Script',
     ];
 
+
+    // Check user agent ----------------------------------------------------------------------------
     protected function checkUserAgent(Request $request)
     {
         $userAgent = $request->header('User-Agent');
@@ -41,117 +44,227 @@ class EmailGatewayController extends Controller
 
     public function getDetails(Request $request)
     {
-        try {
-
-            $our_devices = SiteSetting::getValue('our_devices');
-            if($our_devices){
-
-                if (!$this->checkUserAgent($request)) {
-                    $apiError = ApiError::create([
-                        'serverid' => $request->serverid ?? null,
-                        'error_data' => [
-                            'error' => 'Access Denied',
-                            'message' => 'Invalid User-Agent',
-                            'error_number' => 1
-                        ]
-                    ]);
-                    return response()->json([
-                        'error' => 'Access Denied',
-                        'message' => 'Invalid User-Agent',
-                        'error_number'=> 1,
-                        'user_agent' => $request->header('User-Agent'),
-                        'server' => [
-                            'id' => $request->serverid ?? null
-                        ]
-                    ], 403);
-                }
-            }
-
-            $maintenance = SiteSetting::getValue('maintenance');
-
-            if ($maintenance) {
-                $apiError = ApiError::create([
-                    'serverid' => $request->serverid ?? null,
-                    'error_data' => [
-                        'error' => 'Maintenance Mode',
-                        'message' => 'System is currently under maintenance',
-                        'error_number' => 2
-                    ]
-                ]);
-
-                return response()->json([
-                    'error' => 'Maintenance Mode',
-                    'message' => 'System is currently under maintenance',
-                    'error_number'=> 2,
-                    'server' => [
-                        'id' => $request->serverid ?? null
-                    ]
-                ], 503);
-            }
-
-
-            // Validate request
+            $startTime = microtime(true);
+            // Validate request data ----------------------------------------------------------------------------
+            // I tried my best to secure it This Won't work with normal user Just some one trying to hack or somthing
             $validator = Validator::make($request->all(), [
-                'serverid' => 'required|exists:servers,name',
-                'pass' => 'required|string',
-                'quota'=>'required|integer'
+                'serverid' => 'string',
             ], [
                 'serverid.required' => 'Server ID is required',
+                'serverid.string' => 'Server ID must be a string',
+            ]);
+            if ($validator->fails()) {
+
+                    return response()->json([
+                        'error' => 'Validation failed',
+                        'message' => implode(', ', $validator->errors()->all()),
+                        'error_number'=> 1,
+                    ], 422);
+
+            }
+
+
+            // Validate request data ----------------------------------------------------------------------------
+            // I tried my best to secure it
+            $validator = Validator::make($request->all(), [
+                'serverid' => 'required|string|exists:servers,name',
+                'pass' => 'required|string',
+                'quota' => 'required|integer'
+            ], [
+                'serverid.required' => 'Server ID is required',
+                'serverid.string' => 'Server ID must be a string',
                 'serverid.exists' => 'Invalid server ID',
                 'pass.required' => 'Password is required',
                 'quota.required' => 'Quota is required'
             ]);
 
+
+
             if ($validator->fails()) {
-                $apiError = ApiError::create([
-                    'serverid' => $request->serverid ?? null,
-                    'error_data' => [
+
+                try{
+
+                    ApiError::create([
+                        'serverid' => $request->serverid,
+                        'error_data' => [
+                            'error' => 'Validation failed',
+                            'message' => implode(', ', $validator->errors()->all()),
+                            'error_number' => 1
+                        ]
+                    ]);
+
+                    return response()->json([
                         'error' => 'Validation failed',
                         'message' => implode(', ', $validator->errors()->all()),
-                        'error_number' => 3
-                    ]
-                ]);
+                        'error_number'=> 1,
+                        'server' => [
+                            'id' => $request->serverid
+                        ]
+                    ], 422);
 
-                return response()->json([
-                    'error' => 'Validation failed',
-                    'message' => implode(', ', $validator->errors()->all()),
-                    'error_number'=> 3,
-                    'server' => [
-                        'id' => $request->serverid ?? null
-                    ]
-                ], 422);
+                }finally {
+                    $executionTime = microtime(true) - $startTime;
+                    ApiRequest::create([
+                        'serverid' => $request->serverid,
+                        'execution_time' => $executionTime,
+                        'status' => 'failed'
+                    ]);
+                }
+
             }
 
-            // Log::info('API Access Attempt', [
-            //     'timestamp' => now()->format('Y-m-d H:i:s'),
-            //     'ip' => $request->ip(),
-            //     'origin' => $request->header('Origin'),
-            //     'user_agent' => $request->header('User-Agent'),
-            //     'serverid' => $request->serverid
-            // ]);
 
-            // Check API pass
+            $validatedData = $validator->validated();
+            $serverid      = $validatedData['serverid'];
+            $pass          = $validatedData['pass'];
+            $quota         = $validatedData['quota'];
+
+
+            // Check for our_devices ----------------------------------------------------------------------------
+
+            $our_devices =  SiteSetting::getValue('our_devices');
+
+            if($our_devices){
+
+                if (!$this->checkUserAgent($request)) {
+
+                    try{
+
+                        ApiError::create([
+                            'serverid' => $request->has('serverid') ? $request->serverid : null,
+                            'error_data' => [
+                                'error' => 'Access Denied',
+                                'message' => 'Invalid User-Agent',
+                                'error_number' => 2
+                            ]
+                        ]);
+                        return response()->json([
+                            'error' => 'Access Denied',
+                            'message' => 'Invalid User-Agent',
+                            'error_number'=> 2,
+                            'user_agent' => $request->header('User-Agent'),
+                            'server' => [
+                                'id' => $serverid
+                            ]
+                        ], 403);
+
+                    }finally {
+                        $executionTime = microtime(true) - $startTime;
+                        ApiRequest::create([
+                            'serverid' => $serverid,
+                            'execution_time' => $executionTime,
+                            'status' => 'failed'
+                        ]);
+                    }
+
+                }
+            }
+
+
+
+
+
+
+
+            // Check for maintenance mode ----------------------------------------------------------------------------
+            $maintenance =  SiteSetting::getValue('maintenance');
+            if ($maintenance) {
+
+                try{
+
+                    ApiError::create([
+                        'serverid' => $serverid,
+                        'error_data' => [
+                            'error' => 'Maintenance Mode',
+                            'message' => 'System is currently under maintenance',
+                            'error_number' => 3
+                        ]
+                    ]);
+
+                    return response()->json([
+                        'error' => 'Maintenance Mode',
+                        'message' => 'System is currently under maintenance',
+                        'error_number'=> 3,
+                        'server' => [
+                            'id' => $serverid
+                        ]
+                    ], 503);
+
+                }finally {
+                        $executionTime = microtime(true) - $startTime;
+                        ApiRequest::create([
+                            'serverid' => $serverid,
+                            'execution_time' => $executionTime,
+                            'status' => 'failed'
+                        ]);
+                }
+
+
+
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // Check API pass ----------------------------------------------------------------------------
             if ($request->pass !== $this->apiPassword) {
-                $apiError = ApiError::create([
-                    'serverid' => $request->serverid,
-                    'error_data' => [
-                        'error' => 'Authentication failed',
-                        'message' => 'Invalid API credentials',
-                        'error_number' => 4
-                    ]
-                ]);
 
-                return response()->json([
-                    'error' => 'Authentication failed',
-                    'message' => 'Invalid API credentials',
-                    'error_number'=> 4,
-                    'server' => [
-                        'id' => $request->serverid
-                    ]
-                ], 401);
+                try{
+                        ApiError::create([
+                            'serverid' => $request->serverid,
+                            'error_data' => [
+                                'error' => 'Authentication failed',
+                                'message' => 'Invalid API credentials',
+                                'error_number' => 4
+                            ]
+                        ]);
+
+                        return response()->json([
+                            'error' => 'Authentication failed',
+                            'message' => 'Invalid API credentials',
+                            'error_number'=> 4,
+                            'server' => [
+                                'id' => $request->serverid
+                            ]
+                        ], 401);
+
+                    }finally {
+                        $executionTime = microtime(true) - $startTime;
+                        ApiRequest::create([
+                            'serverid' => $serverid,
+                            'execution_time' => $executionTime,
+                            'status' => 'failed'
+                        ]);
+                }
+
             }
 
 
+
+
+
+
+
+
+
+
+
+            // Start Server && User check ----------------------------------------------------------------------------
 
             // Validate server assignment
             $server = Server::where('name', $request->serverid)->first();
@@ -160,76 +273,142 @@ class EmailGatewayController extends Controller
             $user = User::where('id', $server->assigned_to_user_id)->first();
 
             if (!$user->active) {
-                $apiError = ApiError::create([
-                    'serverid' => $request->serverid,
-                    'error_data' => [
-                        'error' => 'Account inactive',
-                        'message' => 'User account is currently inactive',
-                        'error_number' => 5
-                    ]
-                ]);
 
-                return response()->json([
-                    'error' => 'Account inactive',
-                    'message' => 'User account is currently inactive',
-                    'error_number'=> 5,
-                    'server' => [
-                        'id' => $request->serverid
-                    ]
-                ], 403);
+                try{
+
+                        ApiError::create([
+                                'serverid' => $request->serverid,
+                                'error_data' => [
+                                    'error' => 'Account inactive',
+                                    'message' => 'User account is currently inactive',
+                                    'error_number' => 5
+                                ]
+                            ]);
+
+                            return response()->json([
+                                'error' => 'Account inactive',
+                                'message' => 'User account is currently inactive',
+                                'error_number'=> 5,
+                                'server' => [
+                                    'id' => $request->serverid
+                                ]
+                            ], 403);
+
+                    }finally {
+                        $executionTime = microtime(true) - $startTime;
+                        ApiRequest::create([
+                            'serverid' => $serverid,
+                            'execution_time' => $executionTime,
+                            'status' => 'failed'
+                        ]);
+                }
+
+
             }
 
-            // Validate subscription
+
+
+
+
+
+
+
+
+
+            // Validate subscription ----------------------------------------------------------------------------
             $subscription = $user->lastSubscription();
             if (!$subscription) {
-                $apiError = ApiError::create([
-                    'serverid' => $request->serverid,
-                    'error_data' => [
-                        'error' => 'No subscription',
-                        'message' => 'Active subscription required',
-                        'error_number' => 6
-                    ]
-                ]);
 
-                return response()->json([
-                    'error' => 'No subscription',
-                    'message' => 'Active subscription required',
-                    'error_number'=> 6,
-                    'server' => [
-                        'id' => $request->serverid
-                    ]
-                ], 403);
+                try{
+
+                        ApiError::create([
+                            'serverid' => $request->serverid,
+                            'error_data' => [
+                                'error' => 'No subscription',
+                                'message' => 'Active subscription required',
+                                'error_number' => 6
+                            ]
+                        ]);
+
+                        return response()->json([
+                            'error' => 'No subscription',
+                            'message' => 'Active subscription required',
+                            'error_number'=> 6,
+                            'server' => [
+                                'id' => $request->serverid
+                            ]
+                        ], 403);
+
+                    }finally {
+                        $executionTime = microtime(true) - $startTime;
+                        ApiRequest::create([
+                            'serverid' => $serverid,
+                            'execution_time' => $executionTime,
+                            'status' => 'failed'
+                        ]);
+                }
+
             }
 
-            // Check if can consume batch size
+
+
+
+
+
+
+
+
+
+            // Check if can consume batch size ----------------------------------------------------------------------------
             if (!$user->canConsume('Email Sending', $this->batchSize)) {
-                $apiError = ApiError::create([
-                    'serverid' => $request->serverid,
-                    'error_data' => [
-                        'error' => 'Quota exceeded',
-                        'message' => 'Email sending limit reached',
-                        'error_number' => 7
-                    ]
-                ]);
 
-                return response()->json([
-                    'error' => 'Quota exceeded',
-                    'message' => 'Email sending limit reached',
-                    'error_number'=> 7,
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => $user->first_name . ' ' . $user->last_name,
-                        'email' => $user->email,
-                        'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
-                    ],
-                    'server' => [
-                        'id' => $request->serverid
-                    ]
-                ], 403);
+                try{
+
+                        ApiError::create([
+                                'serverid' => $request->serverid,
+                                'error_data' => [
+                                    'error' => 'Quota exceeded',
+                                    'message' => 'Email sending limit reached',
+                                    'error_number' => 7
+                                ]
+                        ]);
+
+                        return response()->json([
+                            'error' => 'Quota exceeded',
+                            'message' => 'Email sending limit reached',
+                            'error_number'=> 7,
+                            'user' => [
+                                'id' => $user->id,
+                                'name' => $user->first_name . ' ' . $user->last_name,
+                                'email' => $user->email,
+                                'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
+                            ],
+                            'server' => [
+                                'id' => $request->serverid
+                            ]
+                        ], 403);
+
+                    }finally {
+                        $executionTime = microtime(true) - $startTime;
+                        ApiRequest::create([
+                            'serverid' => $serverid,
+                            'execution_time' => $executionTime,
+                            'status' => 'failed'
+                        ]);
+                }
+
             }
 
 
-            // Get active campaign
+
+
+
+
+
+
+
+
+            // Get active campaign ----------------------------------------------------------------------------
             $campaign = Campaign::whereHas('servers', function($query) use ($server) {
                 $query->where('server_id', $server->id);
             })
@@ -238,33 +417,58 @@ class EmailGatewayController extends Controller
             ->first();
 
             if (!$campaign) {
-                $apiError = ApiError::create([
-                    'serverid' => $request->serverid,
-                    'error_data' => [
-                        'error' => 'No active campaign',
-                        'message' => 'No active campaign found for this server',
-                        'error_number' => 8
-                    ]
-                ]);
 
-                return response()->json([
-                    'error' => 'No active campaign',
-                    'message' => 'No active campaign found for this server',
-                    'error_number'=> 8,
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => $user->first_name . ' ' . $user->last_name,
-                        'email' => $user->email,
-                        'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
-                    ],
-                    'server' => [
-                        'id' => $server->id,
-                        'name' => $server->name,
-                        'PreSendServerQuota' => $server->current_quota,
+                try{
 
-                    ]
-                ], 404);
+                        ApiError::create([
+                            'serverid' => $request->serverid,
+                            'error_data' => [
+                                'error' => 'No active campaign',
+                                'message' => 'No active campaign found for this server',
+                                'error_number' => 8
+                            ]
+                        ]);
+
+                        return response()->json([
+                            'error' => 'No active campaign',
+                            'message' => 'No active campaign found for this server',
+                            'error_number'=> 8,
+                            'user' => [
+                                'id' => $user->id,
+                                'name' => $user->first_name . ' ' . $user->last_name,
+                                'email' => $user->email,
+                                'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
+                            ],
+                            'server' => [
+                                'id' => $server->id,
+                                'name' => $server->name,
+                                'PreSendServerQuota' => $server->current_quota,
+
+                            ]
+                        ], 404);
+
+                    }finally {
+
+                        $executionTime = microtime(true) - $startTime;
+                        ApiRequest::create([
+                            'serverid' => $serverid,
+                            'execution_time' => $executionTime,
+                            'status' => 'failed'
+                        ]);
+                }
+
             }
+
+
+
+
+
+
+
+
+
+
+            // Start To Update  ----------------------------------------------------------------------------
 
             $server->update([
                 'current_quota' => $request->quota,
@@ -281,22 +485,29 @@ class EmailGatewayController extends Controller
                 ];
             }
 
-            // Process emails
-            try {
-                $result = $this->processEmails($campaign, $user);
-                $emailsToSend = $result['emails'];
-                $summary = $result['summary'];
 
-                if (empty($emailsToSend)) {
 
-                $apiError = ApiError::create([
-                    'serverid' => $request->serverid,
-                    'error_data' => [
-                        'error' => 'No Emails avaiable',
-                        'message' =>  "No emails found for this server's campaign ",
-                        'error_number' => 9
-                    ]
-                ]);
+
+
+
+
+            // Process emails ----------------------------------------------------------------------------
+
+            $result = $this->processEmails($campaign, $user);
+            $emailsToSend = $result['emails'];
+            $summary = $result['summary'];
+
+            if (empty($emailsToSend)) {
+
+                try{
+                    ApiError::create([
+                        'serverid' => $request->serverid,
+                        'error_data' => [
+                            'error' => 'No Emails avaiable',
+                            'message' =>  "No emails found for this server's campaign ",
+                            'error_number' => 9
+                        ]
+                    ]);
 
                     return response()->json([
                         'error' => 'No Emails avaiable',
@@ -315,90 +526,70 @@ class EmailGatewayController extends Controller
                             'PreSendServerQuota' => $server->current_quota,
                             ],
                     ], 404);
-                }
 
-                // Return success response with unsubscribe data if available
-                $response = [
-                    'status' => 'success',
-                    'message' => 'Batch retrieved successfully',
-                    'referer' => $request->server('HTTP_REFERER'),
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => $user->first_name . ' ' . $user->last_name,
-                        'email' => $user->email,
-                        'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
-                    ],
-                    'server' => [
-                        'id' => $server->id,
-                        'name' => $server->name,
-                        'PreSendServerQuota' => $server->current_quota,
-                    ],
-                    'campaign' => [
-                        'id' => $campaign->id,
-                        'title' => $campaign->title,
-                        'message' => [
-                            'subject' => $campaign->message->email_subject,
-                            'html_content' => html_entity_decode($campaign->message->message_html),
-                            'plain_text' => $campaign->message->message_plain_text,
-                            'sender_name' => $campaign->message->sender_name,
-                            'reply_to' => $campaign->message->reply_to_email,
-                        ],
-                        'processing_summary' => $summary,
-                    ],
-                    'emails' => $emailsToSend,
-                ];
+                    }finally {
+                        $executionTime = microtime(true) - $startTime;
+                        ApiRequest::create([
+                            'serverid' => $serverid,
+                            'execution_time' => $executionTime,
+                            'status' => 'failed'
+                        ]);
+                    }
 
-                // Add unsubscribe data if available
-                if (!empty($unsubscribeData)) {
-                    $response['unsubscribe'] = $unsubscribeData;
-                }
-
-                return response()->json($response);
-
-            } catch (Exception $e) {
-                Log::error('Email processing failed', [
-                    'error' => $e->getMessage(),
-                    'campaign_id' => $campaign->id,
-                    'user_id' => $user->id
-                ]);
-
-                return response()->json([
-                    'error' => 'Processing error',
-                    'message' => $e->getMessage(),
-                    'user' => [
-                        'id' => $user->id,
-                        'name' => $user->first_name . ' ' . $user->last_name,
-                        'email' => $user->email,
-                        'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
-                    ],
-                    'server' => [
-                        'id' => $server->id,
-                        'name' => $server->name,
-                        'PreSendServerQuota' => $server->current_quota,
-
-                    ],
-                    'campaign' => [
-                        'id' => $campaign->id,
-                        'title' => $campaign->title,
-                        'processing_summary' => $summary ?? null
-                    ]
-                ], 500);
             }
 
-        } catch (Exception $e) {
-            Log::error('API request failed', [
-                'error' => $e->getMessage(),
-                'request' => $request->all()
-            ]);
-
-            return response()->json([
-                'error' => 'System error',
-                'message' => $e->getMessage(),
+            // Return success response with unsubscribe data if available ----------------------------------------------------------------------------
+            $response = [
+                'status' => 'success',
+                'message' => 'Batch retrieved successfully',
+                'referer' => $request->server('HTTP_REFERER'),
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->first_name . ' ' . $user->last_name,
+                    'email' => $user->email,
+                    'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
+                ],
                 'server' => [
-                    'id' => $request->serverid ?? null
-                ]
-            ], 500);
-        }
+                    'id' => $server->id,
+                    'name' => $server->name,
+                    'PreSendServerQuota' => $server->current_quota,
+                ],
+                'campaign' => [
+                    'id' => $campaign->id,
+                    'title' => $campaign->title,
+                    'message' => [
+                        'subject' => $campaign->message->email_subject,
+                        'html_content' => html_entity_decode($campaign->message->message_html),
+                        'plain_text' => $campaign->message->message_plain_text,
+                        'sender_name' => $campaign->message->sender_name,
+                        'reply_to' => $campaign->message->reply_to_email,
+                    ],
+                    'processing_summary' => $summary,
+                ],
+                'emails' => $emailsToSend,
+            ];
+
+            // Add unsubscribe data if available
+            if (!empty($unsubscribeData)) {
+                $response['unsubscribe'] = $unsubscribeData;
+            }
+
+            // Success Response ----------------------------------------------------------------------------
+
+            try{
+                return response()->json($response);
+
+                }finally {
+                    $executionTime = microtime(true) - $startTime;
+                    ApiRequest::create([
+                        'serverid' => $serverid,
+                        'execution_time' => $executionTime,
+                        'status' => 'success'
+                    ]);
+            }
+
+
+
     }
 
     protected function processEmails($campaign, $user)

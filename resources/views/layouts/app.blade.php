@@ -89,8 +89,7 @@
                     href="{{ route('admin.subscriptions') }}" wire:navigate>
                     <span>Subscriptions</span>
                 </x-nav-link>
-                <x-nav-link :active="request()->routeIs('admin.payment.transactions') ||
-                                                            request()->routeIs('admin.users.transactions')"
+                <x-nav-link :active="request()->routeIs('admin.payment.transactions') || request()->routeIs('admin.users.transactions')"
                     href="{{ route('admin.payment.transactions') }}" wire:navigate>
                     <span>Transactions</span>
                 </x-nav-link>
@@ -134,6 +133,12 @@
                         <x-nav-link :active="request()->routeIs('admin.site-api-errors')" href="{{ route('admin.site-api-errors') }}"
                             wire:navigate>
                             <span>Api Errors</span>
+                        </x-nav-link>
+                    </li>
+                    <li class="px-1 py-0.5">
+                        <x-nav-link :active="request()->routeIs('admin.site-api-requests')" href="{{ route('admin.site-api-requests') }}"
+                            wire:navigate>
+                            <span>Api Requests</span>
                         </x-nav-link>
                     </li>
                 </ul>
@@ -238,6 +243,9 @@
 
                             <x-nav-link :active="request()->routeIs('admin.site-api-errors')" href="{{ route('admin.site-api-errors') }}" wire:navigate>
                                 <span>Api Errors</span>
+                            </x-nav-link>
+                            <x-nav-link :active="request()->routeIs('admin.site-api-requests')" href="{{ route('admin.site-api-requests') }}" wire:navigate>
+                                <span>Api Requests</span>
                             </x-nav-link>
                         </x-primary-dropdown>
                         @endrole

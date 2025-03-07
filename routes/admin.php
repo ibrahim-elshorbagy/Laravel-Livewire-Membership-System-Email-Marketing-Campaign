@@ -9,6 +9,7 @@ use App\Livewire\Pages\Admin\Plans\PlanManagement\Edit as PlanManagementEdit;
 use App\Livewire\Pages\Admin\Server\ServerForm;
 use App\Livewire\Pages\Admin\Server\ServerList;
 use App\Livewire\Pages\Admin\SiteSettings\ApiErrors;
+use App\Livewire\Pages\Admin\SiteSettings\ApiRequests;
 use App\Livewire\Pages\Admin\SiteSettings\SiteSettings;
 use App\Livewire\Pages\Admin\Subscription\Subscripers;
 use App\Livewire\Pages\Admin\Subscription\Subscripers\EditSubscription;
@@ -47,6 +48,7 @@ use Livewire\Volt\Volt;
         // Site Settings
         Route::get('/site/site-settings', SiteSettings::class)->name('admin.site-settings');
         Route::get('/site/api-errors', ApiErrors::class)->name('admin.site-api-errors');
+        Route::get('/site/api-requests', ApiRequests::class)->name('admin.site-api-requests');
 
 
         // Payment Settings
