@@ -80,6 +80,9 @@
                 </x-nav-link>
                 @endrole
                 @role('admin')
+                <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}" wire:navigate>
+                    <span>Dashboard</span>
+                </x-nav-link>
                 <x-nav-link :active="request()->routeIs('admin.users') ||
                             request()->routeIs('admin.users.create') ||
                             request()->routeIs('admin.users.edit')" href="{{ route('admin.users') }}" wire:navigate>
@@ -206,6 +209,9 @@
 
 
                         @role('admin')
+                        <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}" wire:navigate>
+                            <span>Dashboard</span>
+                        </x-nav-link>
                         <x-nav-link :active="request()->routeIs('admin.users') ||
                                     request()->routeIs('admin.users.create') ||
                                     request()->routeIs('admin.users.edit')" href="{{ route('admin.users') }}"

@@ -61,8 +61,7 @@ class ApiRequests extends Component
     {
         return ApiRequest::when($this->search, function ($query) {
                 $query->where(function($q) {
-                    $q->where('serverid', 'like', '%' . $this->search . '%')
-                      ->orWhere('status', 'like', '%' . $this->search . '%');
+                    $q->where('serverid', 'like', '%' . $this->search . '%');
                 });
             })
             ->orderBy($this->sortField, $this->sortDirection)
