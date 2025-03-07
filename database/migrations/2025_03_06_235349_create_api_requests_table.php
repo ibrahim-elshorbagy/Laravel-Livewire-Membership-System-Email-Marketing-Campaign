@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('serverid')->nullable()->index();
             $table->float('execution_time')->default(0);
             $table->enum('status', ['success', 'failed'])->default('success');
-            $table->timestamp('request_time')->useCurrent();
+            $table->timestamp('request_time');
 
         });
     }

@@ -15,4 +15,12 @@ class ApiRequest extends Model
         'execution_time' => 'float',
         'request_time' => 'datetime'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            $model->request_time = now();
+        });
+    }
 }
