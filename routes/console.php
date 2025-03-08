@@ -9,20 +9,21 @@ Schedule::call(function () {
     Log::info("Cron Works at test_6");
 });
 
-Schedule::command('queue:work --queue=default,high --tries=5  --max-time=86400', [])
+Schedule::command('queue:work --queue=default,high --tries=5 --max-time=86400', [])
     ->withoutOverlapping(86400)
     ->before(function () {
-        Log::info('Starting default and high queue worker');
+        Log::info('Starting queue:work...');
     })
     ->after(function () {
-        Log::info('Queue worker completed successfully');
+        Log::info('Queue worker completed successfully.');
     })
     ->onFailure(function () {
-        Log::error('Queue worker failed to complete');
+        Log::error('Queue worker failed.');
     })
     ->then(function () {
-        Log::info('Closed default and high queue worker');
+        Log::info('Closed queue worker.');
     });
+
 
 
 Schedule::call(function () {

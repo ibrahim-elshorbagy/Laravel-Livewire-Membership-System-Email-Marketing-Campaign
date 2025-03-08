@@ -63,29 +63,42 @@ new #[Layout('layouts.app')] class extends Component
         session()->flash('status', __($status));
     }
 }; ?>
-<div class="grid h-screen place-items-center">
-    <div class="flex flex-col p-6 border rounded-md w-46 md:w-[32rem] group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
-        <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-            {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+<div class="flex justify-center items-center px-4 py-12 min-h-screen bg-gradient-to-br sm:px-6 lg:px-8">
+    <div
+        class="p-4 space-y-8 w-full max-w-md bg-white rounded-2xl shadow-xl dark:shadow dark:shadow-gray-100 dark:bg-neutral-800">
+        <!-- Logo/Brand -->
+        <div class="text-center">
+            <h2 class="mt-6 text-3xl font-extrabold text-neutral-900 dark:text-white">Reset Password</h2>
+            <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">Enter your email to receive a reset link</p>
         </div>
-
         <!-- Session Status -->
         <x-auth-session-status class="mb-4" :status="session('status')" />
 
-        <form wire:submit="sendPasswordResetLink">
-            <!-- Email Address -->
-            <div>
-                <x-input-label for="email" :value="__('Email')" />
-                <x-text-input wire:model="email" id="email" class="block w-full mt-1" type="email" name="email" required autofocus />
-                <x-input-error :messages="$errors->get('email')" class="mt-2" />
-            </div>
+        <form wire:submit="sendPasswordResetLink" class="mt-8 space-y-6">
+            <div class="space-y-4 rounded-md shadow-sm">
+                <!-- Email Address -->
+                <div>
+                    <x-input-label for="email" :value="__('Email')" class="text-sm font-medium" />
+                    <x-text-input wire:model="email" id="email" class="block w-full" type="email" name="email" required
+                        autofocus />
+                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <x-primary-button>
-                    {{ __('Email Password Reset Link') }}
-                </x-primary-button>
+                <div>
+                    <button type="submit"
+                        class="flex justify-center px-4 py-2 w-full text-sm font-medium text-white bg-blue-600 rounded-lg border border-transparent shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        {{ __('Send Reset Link') }}
+                    </button>
+                </div>
+
+                <div class="text-sm text-center">
+                    <span class="text-neutral-600 dark:text-neutral-400">Remember your password? </span>
+                    <a class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                        href="{{ route('login') }}" wire:navigate>
+                        Sign in here
+                    </a>
+                </div>
             </div>
         </form>
     </div>
 </div>
-

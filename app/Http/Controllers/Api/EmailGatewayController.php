@@ -468,7 +468,7 @@ class EmailGatewayController extends Controller
 
 
 
-            // Start To Update  ----------------------------------------------------------------------------
+            // Start To Update && unsubscribe information ----------------------------------------------------------------------------
 
             $server->update([
                 'current_quota' => $request->quota,

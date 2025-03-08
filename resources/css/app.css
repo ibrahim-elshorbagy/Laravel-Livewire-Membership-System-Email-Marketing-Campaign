@@ -24,3 +24,23 @@
     background: #1a1a1a;
     color: #ffffff;
 }
+
+.unsubscribe-container {
+    padding: 16px;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+.unsubscribe-text {
+    margin-top: 16px;
+    font-size: 14px;
+    text-align: center;
+    color: #666;
+}
+.unsubscribe-text a {
+    color: blue;
+    text-decoration: none;
+}
+.unsubscribe-text a:hover {
+    text-decoration: underline;
+}

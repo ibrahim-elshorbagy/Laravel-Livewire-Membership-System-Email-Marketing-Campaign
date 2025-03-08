@@ -45,6 +45,7 @@
                     <th scope="col" class="p-4">Country</th>
                     <th scope="col" class="p-4">WhatsApp</th>
                     <th scope="col" class="p-4">Status</th>
+                    <th scope="col" class="p-4">Email Verified</th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
             </thead>
@@ -77,6 +78,12 @@
                         <span
                             class="inline-flex overflow-hidden rounded-lg px-1 py-0.5 text-xs font-medium {{ $user->active ? 'text-green-300 bg-green-300/10' : 'text-red-500 bg-red-500/10' }}">
                             {{ $user->active ? 'Active' : 'Inactive' }}
+                        </span>
+                    </td>
+                    <td class="p-4">
+                        <span
+                            class="inline-flex overflow-hidden rounded-lg px-1 py-0.5 text-xs font-medium {{ $user->email_verified_at ? 'text-blue-300 bg-blue-300/10' : 'text-yellow-500 bg-yellow-500/10' }}">
+                            {{ $user->email_verified_at ? 'Verified' : 'Unverified' }}
                         </span>
                     </td>
                     <td class="p-4">

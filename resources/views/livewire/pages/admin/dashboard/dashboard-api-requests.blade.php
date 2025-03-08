@@ -12,7 +12,7 @@
     </div>
 
     <!-- Time-based Stats Grid -->
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-3 md:grid-cols-5">
         <!-- Hourly Stats -->
         <div
             class="overflow-hidden relative bg-white rounded-lg border shadow-sm transition-all duration-300 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">

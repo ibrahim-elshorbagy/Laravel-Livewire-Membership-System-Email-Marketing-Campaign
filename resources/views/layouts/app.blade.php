@@ -329,7 +329,7 @@
             </nav>
 
             <!-- Main content -->
-            <main class="flex-1 p-2 my-4 md:mx-4">
+            <main class="flex-1 py-2 my-4 md:mx-4">
                 {{ $slot }}
             </main>
 

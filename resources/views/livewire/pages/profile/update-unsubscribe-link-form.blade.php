@@ -99,7 +99,7 @@ new class extends Component
             <!-- Unsubscribe Pre Text -->
             <div>
                 <x-input-label for="unsubscribe_pre_text" :value="__('Unsubscribe Pre Text')" />
-                <x-text-input wire:model="unsubscribe_pre_text" id="unsubscribe_pre_text"
+                <x-text-input wire:model.live="unsubscribe_pre_text" id="unsubscribe_pre_text"
                     class="block mt-1 w-full" />
                 <p class="mt-3 ml-1 text-sm text-gray-500 dark:text-gray-400">
                     <i class="fas fa-info-circle"></i>
@@ -110,7 +110,7 @@ new class extends Component
             <!-- Unsubscribe Email -->
             <div>
                 <x-input-label for="unsubscribe_text" :value="__('Unsubscribe Button Text')" />
-                <x-text-input wire:model="unsubscribe_text" id="unsubscribe_text"
+                <x-text-input wire:model.live="unsubscribe_text" id="unsubscribe_text"
                     class="block mt-1 w-full" />
                 <p class="mt-3 ml-1 text-sm text-gray-500 dark:text-gray-400">
                     <i class="fas fa-info-circle"></i>
@@ -121,10 +121,10 @@ new class extends Component
             <!-- Unsubscribe Link -->
             <div>
                 <x-input-label for="unsubscribe_link" :value="__('Unsubscribe Link Or Email')" />
-                <x-text-input wire:model="unsubscribe_link" id="unsubscribe_link" class="block mt-1 w-full" placeholder="https://my.gemailapp.com/unsubscribe Or unsubscribe@gemailapp.com" />
+                <x-text-input wire:model.live="unsubscribe_link" id="unsubscribe_link" class="block mt-1 w-full" placeholder="Example: https://xxx.com/unsub.html OR unsub@xxx.com" />
                 <p class="mt-3 ml-1 text-sm text-gray-500 dark:text-gray-400">
                     <i class="fas fa-info-circle"></i>
-                    You Can Enter Email (unsubscribe@gemailapp.com) Or Link (https://my.gemailapp.com/unsubscribe)
+                    Please enter the URL for unsubscribing from or provide the email address you wish to use for the unsubscription request.
                 </p>
                 <x-input-error :messages="$errors->get('unsubscribe_link')" class="mt-2" />
             </div>
@@ -159,29 +159,31 @@ new class extends Component
                 </div>
             </div>
 
-            <!-- Code examples section -->
-            <div class="p-4 my-6 bg-gray-50 rounded-lg border border-gray-200 dark:bg-neutral-900 dark:border-neutral-700">
-                <div class="flex gap-2 items-center mb-4">
-                    <i class="text-blue-500 fas fa-code"></i>
-                    <h3 class="font-medium text-gray-900 text-md dark:text-gray-100">
-                        Unsubscribe Code Snippets
-                    </h3>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="p-3 bg-gray-100 rounded-md dark:bg-gray-700">
-                        <code class="text-sm text-gray-800 dark:text-gray-300">
-                            &lt;hr&gt;&lt;p style="text-align: center;"&gt;[unsubscribe_pre_text] &lt;a href="[unsubscribe_url]"&gt;[unsubscribe_button_text]&lt;/a&gt;.&lt;/p&gt;
-                        </code>
-                    </div>
-
-                    <div class="p-3 bg-gray-100 rounded-md dark:bg-gray-700">
-                        <code class="text-sm text-gray-800 dark:text-gray-300">
-                            &lt;hr&gt;&lt;p style="text-align: center;"&gt;[unsubscribe_pre_text] &lt;a href="mailto:[unsubscribe_email]"&gt;[unsubscribe_button_text]&lt;/a&gt;.&lt;/p&gt;
-                        </code>
+            <!-- Preview -->
+            <div class="mt-4">
+                <h4 class="mb-2 text-sm font-medium text-gray-900 dark:text-gray-100">Preview:</h4>
+                <div class="p-4 bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:bg-neutral-900 dark:border-neutral-700">
+                    <div class="unsubscribe-container">
+                        <p class="unsubscribe-text">
+                            {{ $unsubscribe_pre_text }}
+                            @if(filter_var($unsubscribe_link, FILTER_VALIDATE_EMAIL))
+                            <a href="mailto:{{ $unsubscribe_link }}">
+                                {{ $unsubscribe_text }}
+                            </a>.
+                            @elseif(filter_var($unsubscribe_link, FILTER_VALIDATE_URL))
+                            <a href="{{ $unsubscribe_link }}">
+                                {{ $unsubscribe_text }}
+                            </a>.
+                            @else
+                            <a href="#">
+                                {{ $unsubscribe_text }}
+                            </a>.
+                            @endif
+                        </p>
                     </div>
                 </div>
             </div>
+
         </div>
 
         <div class="flex gap-4 items-center">
