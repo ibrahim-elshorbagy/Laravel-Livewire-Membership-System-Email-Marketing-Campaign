@@ -479,9 +479,22 @@ class EmailGatewayController extends Controller
             $userInfo = UserInfo::where('user_id', $user->id)->first();
             $unsubscribeData = [];
             if ($userInfo && $userInfo->unsubscribe_status) {
+                $unsubscribeHtml = '<hr><p style="text-align: center;">';
+                $unsubscribeHtml .= $userInfo->unsubscribe_pre_text . ' ';
+
+                // Check if the unsubscribe_link is an email or URL
+                if (filter_var($userInfo->unsubscribe_link, FILTER_VALIDATE_EMAIL)) {
+                    // It's an email address
+                    $unsubscribeHtml .= '<a href="mailto:' . $userInfo->unsubscribe_link . '">' . $userInfo->unsubscribe_text . '</a>.';
+                } else {
+                    // It's a URL
+                    $unsubscribeHtml .= '<a href="' . $userInfo->unsubscribe_link . '">' . $userInfo->unsubscribe_text . '</a>.';
+                }
+
+                $unsubscribeHtml .= '</p>';
+
                 $unsubscribeData = [
-                    'unsubscribe_email' => $userInfo->unsubscribe_email,
-                    'unsubscribe_link' => $userInfo->unsubscribe_link
+                    'unsubscribe_html' => $unsubscribeHtml,
                 ];
             }
 

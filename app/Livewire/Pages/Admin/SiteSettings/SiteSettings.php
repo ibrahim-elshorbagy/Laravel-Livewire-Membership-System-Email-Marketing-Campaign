@@ -16,6 +16,7 @@ class SiteSettings extends Component
 {
     use WithFileUploads, LivewireAlert;
 
+    
     public $site_name;
     public $support_email;
     public $support_phone;

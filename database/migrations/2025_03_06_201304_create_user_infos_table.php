@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_infos', function (Blueprint $table) {
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('unsubscribe_email')->nullable();
+            $table->foreignId('user_id')->unique()->constrained()->onDelete('cascade');
+            $table->string('unsubscribe_pre_text')->nullable();
+            $table->string('unsubscribe_text')->nullable();
             $table->string('unsubscribe_link')->nullable();
             $table->boolean('unsubscribe_status')->nullable();
         });
