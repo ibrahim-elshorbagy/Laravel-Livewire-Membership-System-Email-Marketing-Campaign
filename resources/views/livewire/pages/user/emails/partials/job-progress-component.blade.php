@@ -1,8 +1,17 @@
 <div wire:poll.{{ $pollInterval }}ms="refreshProgress">
-    @if($this->progressData['queueStatus'] > 1)
-    <div class="p-4 mb-6 border border-blue-200 rounded-lg bg-blue-50 dark:bg-blue-900 dark:border-blue-800">
-        <!-- Show queue message -->
-        <p>Your task is in queue position {{ $progressData['queueStatus'] }}...</p>
+
+    <!-- Show queue message -->
+    @if($this->progressData['queueStatus'] > 0)
+    <div class="p-4 mb-6 bg-blue-50 rounded-lg border border-blue-200 dark:bg-blue-900 dark:border-blue-800">
+        <div class="flex items-center mb-2">
+            <i class="mr-2 text-lg text-blue-600 fas fa-clock dark:text-blue-400"></i>
+            <p class="text-blue-800 dark:text-blue-300">Please wait for the job processing to complete in the background. This process may take a few minutes, depending on the file
+            size (Numbers of Emails). You may close the page while it processes.</p>
+        </div>
+        <div class="flex items-center">
+            <i class="mr-2 text-lg text-blue-600 fas fa-list-ol dark:text-blue-400"></i>
+            <p class="text-blue-800 dark:text-blue-300">Your task is in queue position {{ $progressData['queueStatus'] }}...</p>
+        </div>
     </div>
     @endif
 
@@ -10,7 +19,7 @@
     <div class="mb-6 space-y-4">
         @foreach($this->progressData['progress'] as $progress)
         <div class="p-4 bg-white rounded-lg shadow dark:bg-gray-800">
-            <div class="flex items-center justify-between mb-1">
+            <div class="flex justify-between items-center mb-1">
                 <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
                     <i class="mr-1 fas fa-tasks"></i>
                     {{ ucwords(str_replace('_', ' ', $progress->job_type)) }}
@@ -20,8 +29,8 @@
                     {{ min(100, number_format($progress->percentage, 1)) }}%
                 </span>
             </div>
-            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+            <div class="w-full h-2.5 bg-gray-200 rounded-full dark:bg-gray-700">
+                <div class="h-2.5 bg-blue-600 rounded-full transition-all duration-300"
                     style="width: {{ min(100, $progress->percentage) }}%"></div>
             </div>
             <div class="flex flex-col mt-1 space-y-1 text-xs text-gray-500 dark:text-gray-400">

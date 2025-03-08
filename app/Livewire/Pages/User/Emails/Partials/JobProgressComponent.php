@@ -70,17 +70,30 @@ class JobProgressComponent extends Component
 
     public function queueStatus()
     {
-        $countProcessing = DB::table('jobs')
+        // Get the earliest job's created_at for this user
+        $userEarliestJob = DB::table('jobs')
             ->where('queue', 'high')
             ->where(function ($query) {
                 $query->whereRaw("payload LIKE '%\"userId\":{$this->user->id}%'")
                     ->orWhereRaw("payload LIKE '%\"user_id\":{$this->user->id}%'")
                     ->orWhereRaw("payload LIKE '%i:{$this->user->id};%'");
             })
+            ->min('created_at');
+
+        if (!$userEarliestJob) {
+            return 0;
+        }
+
+        // Count how many jobs are ahead of the user's earliest job
+        $position = DB::table('jobs')
+            ->where('queue', 'high')
+            ->where('created_at', '<', $userEarliestJob)
             ->count();
 
-        return $countProcessing > 0 ? $countProcessing : 0;
+        return $position + 1; // Add 1 to account for zero-based position
     }
+
+
     public function render()
     {
         return view('livewire.pages.user.emails.partials.job-progress-component', [

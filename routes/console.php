@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Log;
 
 
 Schedule::call(function () {
-    Log::info("Cron Works at test_5 ");
+    Log::info("Cron Works at test_6");
 });
 
 Schedule::command('queue:work --queue=default,high --tries=5  --max-time=86400', [])

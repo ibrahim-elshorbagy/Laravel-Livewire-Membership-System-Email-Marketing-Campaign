@@ -29,6 +29,7 @@
                 </div>
             </div>
 
+            @role('user')
             <div
                 class="flex flex-col p-6 rounded-md border group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
                 <h3 class="mb-4 text-lg font-semibold">
@@ -38,6 +39,7 @@
                     <livewire:pages.profile.update-unsubscribe-link-form />
                 </div>
             </div>
+            @endrole
             <!-- Security Section -->
             <div
                 class="flex flex-col p-6 rounded-md border group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">

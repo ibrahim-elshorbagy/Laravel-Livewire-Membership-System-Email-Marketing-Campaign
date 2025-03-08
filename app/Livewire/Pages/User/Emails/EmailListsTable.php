@@ -34,6 +34,9 @@ class EmailListsTable extends Component
     public $listName = '';
     public $editingListId = null;
 
+
+
+    // Job Progress
     public $hasActiveJobsFlag = false;
     protected $listeners = ['jobStatusUpdated' => 'updateJobStatus'];
 
@@ -42,11 +45,6 @@ class EmailListsTable extends Component
         'search' => ['except' => ''],
         'perPage' => ['except' => 10],
         'sortDirection' => ['except' => 'asc']
-    ];
-        // Add these properties
-    public $pendingJobs = [
-        'file_processing' => 0,
-        'delete_emails' => 0
     ];
 
 
@@ -484,7 +482,7 @@ class EmailListsTable extends Component
 
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+    // Properties
 
 
 
@@ -563,7 +561,6 @@ class EmailListsTable extends Component
             return view('livewire.pages.user.emails.email-lists-table', [
 
                 'emails' => $this->emails,
-                'pendingJobs' => $this->pendingJobs,
                 'selectedListName' => $selectedListName,
                 'hasActiveJobsFlag'  => $this->hasActiveJobsFlag,
 

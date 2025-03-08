@@ -1,6 +1,8 @@
-<div
-    class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
-    <!-- Warning Alert -->
+<div class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+
+
+
+    <!-- Header -->
     <div class="mb-6 md:flex md:items-center md:justify-between">
         <div class="flex-1 min-w-0">
             <h2 class="text-2xl font-bold leading-7 sm:text-3xl sm:truncate">
@@ -9,6 +11,8 @@
         </div>
     </div>
 
+
+    <!-- Warning: Email Limit Exceeded -->
     @if($emailLimit['show'])
     <div class="p-4 mb-6 text-red-800 bg-red-50 rounded-lg border border-red-300 dark:bg-gray-800 dark:text-red-400 dark:border-red-800"
         role="alert">
@@ -26,6 +30,11 @@
         </div>
     </div>
     @endif
+
+
+
+
+
 
     <!-- Search and Filters -->
     <div class="mb-6">
@@ -60,6 +69,7 @@
 
 
 
+    <!-- Total Emails -->
     <div class="p-3 my-4 bg-blue-100 rounded-lg dark:bg-blue-900">
         <ul class="pl-5 text-sm list-disc text-gray-700 dark:text-gray-200">
             <li>
@@ -69,13 +79,18 @@
         </ul>
     </div>
 
+
+    <!-- job progress  -->
     <livewire:pages.user.emails.partials.job-progress-component />
 
+
+
+    <!-- Start The list  -->
     <div class="flex flex-col p-3 rounded-md border md:p-6">
         <!-- List Management -->
         <div class="mb-6 md:flex md:items-center md:justify-between">
 
-
+            <!-- Header -->
             <div class="flex-1 min-w-0">
                 <h2 class="text-2xl font-bold sm:text-3xl sm:truncate">
                     Mailing Lists
