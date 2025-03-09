@@ -36,10 +36,9 @@ class ProhibitedWords extends Component
             'newWords' => 'required|string'
         ]);
 
-        $words = collect(preg_replace('/\\,/', '__COMMA__', $this->newWords))
-            ->flatMap(fn($text) => explode(',', $text))
-            ->map(fn($word) => str_replace('__COMMA__', ',', trim($word)))
-            ->filter();
+        $words = collect(explode(',', $this->newWords))
+            ->map(fn($word) => trim($word))
+            ->filter(fn($word) => !empty($word));
 
         foreach ($words as $word) {
             ProhibitedWord::create(['word' => $word]);

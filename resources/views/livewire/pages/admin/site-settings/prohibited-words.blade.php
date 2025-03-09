@@ -110,7 +110,7 @@
             <div class="mt-4">
                 <x-textarea-input wire:model="newWords" class="w-full" placeholder="Enter words separated by commas" />
                 <p class="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
-                    Enter multiple words separated by commas<br> (badword,secondbadword).<br> To include a comma in a word, escape it with a backslash (word\,with\,commas).
+                    Enter multiple words separated by commas<br> (badword,secondbadword).
                 </p>
             </div>
 
