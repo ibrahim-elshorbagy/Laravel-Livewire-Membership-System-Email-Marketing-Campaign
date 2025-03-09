@@ -1,12 +1,12 @@
-<div class="max-w-2xl py-6 mx-auto sm:px-6 lg:px-8">
+<div class="py-6 mx-auto max-w-2xl sm:px-6 lg:px-8">
     @if($subscription)
-    <div class="overflow-hidden bg-neutral-50 dark:bg-neutral-900 rounded-xl">
+    <div class="overflow-hidden rounded-xl bg-neutral-50 dark:bg-neutral-900">
         <!-- Header with Plan Name -->
         <div class="px-6 py-8 text-center bg-indigo-500 dark:bg-indigo-700">
-            <h2 class="text-2xl font-bold text-white ">
+            <h2 class="text-2xl font-bold text-white">
                 {{ $subscription->plan->name }}
             </h2>
-            <p class="mt-2 text-neutral-200 ">
+            <p class="mt-2 text-neutral-200">
                 Your Active Subscription
             </p>
         </div>
@@ -15,7 +15,7 @@
         <div class="p-6">
             <!-- Price -->
             @if($subscription->plan->id != 1)
-            <div class="flex items-baseline justify-center">
+            <div class="flex justify-center items-baseline">
                 <span class="text-4xl font-bold text-neutral-900 dark:text-neutral-100">
                     ${{ number_format($subscription->plan->price, 2) }}
                 </span>
@@ -28,7 +28,7 @@
             <div class="mt-8 space-y-4">
                 @if($subscription->plan->id != 1)
                 <!-- Start Date -->
-                <div class="flex items-center justify-between px-4 py-3 bg-white rounded-lg dark:bg-neutral-800">
+                <div class="flex justify-between items-center px-4 py-3 bg-white rounded-lg dark:bg-neutral-800">
                     <div class="flex items-center">
                         <i class="fas fa-calendar-alt text-neutral-600 dark:text-neutral-400"></i>
                         <span class="ml-3 text-sm font-medium text-neutral-900 dark:text-neutral-100">Start Date</span>
@@ -39,7 +39,7 @@
                 </div>
 
                 <!-- Expiry Date -->
-                <div class="flex items-center justify-between px-4 py-3 bg-white rounded-lg dark:bg-neutral-800">
+                <div class="flex justify-between items-center px-4 py-3 bg-white rounded-lg dark:bg-neutral-800">
                     <div class="flex items-center">
                         <i class="fas fa-clock text-neutral-600 dark:text-neutral-400"></i>
                         <span class="ml-3 text-sm font-medium text-neutral-900 dark:text-neutral-100">Expiry Date</span>
@@ -50,7 +50,7 @@
                 </div>
 
                 <!-- Remaining Time -->
-                <div class="flex items-center justify-between px-4 py-3 bg-white rounded-lg dark:bg-neutral-800">
+                <div class="flex justify-between items-center px-4 py-3 bg-white rounded-lg dark:bg-neutral-800">
                     <div class="flex items-center">
                         <i class="fas fa-hourglass-half text-neutral-600 dark:text-neutral-400"></i>
                         <span class="ml-3 text-sm font-medium text-neutral-900 dark:text-neutral-100">Remaining
@@ -62,7 +62,7 @@
                 </div>
 
                 <!-- Status -->
-                <div class="flex items-center justify-between px-4 py-3 bg-white rounded-lg dark:bg-neutral-800">
+                <div class="flex justify-between items-center px-4 py-3 bg-white rounded-lg dark:bg-neutral-800">
                     <div class="flex items-center">
                         <i class="fas fa-circle-notch text-neutral-600 dark:text-neutral-400"></i>
                         <span class="ml-3 text-sm font-medium text-neutral-900 dark:text-neutral-100">Status</span>
@@ -82,14 +82,23 @@
                     <ul class="mt-4 space-y-4">
                         @foreach($subscription->plan->features as $feature)
                         <li class="space-y-2">
-                            <div class="flex items-center justify-between">
+                            <div class="flex justify-between items-center">
                                 <div class="flex items-center text-sm text-neutral-600 dark:text-neutral-400">
-                                    <svg class="flex-shrink-0 w-4 h-4 mr-2 text-green-500" fill="none"
+                                    <svg class="flex-shrink-0 mr-2 w-4 h-4 text-green-500" fill="none"
                                         stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M5 13l4 4L19 7" />
                                     </svg>
-                                    <span>{{ $feature->name }}</span>
+                                    {{-- Bad I know --}}
+                                    <span>
+                                        @if($feature->name == 'Subscribers Limit')
+                                        Number of contacts
+                                        @elseif($feature->name == 'Email Sending')
+                                        Emails per month
+                                        @else
+                                        {{ $feature->name }}
+                                        @endif
+                                    </span>
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
@@ -160,15 +169,12 @@
 
     </div>
 
-    <div class="flex items-center justify-center my-10">
-        <a  href="{{ route('our.plans') }}" class="relative px-6 py-3 text-lg font-semibold text-white transition-all duration-300 ease-in-out
-            bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700
-            rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5
-            overflow-hidden group">
-            <span class="relative z-10 flex items-center">
+    <div class="flex justify-center items-center my-10">
+        <a  href="{{ route('our.plans') }}" class="overflow-hidden relative px-6 py-3 text-lg font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-lg transition-all duration-300 ease-in-out transform hover:from-indigo-600 hover:to-purple-700 hover:shadow-xl hover:-translate-y-0.5 group">
+            <span class="flex relative z-10 items-center">
                 Upgrade
                 <svg xmlns="http://www.w3.org/2000/svg"
-                    class="w-5 h-5 ml-2 transition-transform duration-300 ease-in-out transform group-hover:translate-x-1"
+                    class="ml-2 w-5 h-5 transition-transform duration-300 ease-in-out transform group-hover:translate-x-1"
                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -181,8 +187,8 @@
     </div>
     @else
     <!-- No Subscription State -->
-    <div class="p-8 text-center bg-neutral-50 dark:bg-neutral-900 rounded-xl">
-        <svg class="w-12 h-12 mx-auto text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="p-8 text-center rounded-xl bg-neutral-50 dark:bg-neutral-900">
+        <svg class="mx-auto w-12 h-12 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01M12 12h.01" />
         </svg>
@@ -191,15 +197,12 @@
             You don't have any active subscription at the moment.
         </p>
         <div class="mt-6">
-            <div class="flex items-center justify-center my-10">
-                <a  href="{{ route('our.plans') }}" class="relative px-6 py-3 text-lg font-semibold text-white transition-all duration-300 ease-in-out
-                            bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700
-                            rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5
-                            overflow-hidden group">
-                    <span class="relative z-10 flex items-center">
+            <div class="flex justify-center items-center my-10">
+                <a  href="{{ route('our.plans') }}" class="overflow-hidden relative px-6 py-3 text-lg font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-lg transition-all duration-300 ease-in-out transform hover:from-indigo-600 hover:to-purple-700 hover:shadow-xl hover:-translate-y-0.5 group">
+                    <span class="flex relative z-10 items-center">
                         Subscribe Now
                         <svg xmlns="http://www.w3.org/2000/svg"
-                            class="w-5 h-5 ml-2 transition-transform duration-300 ease-in-out transform group-hover:translate-x-1"
+                            class="ml-2 w-5 h-5 transition-transform duration-300 ease-in-out transform group-hover:translate-x-1"
                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 7l5 5m0 0l-5 5m5-5H6" />
