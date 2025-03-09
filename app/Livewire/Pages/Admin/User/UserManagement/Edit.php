@@ -5,10 +5,12 @@ namespace App\Livewire\Pages\Admin\User\UserManagement;
 use App\Models\User;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Session;
 use LucasDotVin\Soulbscription\Models\Plan;
+use Illuminate\Support\Str;
 
 class Edit extends Component
 {
@@ -25,6 +27,7 @@ class Edit extends Component
     public $password_confirmation;
     public $image_url;
     public $selectedRole;
+    public $permissions = [];
 
     public function mount(User $user)
     {
@@ -39,6 +42,7 @@ class Edit extends Component
         $this->active = $user->active;
         $this->image_url = $user->image_url ?? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
         $this->selectedRole = $user->roles->first()?->name ?? '';
+        $this->permissions = $user->permissions->pluck('name')->toArray();
     }
 
     protected function rules()
@@ -55,12 +59,18 @@ class Edit extends Component
             'password' => 'nullable|min:8|confirmed',
             'image_url' => 'nullable|url',
             'selectedRole' => 'required',
+            'permissions' => 'array'
         ];
     }
 
     protected $messages = [
         'selectedRole.required' => 'Please select a role for the user.',
     ];
+
+    public function formatPermissionName($permission)
+    {
+        return Str::title(str_replace('-', ' ', $permission));
+    }
 
     public function updateUser()
     {
@@ -86,26 +96,30 @@ class Edit extends Component
         $this->user->update($data);
 
         // Update role if changed
-        if ($oldRole !== $this->selectedRole) {$this->user->syncRoles([$this->selectedRole]);
+        if ($oldRole !== $this->selectedRole) {
+            $this->user->syncRoles([$this->selectedRole]);
 
-        // If changing to user role and user has no active subscription
-        if ($this->selectedRole === 'user' && !$this->user->lastSubscription()) {
-            $trialPlan = Plan::find(1);
-            if ($trialPlan) {
-                $this->user->subscribeTo($trialPlan);
+            // If changing to user role and user has no active subscription
+            if ($this->selectedRole === 'user' && !$this->user->lastSubscription()) {
+                $trialPlan = Plan::find(1);
+                if ($trialPlan) {
+                    $this->user->subscribeTo($trialPlan);
+                }
             }
         }
-    }
+
+        // Update permissions
+        $this->user->syncPermissions($this->permissions);
 
         Session::flash('success', 'User updated successfully.');
         return $this->redirect(route('admin.users'), navigate: true);
-
     }
 
     public function render()
     {
         return view('livewire.pages.admin.user.user-management.edit', [
-            'roles' => Role::where('name', '!=', 'super-admin')->get()
+            'roles' => Role::where('name', '!=', 'super-admin')->get(),
+            'allPermissions' => Permission::all()
         ])->layout('layouts.app',['title' => 'Edit User']);
     }
 }

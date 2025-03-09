@@ -25,14 +25,22 @@ class MessageForm extends Component
 
     public function rules(): array
     {
+        $messageHtmlRules = ['nullable', 'string'];
+        $messagePlainTextRules = ['nullable', 'string'];
+
+        if (!(auth()->user()->hasRole('admin') || auth()->user()->can('allow-prohibited-words'))) {
+            $messageHtmlRules[] = new ProhibitedWords();
+            $messagePlainTextRules[] = new ProhibitedWords();
+        }
+
         return [
             'message_title' => ['required', 'string'],
             'email_subject' => ['required', 'string'],
-            'message_html'  => ['nullable', 'string', new ProhibitedWords()],
-            'message_plain_text' => ['nullable', 'string', new ProhibitedWords()],
             'sender_name' => ['nullable', 'string'],
             'reply_to_email' => ['nullable', 'email'],
             'sending_status' => ['in:RUN,PAUSE'],
+            'message_html'  => $messageHtmlRules,
+            'message_plain_text' => $messagePlainTextRules,
         ];
     }
 

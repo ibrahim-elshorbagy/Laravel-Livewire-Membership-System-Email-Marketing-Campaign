@@ -5,10 +5,12 @@ namespace App\Livewire\Pages\Admin\User\UserManagement;
 use App\Models\User;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Support\Facades\Session;
 use LucasDotVin\Soulbscription\Models\Plan;
+use Illuminate\Support\Str;
 
 class Create extends Component
 {
@@ -25,6 +27,7 @@ class Create extends Component
     public $password;
     public $password_confirmation;
     public $selectedRole = '';
+    public $permissions = [];
 
     protected $rules = [
         'email' => 'required|email|unique:users',
@@ -36,6 +39,7 @@ class Create extends Component
         'whatsapp' => 'nullable|string|regex:/^\+?\d{10,13}$/',
         'password' => 'required|min:8|confirmed',
         'selectedRole' => 'required',
+        'permissions' => 'array'
     ];
 
     protected $messages = [
@@ -49,6 +53,11 @@ class Create extends Component
         if ($defaultRole) {
             $this->selectedRole = $defaultRole->name;
         }
+    }
+
+    public function formatPermissionName($permission)
+    {
+        return Str::title(str_replace('-', ' ', $permission));
     }
 
     public function createUser()
@@ -70,6 +79,11 @@ class Create extends Component
         ]);
 
         $user->assignRole($this->selectedRole);
+        
+        // Assign selected permissions
+        if (!empty($this->permissions)) {
+            $user->syncPermissions($this->permissions);
+        }
 
         if ($this->selectedRole === 'user') {
             $trialPlan = Plan::find(1);
@@ -81,10 +95,12 @@ class Create extends Component
 
          return $this->redirect(route('admin.users'), navigate: true);
     }
+
     public function render()
     {
         return view('livewire.pages.admin.user.user-management.create', [
-            'roles' => Role::where('name', '!=', 'super-admin')->get()
+            'roles' => Role::where('name', '!=', 'super-admin')->get(),
+            'allPermissions' => Permission::all()
         ])->layout('layouts.app',['title' => 'Create User']);
     }
 }

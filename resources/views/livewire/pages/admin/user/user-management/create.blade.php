@@ -17,11 +17,11 @@
         <!-- Form Card -->
         <div class="rounded-lg shadow bg-neutral-50 dark:bg-neutral-900">
             <form wire:submit.prevent="createUser" class="p-6 space-y-6">
-                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                <div class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
                     <!-- Email -->
                     <div class="sm:col-span-2">
                         <x-input-label for="email" :value="__('Email')" />
-                        <x-text-input wire:model.defer="email" id="email" type="email" class="block w-full mt-1" />
+                        <x-text-input wire:model.defer="email" id="email" type="email" class="block mt-1 w-full" />
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
 
@@ -101,8 +101,18 @@
                         <x-input-label for="active" :value="__('Active Account')" class="block ml-2 text-sm text-neutral-600 dark:text-neutral-300" />
                     </div>
                     <x-input-error :messages="$errors->get('active')" class="mt-2" />
+                </div>
 
-
+                <!-- Permissions Section -->
+                <div class="mt-6">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Permissions <span class="text-xs font-light">(Admin Does Not Need Permissions)</span></h3>
+                    <div class="grid grid-cols-1 gap-4 mt-4 sm:grid-cols-2 md:grid-cols-3">
+                        @foreach($allPermissions as $permission)
+                            <x-check-box wire:model.defer="permissions" value="{{ $permission->name }}">
+                                {{ $this->formatPermissionName($permission->name) }}
+                            </x-check-box>
+                        @endforeach
+                    </div>
                 </div>
 
                 <div class="flex justify-end space-x-3">
