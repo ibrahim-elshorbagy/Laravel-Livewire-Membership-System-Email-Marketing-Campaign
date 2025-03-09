@@ -46,7 +46,8 @@ new #[Layout('layouts.app')] class extends Component
         }
 }; ?>
 
-<div class="grid relative flex-col justify-center items-center px-8 h-[calc(100vh-65px)] sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
+<div
+    class="grid relative flex-col justify-center items-center px-8 h-screen sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
     <div class="hidden relative flex-col p-10 h-full text-white bg-muted lg:flex dark:border-r dark:border-neutral-800">
         <div class="absolute inset-0 bg-[#f7f7f7]"></div>
         <div class="absolute inset-0 bg-center bg-no-repeat bg-contain"
@@ -82,16 +83,16 @@ new #[Layout('layouts.app')] class extends Component
                         <!-- First Name -->
                         <div>
                             <x-input-label for="first_name" :value="__('First Name')" class="text-sm font-medium" />
-                            <x-text-input wire:model="first_name" id="first_name" type="text"
-                                name="first_name" required autofocus autocomplete="given-name" />
+                            <x-text-input wire:model="first_name" id="first_name" type="text" name="first_name" required
+                                autofocus autocomplete="given-name" />
                             <x-input-error :messages="$errors->get('first_name')" class="mt-2" />
                         </div>
 
                         <!-- Last Name -->
                         <div>
                             <x-input-label for="last_name" :value="__('Last Name')" class="text-sm font-medium" />
-                            <x-text-input wire:model="last_name" id="last_name" type="text"
-                                name="last_name" required autocomplete="family-name" />
+                            <x-text-input wire:model="last_name" id="last_name" type="text" name="last_name" required
+                                autocomplete="family-name" />
                             <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
                         </div>
                     </div>
@@ -99,8 +100,8 @@ new #[Layout('layouts.app')] class extends Component
                     <!-- Username -->
                     <div>
                         <x-input-label for="username" :value="__('Username')" class="text-sm font-medium" />
-                        <x-text-input wire:model="username" id="username" type="text" name="username"
-                            required autocomplete="username" />
+                        <x-text-input wire:model="username" id="username" type="text" name="username" required
+                            autocomplete="username" />
                         <x-input-error :messages="$errors->get('username')" class="mt-2" />
                     </div>
 
@@ -115,8 +116,8 @@ new #[Layout('layouts.app')] class extends Component
                     <!-- Password -->
                     <div>
                         <x-input-label for="password" :value="__('Password')" class="text-sm font-medium" />
-                        <x-text-input wire:model="password" id="password" type="password"
-                            name="password" required autocomplete="new-password" />
+                        <x-text-input wire:model="password" id="password" type="password" name="password" required
+                            autocomplete="new-password" />
                         <x-input-error :messages="$errors->get('password')" class="mt-2" />
                     </div>
 
@@ -124,8 +125,8 @@ new #[Layout('layouts.app')] class extends Component
                     <div>
                         <x-input-label for="password_confirmation" :value="__('Confirm Password')"
                             class="text-sm font-medium" />
-                        <x-text-input wire:model="password_confirmation" id="password_confirmation"
-                            type="password" name="password_confirmation" required autocomplete="new-password" />
+                        <x-text-input wire:model="password_confirmation" id="password_confirmation" type="password"
+                            name="password_confirmation" required autocomplete="new-password" />
                         <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
                     </div>
                 </div>
