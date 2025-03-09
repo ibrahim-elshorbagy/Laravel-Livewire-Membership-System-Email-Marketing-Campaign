@@ -26,7 +26,7 @@ new #[Layout('layouts.app')] class extends Component
 
 
 <div
-    class="grid relative flex-col justify-center items-center px-8 h-screen sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
+    class="grid relative flex-col justify-center items-center h-screen md:px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
     <div class="hidden relative flex-col p-10 h-full text-white bg-muted lg:flex dark:border-r dark:border-neutral-800">
         <div class="absolute inset-0 bg-[#f7f7f7]"></div>
         <div class="absolute inset-0 bg-center bg-no-repeat bg-contain"
@@ -42,9 +42,9 @@ new #[Layout('layouts.app')] class extends Component
     </div>
     <div class="flex justify-center items-center w-full h-full">
         <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-            <a href="https://gemailapp.com/" class="flex z-20 flex-col gap-2 items-center font-medium lg:hidden"
+            <a href="https://gemailapp.com/" class="flex flex-col gap-2 items-center font-medium z-5 lg:hidden"
                 wire:navigate>
-                <span class="flex justify-center items-center w-9 h-9 rounded-md">
+                <span class="flex justify-center items-center w-[200px] h-48 rounded-md">
                     <x-application-logo class="text-black fill-current size-9 dark:text-white" />
                 </span>
                 <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
@@ -84,17 +84,15 @@ new #[Layout('layouts.app')] class extends Component
                         <input wire:model="form.remember" id="remember" type="checkbox"
                             class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-neutral-300 dark:border-neutral-600 dark:bg-neutral-700"
                             name="remember">
-                        <label for="remember" class="block ml-2 text-sm text-neutral-900 dark:text-neutral-300">
+                        <label for="remember" class="block ml-2 text-xs text-neutral-900 dark:text-neutral-300">
                             Remember me
                         </label>
                     </div>
 
-                    @if (Route::has('password.request'))
-                    <a class="text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                    <a class="text-xs font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
                         href="{{ route('password.request') }}" wire:navigate>
                         Forgot your password?
                     </a>
-                    @endif
                 </div>
 
                 <div>

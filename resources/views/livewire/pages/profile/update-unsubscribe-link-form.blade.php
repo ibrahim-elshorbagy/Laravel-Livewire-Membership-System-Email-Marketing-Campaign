@@ -95,7 +95,7 @@ new class extends Component
         </header>
 
 
-        <div class="grid grid-cols-1 gap-6 max-w-xl">
+        <div class="grid grid-cols-1 gap-4 max-w-xl">
             <!-- Unsubscribe Pre Text -->
             <div>
                 <x-input-label for="unsubscribe_pre_text" :value="__('Unsubscribe Pre Text')" />
@@ -129,6 +129,32 @@ new class extends Component
                 <x-input-error :messages="$errors->get('unsubscribe_link')" class="mt-2" />
             </div>
 
+            <!-- Preview -->
+            <div class="mt-4">
+                <h4 class="mb-2 text-sm font-medium text-gray-900 dark:text-gray-100">Preview:</h4>
+                <div
+                    class="p-4 bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:bg-neutral-900 dark:border-neutral-700">
+                    <div class="unsubscribe-container">
+                        <p class="unsubscribe-text">
+                            {{ $unsubscribe_pre_text }}
+                            @if(filter_var($unsubscribe_link, FILTER_VALIDATE_EMAIL))
+                            <a href="mailto:{{ $unsubscribe_link }}">
+                                {{ $unsubscribe_text }}
+                            </a>.
+                            @elseif(filter_var($unsubscribe_link, FILTER_VALIDATE_URL))
+                            <a href="{{ $unsubscribe_link }}">
+                                {{ $unsubscribe_text }}
+                            </a>.
+                            @else
+                            <a href="#">
+                                {{ $unsubscribe_text }}
+                            </a>.
+                            @endif
+                        </p>
+                    </div>
+                </div>
+            </div>
+
 
         </div>
 
@@ -159,30 +185,7 @@ new class extends Component
                 </div>
             </div>
 
-            <!-- Preview -->
-            <div class="mt-4">
-                <h4 class="mb-2 text-sm font-medium text-gray-900 dark:text-gray-100">Preview:</h4>
-                <div class="p-4 bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:bg-neutral-900 dark:border-neutral-700">
-                    <div class="unsubscribe-container">
-                        <p class="unsubscribe-text">
-                            {{ $unsubscribe_pre_text }}
-                            @if(filter_var($unsubscribe_link, FILTER_VALIDATE_EMAIL))
-                            <a href="mailto:{{ $unsubscribe_link }}">
-                                {{ $unsubscribe_text }}
-                            </a>.
-                            @elseif(filter_var($unsubscribe_link, FILTER_VALIDATE_URL))
-                            <a href="{{ $unsubscribe_link }}">
-                                {{ $unsubscribe_text }}
-                            </a>.
-                            @else
-                            <a href="#">
-                                {{ $unsubscribe_text }}
-                            </a>.
-                            @endif
-                        </p>
-                    </div>
-                </div>
-            </div>
+
 
         </div>
 

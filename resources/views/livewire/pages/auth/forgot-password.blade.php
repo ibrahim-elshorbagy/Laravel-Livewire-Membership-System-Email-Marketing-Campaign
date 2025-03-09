@@ -81,9 +81,9 @@ new #[Layout('layouts.app')] class extends Component
     </div>
     <div class="flex justify-center items-center w-full h-full">
         <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-            <a href="https://gemailapp.com/" class="flex z-20 flex-col gap-2 items-center font-medium lg:hidden"
+            <a href="https://gemailapp.com/" class="flex z-5 flex-col gap-2 items-center font-medium lg:hidden"
                 wire:navigate>
-                <span class="flex justify-center items-center w-9 h-9 rounded-md">
+                <span class="flex justify-center items-center w-[200px] h-48 rounded-md">
                     <x-application-logo class="text-black fill-current size-9 dark:text-white" />
                 </span>
                 <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
