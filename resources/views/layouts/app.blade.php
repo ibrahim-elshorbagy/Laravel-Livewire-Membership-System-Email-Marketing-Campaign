@@ -79,6 +79,10 @@
                     <span>Support</span>
                 </x-nav-link>
                 @endrole
+
+
+
+
                 @role('admin')
                 <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}" wire:navigate>
                     <span>Dashboard</span>
@@ -130,6 +134,12 @@
                         <x-nav-link :active="request()->routeIs('admin.site-settings')"
                             href="{{ route('admin.site-settings') }}" wire:navigate>
                             <span>Site Settings</span>
+                        </x-nav-link>
+                    </li>
+                    <li class="px-1 py-0.5">
+                        <x-nav-link :active="request()->routeIs('admin.site-prohibited-words')" href="{{ route('admin.site-prohibited-words') }}"
+                            wire:navigate>
+                            <span>Prohibited Words</span>
                         </x-nav-link>
                     </li>
                     <li class="px-1 py-0.5">
@@ -247,6 +257,10 @@
                                 <span>Site Settings</span>
                             </x-nav-link>
 
+                            <x-nav-link :active="request()->routeIs('admin.site-prohibited-words')"
+                                href="{{ route('admin.site-prohibited-words') }}" wire:navigate>
+                                <span>Prohibited Words</span>
+                            </x-nav-link>
                             <x-nav-link :active="request()->routeIs('admin.site-api-errors')" href="{{ route('admin.site-api-errors') }}" wire:navigate>
                                 <span>Api Errors</span>
                             </x-nav-link>

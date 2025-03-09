@@ -21,7 +21,7 @@ class ApiRequests extends Component
     protected function rules()
     {
         return [
-            'search' => 'nullable|string|max:255',
+            'search' => 'nullable|string',
             'sortField' => 'required|in:serverid,request_time,execution_time,status',
             'sortDirection' => 'required|in:asc,desc',
             'perPage' => 'required|integer|in:10,25,50',

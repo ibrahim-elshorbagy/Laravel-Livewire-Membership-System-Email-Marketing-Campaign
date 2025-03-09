@@ -5,7 +5,8 @@
             API Requests
         </h2>
         <div class="mt-4 md:mt-0">
-            <button wire:click="deleteAll" wire:confirm="Are you sure you want to delete all API requests? This action cannot be undone."
+            <button wire:click="deleteAll"
+                wire:confirm="Are you sure you want to delete all API requests? This action cannot be undone."
                 class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-md shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
                 Delete All Requests
             </button>
@@ -16,7 +17,8 @@
     <div class="mb-6">
         <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
             <div class="relative flex-1">
-                <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search ServerId..." class="pl-10 w-full" />
+                <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search ServerId..."
+                    class="pl-10 w-full" />
                 <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </div>
@@ -60,7 +62,8 @@
     <!-- Table -->
     <div class="overflow-hidden overflow-x-auto w-full rounded-lg">
         <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
-            <thead class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
+            <thead
+                class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                 <tr>
                     <th scope="col" class="p-4">
                         <input type="checkbox" wire:model.live="selectPage" class="rounded">
@@ -73,13 +76,15 @@
             </thead>
             <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
                 @foreach($requests as $request)
-                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800">
                     <td class="p-4">
-                        <input type="checkbox" wire:model.live="selectedRequests" value="{{ $request->id }}" class="rounded">
+                        <input type="checkbox" wire:model.live="selectedRequests" value="{{ $request->id }}"
+                            class="rounded">
                     </td>
                     <td class="p-4">{{ $request->serverid }}</td>
                     <td class="p-4">
-                        <span class="px-2 py-1 text-xs font-medium rounded-full {{ $request->status === 'success' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100' }}">
+                        <span
+                            class="px-2 py-1 text-xs font-medium rounded-full {{ $request->status === 'success' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100' }}">
                             {{ ucfirst($request->status) }}
                         </span>
                     </td>

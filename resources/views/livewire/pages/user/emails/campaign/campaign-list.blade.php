@@ -67,17 +67,17 @@
             </thead>
             <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
                 @foreach($campaigns as $index => $campaign)
-                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800">
                     <td class="p-4 text-nowrap">{{ $campaigns->firstItem() + $index }}</td>
                     <td class="p-4 text-nowrap">
-                    <div class="flex flex-col">
-                        <span class="font-medium text-neutral-800 dark:text-neutral-200">
-                            {{ $campaign->title }}
-                        </span>
-                        <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                            {{ $campaign->message->message_title }}
-                        </span>
-                    </div>
+                        <div class="flex flex-col">
+                            <span class="font-medium text-neutral-800 dark:text-neutral-200">
+                                {{ $campaign->title }}
+                            </span>
+                            <span class="text-sm text-neutral-600 dark:text-neutral-400">
+                                {{ $campaign->message->message_title }}
+                            </span>
+                        </div>
                     </td>
                     <td class="p-4">
                         <div class="flex flex-wrap gap-1 text-nowrap">
@@ -126,65 +126,71 @@
 
 
                             <div class="flex items-center space-x-2">
-                                        <div class="relative" x-data="{ showTooltip: false }">
-                                            <button wire:click="toggleActive({{ $campaign->id }})" @if(!$campaign->canBeModified()) disabled @endif
-                                                class="inline-flex items-center px-2 py-1 text-xs rounded-md
-                                                {{ $campaign->status === 'Sending' ? 'bg-green-500/10 text-green-500' :
-                                                ($campaign->status === 'Completed' ? 'bg-blue-500/10 text-blue-500' : 'bg-gray-500/10 text-gray-500') }}
-                                                {{ !$campaign->canBeActive() || !$campaign->canBeModified() ? 'opacity-50 cursor-not-allowed' :
-                                                'hover:bg-opacity-20' }}">
-                                                <i class="mr-1 fas {{
+                                <div class="relative" x-data="{ showTooltip: false }">
+                                    <button wire:click="toggleActive({{ $campaign->id }})"
+                                        @if(!$campaign->canBeModified()) disabled @endif
+                                        class="inline-flex items-center px-2 py-1 text-xs rounded-md
+                                        {{ $campaign->status === 'Sending' ? 'bg-green-500/10 text-green-500' :
+                                        ($campaign->status === 'Completed' ? 'bg-blue-500/10 text-blue-500' :
+                                        'bg-gray-500/10 text-gray-500') }}
+                                        {{ !$campaign->canBeActive() || !$campaign->canBeModified() ? 'opacity-50
+                                        cursor-not-allowed' :
+                                        'hover:bg-opacity-20' }}">
+                                        <i class="mr-1 fas {{
                                                     $campaign->status === 'Sending' ? 'fa-play-circle' :
                                                     ($campaign->status === 'Completed' ? 'fa-check-circle' : 'fa-pause-circle')
                                                 }}"></i>
-                                                {{ $campaign->status }}
-                                            </button>
-                                            @if(!$campaign->canBeActive())
-                                            <!-- Tooltip -->
-                                            <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200"
-                                                x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
-                                                x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
-                                                x-transition:leave-end="opacity-0 translate-y-1"
-                                                class="absolute bottom-full left-1/2 z-10 px-3 py-2 mb-2 w-max text-sm text-white rounded-lg shadow-lg -translate-x-1/2 bg-neutral-900"
-                                                role="tooltip">
-                                                <div class="flex items-center space-x-1">
-                                                    <i class="text-yellow-500 fas fa-exclamation-triangle"></i>
-                                                    <span>
-                                                        @if($campaign->servers()->count() === 0 && $campaign->emailLists()->count() === 0)
-                                                        No servers and email lists assigned
-                                                        @elseif($campaign->servers()->count() === 0)
-                                                        No servers assigned
-                                                        @else
-                                                        No email lists assigned
-                                                        @endif
-                                                    </span>
-                                                </div>
-                                                <!-- Arrow -->
-                                                <div
-                                                    class="absolute top-full left-1/2 w-0 h-0 border-t-8 border-r-8 border-l-8 -translate-x-1/2 border-l-transparent border-r-transparent border-neutral-900">
-                                                </div>
-                                            </div>
-                                            @endif
+                                        {{ $campaign->status }}
+                                    </button>
+                                    @if(!$campaign->canBeActive())
+                                    <!-- Tooltip -->
+                                    <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 translate-y-1"
+                                        x-transition:enter-end="opacity-100 translate-y-0"
+                                        x-transition:leave="transition ease-in duration-150"
+                                        x-transition:leave-start="opacity-100 translate-y-0"
+                                        x-transition:leave-end="opacity-0 translate-y-1"
+                                        class="absolute bottom-full left-1/2 z-10 px-3 py-2 mb-2 w-max text-sm text-white rounded-lg shadow-lg -translate-x-1/2 bg-neutral-900"
+                                        role="tooltip">
+                                        <div class="flex items-center space-x-1">
+                                            <i class="text-yellow-500 fas fa-exclamation-triangle"></i>
+                                            <span>
+                                                @if($campaign->servers()->count() === 0 &&
+                                                $campaign->emailLists()->count() === 0)
+                                                No servers and email lists assigned
+                                                @elseif($campaign->servers()->count() === 0)
+                                                No servers assigned
+                                                @else
+                                                No email lists assigned
+                                                @endif
+                                            </span>
                                         </div>
+                                        <!-- Arrow -->
+                                        <div
+                                            class="absolute top-full left-1/2 w-0 h-0 border-t-8 border-r-8 border-l-8 -translate-x-1/2 border-l-transparent border-r-transparent border-neutral-900">
+                                        </div>
+                                    </div>
+                                    @endif
+                                </div>
 
-                            {{-- <a href="{{ route('user.campaigns.progress', $campaign) }}" wire:navigate
-                                class="inline-flex items-center px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-900/10 hover:bg-purple-500/20">
-                                <i class="mr-1 fas fa-chart-line"></i> Progress
-                            </a> --}}
+                                {{-- <a href="{{ route('user.campaigns.progress', $campaign) }}" wire:navigate
+                                    class="inline-flex items-center px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-900/10 hover:bg-purple-500/20">
+                                    <i class="mr-1 fas fa-chart-line"></i> Progress
+                                </a> --}}
 
-                            @if($campaign->status != 'Completed')
-                            <a href="{{ route('user.campaigns.form', $campaign->id) }}" wire:navigate
-                                class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
-                                <i class="mr-1 fas fa-edit"></i>
-                            </a>
-                            @endif
+                                @if($campaign->status != 'Completed')
+                                <a href="{{ route('user.campaigns.form', $campaign->id) }}" wire:navigate
+                                    class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
+                                    <i class="mr-1 fas fa-edit"></i>
+                                </a>
+                                @endif
 
-                            <button wire:click="deleteCampaign({{ $campaign->id }})"
-                                wire:confirm="Are you sure you want to delete this campaign?"
-                                class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
-                                <i class="mr-1 fas fa-trash"></i>
-                            </button>
-                        </div>
+                                <button wire:click="deleteCampaign({{ $campaign->id }})"
+                                    wire:confirm="Are you sure you want to delete this campaign?"
+                                    class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
+                                    <i class="mr-1 fas fa-trash"></i>
+                                </button>
+                            </div>
                     </td>
                 </tr>
                 @endforeach

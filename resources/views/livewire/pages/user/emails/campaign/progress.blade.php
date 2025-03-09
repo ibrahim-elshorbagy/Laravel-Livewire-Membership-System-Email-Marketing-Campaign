@@ -22,19 +22,20 @@
         </div>
         @endif
     </header>
-<div class="mb-6">
-    <div
-        class="p-4 text-sm text-yellow-800 bg-yellow-50 rounded-lg border border-yellow-200 dark:bg-yellow-900/50 dark:border-yellow-700 dark:text-yellow-400">
-        <div class="flex gap-2 items-center">
-            <i class="text-lg fas fa-exclamation-triangle"></i>
-            <p class="font-medium">Note:</p>
+    <div class="mb-6">
+        <div
+            class="p-4 text-sm text-yellow-800 bg-yellow-50 rounded-lg border border-yellow-200 dark:bg-yellow-900/50 dark:border-yellow-700 dark:text-yellow-400">
+            <div class="flex gap-2 items-center">
+                <i class="text-lg fas fa-exclamation-triangle"></i>
+                <p class="font-medium">Note:</p>
+            </div>
+            <p class="mt-2 ml-6">
+                Deleting an email from the sending list will resend your advertising message to that email again as long
+                as
+                the email is stored in the mailing list.
+            </p>
         </div>
-        <p class="mt-2 ml-6">
-            Deleting an email from the sending list will resend your advertising message to that email again as long as
-            the email is stored in the mailing list.
-        </p>
     </div>
-</div>
     <!-- Search and Filters -->
     <div class="mb-6">
         <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
@@ -82,7 +83,7 @@
             </thead>
             <tbody class="divide-y divide-neutral-200 dark:divide-neutral-700">
                 @forelse($historyRecords as $record)
-                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800">
                     <td class="p-4">
                         <input type="checkbox" wire:model.live="selectedRecords" value="{{ $record->id }}"
                             class="rounded">
@@ -97,7 +98,8 @@
                             {{ ucfirst($record->status) }}
                         </span>
                     </td>
-                    <td class="p-4">{{ $record->sent_time->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->format('d M, Y h:i:s A') }}</td>
+                    <td class="p-4">{{ $record->sent_time->timezone(auth()->user()->timezone ??
+                        $globalSettings['APP_TIMEZONE'])->format('d M, Y h:i:s A') }}</td>
                     <td class="p-4">
                         <button wire:click="deleteRecord({{ $record->id }})" wire:confirm="Are you sure?"
                             class="px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">

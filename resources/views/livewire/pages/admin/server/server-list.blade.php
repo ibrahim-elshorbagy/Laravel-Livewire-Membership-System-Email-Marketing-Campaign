@@ -77,7 +77,7 @@
             </thead>
             <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
                 @foreach($servers as $server)
-                <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800">
                     <td class="p-4">
                         <input type="checkbox" wire:model.live="selectedServers" value="{{ $server->id }}"
                             class="rounded">

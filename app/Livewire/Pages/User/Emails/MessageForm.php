@@ -7,6 +7,7 @@ use App\Models\Email\EmailMessage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use App\Rules\ProhibitedWords;
 
 class MessageForm extends Component
 {
@@ -22,15 +23,19 @@ class MessageForm extends Component
     public $sending_status = 'PAUSE';
     public $showPreview = false;
 
-    protected $rules = [
-        'message_title'      => 'required|string',
-        'email_subject'       => 'required|string',
-        'message_html'        => 'nullable|string',
-        'message_plain_text'  => 'nullable|string',
-        'sender_name'         => 'nullable|string',
-        'reply_to_email'      => 'nullable|email',
-        'sending_status'      => 'in:RUN,PAUSE'
-    ];
+    public function rules(): array
+    {
+        return [
+            'message_title' => ['required', 'string'],
+            'email_subject' => ['required', 'string'],
+            'message_html'  => ['nullable', 'string', new ProhibitedWords()],
+            'message_plain_text' => ['nullable', 'string', new ProhibitedWords()],
+            'sender_name' => ['nullable', 'string'],
+            'reply_to_email' => ['nullable', 'email'],
+            'sending_status' => ['in:RUN,PAUSE'],
+        ];
+    }
+
 
     public function mount($message = null)
     {

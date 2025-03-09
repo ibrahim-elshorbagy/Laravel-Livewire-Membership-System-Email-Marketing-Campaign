@@ -1,4 +1,5 @@
-<div class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+<div
+    class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
 
 
 
@@ -107,15 +108,12 @@
                     <div class="relative">
                         <x-primary-danger-button x-data="{
                             isDisabled: {{ !$selectedList || ($selectedList && $this->lists->firstWhere('id', $selectedList)?->emails_count == 0) ? 'true' : 'false' }}
-                        }"
-                            wire:click="deleteEmails('{{ !empty($selectedEmails) ? 'selected' : 'all' }}')"
-
+                        }" wire:click="deleteEmails('{{ !empty($selectedEmails) ? 'selected' : 'all' }}')"
                             wire:confirm="{{ !empty($selectedEmails)
                             ? 'Are you sure you want to delete ' . count($selectedEmails) . ' selected emails?'
                             : 'WARNING: This will delete ALL emails in the current list. This action cannot be undone. Are you sure?' }}"
                             x-bind:class="isDisabled ? 'opacity-50 cursor-not-allowed' : ''"
                             class="w-full text-sm sm:text-base" x-bind:disabled="isDisabled"
-
                             @mouseenter="$refs.noteBox.classList.remove('opacity-0')"
                             @mouseleave="$refs.noteBox.classList.add('opacity-0')">
 
@@ -123,19 +121,19 @@
 
                                 <i class="text-xs sm:text-sm fas fa-trash"></i>
                                 @if(!empty($selectedEmails))
-                                    <span class="text-xs sm:text-sm">Delete Selected</span>
+                                <span class="text-xs sm:text-sm">Delete Selected</span>
 
-                                    <span class="px-1.5 py-0.5 text-xs bg-red-700 rounded-full sm:px-2">
-                                        {{ count($selectedEmails) }}
-                                    </span>
+                                <span class="px-1.5 py-0.5 text-xs bg-red-700 rounded-full sm:px-2">
+                                    {{ count($selectedEmails) }}
+                                </span>
                                 @else
-                                    <span class="text-xs sm:text-sm">Delete All</span>
+                                <span class="text-xs sm:text-sm">Delete All</span>
 
-                                    @if($selectedList)
-                                        <span class="px-1.5 py-0.5 text-xs bg-red-700 rounded-full sm:px-2">
-                                            {{ $this->lists->firstWhere('id', $selectedList)?->emails_count ?? 0 }}
-                                        </span>
-                                    @endif
+                                @if($selectedList)
+                                <span class="px-1.5 py-0.5 text-xs bg-red-700 rounded-full sm:px-2">
+                                    {{ $this->lists->firstWhere('id', $selectedList)?->emails_count ?? 0 }}
+                                </span>
+                                @endif
                                 @endif
 
                             </div>
@@ -325,7 +323,7 @@
                         </thead>
                         <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
                             @foreach($emails as $email)
-                            <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800"
+                            <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800"
                                 wire:key="email-row-{{ $email->id }}">
                                 <td class="p-4">
                                     <input type="checkbox" wire:model.live="selectedEmails" value="{{ $email->id }}"
@@ -406,9 +404,11 @@
                                                             </span>
                                                             <span
                                                                 class="text-xs text-neutral-500 dark:text-neutral-400">
-                                                                {{ $record->sent_time->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->format('d M, Y
+                                                                {{ $record->sent_time->timezone(auth()->user()->timezone
+                                                                ?? $globalSettings['APP_TIMEZONE'])->format('d M, Y
                                                                 h:i:s A') }} -
-                                                                {{ $record->sent_time->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->diffForHumans() }}
+                                                                {{ $record->sent_time->timezone(auth()->user()->timezone
+                                                                ?? $globalSettings['APP_TIMEZONE'])->diffForHumans() }}
                                                             </span>
                                                         </div>
                                                     </div>

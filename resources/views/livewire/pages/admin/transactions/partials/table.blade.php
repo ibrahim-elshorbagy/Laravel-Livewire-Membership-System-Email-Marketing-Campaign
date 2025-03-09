@@ -6,16 +6,16 @@
 
 <div>
     <!-- Search Box -->
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex justify-between items-center mb-4">
         <div class="w-full">
             <div class="relative">
                 <x-text-input wire:model.live.debounce.600ms="{{ $search }}" id="{{ $search }}" type="text"
-                    class="w-full py-2 pl-10 pr-20" placeholder="{{ $searchPlaceholder }}" />
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    class="py-2 pr-20 pl-10 w-full" placeholder="{{ $searchPlaceholder }}" />
+                <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </div>
                 @if($$search)
-                <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                <div class="flex absolute inset-y-0 right-0 items-center pr-3">
                     <button wire:click="$set('{{ $search }}', '')" class="text-gray-400 hover:text-gray-600">
                         <i class="fas fa-times-circle"></i>
                     </button>
@@ -26,7 +26,7 @@
     </div>
 
     <!-- Table -->
-    <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
+    <div class="overflow-hidden overflow-x-auto w-full rounded-lg">
         <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
             <thead class="text-sm bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                 <tr>
@@ -44,9 +44,9 @@
                 @php
                 $user = $payment->user;
                 @endphp
-                <tr>
+                <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800">
                     <td class="p-4">
-                        <div class="flex items-center gap-2 w-max">
+                        <div class="flex gap-2 items-center w-max">
                             <img class="object-cover rounded-full size-10" src="{{ $user->image_url ?? 'default-avatar.png' }}"
                                 alt="{{ $user->first_name }}" />
                             <div class="flex flex-col">

@@ -46,7 +46,7 @@
                 </thead>
                 <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
                     @forelse($payments as $payment)
-                    <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                    <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800">
                         <td class="p-4">
                             {{ $payment->created_at->format('d / m / Y') }}
                         </td>
