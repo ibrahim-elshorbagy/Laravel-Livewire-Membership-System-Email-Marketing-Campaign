@@ -151,6 +151,14 @@ new class extends Component
                 <div class="flex items-center mt-1 text-gray-900 dark:text-gray-100">
                     <i class="fas fa-envelope"></i>
                     <p class="ms-2">{{ auth()->user()->email }}</p>
+                    
+                    @role('user')
+                        @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && auth()->user()->hasVerifiedEmail())
+                            <p class="px-2 py-1 ml-3 text-sm font-medium text-green-600 bg-green-100 rounded-full dark:text-green-400 dark:bg-green-900/30">
+                                Verified
+                            </p>
+                        @endif
+                    @endrole
                 </div>
             </div>
 
@@ -167,7 +175,7 @@ new class extends Component
                         {{ __('Your email address is unverified.') }}
 
                         <button wire:click.prevent="sendVerification" class="text-sm text-gray-600 underline rounded-md dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
-                            {{ __('Click here to re-send the verification email.') }}
+                            {{ __('Click here to send the verification email.') }}
                         </button>
                     </p>
 
@@ -178,6 +186,7 @@ new class extends Component
                     @endif
                 </div>
             @endif
+
         </div>
 
         <div class="flex gap-4 items-center">

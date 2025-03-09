@@ -329,7 +329,7 @@
             </nav>
 
             <!-- Main content -->
-            <main class="flex-1 py-2 my-4 md:mx-4">
+            <main class="flex-1 {{ request()->routeIs('login', 'register','password.request','password.reset','verification.notice','verification.verify','password.confirm') ? '' : 'py-2 my-4 md:mx-4' }}">
                 {{ $slot }}
             </main>
 

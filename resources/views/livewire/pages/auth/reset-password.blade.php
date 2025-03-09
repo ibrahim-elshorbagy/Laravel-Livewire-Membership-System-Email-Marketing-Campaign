@@ -69,9 +69,19 @@ new #[Layout('layouts.app')] class extends Component
     }
 }; ?>
 
-<div class="grid h-screen place-items-center">
-    <div class="flex flex-col p-6 border rounded-md w-46 md:w-[32rem] group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
-        <form wire:submit="resetPassword">
+<div class="grid relative flex-col justify-center items-center px-8 h-[calc(100vh-65px)] sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
+    <div class="hidden relative flex-col p-10 h-full text-white bg-muted lg:flex dark:border-r dark:border-neutral-800">
+        <div class="absolute inset-0 bg-[#f7f7f7]"></div>
+        <div class="absolute inset-0 bg-center bg-no-repeat bg-contain" style="background-image: url({{ asset('assets/auth/auth.jpeg') }});"></div>
+        <div class="relative z-20 mt-auto text-black my-15">
+            <blockquote class="space-y-2">
+                <p class="text-lg">Create mailing campaigns and send emails to your subscribers and contacts in an easy and quick way.</p>
+            </blockquote>
+        </div>
+    </div>
+    <div class="flex justify-center items-center w-full h-full">
+        <div class="flex flex-col p-6 border rounded-md w-46 md:w-[32rem] group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+            <form wire:submit="resetPassword">
             <!-- Email Address -->
             <div>
                 <x-input-label for="email" :value="__('Email')" />

@@ -2,7 +2,7 @@
 
 <div>
     <!-- Table Header -->
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {{ $periodType }} Plans
         </h3>
@@ -34,8 +34,8 @@
                 </td>
                 <td class="p-4">
                     <div class="space-y-1 text-nowrap">
-                        @foreach($plan->features as $feature)
-                        <div class="flex items-center gap-2">
+                        {{-- @foreach($plan->features as $feature)
+                        <div class="flex gap-2 items-center">
                             <span class="text-green-500">
                                 <i class="fas fa-check"></i>
                             </span>
@@ -46,7 +46,30 @@
                                 @endif
                             </span>
                         </div>
-                        @endforeach
+                        @endforeach --}}
+
+                        <div class="flex gap-2 items-center">
+                            <span class="text-green-500">
+                                <i class="fas fa-check"></i>
+                            </span>
+                            <span class="">
+                                Number of contacts
+                                @if($plan->features[0]->pivot->charges)
+                                ( {{ (int)$plan->features[0]->pivot->charges }} Limit)
+                                @endif
+                            </span>
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <span class="text-green-500">
+                                <i class="fas fa-check"></i>
+                            </span>
+                            <span class="">
+                                Emails per month
+                                @if($plan->features[1]->pivot->charges)
+                                ( {{ (int)$plan->features[1]->pivot->charges }} Limit)
+                                @endif
+                            </span>
+                        </div>
                     </div>
                 </td>
                 <td class="p-4">

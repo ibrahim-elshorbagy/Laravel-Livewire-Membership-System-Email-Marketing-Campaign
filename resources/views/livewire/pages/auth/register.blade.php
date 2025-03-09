@@ -46,65 +46,88 @@ new #[Layout('layouts.app')] class extends Component
         }
 }; ?>
 
-<div class="flex justify-center items-center px-4 py-12 min-h-screen bg-gradient-to-br sm:px-6 lg:px-8">
-    <div
-        class="p-4 space-y-8 w-full max-w-md bg-white rounded-2xl shadow-xl dark:shadow dark:shadow-gray-100 dark:bg-neutral-800">
-        <!-- Logo/Brand -->
-        <div class="text-center">
-            <h2 class="mt-6 text-3xl font-extrabold text-neutral-900 dark:text-white">Create an account</h2>
-            <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">Start your journey with us</p>
+<div class="grid relative flex-col justify-center items-center px-8 h-[calc(100vh-65px)] sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
+    <div class="hidden relative flex-col p-10 h-full text-white bg-muted lg:flex dark:border-r dark:border-neutral-800">
+        <div class="absolute inset-0 bg-[#f7f7f7]"></div>
+        <div class="absolute inset-0 bg-center bg-no-repeat bg-contain"
+            style="background-image: url({{ asset('assets/auth/auth.jpeg') }});">
         </div>
-        <form wire:submit="register" class="mt-8 space-y-6">
-            <div class="space-y-4 rounded-md shadow-sm">
-                <div class="grid grid-cols-2 gap-4">
-                    <!-- First Name -->
-                    <div>
-                        <x-input-label for="first_name" :value="__('First Name')" class="text-sm font-medium" />
-                        <x-text-input wire:model="first_name" id="first_name" class="block w-full" type="text"
-                            name="first_name" required autofocus autocomplete="given-name" />
-                        <x-input-error :messages="$errors->get('first_name')" class="mt-2" />
+
+        <div class="relative z-20 mt-auto text-black my-15">
+            <blockquote class="space-y-2">
+                <p class="text-lg">Create mailing campaigns and send emails to your subscribers and contacts in an easy
+                    and quick way.</p>
+            </blockquote>
+        </div>
+    </div>
+    <div class="flex justify-center items-center w-full h-full">
+        <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+            <a href="https://gemailapp.com/" class="flex z-20 flex-col gap-2 items-center font-medium lg:hidden"
+                wire:navigate>
+                <span class="flex justify-center items-center w-9 h-9 rounded-md">
+                    <x-application-logo class="text-black fill-current size-9 dark:text-white" />
+                </span>
+                <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
+            </a>
+
+            <!-- Logo/Brand -->
+            <div class="text-center">
+                <h2 class="mt-6 text-3xl font-extrabold text-neutral-900 dark:text-white">Create an account</h2>
+                <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">Start your journey with us</p>
+            </div>
+
+            <form wire:submit="register" class="space-y-6">
+                <div class="space-y-4 rounded-md shadow-sm">
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- First Name -->
+                        <div>
+                            <x-input-label for="first_name" :value="__('First Name')" class="text-sm font-medium" />
+                            <x-text-input wire:model="first_name" id="first_name" type="text"
+                                name="first_name" required autofocus autocomplete="given-name" />
+                            <x-input-error :messages="$errors->get('first_name')" class="mt-2" />
+                        </div>
+
+                        <!-- Last Name -->
+                        <div>
+                            <x-input-label for="last_name" :value="__('Last Name')" class="text-sm font-medium" />
+                            <x-text-input wire:model="last_name" id="last_name" type="text"
+                                name="last_name" required autocomplete="family-name" />
+                            <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
+                        </div>
                     </div>
 
-                    <!-- Last Name -->
+                    <!-- Username -->
                     <div>
-                        <x-input-label for="last_name" :value="__('Last Name')" class="text-sm font-medium" />
-                        <x-text-input wire:model="last_name" id="last_name" class="block w-full" type="text"
-                            name="last_name" required autocomplete="family-name" />
-                        <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
+                        <x-input-label for="username" :value="__('Username')" class="text-sm font-medium" />
+                        <x-text-input wire:model="username" id="username" type="text" name="username"
+                            required autocomplete="username" />
+                        <x-input-error :messages="$errors->get('username')" class="mt-2" />
                     </div>
-                </div>
 
-                <!-- Username -->
-                <div>
-                    <x-input-label for="username" :value="__('Username')" class="text-sm font-medium" />
-                    <x-text-input wire:model="username" id="username" class="block w-full" type="text" name="username"
-                        required autocomplete="username" />
-                    <x-input-error :messages="$errors->get('username')" class="mt-2" />
-                </div>
+                    <!-- Email Address -->
+                    <div>
+                        <x-input-label for="email" :value="__('Email')" class="text-sm font-medium" />
+                        <x-text-input wire:model="email" id="email" type="email" name="email" required
+                            autocomplete="email" />
+                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                    </div>
 
-                <!-- Email Address -->
-                <div>
-                    <x-input-label for="email" :value="__('Email')" class="text-sm font-medium" />
-                    <x-text-input wire:model="email" id="email" class="block w-full" type="email" name="email" required
-                        autocomplete="email" />
-                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                </div>
+                    <!-- Password -->
+                    <div>
+                        <x-input-label for="password" :value="__('Password')" class="text-sm font-medium" />
+                        <x-text-input wire:model="password" id="password" type="password"
+                            name="password" required autocomplete="new-password" />
+                        <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                    </div>
 
-                <!-- Password -->
-                <div>
-                    <x-input-label for="password" :value="__('Password')" class="text-sm font-medium" />
-                    <x-text-input wire:model="password" id="password" class="block w-full" type="password"
-                        name="password" required autocomplete="new-password" />
-                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                </div>
-
-                <!-- Confirm Password -->
-                <div>
-                    <x-input-label for="password_confirmation" :value="__('Confirm Password')"
-                        class="text-sm font-medium" />
-                    <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block w-full"
-                        type="password" name="password_confirmation" required autocomplete="new-password" />
-                    <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                    <!-- Confirm Password -->
+                    <div>
+                        <x-input-label for="password_confirmation" :value="__('Confirm Password')"
+                            class="text-sm font-medium" />
+                        <x-text-input wire:model="password_confirmation" id="password_confirmation"
+                            type="password" name="password_confirmation" required autocomplete="new-password" />
+                        <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                    </div>
                 </div>
 
                 <div>
@@ -121,6 +144,7 @@ new #[Layout('layouts.app')] class extends Component
                         Sign in here
                     </a>
                 </div>
-        </form>
+            </form>
+        </div>
     </div>
 </div>
