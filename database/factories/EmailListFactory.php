@@ -17,6 +17,7 @@ class EmailListFactory extends Factory
             'user_id' => User::factory(),
             'list_id' => EmailListName::factory(),
             'email' => $this->faker->unique()->safeEmail(),
+            'name' => $this->faker->name(),
         ];
     }
 

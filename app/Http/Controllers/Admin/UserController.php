@@ -20,6 +20,10 @@ class UserController extends Controller
         }
 
         Auth::logout();
+        // Regenerate session after logout
+        session()->invalidate();
+        session()->regenerateToken();
+
         Auth::login($admin);
 
         session()->forget('impersonated_by');

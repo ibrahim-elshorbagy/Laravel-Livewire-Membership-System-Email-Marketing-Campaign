@@ -21,8 +21,10 @@ class EmailListsTable extends Component
     use WithPagination, LivewireAlert;
 
     public $search = '';
+    public $searchName = '';
     public $perPage = 10;
     public $sortDirection = 'asc';
+    public $orderBy = 'email';
     public $selectedEmails = [];
     public $selectPage = false;
     public $user;
@@ -224,7 +226,7 @@ class EmailListsTable extends Component
 
         // Start with base query with necessary columns only
         $query = EmailList::query()
-            ->select(['id', 'email'])
+            ->select(['id', 'email','name'])
             ->with(['history' => function($query) {
                 $query->with(['campaign:id,message_id', 'campaign.message:id,email_subject'])
                     ->orderBy('sent_time', 'desc');
@@ -239,9 +241,15 @@ class EmailListsTable extends Component
                 $q->where('email', 'like', $searchTerm);
             });
         }
+        if (trim($this->searchName)) {
+            $searchNameTerm = '%' . trim($this->searchName) . '%';
+            $query->where(function($q) use ($searchNameTerm) {
+                $q->where('name', 'like', $searchNameTerm);
+            });
+        }
 
 
-        return $query->orderBy('email', $this->sortDirection);
+        return $query->orderBy($this->orderBy, $this->sortDirection);
     }
 
 

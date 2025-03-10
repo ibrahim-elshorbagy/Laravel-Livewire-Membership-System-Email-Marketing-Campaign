@@ -38,7 +38,7 @@ class ProcessEmailFile implements ShouldQueue
 
         $this->onQueue('high');
 
-        JobProgress::where('user_id', $this->userId)
+        JobProgress::where('user_id', $this->userId)   //As if there is Error happend and it does not complete so redo it
             ->where('job_type', 'process_email_file')
             ->where('status', 'processing')
             ->orWhere('status', 'failed')
@@ -47,7 +47,7 @@ class ProcessEmailFile implements ShouldQueue
 
     public function handle()
     {
-        ini_set('memory_limit', '512M');
+        // ini_set('memory_limit', '512M');
 
         try {
             $currentCount = EmailList::where('user_id', $this->userId)->count();

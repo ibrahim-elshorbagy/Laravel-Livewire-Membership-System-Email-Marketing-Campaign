@@ -1,4 +1,4 @@
-<div class="p-6 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+<div class="p-6 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
     x-data="{
         emailInput: '',
         parsedEmails: [],
@@ -79,7 +79,7 @@
     </div>
 
     <div class="p-3 my-4 bg-blue-100 rounded-lg dark:bg-blue-900">
-        <ul class="pl-5 text-sm text-gray-700 list-disc dark:text-gray-200">
+        <ul class="pl-5 text-sm list-disc text-gray-700 dark:text-gray-200">
             <li>
                 <i class="mr-2 text-blue-600 fas fa-envelope dark:text-blue-300"></i>
                 Remaining Quota: <span class="font-bold">{{ $remainingQuota }}</span> emails
@@ -87,10 +87,10 @@
         </ul>
     </div>
     <!-- Warning Message -->
-    <div class="p-4 my-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20">
+    <div class="p-4 my-4 bg-yellow-50 rounded-lg dark:bg-yellow-900/20">
         <div class="flex flex-col">
             <!-- Icon -->
-            <div class="flex items-center gap-4">
+            <div class="flex gap-4 items-center">
                 <div class="flex-shrink-0 sm:mr-3">
                     <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd"
@@ -108,6 +108,9 @@
                     <p >
                         - Importing will start immediately when importing from  ( file text or Excel file )
                     </p>
+                    {{-- <p>
+                        - You Can Import Email And Name with Excel file only
+                    </p> --}}
                     <p >
                         - Enter one email per line or separate emails with commas.
                     </p>
@@ -139,11 +142,11 @@
     <!-- List Selection -->
 
 
-    <div class="grid items-center grid-cols-1 gap-4 mb-4 sm:grid-cols-2 justify-normal">
+    <div class="grid grid-cols-1 gap-4 items-center mb-4 sm:grid-cols-2 justify-normal">
         <div>
             <x-input-label for="list_id">Select List</x-input-label>
             <x-primary-select-input wire:model.live="list_id" id="list_id"
-                class="w-full mt-1 border-gray-300 rounded-md shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                class="mt-1 w-full rounded-md border-gray-300 shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
                 <option value="0">Select a list</option>
                 @foreach($emailLists as $list)
                 <option value="{{ $list->id }}">{{ $list->name }}</option>
@@ -175,7 +178,7 @@
     <!-- Processing Indicator -->
     <div x-show="processing" class="p-4 mb-4 text-blue-700 bg-blue-100 rounded-lg dark:bg-blue-900 dark:text-blue-300">
         <div class="flex items-center">
-            <svg class="w-5 h-5 mr-2 animate-spin" viewBox="0 0 24 24">
+            <svg class="mr-2 w-5 h-5 animate-spin" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" />
                 <path class="opacity-75" fill="currentColor"
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -197,9 +200,9 @@
     <!-- Preview Section -->
     <div class="mt-4" x-show="parsedEmails.length > 0">
         <h3 class="mb-2 text-lg font-semibold" x-text="`Preview (${parsedEmails.length} entries)`"></h3>
-        <div class="p-4 overflow-y-auto border rounded-lg max-h-96">
+        <div class="overflow-y-auto p-4 max-h-96 rounded-lg border">
             <template x-for="(entry, index) in parsedEmails" :key="index">
-                <div class="flex items-center justify-between gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <div class="flex gap-2 justify-between items-center p-2 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <span :class="{ 'text-red-500': !entry.valid }" x-text="entry.value"></span>
                 </div>
             </template>

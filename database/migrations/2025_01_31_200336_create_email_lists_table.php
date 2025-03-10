@@ -23,6 +23,8 @@ return new class extends Migration
             // Add indexes for better performance
             $table->index(['email', 'user_id']);
 
+            $table->string('name')->nullable();
+            $table->index(['name', 'user_id']);
 
             $table->foreignId('list_id')->nullable()->constrained('email_list_names')->onDelete('cascade');
 

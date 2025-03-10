@@ -48,9 +48,20 @@
                 </div>
             </div>
 
+            <!-- Search Box -->
+            <div class="relative flex-1">
+                <x-text-input wire:model.live.debounce.300ms="searchNameTerm" placeholder="Search..."
+                    class="pl-10 w-full" />
+                <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                    <i class="text-gray-400 fas fa-search"></i>
+                </div>
+            </div>
             <!-- Filters -->
             <div class="flex flex-wrap gap-2">
-
+                <x-primary-select-input wire:model.live="orderBy" class="w-full sm:w-32">
+                    <option value="email">Email</option>
+                    <option value="name">Name</option>
+                </x-primary-select-input>
                 <x-primary-select-input wire:model.live="sortDirection" class="w-full sm:w-32">
                     <option value="asc">Ascending</option>
                     <option value="desc">Descending</option>
@@ -314,10 +325,21 @@
                         <thead
                             class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                             <tr>
+                                <!-- Checkbox column -->
                                 <th scope="col" class="p-4 w-10">
                                     <input type="checkbox" wire:model.live="selectPage" class="rounded">
                                 </th>
-                                <th scope="col" class="p-4">Email</th>
+
+                                <!-- Combined Email/Name column -->
+                                <th scope="col" class="p-4">
+                                    <div class="flex justify-between items-center">
+                                        <span class="w-[350px]">Email</span>
+                                        <span class="w-[350px]">Name</span>
+                                        <span class="w-[130px]"></span> {{-- Spacer For History --}}
+                                    </div>
+                                </th>
+
+                                <!-- Actions column -->
                                 <th scope="col" class="p-4">Actions</th>
                             </tr>
                         </thead>
@@ -331,11 +353,13 @@
                                 </td>
 
 
-                                <td class="p-4">
-                                    <div x-data="{ isExpanded: false }" class="w-full">
-                                        <div class="flex justify-between items-center">
-                                            <span>{{ $email->email }}</span>
-                                            <div class="flex gap-2 items-center">
+                                <td x-data="{ isExpanded: false }" class="p-4 w-full">
+                                    <div class="flex justify-between items-center">
+
+                                        <span class="w-[350px]">{{ $email->email }}</span>
+                                        <span class="w-[350px]">{{ $email->name }}</span>
+
+                                        <div class="flex self-end gap-2 items-center w-[130px] justify-end">
                                                 @if($email->history->count() > 0)
                                                 <!-- Delete All History Button -->
                                                 <button wire:click="deleteAllHistory({{ $email->id }})"
@@ -346,8 +370,8 @@
                                                 @endif
 
                                                 <!-- View History Button - Always visible -->
-                                                <button type="button" x-on:click="isExpanded = !isExpanded"
-                                                    class="flex gap-2 items-center px-2 py-1 text-xs rounded-md transition-colors text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+                                                <button  type="button" x-on:click="isExpanded = !isExpanded"
+                                                    class="flex gap-2 items-center self-end px-2 py-1 text-xs rounded-md transition-colors text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800">
                                                     @if($email->history->count() > 0)
                                                     <span
                                                         class="px-2 py-0.5 text-xs font-medium text-purple-700 bg-purple-100 rounded-full dark:bg-purple-900/50 dark:text-purple-400">
@@ -363,68 +387,66 @@
                                                     <i class="transition-transform duration-200 fas fa-chevron-down"
                                                         :class="{'rotate-180': isExpanded}"></i>
                                                 </button>
-                                            </div>
                                         </div>
+                                    </div>
 
-                                        <!-- History Records -->
-                                        <div x-show="isExpanded" x-collapse class="mt-2">
-                                            @if($email->history->count() > 0)
-                                            <div class="space-y-2">
-                                                @foreach($email->history->sortByDesc('sent_time') as $record)
-                                                <div class="relative group p-3 text-sm rounded-lg {{ $record->status === 'sent'
+                                    <!-- History Records -->
+                                    <div x-show="isExpanded" x-collapse class="mt-2">
+                                        @if($email->history->count() > 0)
+                                        <div class="space-y-2">
+                                            @foreach($email->history->sortByDesc('sent_time') as $record)
+                                            <div class="relative group p-3 text-sm rounded-lg {{ $record->status === 'sent'
                                                             ? 'bg-green-100 dark:bg-green-900/30'
                                                             : 'bg-red-100 dark:bg-red-900/30' }}">
 
-                                                    <!-- Delete Single History Button -->
-                                                    <button wire:click="deleteHistory({{ $record->id }})"
-                                                        wire:confirm="Are you sure you want to delete this record?"
-                                                        class="absolute top-2 right-2 p-1.5 px-2 py-1 text-xs text-red-500 rounded-md opacity-0 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20 group-hover:opacity-100">
-                                                        <i class="fas fa-trash-alt"></i>
-                                                    </button>
+                                                <!-- Delete Single History Button -->
+                                                <button wire:click="deleteHistory({{ $record->id }})"
+                                                    wire:confirm="Are you sure you want to delete this record?"
+                                                    class="absolute top-2 right-2 p-1.5 px-2 py-1 text-xs text-red-500 rounded-md opacity-0 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20 group-hover:opacity-100">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
 
-                                                    <div class="flex justify-between items-center">
-                                                        <div class="flex items-center space-x-2">
-                                                            @if($record->status === 'sent')
-                                                            <i
-                                                                class="text-green-600 dark:text-green-400 fas fa-check-circle"></i>
-                                                            @else
-                                                            <i
-                                                                class="text-red-600 dark:text-red-400 fas fa-exclamation-circle"></i>
-                                                            @endif
-                                                            <span class="font-medium">Campaign: {{
-                                                                $record->campaign?->message?->email_subject }}</span>
-                                                        </div>
-                                                        <div class="flex gap-2 items-center mr-10">
-                                                            <span class="px-2 py-0.5 text-xs font-medium rounded-full
+                                                <div class="flex justify-between items-center">
+                                                    <div class="flex items-center space-x-2">
+                                                        @if($record->status === 'sent')
+                                                        <i
+                                                            class="text-green-600 dark:text-green-400 fas fa-check-circle"></i>
+                                                        @else
+                                                        <i
+                                                            class="text-red-600 dark:text-red-400 fas fa-exclamation-circle"></i>
+                                                        @endif
+                                                        <span class="font-medium">Campaign: {{
+                                                            $record->campaign?->message?->email_subject }}</span>
+                                                    </div>
+                                                    <div class="flex gap-2 items-center mr-10">
+                                                        <span class="px-2 py-0.5 text-xs font-medium rounded-full
                                                                         {{ $record->status === 'sent'
                                                                             ? 'bg-green-200 text-green-800 dark:bg-green-900 dark:text-green-300'
                                                                             : 'bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-300'
                                                                         }}">
-                                                                {{ ucfirst($record->status) }}
-                                                            </span>
-                                                            <span
-                                                                class="text-xs text-neutral-500 dark:text-neutral-400">
-                                                                {{ $record->sent_time->timezone(auth()->user()->timezone
-                                                                ?? $globalSettings['APP_TIMEZONE'])->format('d M, Y
-                                                                h:i:s A') }} -
-                                                                {{ $record->sent_time->timezone(auth()->user()->timezone
-                                                                ?? $globalSettings['APP_TIMEZONE'])->diffForHumans() }}
-                                                            </span>
-                                                        </div>
+                                                            {{ ucfirst($record->status) }}
+                                                        </span>
+                                                        <span class="text-xs text-neutral-500 dark:text-neutral-400">
+                                                            {{ $record->sent_time->timezone(auth()->user()->timezone
+                                                            ?? $globalSettings['APP_TIMEZONE'])->format('d M, Y
+                                                            h:i:s A') }} -
+                                                            {{ $record->sent_time->timezone(auth()->user()->timezone
+                                                            ?? $globalSettings['APP_TIMEZONE'])->diffForHumans() }}
+                                                        </span>
                                                     </div>
                                                 </div>
-                                                @endforeach
                                             </div>
-                                            @else
-                                            <div
-                                                class="p-4 text-sm text-center rounded-lg bg-neutral-100 dark:bg-neutral-800">
-                                                <i
-                                                    class="mb-2 text-2xl text-neutral-400 dark:text-neutral-600 fas fa-inbox"></i>
-                                                <p class="text-neutral-600 dark:text-neutral-400">No sending history
-                                                    available</p>
-                                            </div>
-                                            @endif
+                                            @endforeach
                                         </div>
+                                        @else
+                                        <div
+                                            class="p-4 text-sm text-center rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                                            <i
+                                                class="mb-2 text-2xl text-neutral-400 dark:text-neutral-600 fas fa-inbox"></i>
+                                            <p class="text-neutral-600 dark:text-neutral-400">No sending history
+                                                available</p>
+                                        </div>
+                                        @endif
                                     </div>
                                 </td>
 
