@@ -15,7 +15,7 @@ class MySubscription extends Component
     use LivewireAlert, PaypalPaymentService;
 
     public $subscription;
-    public $user;
+    private  $user;
     public $isProcessing = false;
 
     public function mount()

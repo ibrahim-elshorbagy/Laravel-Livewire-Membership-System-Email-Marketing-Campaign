@@ -20,7 +20,9 @@ class CreateEmailList extends Component
     public $file;
     public $emails = [];
     public $remainingQuota = 0;
-    public $user;
+    public $userId;
+    private $user;
+
     public $processing = false;
 
     protected $listeners = ['refreshComponent' => '$refresh'];
@@ -42,6 +44,7 @@ class CreateEmailList extends Component
     public function mount()
     {
         $this->user = auth()->user();
+        $this->userId = $this->user->id;
         $this->remainingQuota = $this->user->balance('Subscribers Limit');
 
         $this->emailLists = EmailListName::where('user_id', $this->user->id)->get();
@@ -65,9 +68,9 @@ class CreateEmailList extends Component
         return DB::table('jobs')
             ->where('queue', 'high')
             ->where(function($query) {
-                $query->where('payload', 'like', '%"userId":' . $this->user->id . '%')
-                    ->orWhere('payload', 'like', '%"user_id":' . $this->user->id . '%')
-                    ->orWhere('payload', 'like', '%i:' . $this->user->id . ';%');
+                $query->where('payload', 'like', '%"userId":' . $this->userId . '%')
+                    ->orWhere('payload', 'like', '%"user_id":' . $this->userId . '%')
+                    ->orWhere('payload', 'like', '%i:' . $this->userId . ';%');
             })
             ->exists();
     }
@@ -108,6 +111,7 @@ class CreateEmailList extends Component
             ]);
 
             $emailsCount = count($emails);
+            $this->user = auth()->user();
 
             if ($emailsCount === 0) {
                 $this->alert('error', 'No valid emails found', ['position' => 'bottom-end']);

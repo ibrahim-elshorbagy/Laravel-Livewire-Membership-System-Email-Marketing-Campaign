@@ -10,6 +10,7 @@ use Livewire\WithPagination;
 use App\Models\EmailList;
 use App\Models\EmailListName;
 use App\Models\JobProgress;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -27,7 +28,8 @@ class EmailListsTable extends Component
     public $orderBy = 'email';
     public $selectedEmails = [];
     public $selectPage = false;
-    public $user;
+    private $user;
+    public $subscriberBalance;
     public $emailLimit;
     public $selectedEmailId = null;
     public $editEmail = '';
@@ -61,13 +63,13 @@ class EmailListsTable extends Component
             'selectedEmails.*' => [
                 'required',
                 Rule::exists('email_lists', 'id')->where(function ($query) {
-                    return $query->where('user_id', auth()->id());
+                    return $query->where('user_id', Auth::id());
                 }),
             ],
             'selectedEmailId' => [
                 'required',
                 Rule::exists('email_lists', 'id')->where(function ($query) {
-                    return $query->where('user_id', $this->user->id);
+                    return $query->where('user_id', Auth::id());
                 }),
             ],
         ];
@@ -80,7 +82,7 @@ class EmailListsTable extends Component
                 'required',
                 'string',
                 Rule::unique('email_list_names', 'name')
-                    ->where('user_id', $this->user->id)
+                    ->where('user_id', Auth::id())
             ],
         ];
     }
@@ -105,6 +107,7 @@ class EmailListsTable extends Component
     public function mount()
     {
         $this->user = auth()->user();
+        $this->subscriberBalance = $this->user->balance('Subscribers Limit');
         if (!$this->user) {
             return redirect()->route('login');
         }
@@ -232,7 +235,7 @@ class EmailListsTable extends Component
                 $query->with(['campaign:id,message_id', 'campaign.message:id,email_subject'])
                     ->orderBy('sent_time', 'desc');
             }])
-            ->where('user_id', $this->user->id)
+            ->where('user_id', Auth::id())
             ->where('list_id', $this->selectedList);
 
         // Apply search filters only if search term exists
@@ -259,6 +262,8 @@ class EmailListsTable extends Component
     public function deleteEmails($type = 'selected', $emailId = null)
     {
 
+        $this->user = auth()->user();
+
         // Handle single email deletion
         if (is_numeric($type)) {
                 $emailId = $type;
@@ -268,7 +273,7 @@ class EmailListsTable extends Component
         try {
             DB::transaction(function () use ($type, $emailId) {
                 // Build the query based on deletion type
-                $query = EmailList::where('user_id', $this->user->id);
+                $query = EmailList::where('user_id',Auth::id());
 
                 switch ($type) {
                     case 'single':
@@ -302,7 +307,7 @@ class EmailListsTable extends Component
 
                 // Use job for large deletions
                 if ($count > 10000) {
-                    DeleteEmails::dispatch($this->user->id, $this->selectedList);
+                    DeleteEmails::dispatch(Auth::id(), $this->selectedList);
                     $this->alert('success',
                         "Processing deletion of {$count} emails. This may take a while.",
                         ['position' => 'bottom-end']
@@ -314,7 +319,7 @@ class EmailListsTable extends Component
                     // Update user's quota
                     $this->user->forceSetConsumption(
                         'Subscribers Limit',
-                        EmailList::where('user_id', $this->user->id)->count()
+                        EmailList::where('user_id', Auth::id())->count()
                     );
 
                     // Success message based on deletion type
@@ -416,7 +421,7 @@ class EmailListsTable extends Component
 
         try {
             EmailListName::create([
-                'user_id' => $this->user->id,
+                'user_id' => Auth::id(),
                 'name' => $this->listName
             ]);
 
@@ -436,13 +441,13 @@ class EmailListsTable extends Component
                 'string',
                 'max:255',
                 Rule::unique('email_list_names', 'name')
-                    ->where('user_id', $this->user->id)
+                    ->where('user_id', Auth::id())
                     ->ignore($listId)
             ]
         ]);
 
         try {
-            EmailListName::where('user_id', $this->user->id)
+            EmailListName::where('user_id', Auth::id())
                 ->findOrFail($listId)
                 ->update(['name' => $this->listName]);
 
@@ -472,7 +477,7 @@ class EmailListsTable extends Component
                 'required',
                 'email',
                 Rule::unique('email_lists', 'email')
-                    ->where('user_id', $this->user->id)
+                    ->where('user_id', Auth::id())
                     ->where('list_id', $this->selectedList)
                     ->ignore($this->selectedEmailId)
             ],
@@ -480,7 +485,7 @@ class EmailListsTable extends Component
         ]);
 
         try {
-            $email = EmailList::where('user_id', $this->user->id)
+            $email = EmailList::where('user_id', Auth::id())
                 ->findOrFail($this->selectedEmailId);
 
             $email->update([
@@ -501,13 +506,13 @@ class EmailListsTable extends Component
 
     public function deleteList($listId)
     {
-        $list = EmailListName::where('user_id', $this->user->id)
+        $list = EmailListName::where('user_id', Auth::id())
             ->withCount('emails')
             ->findOrFail($listId);
 
         if ($list->emails_count > 30000) {
             // Use job for large lists
-            DeleteEmails::dispatch($this->user->id, $listId);
+            DeleteEmails::dispatch(Auth::id(), $listId);
             $this->alert('success', "Processing deletion of {$list->emails_count} emails. This may take a while.");
         } else {
             $list->delete();
@@ -545,7 +550,7 @@ class EmailListsTable extends Component
 
     public function getListsProperty()
     {
-        return EmailListName::where('user_id', $this->user->id)
+        return EmailListName::where('user_id', Auth::id())
             ->withCount('emails')
             ->get();
     }
@@ -553,6 +558,8 @@ class EmailListsTable extends Component
 
     protected function checkEmailLimit()
     {
+        $this->user = auth()->user();
+
         try {
             $subscription = $this->user->subscription;
             if (!$subscription || !$subscription->plan) {
@@ -607,6 +614,7 @@ class EmailListsTable extends Component
                 'emails' => $this->emails,
                 'selectedListName' => $selectedListName,
                 'hasActiveJobsFlag'  => $this->hasActiveJobsFlag,
+                'subscriberBalance' => $this->subscriberBalance,
 
             ])->layout('layouts.app', ['title' => 'Email Lists']);
 

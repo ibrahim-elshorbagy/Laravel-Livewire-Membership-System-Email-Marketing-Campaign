@@ -7,10 +7,11 @@ use App\Models\JobProgress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Computed;
-
+use Illuminate\Support\Facades\Auth;
 class JobProgressComponent extends Component
 {
-    public $user;
+    public $userId;
+    private $user;
 
     // default in ms
     public $pollInterval = 1000;
@@ -18,6 +19,8 @@ class JobProgressComponent extends Component
     public function mount()
     {
         $this->user = auth()->user();
+        $this->userId = $this->user->id;
+
     }
 
     /**
@@ -46,7 +49,7 @@ class JobProgressComponent extends Component
     protected function checkActiveJobs()
     {
         // Return TRUE if any are still “processing” or “pending”
-        $countProcessing = JobProgress::where('user_id', $this->user->id)
+        $countProcessing = JobProgress::where('user_id', $this->userId)
             ->whereIn('status', ['processing', 'pending'])
             ->count();
 
@@ -60,7 +63,7 @@ class JobProgressComponent extends Component
     public function progressData()
     {
         return [
-            'progress' => JobProgress::where('user_id', $this->user->id)
+            'progress' => JobProgress::where('user_id', $this->userId)
                 ->whereIn('status', ['processing', 'pending'])
                 ->orderBy('created_at', 'desc')
                 ->get(),
@@ -74,9 +77,9 @@ class JobProgressComponent extends Component
         $userEarliestJob = DB::table('jobs')
             ->where('queue', 'high')
             ->where(function ($query) {
-                $query->whereRaw("payload LIKE '%\"userId\":{$this->user->id}%'")
-                    ->orWhereRaw("payload LIKE '%\"user_id\":{$this->user->id}%'")
-                    ->orWhereRaw("payload LIKE '%i:{$this->user->id};%'");
+                $query->whereRaw("payload LIKE '%\"userId\":{$this->userId}%'")
+                    ->orWhereRaw("payload LIKE '%\"user_id\":{$this->userId}%'")
+                    ->orWhereRaw("payload LIKE '%i:{$this->userId};%'");
             })
             ->min('created_at');
 

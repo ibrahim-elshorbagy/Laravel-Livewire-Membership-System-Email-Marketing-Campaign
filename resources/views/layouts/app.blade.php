@@ -36,17 +36,15 @@
         <nav x-cloak
             class="flex fixed left-0 z-30 flex-col p-4 w-60 border-r transition-transform duration-300 h-svh shrink-0 border-neutral-300 bg-neutral-50 md:hidden md:w-64 md:translate-x-0 dark:border-neutral-700 dark:bg-neutral-900"
             x-bind:class="sidebarIsOpen ? 'translate-x-0' : '-translate-x-60'">
-            <a href="{{ route('welcome') }}" class="mb-4 ml-2 w-12 text-2xl font-bold text-neutral-900 dark:text-white"
-                wire:navigate>
+            <a href="https://www.gemailapp.com/" class="mb-4 ml-2 w-12 text-2xl font-bold text-neutral-900 dark:text-white">
                 <x-application-logo />
             </a>
 
             <div class="flex overflow-y-auto flex-col gap-2 pb-3">
-                {{-- <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
+                <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
                     wire:navigate>
-                    <i class="fas fa-th-large"></i>
                     <span>Dashboard</span>
-                </x-nav-link> --}}
+                </x-nav-link>
                 @role('user')
                 {{-- <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}"
                     wire:navigate>
@@ -84,9 +82,6 @@
 
 
                 @role('admin')
-                <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}" wire:navigate>
-                    <span>Dashboard</span>
-                </x-nav-link>
                 <x-nav-link :active="request()->routeIs('admin.users') ||
                             request()->routeIs('admin.users.create') ||
                             request()->routeIs('admin.users.edit')" href="{{ route('admin.users') }}" wire:navigate>
@@ -168,8 +163,7 @@
                 <div class="container flex justify-between items-center mx-3 h-14">
                     <!-- Site name + Logo -->
                     <div class="flex gap-4 items-center">
-                        <a href="{{ route('welcome') }}" class="w-24 text-neutral-600 dark:text-neutral-300"
-                            wire:navigate>
+                        <a href="https://www.gemailapp.com/" class="w-24 text-neutral-600 dark:text-neutral-300">
                             <x-application-logo />
                         </a>
                     </div>
@@ -177,16 +171,16 @@
                     <!-- Desktop navigation -->
                     <div class="hidden gap-2 items-center md:flex">
 
-                        {{-- <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
+                        <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
                             wire:navigate>
-                            <i class="fas fa-th-large"></i>
                             <span>Dashboard</span>
-                        </x-nav-link> --}}
+                        </x-nav-link>
                         @role('user')
                         {{-- <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}"
                             wire:navigate>
                             <span>Plans</span>
                         </x-nav-link> --}}
+
                         <x-nav-link :active="request()->routeIs('user.my-subscription')"
                             href="{{ route('user.my-subscription') }}">
                             <span class="text-nowrap">Subscription</span>
@@ -219,9 +213,6 @@
 
 
                         @role('admin')
-                        <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}" wire:navigate>
-                            <span>Dashboard</span>
-                        </x-nav-link>
                         <x-nav-link :active="request()->routeIs('admin.users') ||
                                     request()->routeIs('admin.users.create') ||
                                     request()->routeIs('admin.users.edit')" href="{{ route('admin.users') }}"

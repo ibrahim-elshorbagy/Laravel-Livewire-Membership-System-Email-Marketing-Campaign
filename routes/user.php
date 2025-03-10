@@ -15,7 +15,19 @@ use App\Livewire\Pages\User\Subscription\Transaction;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
-    Route::webhooks('/paypal/webhook', 'paypal');
+
+
+
+
+// WebHook Payments
+
+Route::webhooks('/paypal/webhook', 'paypal');
+
+
+
+
+
+
 
 Route::middleware(['auth'])->group(function () {
 

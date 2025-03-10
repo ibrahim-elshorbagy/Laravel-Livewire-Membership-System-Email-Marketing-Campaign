@@ -201,7 +201,7 @@
                     </div>
 
                     <!-- Other Buttons -->
-                    @if(!$emailLimit['show'] && $user->balance('Subscribers Limit') != 0 && !$this->lists->isEmpty())
+                    @if(!$emailLimit['show'] && $subscriberBalance != 0 && !$this->lists->isEmpty())
                     <x-primary-info-button class="text-xs sm:text-sm"
                         href="{{ $selectedList ? route('user.emails.create', ['list_id' => $selectedList]) : route('user.emails.create') }}"
                         wire:navigate>
@@ -485,7 +485,7 @@
                     @else
                     No emails found in this list.
                     @endif
-                    @if(!$hasActiveJobsFlag && !$emailLimit['show'] && $user->balance('Subscribers Limit') != 0)
+                    @if(!$hasActiveJobsFlag && !$emailLimit['show'] && $subscriberBalance != 0)
                     <div class="mt-2">
                         <x-primary-info-button href="{{ route('user.emails.create', ['list_id' => $selectedList]) }}"
                             wire:navigate>

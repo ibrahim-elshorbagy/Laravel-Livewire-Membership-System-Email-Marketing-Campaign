@@ -108,9 +108,9 @@
                     <p >
                         - Importing will start immediately when importing from  ( file text or Excel file )
                     </p>
-                    {{-- <p>
+                    <p>
                         - You Can Import Email And Name with Excel file only
-                    </p> --}}
+                    </p>
                     <p >
                         - Enter one email per line or separate emails with commas.
                     </p>

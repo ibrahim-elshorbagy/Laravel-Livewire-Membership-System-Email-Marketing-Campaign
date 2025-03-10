@@ -3,6 +3,7 @@
 namespace App\Livewire\Pages\User\Subscription;
 
 use App\Models\Payment\Payment;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -11,12 +12,6 @@ class Transaction extends Component
     use WithPagination;
 
     public $selectedTab = 'all';
-    public $user;
-
-    public function mount()
-    {
-        $this->user = auth()->user();
-    }
 
     public function updatedSelectedTab()
     {
@@ -25,7 +20,7 @@ class Transaction extends Component
 
     public function getPaymentsProperty()
     {
-        return Payment::where('user_id', $this->user->id)
+        return Payment::where('user_id', Auth::id())
             ->when($this->selectedTab === 'approved', fn($query) => $query->where('status', 'approved'))
             ->when($this->selectedTab === 'pending', fn($query) => $query->where('status', 'pending'))
             ->when($this->selectedTab === 'refunded', fn($query) => $query->where('status', 'refunded'))
