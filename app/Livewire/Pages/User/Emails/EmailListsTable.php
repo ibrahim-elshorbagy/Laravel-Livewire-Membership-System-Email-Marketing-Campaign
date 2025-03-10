@@ -30,7 +30,8 @@ class EmailListsTable extends Component
     public $user;
     public $emailLimit;
     public $selectedEmailId = null;
-
+    public $editEmail = '';
+    public $editName = '';
 
     public $selectedList = null;
     public $listName = '';
@@ -63,8 +64,8 @@ class EmailListsTable extends Component
                     return $query->where('user_id', auth()->id());
                 }),
             ],
-            'selectedEmailId' => [ // Make it nullable
-                'nullable',
+            'selectedEmailId' => [
+                'required',
                 Rule::exists('email_lists', 'id')->where(function ($query) {
                     return $query->where('user_id', $this->user->id);
                 }),
@@ -460,6 +461,41 @@ class EmailListsTable extends Component
             $this->resetPage();
             $this->resetSelections();
             $this->dispatch('tabSelected', $listId);
+        }
+    }
+
+    public function updateEmail()
+    {
+
+        $this->validate([
+            'editEmail' => [
+                'required',
+                'email',
+                Rule::unique('email_lists', 'email')
+                    ->where('user_id', $this->user->id)
+                    ->where('list_id', $this->selectedList)
+                    ->ignore($this->selectedEmailId)
+            ],
+            'editName' => 'nullable|string'
+        ]);
+
+        try {
+            $email = EmailList::where('user_id', $this->user->id)
+                ->findOrFail($this->selectedEmailId);
+
+            $email->update([
+                'email' => $this->editEmail,
+                'name' => $this->editName
+            ]);
+
+            $this->dispatch('close-modal', 'edit-email-modal');
+            $this->alert('success', 'Email updated successfully!', ['position' => 'bottom-end']);
+
+            // Reset form
+            $this->editEmail = '';
+            $this->editName = '';
+        } catch (\Exception $e) {
+            $this->alert('error', 'Failed to update email.', ['position' => 'bottom-end']);
         }
     }
 

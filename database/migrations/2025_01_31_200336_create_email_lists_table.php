@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('email');
-            $table->timestamps();
+            // $table->timestamps();
 
             // Add unique composite index
             $table->unique(['user_id', 'list_id', 'email']);

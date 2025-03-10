@@ -124,8 +124,6 @@ class CreateEmailList extends Component
                     'user_id' => $this->user->id,
                     'list_id' => $this->list_id,
                     'email' => $email,
-                    'created_at' => now(),
-                    'updated_at' => now()
                 ])->toArray();
 
                 DB::table('email_lists')->insertOrIgnore($batch);

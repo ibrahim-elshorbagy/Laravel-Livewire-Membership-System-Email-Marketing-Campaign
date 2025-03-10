@@ -86,7 +86,6 @@ class ProcessEmailFile implements ShouldQueue
         $handle = fopen($fullPath, 'r');
         $batch = [];
         $processedCount = 0;
-        $now = now()->format('Y-m-d H:i:s');
 
         while (($line = fgets($handle)) !== false) {
             $emails = $this->extractEmailsFromLine(trim($line));
@@ -103,8 +102,6 @@ class ProcessEmailFile implements ShouldQueue
                     'user_id' => $this->userId,
                     'list_id' => $this->listId,
                     'email' => $email,
-                    'created_at' => $now,
-                    'updated_at' => $now
                 ];
 
                 if (count($batch) >= $this->batchSize) {
@@ -132,7 +129,6 @@ class ProcessEmailFile implements ShouldQueue
 
         $batch = [];
         $processedCount = 0;
-        $now = now()->format('Y-m-d H:i:s');
 
         foreach ($worksheet->getRowIterator() as $row) {
             if ($processedCount >= $remainingSpace) {
@@ -141,28 +137,35 @@ class ProcessEmailFile implements ShouldQueue
 
             $cellIterator = $row->getCellIterator();
             $cellIterator->setIterateOnlyExistingCells(false);
+            $rowData = [];
 
             foreach ($cellIterator as $cell) {
                 $value = trim((string)$cell->getValue());
                 if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
-
-                    if ($processedCount >= $remainingSpace) {
-                        break 2;
+                    $rowData['email'] = $value;
+                } else {
+                    // Validate and sanitize name string
+                    if (is_string($value) && strlen($value) <= 255 && !preg_match('/[\x00-\x1F\x7F]/', $value)) {
+                        $rowData['name'] = strip_tags(trim($value));
                     }
+                }
+            }
 
+            if (isset($rowData['email'])) {
+                if ($processedCount >= $remainingSpace) {
+                    break;
+                }
 
-                    $batch[] = [
-                        'user_id' => $this->userId,
-                        'list_id' => $this->listId,
-                        'email' => $value,
-                        'created_at' => $now,
-                        'updated_at' => $now
-                    ];
+                $batch[] = [
+                    'user_id' => $this->userId,
+                    'list_id' => $this->listId,
+                    'email' => $rowData['email'],
+                    'name' => $rowData['name'] ?? null,
+                ];
 
-                    if (count($batch) >= $this->batchSize) {
-                        $processedCount += $this->insertBatchAndUpdateProgress($batch, $remainingSpace, $currentCount, $processedCount);
-                        $batch = [];
-                    }
+                if (count($batch) >= $this->batchSize) {
+                    $processedCount += $this->insertBatchAndUpdateProgress($batch, $remainingSpace, $currentCount, $processedCount);
+                    $batch = [];
                 }
             }
         }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class EmailList extends Model
 {
+    public $timestamps = false;
     use HasFactory;
     protected $fillable = ['user_id', 'email', 'active'];
 

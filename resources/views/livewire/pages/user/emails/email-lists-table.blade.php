@@ -42,7 +42,8 @@
         <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
             <!-- Search Box -->
             <div class="relative flex-1">
-                <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search..." class="pl-10 w-full" />
+                <x-text-input wire:model.live.debounce.300ms="search" placeholder="Email Search..."
+                    class="pl-10 w-full" />
                 <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </div>
@@ -50,7 +51,7 @@
 
             <!-- Search Box -->
             <div class="relative flex-1">
-                <x-text-input wire:model.live.debounce.300ms="searchNameTerm" placeholder="Search..."
+                <x-text-input wire:model.live.debounce.300ms="searchName" placeholder="Name Search..."
                     class="pl-10 w-full" />
                 <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
@@ -360,33 +361,33 @@
                                         <span class="w-[350px]">{{ $email->name }}</span>
 
                                         <div class="flex self-end gap-2 items-center w-[130px] justify-end">
-                                                @if($email->history->count() > 0)
-                                                <!-- Delete All History Button -->
-                                                <button wire:click="deleteAllHistory({{ $email->id }})"
-                                                    wire:confirm="Are you sure you want to delete all history records?"
-                                                    class="px-2 py-1 text-xs text-red-500 rounded-md transition-colors hover:bg-red-50 dark:hover:bg-red-900/20">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                                @endif
+                                            @if($email->history->count() > 0)
+                                            <!-- Delete All History Button -->
+                                            <button wire:click="deleteAllHistory({{ $email->id }})"
+                                                wire:confirm="Are you sure you want to delete all history records?"
+                                                class="px-2 py-1 text-xs text-red-500 rounded-md transition-colors hover:bg-red-50 dark:hover:bg-red-900/20">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                            @endif
 
-                                                <!-- View History Button - Always visible -->
-                                                <button  type="button" x-on:click="isExpanded = !isExpanded"
-                                                    class="flex gap-2 items-center self-end px-2 py-1 text-xs rounded-md transition-colors text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                                                    @if($email->history->count() > 0)
-                                                    <span
-                                                        class="px-2 py-0.5 text-xs font-medium text-purple-700 bg-purple-100 rounded-full dark:bg-purple-900/50 dark:text-purple-400">
-                                                        {{ $email->history->count() }}
-                                                    </span>
-                                                    History
-                                                    @else
-                                                    <span class="flex gap-1 items-center">
-                                                        <i class="text-xs text-red-500 fas fa-info-circle"></i>
-                                                        No History
-                                                    </span>
-                                                    @endif
-                                                    <i class="transition-transform duration-200 fas fa-chevron-down"
-                                                        :class="{'rotate-180': isExpanded}"></i>
-                                                </button>
+                                            <!-- View History Button - Always visible -->
+                                            <button type="button" x-on:click="isExpanded = !isExpanded"
+                                                class="flex gap-2 items-center self-end px-2 py-1 text-xs rounded-md transition-colors text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+                                                @if($email->history->count() > 0)
+                                                <span
+                                                    class="px-2 py-0.5 text-xs font-medium text-purple-700 bg-purple-100 rounded-full dark:bg-purple-900/50 dark:text-purple-400">
+                                                    {{ $email->history->count() }}
+                                                </span>
+                                                History
+                                                @else
+                                                <span class="flex gap-1 items-center">
+                                                    <i class="text-xs text-red-500 fas fa-info-circle"></i>
+                                                    No History
+                                                </span>
+                                                @endif
+                                                <i class="transition-transform duration-200 fas fa-chevron-down"
+                                                    :class="{'rotate-180': isExpanded}"></i>
+                                            </button>
                                         </div>
                                     </div>
 
@@ -457,6 +458,11 @@
                                             wire:confirm="Are you sure you want to delete this email?"
                                             class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
                                             Delete
+                                        </button>
+                                        <button type="button"
+                                            class="ml-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300"
+                                            x-on:click="$dispatch('open-modal', 'edit-email-modal'); $wire.selectedEmailId = {{ $email->id }}; $wire.editEmail = '{{ $email->email }}'; $wire.editName = '{{ $email->name }}'">
+                                            <i class="fas fa-edit"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -578,5 +584,37 @@
             </div>
         </x-modal>
         @endforeach
+
+        <!-- Single Reusable Edit Email Modal -->
+        <x-modal name="edit-email-modal" maxWidth="md">
+            <div class="p-6">
+                <h2 class="text-lg font-medium">Edit Email</h2>
+                <form wire:submit.prevent="updateEmail" class="mt-4">
+                    <div class="space-y-4">
+                        <div>
+                            <x-input-label for="emailAddress" value="Email Address" />
+                            <x-text-input wire:model="editEmail" id="emailAddress" type="email"
+                                class="block mt-1 w-full" />
+                            <x-input-error :messages="$errors->get('editEmail')" class="mt-2" />
+                        </div>
+                        <div>
+                            <x-input-label for="emailName" value="Name" />
+                            <x-text-input wire:model="editName" id="emailName" type="text" class="block mt-1 w-full" />
+                            <x-input-error :messages="$errors->get('editName')" class="mt-2" />
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-6 space-x-3">
+                        <x-secondary-button x-on:click="$dispatch('close-modal', 'edit-email-modal')">
+                            Cancel
+                        </x-secondary-button>
+                        <x-primary-create-button  type="submit">
+                            Update
+                        </x-primary-create-button>
+                    </div>
+                </form>
+            </div>
+        </x-modal>
+
+
     </div>
 </div>
