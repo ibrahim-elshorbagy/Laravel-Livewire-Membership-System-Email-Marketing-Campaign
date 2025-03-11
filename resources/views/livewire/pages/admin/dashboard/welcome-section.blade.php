@@ -24,7 +24,7 @@
 
             <!-- Subscription Info -->
             @if($subscription)
-            <div class="mb-3 md:mb-0">
+            <div class="mx-3 mb-3 md:mx-0 md:mb-0">
                 <div
                     class="overflow-hidden relative w-full max-w-md bg-white rounded-lg border shadow-sm transition-all duration-300 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
                     <div class="absolute inset-0 bg-gradient-to-br to-transparent from-blue-500/10"></div>
