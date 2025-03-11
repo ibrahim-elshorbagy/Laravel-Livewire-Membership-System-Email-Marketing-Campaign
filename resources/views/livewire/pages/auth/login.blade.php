@@ -25,23 +25,17 @@ new #[Layout('layouts.app')] class extends Component
 }; ?>
 
 
-<div
-    class="grid relative flex-col h-[85vh] md:px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
+<div class="grid relative flex-col h-[85vh] md:px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
     <div class="hidden relative flex-col p-10 h-full text-white bg-muted lg:flex dark:border-r dark:border-neutral-800">
         <div class="absolute inset-0 bg-[#f7f7f7]"></div>
         <div class="absolute inset-0 bg-center bg-no-repeat bg-contain"
             style="background-image: url({{ asset('assets/auth/auth.jpeg') }});">
         </div>
 
-        <div class="relative z-20 mt-auto text-black my-15">
-            <blockquote class="space-y-2">
-                <p class="text-lg">Create mailing campaigns and send emails to your subscribers and contacts in an easy
-                    and quick way.</p>
-            </blockquote>
-        </div>
+
     </div>
     <div class="flex justify-center items-center w-full h-full">
-        <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+        <div class="mx-auto flex w-full flex-col justify-evenly h-full space-y-6 sm:w-[350px] ">
             <a href="https://gemailapp.com/" class="flex flex-col gap-2 items-center font-medium z-5 lg:hidden"
                 wire:navigate>
                 <span class="flex justify-center items-center w-[200px] h-48 rounded-md">

@@ -1,0 +1,76 @@
+<div
+    class="overflow-hidden relative mb-8 bg-white rounded-lg border shadow-sm transition-all duration-300 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
+    <div class="absolute inset-0 bg-gradient-to-br to-transparent from-primary-500/10"></div>
+    <div class="relative">
+        <div class="flex items-center justify-between space-x-4">
+
+            <div class="flex gap-2 items-center">
+                <div class="p-4 bg-primary-100 dark:bg-primary-500/10">
+                    <div class="flex gap-2 items-center rounded-md">
+                        <img src="{{ Auth::user()->image_url }}" class="object-cover rounded-md size-28" alt="avatar">
+                    </div>
+                </div>
+
+                <div>
+                    <h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                        Welcome back, {{ Auth::user()->first_name }} {{ Auth::user()->last_name }}!
+                    </h1>
+                    <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+                        {{ now()->format('l, j F Y') }}
+                    </p>
+                </div>
+            </div>
+
+
+            <!-- Subscription Info -->
+            @if($subscription)
+            <div class="">
+                <div
+                    class="overflow-hidden relative w-full max-w-md bg-white rounded-lg border shadow-sm transition-all duration-300 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
+                    <div class="absolute inset-0 bg-gradient-to-br to-transparent from-blue-500/10"></div>
+                    <div class="relative p-3 lg:p-6">
+                        <div class="flex justify-between items-center space-x-3">
+                            <!-- Left side: Plan name and icon -->
+                            <div class="flex flex-col items-center space-y-3">
+                                <i class="text-3xl text-blue-500 dark:text-blue-400 fas fa-crown"></i>
+                                <h3 class="text-xl font-bold text-blue-600 dark:text-blue-400 text-center">
+                                    {{$subscription['plan_name']}}</h3>
+                                <span
+                                    class="px-2 py-1 text-xs font-medium text-blue-500 bg-blue-50 rounded-full dark:text-blue-400 dark:bg-blue-500/10">Subscription</span>
+                            </div>
+
+                            <!-- Right side: Subscription details -->
+                            <div class="flex-1 space-y-3">
+                                <div class="space-y-2 space-y-">
+                                    <div class="flex justify-between items-center gap-5">
+                                        <span
+                                            class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Started:</span>
+                                        <span class="text-sm text-blue-600 dark:text-blue-400">{{
+                                            $subscription['started_at'] }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center gap-5">
+                                        <span
+                                            class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Expires:</span>
+                                        <span class="text-sm text-blue-600 dark:text-blue-400">{{
+                                            $subscription['expired_at'] }}</span>
+                                    </div>
+                                    @if($subscription['plan_id'] != 1)
+                                    <div class="flex justify-between items-center gap-5">
+                                        <span
+                                            class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Remaining:</span>
+                                        <span class="text-sm text-blue-600 dark:text-blue-400">{{
+                                            $subscription['remaining_time'] }}</span>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+
+        </div>
+    </div>
+</div>

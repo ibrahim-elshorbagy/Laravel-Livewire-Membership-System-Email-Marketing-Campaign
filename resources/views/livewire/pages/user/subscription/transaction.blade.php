@@ -48,7 +48,7 @@
                     @forelse($payments as $payment)
                     <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800">
                         <td class="p-4">
-                            {{ $payment->created_at->format('d / m / Y') }}
+                            {{ $payment->created_at?->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i:s A') ?? '' }}
                         </td>
                         <td class="p-4">
                             <div class="font-medium text-neutral-900 dark:text-neutral-100">

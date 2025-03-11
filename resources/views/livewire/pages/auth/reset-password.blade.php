@@ -75,12 +75,7 @@ new #[Layout('layouts.app')] class extends Component
         <div class="absolute inset-0 bg-[#f7f7f7]"></div>
         <div class="absolute inset-0 bg-center bg-no-repeat bg-contain"
             style="background-image: url({{ asset('assets/auth/auth.jpeg') }});"></div>
-        <div class="relative z-20 mt-auto text-black my-15">
-            <blockquote class="space-y-2">
-                <p class="text-lg">Create mailing campaigns and send emails to your subscribers and contacts in an easy
-                    and quick way.</p>
-            </blockquote>
-        </div>
+
     </div>
     <div class="flex justify-center items-center w-full h-full">
         <div

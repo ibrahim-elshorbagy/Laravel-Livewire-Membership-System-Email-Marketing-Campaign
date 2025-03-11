@@ -52,6 +52,13 @@ class Subscribe extends Component
 
     public function initiatePayment()
     {
+
+
+        if (!auth()->user()->hasVerifiedEmail()) {
+            $this->alert('warning', 'Please verify your email address before subscribing.',['position' => 'center']);
+            return;
+        }
+
         $this->validate();
         $user = auth()->user();
 

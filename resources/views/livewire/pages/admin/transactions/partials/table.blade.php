@@ -59,7 +59,8 @@
                                 <span class="text-sm text-neutral-500">{{ $user->email }}</span>
                             </div>
                         </div>
-                    </td>                    <td class="p-4 font-mono text-sm">{{ $payment->transaction_id }}</td>
+                    </td>
+                    <td class="p-4 font-mono text-sm">{{ $payment->transaction_id }}</td>
                     <td class="p-4">{{ number_format($payment->amount, 2) }} {{ $payment->currency }}</td>
                     <td class="p-4">
                         <span
@@ -80,7 +81,7 @@
                         </span>
                     </td>
                     <td class="p-4 whitespace-nowrap">
-                        {{ $payment->created_at->format('d/m/Y H:i') }}
+                        {{ $payment->created_at->format('d/m/Y H:i A') }}
                     </td>
                     <td class="p-4">
                         <div class="flex space-x-2">
