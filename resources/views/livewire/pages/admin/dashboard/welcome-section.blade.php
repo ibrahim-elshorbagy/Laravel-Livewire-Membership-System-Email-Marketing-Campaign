@@ -24,14 +24,14 @@
 
             <!-- Subscription Info -->
             @if($subscription)
-            <div class="">
+            <div class="mb-3 md:mb-0">
                 <div
                     class="overflow-hidden relative w-full max-w-md bg-white rounded-lg border shadow-sm transition-all duration-300 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
                     <div class="absolute inset-0 bg-gradient-to-br to-transparent from-blue-500/10"></div>
                     <div class="relative p-3 lg:p-6">
-                        <div class="flex justify-between items-center space-x-3">
+                        <div class="flex flex-col justify-between items-center space-x-3 md:flex-row">
                             <!-- Left side: Plan name and icon -->
-                            <div class="flex flex-col items-center space-y-3">
+                            <div class="flex flex-col items-center md:space-y-3">
                                 <i class="text-3xl text-blue-500 dark:text-blue-400 fas fa-crown"></i>
                                 <h3 class="text-xl font-bold text-center text-blue-600 dark:text-blue-400">
                                     {{$subscription['plan_name']}}</h3>
