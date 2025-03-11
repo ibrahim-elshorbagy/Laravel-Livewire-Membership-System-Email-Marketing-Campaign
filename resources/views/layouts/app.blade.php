@@ -41,10 +41,12 @@
             </a>
 
             <div class="flex overflow-y-auto flex-col gap-2 pb-3">
+                @auth
                 <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
                     wire:navigate>
                     <span>Dashboard</span>
                 </x-nav-link>
+                @endauth
                 @role('user')
                 {{-- <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}"
                     wire:navigate>
@@ -170,11 +172,12 @@
 
                     <!-- Desktop navigation -->
                     <div class="hidden gap-2 items-center md:flex">
-
+                        @auth
                         <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
                             wire:navigate>
                             <span>Dashboard</span>
                         </x-nav-link>
+                        @endauth
                         @role('user')
                         {{-- <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}"
                             wire:navigate>
@@ -334,13 +337,13 @@
             </nav>
 
             <!-- Main content -->
-            <main class="flex-1 {{ request()->routeIs('login', 'register','password.request','password.reset','verification.notice','verification.verify','password.confirm') ? '' : 'py-2 px-1 my-4 md:mx-4' }}">
+            <main class="flex-1 {{ request()->routeIs('login', 'register','password.request','password.reset','verification.notice','verification.verify','password.confirm') ? '' : 'py-2 px-2 my-4 md:mx-4' }}">
                 {{ $slot }}
             </main>
 
             <!-- Footer -->
             <footer
-                class="py-3 mt-auto text-center border-t border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300">
+                class="py-3 mt-auto text-center border-t z-3 border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300">
 
                 <div>{{ $globalSettings['footer_first_line']}}</div>
                 <div>{{ $globalSettings['footer_second_line'] }}</div>

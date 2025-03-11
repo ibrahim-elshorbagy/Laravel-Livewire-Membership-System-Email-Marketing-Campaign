@@ -64,9 +64,8 @@ new #[Layout('layouts.app')] class extends Component
     }
 }; ?>
 
-<div
-    class="grid relative flex-col justify-center items-center px-8 h-screen sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
-    <div class="hidden relative flex-col p-10 h-full text-white bg-muted lg:flex dark:border-r dark:border-neutral-800">
+<div class="grid relative flex-col px-8 h-[85vh] sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
+    <div class="hidden relative flex-col p-6 h-full text-white bg-muted lg:flex dark:border-r dark:border-neutral-800">
         <div class="absolute inset-0 bg-[#f7f7f7]"></div>
         <div class="absolute inset-0 bg-center bg-no-repeat bg-contain"
             style="background-image: url({{ asset('assets/auth/auth.jpeg') }});">
@@ -81,7 +80,7 @@ new #[Layout('layouts.app')] class extends Component
     </div>
     <div class="flex justify-center items-center w-full h-full">
         <div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-            <a href="https://gemailapp.com/" class="flex z-5 flex-col gap-2 items-center font-medium lg:hidden"
+            <a href="https://gemailapp.com/" class="flex flex-col gap-2 items-center font-medium z-5 lg:hidden"
                 wire:navigate>
                 <span class="flex justify-center items-center w-[200px] h-48 rounded-md">
                     <x-application-logo class="text-black fill-current size-9 dark:text-white" />
@@ -91,7 +90,7 @@ new #[Layout('layouts.app')] class extends Component
 
             <!-- Logo/Brand -->
             <div class="text-center">
-                <h2 class="mt-6 text-3xl font-extrabold text-neutral-900 dark:text-white">Reset Password</h2>
+                <h2 class="text-3xl font-extrabold text-neutral-900 dark:text-white">Reset Password</h2>
                 <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">Enter your email to receive a reset link
                 </p>
             </div>

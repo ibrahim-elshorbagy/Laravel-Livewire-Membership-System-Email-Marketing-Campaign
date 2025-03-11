@@ -38,10 +38,53 @@
                 </div>
                 <div>
                     <x-input-label for="message_plain_text">Message Plain Text</x-input-label>
-                    <x-primary-textarea wire:model="message_plain_text" id="message_plain_text" rows="4"
+                    <x-primary-textarea wire:model="message_plain_text" id="message_plain_text" rows="16"
                         class="block mt-1 w-full"> </x-primary-textarea>
                     {{-- <x-input-error :messages="$errors->get('message_plain_text')" class="mt-2" /> --}}
                 </div>
+
+                <div class="p-4 mb-4 bg-white rounded-lg border dark:bg-neutral-800 dark:border-neutral-700">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <i class="w-5 h-5 text-blue-500 fas fa-info-circle"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                                Message Personalization
+                            </h3>
+                            <div class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                                <p class="mb-3">
+                                    A powerful feature of GeMailApp is the ability to personalize outgoing messages with the name and/or email address of
+                                    the recipient.
+                                    To take advantage of this feature you need only specify the personalization fields in your
+                                    text of your message. As the message is sent the fields are replaced with the appropriate value for each
+                                    message recipient.
+                                </p>
+                                <div class="mt-3 space-y-2">
+                                    <div class="flex items-center">
+                                        <code class="px-2 py-1 font-mono text-sm bg-gray-100 rounded dark:bg-neutral-700">%FullName%</code>
+                                        <span class="ml-2">Replaced with the Full Name of the member</span>
+                                    </div>
+                                    
+                                    <p class="mb-3">
+                                        Full Name field is filled automatically when retrieving e-mail addresses if the information is available.
+                                    </p>
+
+                                    <div class="flex items-center">
+                                        <code class="px-2 py-1 font-mono text-sm bg-gray-100 rounded dark:bg-neutral-700">%Email%</code>
+                                        <span class="ml-2">Replaced with the e-mail address of the user</span>
+                                    </div>
+                                </div>
+
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <x-input-label for="sender_name">Sender Name</x-input-label>
@@ -54,13 +97,8 @@
                             class="block mt-1 w-full" />
                         <x-input-error :messages="$errors->get('reply_to_email')" class="mt-2" />
                     </div>
-                </div> {{-- <div>
-                    <x-input-label for="sending_status">Sending Status</x-input-label>
-                    <x-primary-select-input wire:model="sending_status" id="sending_status" class="block mt-1 w-full">
-                        <option value="PAUSE">Pause</option>
-                        <option value="RUN">Run</option>
-                    </x-primary-select-input>
-                </div> --}} <div
+                </div>
+                <div
                     class="flex sticky bottom-0 justify-end py-4 space-x-3 bg-neutral-50 dark:bg-neutral-900">
                     <x-secondary-button type="button" wire:navigate href="{{ route('user.email-messages') }}"> Cancel
                     </x-secondary-button>

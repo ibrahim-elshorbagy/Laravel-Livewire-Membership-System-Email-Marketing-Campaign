@@ -29,11 +29,10 @@ Route::webhooks('/paypal/webhook', 'paypal');
 
 
 
-Route::middleware(['auth'])->group(function () {
+
 
     Route::get('/plans', Subscribe::class)->name('our.plans');
 
-});
 
 Route::middleware(['auth','role:user'])->group(function () {
 

@@ -60,6 +60,7 @@
                     <li>Emails per month ({{ (int)$plan->features[0]->pivot->charges }})</li>
                 </ul>
 
+                @auth
                 <button type="button" @if($currentPlanId===$plan->id)
                     disabled
                     class="px-4 py-2 mt-12 w-full text-sm font-medium tracking-wide text-center text-white whitespace-nowrap rounded-lg transition cursor-not-allowed bg-neutral-400"
@@ -79,6 +80,7 @@
                     {{ $selectedPlan === $plan->id ? 'Selected' : 'Select Plan' }}
                     @endif
                 </button>
+                @endauth
             </article>
             @endforeach
         </div>
@@ -120,6 +122,7 @@
                     <li>Emails per month ({{ (int)$plan->features[0]->pivot->charges }})</li>
                 </ul>
 
+                @auth
                 <button type="button" @if($currentPlanId===$plan->id)
                     disabled
                     class="px-4 py-2 mt-12 w-full text-sm font-medium tracking-wide text-center text-white whitespace-nowrap rounded-lg transition cursor-not-allowed bg-neutral-400"
@@ -139,21 +142,31 @@
                     {{ $selectedPlan === $plan->id ? 'Selected' : 'Select Plan' }}
                     @endif
                 </button>
+                @endauth
             </article>
             @endforeach
         </div>
     </div>
 
     <!-- Payment Button -->
-    @if($selectedPlan)
-    <div class="flex justify-center mt-8">
-        <button wire:click="initiatePayment" wire:loading.attr="disabled"
-            class="px-6 py-3 text-sm font-semibold text-white bg-black rounded-lg transition hover:bg-black/80 dark:bg-orange-500 dark:text-black dark:hover:bg-orange-600">
-            <span wire:loading.remove>Proceed to Payment</span>
-            <span wire:loading>Processing...</span>
-        </button>
-    </div>
-    @endif
+    @auth
+        @if($selectedPlan)
+        <div class="flex justify-center mt-8">
+            <button wire:click="initiatePayment" wire:loading.attr="disabled"
+                class="px-6 py-3 text-sm font-semibold text-white bg-black rounded-lg transition hover:bg-black/80 dark:bg-orange-500 dark:text-black dark:hover:bg-orange-600">
+                <span wire:loading.remove>Proceed to Payment</span>
+                <span wire:loading>Processing...</span>
+            </button>
+        </div>
+        @endif
+    @else
+        <div class="flex justify-center mt-8">
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                Please <a href="{{ route('login') }}" class="font-medium text-black hover:underline dark:text-orange-500">sign
+                    in</a> to purchase a subscription
+            </p>
+        </div>
+    @endauth
 
     <!-- Payment Modal -->
     <div x-data="{

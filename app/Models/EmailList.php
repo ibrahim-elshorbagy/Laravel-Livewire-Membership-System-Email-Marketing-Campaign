@@ -10,11 +10,17 @@ class EmailList extends Model
 {
     public $timestamps = false;
     use HasFactory;
-    protected $fillable = ['user_id', 'email', 'active'];
+    protected $guarded = ['id'];
+
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function emailListName()
+    {
+        return $this->belongsTo(EmailListName::class, 'list_id');
     }
 
     public function history()
