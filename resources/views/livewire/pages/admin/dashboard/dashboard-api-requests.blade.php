@@ -1,7 +1,7 @@
 <div x-data="{ refreshing: false }">
     <!-- Header with Refresh Button -->
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">API Request Statistics</h2>
+        <h2 class="font-bold md:text-2xl text-neutral-900 dark:text-neutral-100">API Request Statistics</h2>
         <button
             @click="refreshing = true; $wire.refresh().then(() => { refreshing = false; $dispatch('refresh-charts') })"
             :class="{ 'opacity-50 cursor-not-allowed': refreshing }"

@@ -47,7 +47,7 @@ new #[Layout('layouts.app')] class extends Component
 }; ?>
 
 <div
-    class="grid relative flex-col justify-center items-center px-8 h-[85vh] sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
+    class="grid relative flex-col justify-center items-center md:px-8 h-[85vh] sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
     <div class="hidden relative flex-col p-10 h-full text-white bg-muted lg:flex dark:border-r dark:border-neutral-800">
         <div class="absolute inset-0 bg-[#f7f7f7]"></div>
         <div class="absolute inset-0 bg-center bg-no-repeat bg-contain"
@@ -60,7 +60,7 @@ new #[Layout('layouts.app')] class extends Component
         <div class="mx-auto flex w-full flex-col justify-evenly space-y-6 sm:w-[350px] h-full">
             <a href="https://gemailapp.com/" class="flex flex-col gap-2 items-center font-medium z-5 lg:hidden"
                 wire:navigate>
-                <span class="flex justify-center items-center w-[200px] h-48 rounded-md">
+                <span class="flex justify-center items-center w-[200px]  rounded-md">
                     <x-application-logo class="text-black fill-current size-9 dark:text-white" />
                 </span>
                 <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
