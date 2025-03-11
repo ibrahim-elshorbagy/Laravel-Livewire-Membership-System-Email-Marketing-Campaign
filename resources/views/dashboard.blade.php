@@ -16,7 +16,7 @@
                         Welcome back, {{ Auth::user()->first_name }} {{ Auth::user()->last_name }}!
                     </h1>
                     <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-                        {{ now()->format('l, F j, Y') }}
+                        {{ now()->format('l, j F Y') }}
                     </p>
                 </div>
             </div>
