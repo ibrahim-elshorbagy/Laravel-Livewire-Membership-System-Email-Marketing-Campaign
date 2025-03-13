@@ -44,3 +44,5 @@
 .unsubscribe-text a:hover {
     text-decoration: underline;
 }
+
+[x-cloak] { display: none !important; }
