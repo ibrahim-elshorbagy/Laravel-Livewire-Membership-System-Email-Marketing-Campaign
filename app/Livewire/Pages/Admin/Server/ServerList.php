@@ -27,6 +27,12 @@ class ServerList extends Component
     public $editingServerId = null;
     public $previousUserId = null;
 
+
+    public $admin_notes = '';
+    public $selectedServerId = null;
+    public $edit_admin_notes = '';
+
+
     protected $queryString = [
         'search' => ['except' => ''],
         'sortField' => ['except' => 'created_at'],
@@ -57,6 +63,17 @@ class ServerList extends Component
         }
     }
 
+
+    public function saveNote()
+    {
+        $server = Server::findOrFail($this->selectedServerId);
+        $server->update([
+            'admin_notes' => $this->edit_admin_notes
+        ]);
+
+        $this->alert('success', 'Notes saved successfully!', ['position' => 'bottom-end']);
+        $this->dispatch('close-modal', 'edit-note-modal');
+    }
 
     public function deleteServer($serverId)
     {
