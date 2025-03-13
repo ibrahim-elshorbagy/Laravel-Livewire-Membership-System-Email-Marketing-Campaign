@@ -24,7 +24,7 @@
             </div>
         </div>
     </div>
-
+    <div x-text="selectedTab" class="mb-4"></div>
     <!-- Table -->
     <div class="overflow-hidden overflow-x-auto w-full rounded-lg">
         <table class="w-full text-xs text-left text-neutral-600 dark:text-neutral-400">
@@ -48,18 +48,17 @@
                 @endphp
                 <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800">
                     <td class="p-4">
-                        <div class="flex gap-2 items-center w-max">
-                            <img class="object-cover rounded-full size-10" src="{{ $subscriber->image_url ?? 'default-avatar.png' }}"
-                                alt="{{ $subscriber->first_name }}" />
-                            <div class="flex flex-col">
-                                <span class="font-medium">
-                                    {{ $subscriber->first_name }} {{ $subscriber->last_name}} - ( {{ $subscriber->username }} )
-                                    @if($subscriber->deleted_at)
-                                    <span class="text-xs text-red-500">(Soft Delete)</span>
-                                    @endif
-                                </span>
-                                <span class="text-sm text-neutral-500">{{ $subscriber->email }}</span>
-                            </div>
+                        <div class="flex flex-col">
+                            <span class="font-medium">
+                                Name :
+                                {{ $subscriber->first_name }} {{ $subscriber->last_name}}
+                                @if($subscriber->deleted_at)
+                                <span x-show="selectedTab === 'all'" class="text-xs text-red-500">(Soft Delete)</span>
+                                @endif
+                            </span>
+                            <span>
+                                UserName: {{ $subscriber->username }}
+                            </span>
                         </div>
                     </td>
                     <td class="p-4">
@@ -118,16 +117,17 @@
                                 @case('failed') text-red-800 bg-red-100 @break
                                 @default text-gray-800 bg-gray-100
                             @endswitch">
-                            {{ ucfirst($payment->status) }}
+                            <span class="text-nowrap">{{ ucfirst($payment->status) }}</span>
+
                         </span>
                         @else
-                        <span class="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full">
+                        <span class="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full text-nowrap">
                             No Payment
                         </span>
                         @endif
                     </td>
                     <td class="p-4">
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full text-nowrap
                             @if($subscription->suppressed_at) text-purple-800 bg-purple-100
                             @elseif($subscription->canceled_at) text-red-800 bg-red-100
                             @elseif($subscription->expired_at?->isPast()) text-orange-800 bg-orange-100

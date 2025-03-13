@@ -3,6 +3,7 @@
 namespace App\Livewire\Pages\Admin\Transactions;
 
 use App\Models\Payment\Payment;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 use Livewire\Component;
@@ -169,7 +170,7 @@ class Transactions extends Component
 
     public function impersonateUser($userId)
     {
-        $user = config('auth.providers.users.model')::find($userId);
+        $user = User::find($userId);
         if ($user) {
             session()->put('impersonated_by', auth()->id());
             auth()->login($user);

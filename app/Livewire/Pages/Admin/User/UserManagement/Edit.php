@@ -40,7 +40,6 @@ class Edit extends Component
         $this->country = $user->country;
         $this->whatsapp = $user->whatsapp;
         $this->active = $user->active;
-        $this->image_url = $user->image_url ?? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
         $this->selectedRole = $user->roles->first()?->name ?? '';
         $this->permissions = $user->permissions->pluck('name')->toArray();
     }
@@ -57,7 +56,6 @@ class Edit extends Component
             'whatsapp' => 'nullable|string|regex:/^\+?\d{10,13}$/',
             'active' => 'boolean',
             'password' => 'nullable|min:8|confirmed',
-            'image_url' => 'nullable|url',
             'selectedRole' => 'required',
             'permissions' => 'array'
         ];
@@ -85,7 +83,6 @@ class Edit extends Component
             'country' => $this->country,
             'whatsapp' => $this->whatsapp,
             'active' => $this->active,
-            'image_url' => $this->image_url,
         ];
 
         if ($this->password) {

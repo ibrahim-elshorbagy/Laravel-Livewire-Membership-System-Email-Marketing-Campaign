@@ -46,12 +46,12 @@
                     </div>
                     <div class="flex items-center mt-4">
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Email Lists</p>
+                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Lists</p>
                             <p class="font-bold text-teal-600 md:text-2xl dark:text-teal-400">{{ $totalEmailLists }}</p>
                         </div>
                         <div class="mx-4 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Total Emails</p>
+                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400"> Emails</p>
                             <p class="font-bold text-teal-600 md:text-2xl dark:text-teal-400">{{ $totalEmails }}</p>
                         </div>
                     </div>
@@ -71,7 +71,7 @@
                     </div>
                     <div class="flex items-center mt-4">
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Active Campaigns</p>
+                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Campaigns</p>
                             <p class="font-bold text-indigo-600 md:text-2xl dark:text-indigo-400">{{ $totalCampaigns }}</p>
                         </div>
                         <div class="mx-4 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
@@ -101,7 +101,7 @@
                         </div>
                         <div class="mx-4 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Total Amount</p>
+                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400"> Amount</p>
                             <p class="font-bold text-green-600 md:text-2xl dark:text-green-400">${{
                                 number_format($totalPayments, 2) }}</p>
                         </div>

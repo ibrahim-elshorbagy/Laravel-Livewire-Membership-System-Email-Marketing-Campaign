@@ -13,8 +13,8 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <!-- Total Users & Subscriptions -->
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
+            <!--  Users & Subscriptions -->
             <div
                 class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-blue-500/20"></div>
@@ -27,12 +27,12 @@
                     </div>
                     <div class="flex items-center mt-4">
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Total Users</p>
+                            <p class="text-sm font-medium md:text-lg text-neutral-600 dark:text-neutral-400"> Users</p>
                             <p class="font-bold text-blue-600 md:text-2xl dark:text-blue-400">{{$totalUsers}}</p>
                         </div>
                         <div class="mx-4 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Active Subscriptions
+                            <p class="text-sm font-medium md:text-lg text-neutral-600 dark:text-neutral-400">Subscriptions
                             </p>
                             <p class="font-bold text-blue-600 md:text-2xl dark:text-blue-400">{{$activeSubscriptions}}</p>
                         </div>
@@ -52,7 +52,7 @@
                             Management</span>
                     </div>
                     <div class="mt-4">
-                        <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Total Servers</p>
+                        <p class="text-sm font-medium md:text-lg text-neutral-600 dark:text-neutral-400"> Servers</p>
                         <p class="font-bold text-purple-600 md:text-2xl dark:text-purple-400">{{$serverCount}}</p>
                     </div>
                 </div>
@@ -71,12 +71,12 @@
                     </div>
                     <div class="flex items-center mt-4">
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Total Campaigns</p>
+                            <p class="text-sm font-medium md:text-lg text-neutral-600 dark:text-neutral-400"> Campaigns</p>
                             <p class="font-bold text-yellow-600 md:text-2xl dark:text-yellow-400">{{$totalCampaigns}}</p>
                         </div>
                         <div class="mx-4 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Messages</p>
+                            <p class="text-sm font-medium md:text-lg text-neutral-600 dark:text-neutral-400">Messages</p>
                             <p class="font-bold text-yellow-600 md:text-2xl dark:text-yellow-400">{{$storedMessages}}</p>
                         </div>
                     </div>
@@ -96,12 +96,12 @@
                     </div>
                     <div class="flex items-center mt-4">
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Email Lists</p>
+                            <p class="text-sm font-medium md:text-lg text-neutral-600 dark:text-neutral-400">Lists</p>
                             <p class="font-bold text-indigo-600 md:text-2xl dark:text-indigo-400">{{$totalEmailLists}}</p>
                         </div>
                         <div class="mx-4 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Total Emails</p>
+                            <p class="text-sm font-medium md:text-lg text-neutral-600 dark:text-neutral-400"> Emails</p>
                             <p class="font-bold text-indigo-600 md:text-2xl dark:text-indigo-400">{{$totalEmails}}</p>
                         </div>
                     </div>
@@ -121,12 +121,12 @@
                     </div>
                     <div class="flex items-center mt-4">
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Total Payments</p>
+                            <p class="text-sm font-medium md:text-lg text-neutral-600 dark:text-neutral-400"> Payments</p>
                             <p class="font-bold text-green-600 md:text-2xl dark:text-green-400">{{$paymentCount}}</p>
                         </div>
                         <div class="mx-4 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Total Amount</p>
+                            <p class="text-sm font-medium md:text-lg text-neutral-600 dark:text-neutral-400"> Revenue</p>
                             <p class="font-bold text-green-600 md:text-2xl dark:text-green-400">
                                 ${{number_format($totalPayments, 2)}}</p>
                         </div>

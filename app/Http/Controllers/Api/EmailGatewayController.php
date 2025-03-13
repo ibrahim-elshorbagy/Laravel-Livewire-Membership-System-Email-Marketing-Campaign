@@ -658,6 +658,7 @@ class EmailGatewayController extends Controller
                     $emailsToSend[] = [
                         'id' => $email->id,
                         'email' => $email->email,
+                        'name' => $email->name,
                         'sent_time' => Carbon::now()->format('Y-m-d H:i:s'),
                     ];
 

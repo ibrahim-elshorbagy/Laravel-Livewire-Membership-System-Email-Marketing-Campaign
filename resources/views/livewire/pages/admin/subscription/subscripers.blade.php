@@ -13,6 +13,9 @@
             <button x-on:click="selectedTab = 'canceled'"
                 :class="selectedTab === 'canceled' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">Canceled</button>
+            <button x-on:click="selectedTab = 'deleted'"
+                :class="selectedTab === 'deleted' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
+                class="px-4 py-2 text-sm h-min" role="tab">Deleted</button>
             <button x-on:click="selectedTab = 'suppressed'"
                 :class="selectedTab === 'suppressed' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">Suppressed</button>
@@ -47,6 +50,14 @@
             ])
         </div>
 
+        <!-- Deleted Users Tab Content -->
+        <div x-show="selectedTab === 'deleted'">
+            @include('livewire.pages.admin.subscription.partials.table', [
+            'items' => $this->deletedSubscriptions,
+            'search' => 'searchDeleted',
+            'searchPlaceholder' => 'Search deleted subscriptions...'
+            ])
+        </div>
         <!-- Suppressed Tab Content -->
         <div x-show="selectedTab === 'suppressed'">
             @include('livewire.pages.admin.subscription.partials.table', [

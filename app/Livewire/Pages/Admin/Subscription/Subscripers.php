@@ -4,6 +4,7 @@ namespace App\Livewire\Pages\Admin\Subscription;
 
 use App\Models\Payment\Payment;
 use App\Models\Subscription\Note;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 use Livewire\Component;
@@ -22,6 +23,7 @@ class Subscripers extends Component
     public $searchAll = '';
     public $searchActive = '';
     public $searchCanceled = '';
+    public $searchDeleted = '';
     public $searchSuppressed = '';
     public $searchExpired = '';
     public $perPage = 10;
@@ -97,6 +99,15 @@ class Subscripers extends Component
     }
 
     #[Computed]
+    public function deletedSubscriptions()
+    {
+        return $this->baseQuery('deleted')
+            ->when($this->searchDeleted, $this->searchCallback())
+            ->latest()
+            ->paginate($this->perPage);
+    }
+
+    #[Computed]
     public function suppressedSubscriptions()
     {
         return $this->baseQuery('suppressed')
@@ -122,8 +133,18 @@ class Subscripers extends Component
         }])
         ->withoutGlobalScopes([SuppressingScope::class, StartingScope::class]);
 
+        // Only show subscriptions with non-deleted users unless in 'all' or 'deleted' tabs
+        if (!in_array($status, ['all', 'deleted'])) {
+            $query->whereHas('subscriber', function($q) {
+                $q->whereNull('deleted_at');
+            });
+        }
+
         return match($status) {
             'canceled' => $query->whereNotNull('canceled_at'),
+            'deleted' => $query->whereHas('subscriber', function($q) {
+                $q->onlyTrashed();
+            }),
             'suppressed' => $query->whereNotNull('suppressed_at'),
             'expired' => $query->whereNotNull('expired_at'),
             'active' => $query->whereNull('canceled_at')
@@ -134,6 +155,8 @@ class Subscripers extends Component
                             }),
             default => $query
         };
+
+        return $query;
     }
 
     protected function searchCallback()
@@ -141,6 +164,7 @@ class Subscripers extends Component
         return function ($query) {
             $searchTerm = $this->{match($this->selectedTab) {
                 'canceled' => 'searchCanceled',
+                'deleted' => 'searchDeleted',
                 'suppressed' => 'searchSuppressed',
                 'expired' => 'searchExpired',
                 'active' => 'searchActive',
@@ -151,9 +175,6 @@ class Subscripers extends Component
                 $q->withTrashed()
                     ->where(function ($subQuery) use ($searchTerm) {
                     $subQuery->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$searchTerm%")
-                        ->orWhere('first_name', 'like', "%$searchTerm%")
-                        ->orWhere('last_name', 'like', "%$searchTerm%")
-                        ->orWhere('email', 'like', "%$searchTerm%")
                         ->orWhere('username', 'like', "%$searchTerm%");
                 });
             });
@@ -173,7 +194,7 @@ class Subscripers extends Component
     }
     public function impersonateUser($userId)
     {
-        $user = config('auth.providers.users.model')::find($userId);
+        $user = User::find($userId);
         if ($user) {
             session()->put('impersonated_by', auth()->id());
             auth()->login($user);
