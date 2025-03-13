@@ -13,22 +13,28 @@
 
     <form wire:submit.prevent="saveServer" class="space-y-4">
         <div class="grid gap-6 lg:grid-cols-2">
-            <!-- Server Name -->
+            @if($server_id)
+            <!-- Single Server Name (Edit Mode) -->
             <div>
                 <x-input-label for="name" required>Server Name</x-input-label>
                 <x-text-input wire:model="name" id="name" type="text" class="block w-full mt-1" required />
                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
             </div>
+            @else
+            <!-- Multiple Server Names (Create Mode) -->
+            <div class="lg:col-span-2">
+                <x-input-label for="servers" required>Server Names</x-input-label>
+                <x-textarea-input wire:model="servers" id="servers" placeholder="Enter server names separated by commas or new lines" class="block w-full mt-1" required />
+                <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Enter server names using only English letters, dots, and hyphens (server-one.com, server-two)
+                </div>
+                <x-input-error :messages="$errors->get('servers.*')" class="mt-2" />
+                <x-input-error :messages="$errors->get('servers')" class="mt-2" />
+            </div>
+            @endif
 
-            <!-- Current Quota -->
-            {{-- <div>
-                <x-input-label for="current_quota" required>Current Quota</x-input-label>
-                <x-text-input wire:model="current_quota" id="current_quota" type="number" class="block w-full mt-1"
-                    required />
-                <x-input-error :messages="$errors->get('current_quota')" class="mt-2" />
-            </div> --}}
-
-            <!-- Assigned User -->
+            @if($server_id)
+            <!-- Assigned User (Edit Mode Only) -->
             <div x-data="{ open: false }" class="relative">
                 <x-input-label for="assigned_user">Assigned User</x-input-label>
                 <div class="mt-1">
@@ -80,32 +86,19 @@
                 <x-input-error :messages="$errors->get('assigned_to_user_id')" class="mt-2" />
             </div>
 
-            {{-- Last Access Time --}}
-            {{-- <div>
-                <x-input-label for="last_access_time" :value="__('Last Access Time')" />
-                <x-text-input x-data x-init="flatpickr($el, {
-                                        dateFormat: 'Y-m-d',
-                                        defaultDate: '{{ $last_access_time }}',
-                                        allowInput: true
-                                    })" wire:model="last_access_time" type="text" class="block w-full mt-1" placeholder="YYYY-MM-DD" />
-                <x-input-error :messages="$errors->get('last_access_time')" class="mt-2" />
-             </div> --}}
-            <!-- Admin Notes -->
+            <!-- Admin Notes (Edit Mode Only) -->
             <div class="lg:col-span-2">
                 <x-input-label for="admin_notes">Admin Notes</x-input-label>
-                <x-primary-textarea wire:model="admin_notes" id="admin_notes" rows="4" class="block w-full mt-1">
-                </x-primary-textarea>
+                <x-textarea-input wire:model="admin_notes" id="admin_notes" class="block w-full mt-1" />
                 <x-input-error :messages="$errors->get('admin_notes')" class="mt-2" />
             </div>
+            @endif
         </div>
 
-        <div class="flex justify-end space-x-3">
-            <x-secondary-button type="button" wire:navigate href="{{ route('admin.servers') }}">
-                Cancel
-            </x-secondary-button>
-            <x-primary-create-button type="submit">
-                {{ $server_id ? 'Update Server' : 'Create Server' }}
-            </x-primary-create-button>
+        <div class="flex justify-end mt-6">
+            <x-primary-button type="submit">
+                {{ $server_id ? 'Update Server' : 'Create Servers' }}
+            </x-primary-button>
         </div>
     </form>
 </div>

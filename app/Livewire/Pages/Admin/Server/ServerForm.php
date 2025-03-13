@@ -6,39 +6,48 @@ use App\Models\Campaign\Campaign;
 use App\Models\Campaign\CampaignServer;
 use App\Models\Server;
 use App\Models\User;
+use App\Rules\ServersRule;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Illuminate\Support\Facades\Session;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
+
 class ServerForm extends Component
 {
     use LivewireAlert;
 
     public $server_id;
     public $name = '';
+    public $servers = '';
     public $assigned_to_user_id = null;
     public $current_quota = 0;
     public $admin_notes = '';
     public $userSearch = '';
     public $last_access_time = null;
-    public $previous_user_id = null; // To track user changes
-
+    public $previous_user_id = null;
 
     protected function rules()
     {
-        return [
-            'name' => [
-                'required',
-                'string',
-                'without_space',
-                Rule::unique('servers')->where(function ($query) {
-                    return $query->where('assigned_to_user_id', $this->assigned_to_user_id);
-                })->ignore($this->server_id),
-            ],
-            'assigned_to_user_id' => 'nullable|exists:users,id',
-            'admin_notes' => 'nullable|string',
-        ];
+        if ($this->server_id) {
+            return [
+                'name' => [
+                    'required',
+                    'string',
+                    'without_space',
+                    Rule::unique('servers')->where(function ($query) {
+                        return $query->where('assigned_to_user_id', $this->assigned_to_user_id);
+                    })->ignore($this->server_id),
+                ],
+                'assigned_to_user_id' => 'nullable|exists:users,id',
+                'admin_notes' => 'nullable|string',
+            ];
+        } else {
+            return [
+                'servers' => ['required', 'string', new ServersRule(),'unique:servers,name'],
+            ];
+        }
     }
 
     public function mount($server = null)
@@ -49,7 +58,6 @@ class ServerForm extends Component
             $this->fill($serverModel->toArray());
             $this->assigned_to_user_id = $serverModel->assigned_to_user_id;
             $this->previous_user_id = $serverModel->assigned_to_user_id;
-
         }
     }
 
@@ -70,7 +78,6 @@ class ServerForm extends Component
 
         return $query->get();
     }
-
 
     public function saveServer()
     {
@@ -112,11 +119,22 @@ class ServerForm extends Component
 
                 $server->update($validatedData);
             } else {
-                Server::create($validatedData);
+                // Handle multiple server creation
+                $serverNames = Str::of($validatedData['servers'])
+                    ->explode(',')
+                    ->map(fn($name) => trim($name))
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->toArray();
+
+                foreach ($serverNames as $serverName) {
+                    Server::create(['name' => $serverName]);
+                }
             }
 
             DB::commit();
-            Session::flash('success', 'Server saved successfully.');
+            Session::flash('success', 'Server(s) saved successfully.');
             return $this->redirect(route('admin.servers'), navigate: true);
 
         } catch (\Exception $e) {
@@ -154,9 +172,6 @@ class ServerForm extends Component
             }
         }
     }
-
-
-
 
     public function render()
     {
