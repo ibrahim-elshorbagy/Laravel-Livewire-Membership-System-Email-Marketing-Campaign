@@ -58,8 +58,8 @@
         </div>
     </div>
 
-    <!-- Table -->
-    <div class="overflow-hidden overflow-x-auto w-full rounded-lg">
+    <!-- Table Container with Relative Positioning -->
+    <div class="overflow-hidden overflow-x-auto relative w-full rounded-lg">
         <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
             <thead
                 class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
@@ -84,31 +84,99 @@
                     </td>
                     <td class="p-4">{{ $server->name }}</td>
                     <td class="p-4">
-                        @if($server->assignedUser)
-                        <div class="flex gap-2 items-center w-max">
-                            <img class="object-cover rounded-full size-10"
-                                src="{{ $server->assignedUser->image_url ?? asset('default-avatar.png') }}"
-                                alt="{{ $server->assignedUser->first_name }} {{ $server->assignedUser->last_name }}" />
-                            <div class="flex flex-col">
-                                <span class="text-neutral-900 dark:text-neutral-100">
-                                    {{ $server->assignedUser->first_name }} {{ $server->assignedUser->last_name }}
-                                    - ({{ $server->assignedUser->username }})
-                                </span>
-                                <span class="text-sm text-neutral-600 opacity-85 dark:text-neutral-400">
-                                    {{ $server->assignedUser->email }}
-                                </span>
+                        <div x-data="{ open: false }" class="relative">
+                            <button type="button" @click="open = !open"
+                                class="px-4 py-2 w-full text-left rounded-md border shadow-sm dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                @if($server->assignedUser)
+                                <div class="flex gap-2 items-center w-max">
+                                    <img class="object-cover rounded-full size-10"
+                                        src="{{ $server->assignedUser->image_url ?? asset('default-avatar.png') }}"
+                                        alt="{{ $server->assignedUser->first_name }} {{ $server->assignedUser->last_name }}" />
+                                    <div class="flex flex-col">
+                                        <span class="text-neutral-900 dark:text-neutral-100">
+                                            {{ $server->assignedUser->first_name }} {{ $server->assignedUser->last_name
+                                            }}
+                                            - ({{ $server->assignedUser->username }})
+                                        </span>
+                                        <span class="text-sm text-neutral-600 opacity-85 dark:text-neutral-400">
+                                            {{ $server->assignedUser->email }}
+                                        </span>
+                                    </div>
+                                </div>
+                                @else
+                                <span class="text-neutral-500 dark:text-neutral-400">Select User</span>
+                                @endif
+                            </button>
+
+                            <!-- Dropdown positioned with fixed strategy -->
+                            <div x-show="open" @click.outside="open = false"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="fixed z-[9999] w-96 bg-white rounded-md shadow-lg dark:bg-neutral-800" x-init="$watch('open', value => {
+                                    if (value) {
+                                        $nextTick(() => {
+                                            const button = $el.previousElementSibling;
+                                            const rect = button.getBoundingClientRect();
+                                            const dropdown = $el;
+                                            const dropdownHeight = dropdown.offsetHeight;
+                                            const viewportHeight = window.innerHeight;
+
+                                            // Position dropdown below or above the button based on available space
+                                            if (rect.bottom + dropdownHeight > viewportHeight && rect.top > dropdownHeight) {
+                                                dropdown.style.bottom = `${viewportHeight - rect.top}px`;
+                                                dropdown.style.top = 'auto';
+                                            } else {
+                                                dropdown.style.top = `${rect.bottom}px`;
+                                                dropdown.style.bottom = 'auto';
+                                            }
+
+                                            dropdown.style.left = `${rect.left}px`;
+                                        });
+                                    }
+                                })">
+                                <div class="p-2">
+                                    <input type="text" wire:model.live.debounce.300ms="userSearch"
+                                        class="px-3 py-2 w-full rounded-md border dark:bg-neutral-700 dark:border-neutral-600"
+                                        placeholder="Search users...">
+
+                                    <div class="overflow-y-auto mt-2 max-h-[300px]">
+                                        <div class="px-3 py-2 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700"
+                                            wire:click="assignUser({{ $server->id }}, null); open = false">
+                                            No User (Clear Selection)
+                                        </div>
+                                        @foreach($users as $user)
+                                        <div class="px-3 py-2 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700
+                                            {{ $server->assigned_to_user_id == $user->id ? 'bg-sky-50 dark:bg-sky-900' : '' }}"
+                                            wire:click="assignUser({{ $server->id }}, {{ $user->id }}); open = false">
+                                            <div class="flex gap-2 items-center w-max">
+                                                <img class="object-cover rounded-full size-10"
+                                                    src="{{ $user->image_url ?? asset('default-avatar.png') }}"
+                                                    alt="{{ $user->first_name }} {{ $user->last_name }}" />
+                                                <div class="flex flex-col">
+                                                    <span class="text-neutral-900 dark:text-neutral-100">
+                                                        {{ $user->first_name }} {{ $user->last_name }}
+                                                        - ({{ $user->username }})
+                                                    </span>
+                                                    <span
+                                                        class="text-sm text-neutral-600 opacity-85 dark:text-neutral-400">
+                                                        {{ $user->email }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        @else
-                        <span class="text-neutral-500 dark:text-neutral-400">Not Assigned</span>
-                        @endif
                     </td>
-                    <td class="p-4">{{
-                        $server->last_access_time?->format('d/m/Y h:i:s A')??
-                        '' }}</td>
+                    <td class="p-4">{{ $server->last_access_time?->format('d/m/Y h:i:s A')?? '' }}</td>
                     <td class="p-4">{{ $server->current_quota }}</td>
-                    <td class="p-4">{{ $server->created_at?->format('d/m/Y
-                        h:i:s A') }}</td>
+                    <td class="p-4">{{ $server->created_at?->format('d/m/Y h:i:s A') }}</td>
                     <td class="p-4">
                         <div class="flex space-x-2">
                             @if($server->admin_notes)

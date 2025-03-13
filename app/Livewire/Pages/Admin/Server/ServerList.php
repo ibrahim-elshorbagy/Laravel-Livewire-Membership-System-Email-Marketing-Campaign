@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages\Admin\Server;
 
+use App\Models\Campaign\Campaign;
 use App\Models\Server;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +24,8 @@ class ServerList extends Component
     public $serverId;
     public $userSearch = '';
     public $selectedUserId = null;
+    public $editingServerId = null;
+    public $previousUserId = null;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -110,13 +113,57 @@ class ServerList extends Component
 
     public function getUsersProperty()
     {
-        return User::when($this->userSearch, function ($query) {
-            $query->where(function($q) {
-                $q->where('first_name', 'like', '%' . $this->userSearch . '%')
-                ->orWhere('last_name', 'like', '%' . $this->userSearch . '%')
-                ->orWhere('email', 'like', '%' . $this->userSearch . '%');
-            });
-        })->get();
+        return User::role('User')
+            ->when($this->userSearch, function ($query) {
+                $query->where(function($q) {
+                    $q->where('first_name', 'like', '%' . $this->userSearch . '%')
+                        ->orWhere('last_name', 'like', '%' . $this->userSearch . '%')
+                        ->orWhere('username', 'like', '%' . $this->userSearch . '%')
+                        ->orWhere('email', 'like', '%' . $this->userSearch . '%');
+                });
+            })->limit(30)->get();
+    }
+
+    public function assignUser($serverId, $userId)
+    {
+        try {
+            DB::beginTransaction();
+
+            $server = Server::findOrFail($serverId);
+            $previousUserId = $server->assigned_to_user_id;
+
+            if ($previousUserId !== $userId) {
+                $query = Campaign::whereHas('servers', function($query) use ($serverId) {
+                    $query->where('server_id', $serverId);
+                });
+
+                if ($userId !== null) {
+                    $query->where('user_id', $previousUserId);
+                }
+
+                $affectedCampaigns = $query->get();
+
+                foreach ($affectedCampaigns as $campaign) {
+                    if ($campaign->status === Campaign::STATUS_SENDING) {
+                        $campaign->update(['status' => Campaign::STATUS_PAUSE]);
+                    }
+                    $campaign->servers()->detach($serverId);
+                }
+
+                $server->update(['assigned_to_user_id' => $userId]);
+
+                if ($affectedCampaigns->count() > 0) {
+                    $this->alert('info', 'Server has been removed from affected campaigns and they have been deactivated.', ['position' => 'bottom-end']);
+                }
+
+                $this->alert('success', 'User assignment updated successfully!', ['position' => 'bottom-end']);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->alert('error', 'Failed to update user assignment: ' . $e->getMessage(), ['position' => 'bottom-end']);
+        }
     }
 
     public function render()
