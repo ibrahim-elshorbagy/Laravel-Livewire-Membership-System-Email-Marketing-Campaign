@@ -1,66 +1,36 @@
 <?php
 
-namespace App\Livewire\Pages\User\Subscription;
+namespace App\Livewire\Pages\User\Subscription\Renew;
 
 use App\Models\Payment\Payment;
 use App\Services\PaypalPaymentService;
-use Illuminate\Database\DeadlockException;
-use Illuminate\Support\Facades\Artisan;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use LucasDotVin\Soulbscription\Models\Plan;
-use LucasDotVin\Soulbscription\Models\Subscriber;
 use Illuminate\Support\Facades\Log;
 
-class Subscribe extends Component
+class Renew extends Component
 {
     use LivewireAlert, PaypalPaymentService;
-
-    public $selectedPlan;
-    public $selectedTab = 'monthly';
     public $paymentUrl;
     public $isProcessing = false;
+
+
 
     protected $listeners = [
         'confirmed' => 'handleConfirmed',
         'cancelled' => 'handleCancelled'
     ];
 
-    protected function rules()
-    {
-        return [
-            'selectedPlan' => [
-                'required',
-                'exists:plans,id',
-                function ($attribute, $value, $fail) {
-                    $currentPlanId = $this->getCurrentPlanId();
-                    if ($currentPlanId === (int)$value) {
-                        $fail("You can't select your current plan.");
-                    }
-                },
-            ],
-        ];
-    }
-
-
-
-    public function updatedSelectedPlan($value)
-    {
-        $this->validateOnly('selectedPlan');
-    }
-
     public function initiatePayment()
     {
-        $this->isProcessing = true;
-
 
         if (!auth()->user()->hasVerifiedEmail()) {
             $this->alert('warning', 'Please verify your email address before subscribing.',['position' => 'center']);
             return;
         }
 
-        $this->validate();
         $user = auth()->user();
 
         // Check if user has an active subscription
@@ -69,12 +39,17 @@ class Subscribe extends Component
 
             // Show confirmation dialog with correct event handling
             $this->alert('warning', 'Active Subscription', [
-                    'title'             => 'Confirm Subscription Change',
-                    'text'              => 'You currently have an active subscription. Do you want to replace it with the new plan?',
+                    'title'             => 'Confirm Renew Subscription',
+                    'html'              =>  "
+                            <ul class='pl-5 space-y-2 list-disc'>
+                                <li class='text-left'>Renew will calculate the remaining expiration date from the old subscription with the new one.</li>
+                                <li class='text-left'>Your contacts will remain.</li>
+                                <li class='text-left'>Your emails per month will be reset.</li>
+                            </ul>",
                     'showConfirmButton' => true,
-                    'confirmButtonText' => 'Replace Subscription',
+                    'confirmButtonText' => 'Renew',
                     'showCancelButton'  => true,
-                    'cancelButtonText'  => 'Keep Current Plan',
+                    'cancelButtonText'  => 'Cancel',
                     'reverseButtons'    => true,
                     'position'          => 'center',
                     'timer'             => null,
@@ -88,8 +63,6 @@ class Subscribe extends Component
             return;
         }
 
-        // If no active subscription, proceed directly
-        $this->proceedWithPayment();
     }
 
         // New method to handle confirmation
@@ -102,11 +75,11 @@ class Subscribe extends Component
     // New method to handle cancellation
     public function handleCancelled()
     {
-        // Log::info('Cancellation received');
+        Log::info('Cancellation received');
         $this->isProcessing = false;
-        $this->selectedPlan = null;
-        $this->alert('info', 'Subscription change cancelled');
+        $this->alert('info', 'Subscription change cancelled',['position' => 'center']);
     }
+
     public function proceedWithPayment()
     {
         // Log::info('proceedWithPayment called');
@@ -119,7 +92,9 @@ class Subscribe extends Component
             DB::beginTransaction();
 
             $user = auth()->user();
-            $plan = Plan::findOrFail($this->selectedPlan);
+            $plan_id = $user->lastSubscription()->plan_id;
+
+            $plan = Plan::findOrFail($plan_id);
 
             // Create payment record
             $payment = Payment::create([
@@ -152,33 +127,9 @@ class Subscribe extends Component
         }
     }
 
-    public function getCurrentPlanId()
-    {
-        $user = auth()->user();
-        if ($user && $user->lastSubscription()) {
-            return $user->lastSubscription()->plan_id;
-        }
-        return null;
-    }
 
     public function render()
     {
-        $currentPlanId = $this->getCurrentPlanId();
-
-        $monthlyPlans = Plan::with('features')
-            ->where('periodicity_type', 'Month')
-            ->get();
-
-        $yearlyPlans = Plan::with('features')
-            ->where('periodicity_type', 'Year')
-            ->where('id', '!=', 1)
-            ->get();
-
-        return view('livewire.pages.user.subscription.subscribe', [
-            'monthlyPlans' => $monthlyPlans,
-            'yearlyPlans' => $yearlyPlans,
-            'currentPlanId' => $currentPlanId,
-
-        ])->layout('layouts.app',['title' => 'Plans']);
+        return view('livewire.pages.user.subscription.renew.renew');
     }
 }

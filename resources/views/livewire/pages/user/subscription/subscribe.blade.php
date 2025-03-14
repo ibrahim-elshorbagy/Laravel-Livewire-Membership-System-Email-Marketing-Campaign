@@ -86,7 +86,7 @@
         </div>
 
         <!-- Yearly Plans -->
-        <div x-show="selectedTab === 'yearly'" class="grid grid-cols-1 gap-6 md:grid-cols-4">
+        <div x-cloak x-show="selectedTab === 'yearly'" class="grid grid-cols-1 gap-6 md:grid-cols-4">
             @foreach($yearlyPlans as $plan)
             <article
                 class="flex overflow-hidden flex-col p-3 w-full rounded-lg md:p-6 group bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">

@@ -35,8 +35,12 @@
                                 <i class="text-xl text-blue-500 md:text-3xl dark:text-blue-400 fas fa-crown"></i>
                                 <h3 class="font-bold text-center text-blue-600 md:text-xl dark:text-blue-400">
                                     {{$subscription['plan_name']}}</h3>
-                                <span
-                                    class="px-2 py-1 text-xs font-medium text-blue-500 bg-blue-50 rounded-full dark:text-blue-400 dark:bg-blue-500/10">Subscription</span>
+                                <div class="text-sm text-center text-neutral-600 dark:text-neutral-400">
+                                    <span>${{number_format($subscription['price'], 2)}}</span> /
+                                    <span class="capitalize">{{$subscription['periodicity_type']}}</span>
+                                </div>
+                                <a wire:navigate href="{{ route('our.plans') }}"
+                                    class="px-2 py-1 text-xs font-medium text-blue-500 bg-indigo-100 rounded-full dark:text-blue-400 dark:bg-blue-500/10">Upgrade</a>
                             </div>
 
                             <!-- Right side: Subscription details -->
@@ -60,6 +64,11 @@
                                             class="text-xs font-medium md:text-sm text-neutral-600 dark:text-neutral-400">Remaining:</span>
                                         <span class="text-xs text-blue-600 md:text-sm dark:text-blue-400">{{
                                             $subscription['remaining_time'] }}</span>
+                                    </div>
+                                    @endif
+                                    @if($subscription['plan_id'] != 1)
+                                    <div class="flex gap-2 justify-center mt-3">
+                                        <livewire:pages.user.subscription.renew.renew>
                                     </div>
                                     @endif
                                 </div>

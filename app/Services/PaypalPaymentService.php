@@ -49,7 +49,7 @@ trait PaypalPaymentService
             Log::debug('Verifying PayPal Webhook Endpoint.', ['webhook_id' => $webhookId]);
 
             $webhookData = $paypalClient->listWebhooks();
-            Log::debug('Retrieved PayPal Webhooks.', ['webhook_count' => count($webhookData['webhooks'] ?? [])]);
+            Log::debug('Retrieved PayPal Webhooks.', ['webhookData' => $webhookData]);
 
             $webhooks = $webhookData['webhooks'] ?? [];
 
@@ -59,7 +59,7 @@ trait PaypalPaymentService
 
             if (!$webhookExists) {
                 $message = 'Invalid PayPal Webhook configuration: Webhook ID not found.';
-                Log::error($message, ['configured_webhook_id' => $webhookId, 'available_webhooks' => $webhooks]);
+                Log::error($message, ['configured_webhook_id' => $webhookId,"webhookExists"=>$webhookExists,'$webhookData'=>$webhookData]);
                 throw new \Exception($message);
             }
 

@@ -2,6 +2,7 @@
 
 namespace App\Handler;
 
+use App\Models\EmailList;
 use App\Models\Payment\Payment;
 use App\Notifications\Paypal\SubscriptionActivatedNotification;
 use Illuminate\Support\Facades\DB;
@@ -122,11 +123,34 @@ class PayPalWebhookJob extends ProcessWebhookJob
 
 
             DB::transaction(function () use ($payment, $resource) {
-                    if ($payment->user->lastSubscription()) {
-                $payment->user->lastSubscription()->suppress();
+                if ($payment->user->lastSubscription()) {
+
+                    if($payment->user->lastSubscription()->plan->id == $payment->plan_id){// This only work if he renew the subscription
+
+                        $subscription = $payment->user->lastSubscription()->renew();
+                        $payment->user->forceSetConsumption('Subscribers Limit',EmailList::where('user_id', $payment->user->id)->count());
+                        $payment->user->forceSetConsumption('Email Sending',0);
+
+                        Log::info('Renew Subscription ', [
+                            'payment_id' => $payment->id,
+                            'subscription_id' => $subscription->id,
+                        ]);
+
+                    }else{ //New Subscription or Upgrade
+
+                        $payment->user->lastSubscription()->suppress();
+                        $subscription = $payment->user->subscribeTo($payment->plan);
+                        $payment->user->forceSetConsumption('Subscribers Limit',EmailList::where('user_id', $payment->user->id)->count());
+                        $payment->user->forceSetConsumption('Email Sending',0);
+
+
+                        Log::info('Upgrade Subscription ', [
+                            'payment_id' => $payment->id,
+                            'subscription_id' => $subscription->id,
+                        ]);
+                    }
                 }
                 // Create subscription
-                $subscription = $payment->user->subscribeTo($payment->plan);
 
                 // Update payment with capture details
                 $payment->update([
