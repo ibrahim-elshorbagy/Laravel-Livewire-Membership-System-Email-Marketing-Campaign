@@ -106,7 +106,7 @@
                             <x-primary-info-button
                                 onclick="confirm('Are you sure you want to impersonate this user?') || event.stopImmediatePropagation()"
                                 wire:click="impersonateUser({{ $user->id }})">
-                                Login As
+                                Login
                             </x-primary-info-button>
 
                             @if($user->active)

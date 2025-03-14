@@ -15,9 +15,9 @@ class ServersRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        // Split the input string by commas and process each server name
+        // Split the input string by newlines and process each server name
         $serverNames = Str::of($value)
-            ->explode(',')
+            ->explode("\n")
             ->map(fn($name) => trim($name))
             ->filter()
             ->values()

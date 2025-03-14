@@ -27,10 +27,9 @@ class DashboardApiRequests extends Component
     }
 
 
-
     public function refresh()
     {
-        // $this->dispatch('stats-refreshed'); No need to add anything here 
+        // $this->dispatch('stats-refreshed'); No need to add anything here
     }
 
     public $hourLabels = [];

@@ -26,13 +26,15 @@
                 </div>
                 <div class="mt-4">
                     <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Total Requests</p>
-                    <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{number_format($stats['hour']['count'])}}</p>
+                    <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                        {{number_format($stats['hour']['count'])}}</p>
                 </div>
                 <div class="mt-4">
                     <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Avg. Execution Time</p>
-                    <p class="text-xl font-semibold text-blue-600 dark:text-blue-400">{{$stats['hour']['avg_execution_time'] }}s</p>
+                    <p class="text-xl font-semibold text-blue-600 dark:text-blue-400">
+                        {{$stats['hour']['avg_execution_time'] }}s</p>
                 </div>
-                <div class="mt-4" x-data="{ chart: null, initChart() { chart = new Chart(document.getElementById('hourlyChart').getContext('2d'), {
+                <div class="mt-4" x-data="{ chart: null, initChart() { if (typeof Chart === 'undefined') { setTimeout(() => this.initChart(), 100); return; } chart = new Chart(document.getElementById('hourlyChart').getContext('2d'), {
                         type: 'line',
                         data: {
                             labels: $wire.hourLabels,
@@ -74,13 +76,15 @@
                 </div>
                 <div class="mt-4">
                     <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Total Requests</p>
-                    <p class="text-3xl font-bold text-green-600 dark:text-green-400">{{number_format($stats['day']['count']) }}</p>
+                    <p class="text-3xl font-bold text-green-600 dark:text-green-400">
+                        {{number_format($stats['day']['count']) }}</p>
                 </div>
                 <div class="mt-4">
                     <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Avg. Execution Time</p>
-                    <p class="text-xl font-semibold text-green-600 dark:text-green-400">{{$stats['day']['avg_execution_time'] }}s</p>
+                    <p class="text-xl font-semibold text-green-600 dark:text-green-400">
+                        {{$stats['day']['avg_execution_time'] }}s</p>
                 </div>
-                <div class="mt-4" x-data="{ chart: null, initChart() { chart = new Chart(document.getElementById('dailyChart').getContext('2d'), {
+                <div class="mt-4" x-data="{ chart: null, initChart() { if (typeof Chart === 'undefined') { setTimeout(() => this.initChart(), 100); return; } chart = new Chart(document.getElementById('dailyChart').getContext('2d'), {
                         type: 'line',
                         data: {
                             labels: $wire.dayLabels,
@@ -122,13 +126,15 @@
                 </div>
                 <div class="mt-4">
                     <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Total Requests</p>
-                    <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{{number_format($stats['week']['count']) }}</p>
+                    <p class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
+                        {{number_format($stats['week']['count']) }}</p>
                 </div>
                 <div class="mt-4">
                     <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Avg. Execution Time</p>
-                    <p class="text-xl font-semibold text-yellow-600 dark:text-yellow-400">{{$stats['week']['avg_execution_time'] }}s</p>
+                    <p class="text-xl font-semibold text-yellow-600 dark:text-yellow-400">
+                        {{$stats['week']['avg_execution_time'] }}s</p>
                 </div>
-                <div class="mt-4" x-data="{ chart: null, initChart() { chart = new Chart(document.getElementById('weeklyChart').getContext('2d'), {
+                <div class="mt-4" x-data="{ chart: null, initChart() { if (typeof Chart === 'undefined') { setTimeout(() => this.initChart(), 100); return; } chart = new Chart(document.getElementById('weeklyChart').getContext('2d'), {
                         type: 'line',
                         data: {
                             labels: $wire.weekLabels,
@@ -170,13 +176,15 @@
                 </div>
                 <div class="mt-4">
                     <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Total Requests</p>
-                    <p class="text-3xl font-bold text-red-600 dark:text-red-400">{{number_format($stats['month']['count'])}}</p>
+                    <p class="text-3xl font-bold text-red-600 dark:text-red-400">
+                        {{number_format($stats['month']['count'])}}</p>
                 </div>
                 <div class="mt-4">
                     <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Avg. Execution Time</p>
-                    <p class="text-xl font-semibold text-red-600 dark:text-red-400">{{$stats['month']['avg_execution_time']}}s</p>
+                    <p class="text-xl font-semibold text-red-600 dark:text-red-400">
+                        {{$stats['month']['avg_execution_time']}}s</p>
                 </div>
-                <div class="mt-4" x-data="{ chart: null, initChart() { chart = new Chart(document.getElementById('monthlyChart').getContext('2d'), {
+                <div class="mt-4" x-data="{ chart: null, initChart() { if (typeof Chart === 'undefined') { setTimeout(() => this.initChart(), 100); return; } chart = new Chart(document.getElementById('monthlyChart').getContext('2d'), {
                         type: 'line',
                         data: {
                             labels: $wire.monthLabels,
@@ -218,13 +226,15 @@
                 </div>
                 <div class="mt-4">
                     <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Total Requests</p>
-                    <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{{number_format($stats['year']['count']) }}</p>
+                    <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+                        {{number_format($stats['year']['count']) }}</p>
                 </div>
                 <div class="mt-4">
                     <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Avg. Execution Time</p>
-                    <p class="text-xl font-semibold text-indigo-600 dark:text-indigo-400">{{$stats['year']['avg_execution_time'] }}s</p>
+                    <p class="text-xl font-semibold text-indigo-600 dark:text-indigo-400">
+                        {{$stats['year']['avg_execution_time'] }}s</p>
                 </div>
-                <div class="mt-4" x-data="{ chart: null, initChart() { chart = new Chart(document.getElementById('yearlyChart').getContext('2d'), {
+                <div class="mt-4" x-data="{ chart: null, initChart() { if (typeof Chart === 'undefined') { setTimeout(() => this.initChart(), 100); return; } chart = new Chart(document.getElementById('yearlyChart').getContext('2d'), {
                         type: 'line',
                         data: {
                             labels: $wire.yearLabels,
@@ -255,7 +265,6 @@
     </div>
 
 </div>
-
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>

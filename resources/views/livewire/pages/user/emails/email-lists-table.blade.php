@@ -94,7 +94,8 @@
 
 
     <!-- job progress  -->
-    <livewire:pages.user.emails.partials.job-progress-component />
+    {{--
+    <livewire:pages.user.emails.partials.job-progress-component /> --}}
 
 
 
@@ -119,7 +120,7 @@
                     <!-- Delete Button  -->
                     <div class="relative">
                         <x-primary-danger-button x-data="{
-                            isDisabled: {{ !$selectedList || ($selectedList && $this->lists->firstWhere('id', $selectedList)?->emails_count == 0) ? 'true' : 'false' }}
+                            isDisabled: {{ !$selectedList || ($selectedList && $this->lists->firstWhere('name', $selectedList)?->emails_count == 0) ? 'true' : 'false' }}
                         }" wire:click="deleteEmails('{{ !empty($selectedEmails) ? 'selected' : 'all' }}')"
                             wire:confirm="{{ !empty($selectedEmails)
                             ? 'Are you sure you want to delete ' . count($selectedEmails) . ' selected emails?'
@@ -143,7 +144,7 @@
 
                                 @if($selectedList)
                                 <span class="px-1.5 py-0.5 text-xs bg-red-700 rounded-full sm:px-2">
-                                    {{ $this->lists->firstWhere('id', $selectedList)?->emails_count ?? 0 }}
+                                    {{ $this->lists->firstWhere('name', $selectedList)?->emails_count ?? 0 }}
                                 </span>
                                 @endif
                                 @endif
@@ -164,19 +165,19 @@
                                     </p>
                                 </div>
                             </div>
-                            @elseif($selectedList && $this->lists->firstWhere('id', $selectedList)?->emails_count != 0)
+                            @elseif($selectedList && $this->lists->firstWhere('name', $selectedList)?->emails_count != 0)
                             <div class="flex gap-1.5 items-start text-red-600 sm:gap-2 dark:text-red-500">
                                 <i class="mt-0.5 text-xs sm:text-sm fas fa-exclamation-triangle"></i>
                                 <div>
                                     <p class="font-medium">Warning</p>
                                     <p class="mt-0.5 text-xs text-neutral-600 dark:text-neutral-400">
-                                        Delete all {{ $this->lists->firstWhere('id', $selectedList)?->emails_count ?? 0
+                                        Delete all {{ $this->lists->firstWhere('name', $selectedList)?->emails_count ?? 0
                                         }} emails
                                         from "{{ $this->lists->firstWhere('id', $selectedList)?->name }}"
                                     </p>
                                 </div>
                             </div>
-                            @elseif($selectedList && $this->lists->firstWhere('id', $selectedList)?->emails_count == 0)
+                            @elseif($selectedList && $this->lists->firstWhere('name', $selectedList)?->emails_count == 0)
                             <div class="flex gap-1.5 items-start text-yellow-600 sm:gap-2 dark:text-yellow-500">
                                 <i class="mt-0.5 text-xs sm:text-sm fas fa-exclamation-circle"></i>
                                 <div>
@@ -228,6 +229,11 @@
 
         </div>
 
+
+
+
+
+
         <!-- Tabs -->
         <div x-data="{
                                 selectedTab: @entangle('selectedList').live,
@@ -265,7 +271,7 @@
                             }">
             <div class="flex relative items-center">
                 <!-- Left Scroll Button -->
-                <button x-show="isScrollable && !hasScrolledToStart" x-on:click="scrollLeft"
+                <button x-cloak x-show="isScrollable && !hasScrolledToStart" x-on:click="scrollLeft"
                     class="absolute left-0 z-10 p-2 rounded-full shadow-md transition-all text-neutral-600 bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                     style="transform: translateX(-50%);">
                     <i class="fas fa-chevron-left"></i>
@@ -278,11 +284,11 @@
                     @foreach($this->lists as $list)
                     <div class="flex items-center px-4 py-2 rounded-lg transition-all text-md group text-nowrap hover:bg-neutral-100 dark:hover:bg-neutral-800"
                         :class="{
-                                            'bg-neutral-100 dark:bg-neutral-800 border-b-2 border-neutral-600 dark:border-orange-500': selectedTab == {{ $list->id }},
-                                            'bg-neutral-50 dark:bg-neutral-900': selectedTab != {{ $list->id }}
+                                            'bg-neutral-100 dark:bg-neutral-800 border-b-2 border-neutral-600 dark:border-orange-500': selectedTab == '{{ $list->name }}',
+                                            'bg-neutral-50 dark:bg-neutral-900': selectedTab != '{{ $list->name }}'
                                         }">
-                        <button type="button" x-on:click="selectedTab = {{ $list->id }}"
-                            wire:click.debounce.100ms="selectList({{ $list->id }})"
+                        <button type="button" x-on:click="selectedTab = '{{ $list->name }}'"
+                            wire:click.debounce.100ms="selectList('{{ $list->name }}')"
                             class="mr-2 font-medium text-neutral-600 dark:text-neutral-300">
                             {{ $list->name }}
                             <span class="text-xs text-neutral-500 dark:text-neutral-400">({{ $list->emails_count
@@ -308,7 +314,7 @@
                 </div>
 
                 <!-- Right Scroll Button -->
-                <button x-show="isScrollable && !hasScrolledToEnd" x-on:click="scrollRight"
+                <button x-cloak x-show="isScrollable && !hasScrolledToEnd" x-on:click="scrollRight"
                     class="absolute right-0 z-10 p-2 rounded-full shadow-md transition-all text-neutral-600 bg-neutral-50 dark:bg-neutral-900 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
                     style="transform: translateX(50%);">
                     <i class="fas fa-chevron-right"></i>
@@ -392,7 +398,7 @@
                                     </div>
 
                                     <!-- History Records -->
-                                    <div x-show="isExpanded" x-collapse class="mt-2">
+                                    <div x-cloak x-show="isExpanded" x-collapse class="mt-2">
                                         @if($email->history->count() > 0)
                                         <div class="space-y-2">
                                             @foreach($email->history->sortByDesc('sent_time') as $record)
@@ -537,6 +543,15 @@
 
         </div>
 
+
+
+
+
+
+
+
+
+
         <!-- Modals -->
         <x-modal name="create-list" maxWidth="md">
             <div class="p-6">
@@ -607,7 +622,7 @@
                         <x-secondary-button x-on:click="$dispatch('close-modal', 'edit-email-modal')">
                             Cancel
                         </x-secondary-button>
-                        <x-primary-create-button  type="submit">
+                        <x-primary-create-button type="submit">
                             Update
                         </x-primary-create-button>
                     </div>

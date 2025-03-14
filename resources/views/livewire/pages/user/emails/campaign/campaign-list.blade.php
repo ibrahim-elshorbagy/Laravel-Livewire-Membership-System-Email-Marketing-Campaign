@@ -91,9 +91,11 @@
                     <td class="p-4">
                         <div class="flex flex-wrap gap-1 text-nowrap">
                             @foreach($campaign->emailLists as $list)
-                            <span class="px-2 py-1 text-xs text-green-500 rounded-full bg-green-500/10">
-                                {{ $list->name }}
-                            </span>
+                            <a href="{{ route('user.emails.index') }}?selectedList={{ $list->name }}">
+                                <span class="px-2 py-1 text-xs text-green-500 rounded-full bg-green-500/10">
+                                    {{ $list->name }}
+                                </span>
+                            </a>
                             @endforeach
                         </div>
                     </td>

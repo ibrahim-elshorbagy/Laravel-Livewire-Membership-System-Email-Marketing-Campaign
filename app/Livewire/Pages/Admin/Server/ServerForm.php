@@ -121,7 +121,7 @@ class ServerForm extends Component
             } else {
                 // Handle multiple server creation
                 $serverNames = Str::of($validatedData['servers'])
-                    ->explode(',')
+                    ->explode("\n")
                     ->map(fn($name) => trim($name))
                     ->filter()
                     ->unique()

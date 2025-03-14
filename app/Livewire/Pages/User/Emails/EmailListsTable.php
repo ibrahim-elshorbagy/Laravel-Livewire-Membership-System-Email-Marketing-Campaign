@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Url;
 
 
 class EmailListsTable extends Component
@@ -35,7 +36,9 @@ class EmailListsTable extends Component
     public $editEmail = '';
     public $editName = '';
 
-    public $selectedList = null;
+    #[Url]
+    public $selectedList = '';
+
     public $listName = '';
     public $editingListId = null;
 
@@ -60,6 +63,7 @@ class EmailListsTable extends Component
             'perPage' => 'required|integer|in:10,25,50,100',
             'sortDirection' => ['required', 'string', Rule::in(['asc', 'desc'])],
             'selectedEmails' => 'array',
+            'selectedList' => 'nullable|string|max:255',
             'selectedEmails.*' => [
                 'required',
                 Rule::exists('email_lists', 'id')->where(function ($query) {
@@ -236,7 +240,9 @@ class EmailListsTable extends Component
                     ->orderBy('sent_time', 'desc');
             }])
             ->where('user_id', Auth::id())
-            ->where('list_id', $this->selectedList);
+            ->whereHas('emailListName', function($query) {
+                $query->where('name', $this->selectedList);
+            });
 
         // Apply search filters only if search term exists
         if (trim($this->search)) {
@@ -459,13 +465,13 @@ class EmailListsTable extends Component
         }
     }
 
-    public function selectList($listId)
+    public function selectList($listName)
     {
-        if ($this->selectedList !== $listId) {
-            $this->selectedList = $listId;
+        if ($this->selectedList !== $listName) {
+            $this->selectedList = $listName;
             $this->resetPage();
             $this->resetSelections();
-            $this->dispatch('tabSelected', $listId);
+            $this->dispatch('tabSelected', $listName);
         }
     }
 
