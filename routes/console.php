@@ -6,11 +6,12 @@ use Illuminate\Support\Facades\Log;
 
 
 Schedule::call(function () {
-    Log::info("Cron Works at test_6");
+    Log::info("Cron Works at test_7");
 });
 
-Schedule::command('queue:work --queue=default,high --tries=5 --max-time=86400', [])
-    ->withoutOverlapping(86400)
+Schedule::command('queue:work --queue=default,high --tries=5 --stop-when-empty', [])
+    ->everyTenSeconds()
+    ->withoutOverlapping()
     ->before(function () {
         Log::info('Starting queue:work...');
     })

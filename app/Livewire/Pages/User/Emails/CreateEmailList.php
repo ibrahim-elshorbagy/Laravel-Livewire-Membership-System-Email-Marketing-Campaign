@@ -50,12 +50,14 @@ class CreateEmailList extends Component
         $this->emailLists = EmailListName::where('user_id', $this->user->id)->get();
 
         $listId = request()->validate([
-            'list_id' => 'nullable|integer|exists:email_list_names,id'
-        ])['list_id'] ?? null;
+            'list_id' => 'nullable|string|exists:email_list_names,name'])['list_id'] ?? null;
 
         if ($listId) {
 
-                $this->list_id = $listId;
+                $list = EmailListName::where('user_id', $this->user->id)->where('name', $listId)->first();
+                if ($list) {
+                    $this->list_id = $list->id;
+                }
             }
 
         if ($this->remainingQuota == 0 || $this->hasActiveJobs()) {
@@ -77,16 +79,17 @@ class CreateEmailList extends Component
     public function processFile()
     {
         try {
-            $this->validate([
+            $data = $this->validate([
                 'file' => 'required|file',
                 'list_id' => 'required|exists:email_list_names,id',
             ]);
+
 
             $path = $this->file->store('temp-emails');
 
             ProcessEmailFile::dispatch(
                 $path,
-                $this->user->id,
+                $this->userId,
                 $this->remainingQuota,
                 $this->list_id,
             );
