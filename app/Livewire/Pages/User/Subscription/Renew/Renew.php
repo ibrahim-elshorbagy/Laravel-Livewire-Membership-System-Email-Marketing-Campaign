@@ -14,7 +14,6 @@ class Renew extends Component
 {
     use LivewireAlert, PaypalPaymentService;
     public $paymentUrl;
-    public $isProcessing = false;
 
 
 
@@ -25,7 +24,6 @@ class Renew extends Component
 
     public function initiatePayment()
     {
-
         if (!auth()->user()->hasVerifiedEmail()) {
             $this->alert('warning', 'Please verify your email address before subscribing.',['position' => 'center']);
             return;
@@ -57,7 +55,8 @@ class Renew extends Component
                     'showLoaderOnConfirm' => true,
                     'allowOutsideClick' => false,
                     'onConfirmed' => 'confirmed',
-                    'onDismissed' => 'cancelled',
+                    // 'onDismissed' => 'cancelled',
+                    // 'preConfirm' => true
                 ]);
 
             return;
@@ -75,15 +74,13 @@ class Renew extends Component
     // New method to handle cancellation
     public function handleCancelled()
     {
-        Log::info('Cancellation received');
-        $this->isProcessing = false;
+
         $this->alert('info', 'Subscription change cancelled',['position' => 'center']);
     }
 
     public function proceedWithPayment()
     {
         // Log::info('proceedWithPayment called');
-        $this->isProcessing = true;
 
         try {
             // Verify webhook first
@@ -122,7 +119,7 @@ class Renew extends Component
             return redirect()->away($approvalUrl);
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->isProcessing = false;
+
             $this->alert('error', 'Failed to initiate payment: ' . $e->getMessage());
         }
     }
