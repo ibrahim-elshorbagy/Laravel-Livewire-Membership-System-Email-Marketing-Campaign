@@ -40,7 +40,7 @@
                                     <span class="capitalize">{{$subscription['periodicity_type']}}</span>
                                 </div>
                                 <a wire:navigate href="{{ route('our.plans') }}"
-                                    class="px-2 py-1 text-xs font-medium text-blue-500 bg-indigo-100 rounded-full dark:text-blue-400 dark:bg-blue-500/10">Upgrade</a>
+                                    class="px-2 py-1 text-xs font-medium text-blue-500 bg-indigo-100 rounded-full dark:text-blue-400 dark:bg-blue-500/10">Upgrade / Downgrade</a>
                             </div>
 
                             <!-- Right side: Subscription details -->

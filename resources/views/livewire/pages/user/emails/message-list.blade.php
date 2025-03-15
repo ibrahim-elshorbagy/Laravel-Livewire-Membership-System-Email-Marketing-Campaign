@@ -75,7 +75,12 @@
                         <input type="checkbox" wire:model.live="selectedTemplates" value="{{ $message->id }}"
                             class="rounded">
                     </td>
-                    <td class="p-4">{{ $message->email_subject }}</td>
+                    <td class="p-4">
+                        <div>
+                            <p class="text-xs">{{ $message->message_title }}</p>
+                            <p>{{ $message->email_subject }}</p>
+                        </div>
+                    </td>
                     <td class="p-4">{{ $message->created_at->timezone(auth()->user()->timezone ??
                         $globalSettings['APP_TIMEZONE'])->format('d / m / Y') }}</td>
                     <td class="p-4">

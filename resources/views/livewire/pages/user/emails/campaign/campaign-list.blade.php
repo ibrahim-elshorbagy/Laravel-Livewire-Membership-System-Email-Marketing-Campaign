@@ -77,6 +77,9 @@
                             <span class="text-sm text-neutral-600 dark:text-neutral-400">
                                 {{ $campaign->message->message_title }}
                             </span>
+                            <span class="text-xs text-neutral-600 dark:text-neutral-400">
+                                {{ $campaign->message->email_subject }}
+                            </span>
                         </div>
                     </td>
                     <td class="p-4">

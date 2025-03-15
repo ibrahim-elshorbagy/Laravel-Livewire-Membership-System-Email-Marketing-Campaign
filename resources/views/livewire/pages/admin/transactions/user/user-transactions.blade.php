@@ -1,9 +1,9 @@
 <div
-    class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+    class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <!-- Header -->
-    <div class="flex flex-col items-center justify-between gap-5 mb-6 md:flex-row">
+    <div class="flex flex-col gap-5 justify-between items-center mb-6 md:flex-row">
 
-        <div class="flex flex-col items-center gap-2 mt-4 w-max md:mt-0">
+        <div class="flex flex-col gap-2 items-center mt-4 w-max md:mt-0">
             <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
                 Transactions for
             </h2>
@@ -16,15 +16,15 @@
                 </div>
             </div>
         </div>
-        <x-primary-info-button href="{{ route('admin.subscriptions') }}" wire:navigate>
-            Back to Subscribers
+        <x-primary-info-button href="{{ route('admin.payment.transactions') }}" wire:navigate>
+            Back to Transactions
         </x-primary-info-button>
     </div>
 
     <!-- Tabs -->
     <div x-data="{ selectedTab: @entangle('selectedTab') }" class="w-full">
         <!-- Tab buttons -->
-        <div class="flex gap-2 mb-5 overflow-x-auto border-b border-neutral-300 dark:border-neutral-700" role="tablist">
+        <div class="flex overflow-x-auto gap-2 mb-5 border-b border-neutral-300 dark:border-neutral-700" role="tablist">
             <button x-on:click="selectedTab = 'all'"
                 :class="selectedTab === 'all' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">All</button>

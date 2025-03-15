@@ -151,7 +151,7 @@
                             <x-primary-info-button
                                 onclick="confirm('Are you sure you want to impersonate this user?') || event.stopImmediatePropagation()"
                                 wire:click="impersonateUser({{ $subscriber->id }})">
-                                Login As
+                                Login
                             </x-primary-info-button>
                             @endif
                             <x-primary-info-button x-on:click="$dispatch('open-modal', 'subscription-note-{{ $subscription->id }}')">

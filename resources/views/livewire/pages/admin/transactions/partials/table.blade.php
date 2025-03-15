@@ -89,13 +89,13 @@
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </x-primary-info-button>
                             <x-primary-info-button href="{{ route('admin.users.transactions', $user) }}" wire:navigate>
-                                View Transactions
+                                View
                             </x-primary-info-button>
                             @if(!$user->deleted_at)
                             <x-primary-info-button
                                 onclick="confirm('Are you sure you want to impersonate this user?') || event.stopImmediatePropagation()"
                                 wire:click="impersonateUser({{ $user->id }})">
-                                Login As
+                                Login
                             </x-primary-info-button>
                             @endif
                         </div>
