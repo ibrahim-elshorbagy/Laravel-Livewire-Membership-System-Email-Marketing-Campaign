@@ -33,7 +33,7 @@ class SubscriptionRenewedNotification extends Notification
             ->line('Plan: ' . $this->subscription->plan->name)
             ->line('Duration: ' . $this->subscription->plan->periodicity_type)
             ->line('Amount: $' . number_format($this->subscription->plan->price, 2))
-            ->line('Next Billing Date: ' . $this->subscription->expires_at->format('F j, Y'))
+            ->line('Next Billing Date: ' . ($this->subscription->expired_at ? $this->subscription->expired_at->format('F j, Y') : 'Not Available'))
             // ->action('View Subscription Details', url('/dashboard/subscription'))
             ->line('Thank you for continuing your subscription with us!')
             ->line('If you have any questions, please don\'t hesitate to contact our support team.');

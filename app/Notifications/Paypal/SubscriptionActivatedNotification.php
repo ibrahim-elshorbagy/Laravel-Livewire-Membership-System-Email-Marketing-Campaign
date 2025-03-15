@@ -35,7 +35,7 @@ class SubscriptionActivatedNotification extends Notification
             ->line('Amount: $' . number_format($this->subscription->plan->price, 2))
             ->line('Start Date: ' . $this->subscription->created_at->format('F j, Y'))
             ->line('Next Billing Date: ' . $this->subscription->created_at->addMonth()->format('F j, Y'))
-            ->line('Your subscription will automatically renew each ' . strtolower($this->subscription->plan->periodicity_type) . '.')
+            // ->line('Your subscription will automatically renew each ' . strtolower($this->subscription->plan->periodicity_type) . '.')
             // ->action('View Subscription Details', config('app.after_success_payment_url'))
             ->line('Thank you for subscribing to our service!')
             ->line('If you have any questions, please don\'t hesitate to contact our support team.');

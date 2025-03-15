@@ -99,6 +99,37 @@ class PayPalWebhookJob extends ProcessWebhookJob
                 'payment_id' => $payment->id
             ]);
 
+            // Check if there's an error in the capture response
+            if (isset($captureResponse['error'])) {
+                $errorDetails = $captureResponse['error'];
+
+                // Update payment status to failed
+                $payment->update([
+                    'status' => 'failed',
+                    'transaction_id' => $orderId
+                ]);
+
+                $this->logPayPalResponse($payment->user_id, 'failed', [
+                    'error' => 'Payment capture failed: ' . ($errorDetails['message'] ?? 'Unknown error'),
+                    'error_details' => $errorDetails,
+                    'order_id' => $orderId
+                ]);
+                PayPalLogger::error('Payment capture failed', [
+                    'error_details' => $errorDetails,
+                    'order_id' => $orderId,
+                    'payment_id' => $payment->id
+                ]);
+                return;
+            }
+
+            if (!isset($captureResponse['status']) || $captureResponse['status'] !== 'COMPLETED') {
+                PayPalLogger::error('Unexpected capture response status', [
+                    'response' => $captureResponse,
+                    'order_id' => $orderId,
+                    'payment_id' => $payment->id
+                ]);
+            }
+
         } catch (\Exception $e) {
             $this->logPayPalResponse(null, 'failed', [
                 'error' => 'Error processing order approval: ' . $e->getMessage(),
