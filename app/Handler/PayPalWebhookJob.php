@@ -5,6 +5,7 @@ namespace App\Handler;
 use App\Models\EmailList;
 use App\Models\Payment\Payment;
 use App\Notifications\Paypal\SubscriptionActivatedNotification;
+use App\Notifications\Paypal\SubscriptionRenewedNotification;
 use App\Services\PayPalLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -147,6 +148,8 @@ class PayPalWebhookJob extends ProcessWebhookJob
                             'subscription_id' => $subscription->id,
                         ]);
 
+                        $payment->user->notify(new SubscriptionRenewedNotification($subscription));
+
                     }else{ //New Subscription or Upgrade
 
                         $payment->user->lastSubscription()->suppress();
@@ -154,6 +157,8 @@ class PayPalWebhookJob extends ProcessWebhookJob
                         $payment->user->forceSetConsumption('Subscribers Limit',EmailList::where('user_id', $payment->user->id)->count());
                         $payment->user->forceSetConsumption('Email Sending',0);
 
+                        // Notify user
+                        $payment->user->notify(new SubscriptionActivatedNotification($subscription));
 
                         PayPalLogger::info('Upgrade Subscription ', [
                             'payment_id' => $payment->id,
@@ -170,8 +175,6 @@ class PayPalWebhookJob extends ProcessWebhookJob
                     'transaction_id' =>  $resource['id'] ?? null,
                 ]);
 
-                // Notify user
-                $payment->user->notify(new SubscriptionActivatedNotification($subscription));
 
                 $this->logPayPalResponse($payment->user_id, 'success', [
                     'message' => 'Payment processed successfully',
