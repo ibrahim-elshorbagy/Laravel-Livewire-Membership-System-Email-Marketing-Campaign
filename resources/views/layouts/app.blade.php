@@ -26,7 +26,7 @@
 </head>
 
 <body class="font-sans antialiased">
-    <div x-data="{ sidebarIsOpen: false }" >
+    <div x-data="{ sidebarIsOpen: false }">
 
         <!-- Mobile sidebar overlay -->
         <div x-cloak x-show="sidebarIsOpen" class="fixed inset-0 z-20 backdrop-blur-sm bg-neutral-950/10 md:hidden"
@@ -36,14 +36,14 @@
         <nav x-cloak
             class="flex fixed left-0 z-30 flex-col p-4 w-60 border-r transition-transform duration-300 h-svh shrink-0 border-neutral-300 bg-neutral-50 md:hidden md:w-64 md:translate-x-0 dark:border-neutral-700 dark:bg-neutral-900"
             x-bind:class="sidebarIsOpen ? 'translate-x-0' : '-translate-x-60'">
-            <a href="https://www.gemailapp.com/" class="mb-4 ml-2 w-12 text-2xl font-bold text-neutral-900 dark:text-white">
+            <a href="https://www.gemailapp.com/"
+                class="mb-4 ml-2 w-12 text-2xl font-bold text-neutral-900 dark:text-white">
                 <x-application-logo />
             </a>
 
             <div class="flex overflow-y-auto flex-col gap-2 pb-3">
                 @auth
-                <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
-                    wire:navigate>
+                <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}" wire:navigate>
                     <span>Dashboard</span>
                 </x-nav-link>
                 @endauth
@@ -64,14 +64,16 @@
                     wire:navigate>
                     <span>Mailing list</span>
                 </x-nav-link>
-                <x-nav-link :active="request()->routeIs('user.email-messages')" href="{{ route('user.email-messages') }}"
-                    wire:navigate>
+                <x-nav-link :active="request()->routeIs('user.email-messages')"
+                    href="{{ route('user.email-messages') }}" wire:navigate>
                     <span>Messages</span>
                 </x-nav-link>
-                <x-nav-link :active="request()->routeIs('user.servers')" href="{{ route('user.servers') }}" wire:navigate>
+                <x-nav-link :active="request()->routeIs('user.servers')" href="{{ route('user.servers') }}"
+                    wire:navigate>
                     <span>Servers</span>
                 </x-nav-link>
-                <x-nav-link :active="request()->routeIs('user.campaigns.list')" href="{{ route('user.campaigns.list') }}" wire:navigate>
+                <x-nav-link :active="request()->routeIs('user.campaigns.list')"
+                    href="{{ route('user.campaigns.list') }}" wire:navigate>
                     <span>Campaigns</span>
                 </x-nav-link>
                 <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}"
@@ -93,7 +95,8 @@
                     href="{{ route('admin.subscriptions') }}" wire:navigate>
                     <span>Subscriptions</span>
                 </x-nav-link>
-                <x-nav-link :active="request()->routeIs('admin.payment.transactions') || request()->routeIs('admin.users.transactions')"
+                <x-nav-link
+                    :active="request()->routeIs('admin.payment.transactions') || request()->routeIs('admin.users.transactions')"
                     href="{{ route('admin.payment.transactions') }}" wire:navigate>
                     <span>Transactions</span>
                 </x-nav-link>
@@ -101,7 +104,8 @@
                     <span>Plans</span>
                 </x-nav-link>
 
-                <x-nav-link :active="request()->routeIs('admin.servers')" href="{{ route('admin.servers') }}" wire:navigate>
+                <x-nav-link :active="request()->routeIs('admin.servers')" href="{{ route('admin.servers') }}"
+                    wire:navigate>
                     <span>Servers</span>
                 </x-nav-link>
                 @endrole
@@ -128,8 +132,8 @@
                         </x-nav-link>
                     </li>
                     <li class="px-1 py-0.5 first:mt-2">
-                        <x-nav-link :active="request()->routeIs('admin.payment.paypal.responses')" href="{{ route('admin.payment.paypal.responses') }}"
-                            wire:navigate>
+                        <x-nav-link :active="request()->routeIs('admin.payment.paypal.responses')"
+                            href="{{ route('admin.payment.paypal.responses') }}" wire:navigate>
                             <span>Paypal Responses</span>
                         </x-nav-link>
                     </li>
@@ -140,20 +144,20 @@
                         </x-nav-link>
                     </li>
                     <li class="px-1 py-0.5">
-                        <x-nav-link :active="request()->routeIs('admin.site-prohibited-words')" href="{{ route('admin.site-prohibited-words') }}"
-                            wire:navigate>
+                        <x-nav-link :active="request()->routeIs('admin.site-prohibited-words')"
+                            href="{{ route('admin.site-prohibited-words') }}" wire:navigate>
                             <span>Prohibited Words</span>
                         </x-nav-link>
                     </li>
                     <li class="px-1 py-0.5">
-                        <x-nav-link :active="request()->routeIs('admin.site-api-errors')" href="{{ route('admin.site-api-errors') }}"
-                            wire:navigate>
+                        <x-nav-link :active="request()->routeIs('admin.site-api-errors')"
+                            href="{{ route('admin.site-api-errors') }}" wire:navigate>
                             <span>Api Errors</span>
                         </x-nav-link>
                     </li>
                     <li class="px-1 py-0.5">
-                        <x-nav-link :active="request()->routeIs('admin.site-api-requests')" href="{{ route('admin.site-api-requests') }}"
-                            wire:navigate>
+                        <x-nav-link :active="request()->routeIs('admin.site-api-requests')"
+                            href="{{ route('admin.site-api-requests') }}" wire:navigate>
                             <span>Api Requests</span>
                         </x-nav-link>
                     </li>
@@ -206,10 +210,12 @@
                             href="{{ route('user.email-messages') }}" wire:navigate>
                             <span class="text-nowrap">Messages</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.servers')" href="{{ route('user.servers') }}" wire:navigate>
+                        <x-nav-link :active="request()->routeIs('user.servers')" href="{{ route('user.servers') }}"
+                            wire:navigate>
                             <span>Servers</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.campaigns.list')" href="{{ route('user.campaigns.list') }}" wire:navigate>
+                        <x-nav-link :active="request()->routeIs('user.campaigns.list')"
+                            href="{{ route('user.campaigns.list') }}" wire:navigate>
                             <span>Campaigns</span>
                         </x-nav-link>
                         <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}"
@@ -242,7 +248,8 @@
                             <span>Plans</span>
                         </x-nav-link>
 
-                        <x-nav-link :active="request()->routeIs('admin.servers')" href="{{ route('admin.servers') }}" wire:navigate>
+                        <x-nav-link :active="request()->routeIs('admin.servers')" href="{{ route('admin.servers') }}"
+                            wire:navigate>
                             <span>Servers</span>
                         </x-nav-link>
                         <!-- Dropdown menu -->
@@ -265,10 +272,12 @@
                                 href="{{ route('admin.site-prohibited-words') }}" wire:navigate>
                                 <span>Prohibited Words</span>
                             </x-nav-link>
-                            <x-nav-link :active="request()->routeIs('admin.site-api-errors')" href="{{ route('admin.site-api-errors') }}" wire:navigate>
+                            <x-nav-link :active="request()->routeIs('admin.site-api-errors')"
+                                href="{{ route('admin.site-api-errors') }}" wire:navigate>
                                 <span>Api Errors</span>
                             </x-nav-link>
-                            <x-nav-link :active="request()->routeIs('admin.site-api-requests')" href="{{ route('admin.site-api-requests') }}" wire:navigate>
+                            <x-nav-link :active="request()->routeIs('admin.site-api-requests')"
+                                href="{{ route('admin.site-api-requests') }}" wire:navigate>
                                 <span>Api Requests</span>
                             </x-nav-link>
                         </x-primary-dropdown>
@@ -347,7 +356,8 @@
             </nav>
 
             <!-- Main content -->
-            <main class="flex-1 {{ request()->routeIs('login', 'register','password.request','password.reset','verification.notice','verification.verify','password.confirm') ? '' : 'py-2 px-2 md:mx-4 my-4 ' }}">
+            <main
+                class="flex-1 {{ request()->routeIs('login', 'register','password.request','password.reset','verification.notice','verification.verify','password.confirm') ? '' : 'py-2 px-2 md:mx-4 my-4 ' }}">
                 {{ $slot }}
             </main>
 
@@ -378,6 +388,33 @@
                         timer: 3000,
                         // timerProgressBar: true,
                     });
+    </script>
+    @endif
+
+    @if (session('welcome-flash'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: '<div class="text-2xl font-bold text-primary-600 dark:text-primary-400">Welcome To {{ config('app.name', 'Laravel') }}! 🎉</div>',
+            html: '<div class="mt-2 text-base text-neutral-600 dark:text-neutral-400">{{ session('welcome-flash') }}</div>',
+            toast: true,
+            position: 'center',
+            showConfirmButton: false,
+            timer: 6000,
+            timerProgressBar: true,
+            background: 'bg-white dark:bg-neutral-800',
+            customClass: {
+                popup: 'p-6 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 max-w-md w-11/12',
+                title: 'p-0 mb-1',
+                htmlContainer: 'p-0'
+            },
+            showClass: {
+                popup: 'animate-fade-up animate-duration-300'
+            },
+            hideClass: {
+                popup: 'animate-fade-down animate-duration-300'
+            }
+        });
     </script>
     @endif
 

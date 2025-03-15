@@ -3,11 +3,30 @@
 namespace App\Livewire\Pages\Admin\Dashboard;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 
 class WelcomeSection extends Component
 {
 
+    /**
+     * Send an email verification notification to the current user.
+     */
+    public function sendVerification(): void
+    {
+        $user = Auth::user();
+
+        if ($user->hasVerifiedEmail()) {
+            $this->redirectIntended(default: route('dashboard', absolute: false));
+
+            return;
+        }
+
+        $user->sendEmailVerificationNotification();
+
+        Session::flash('status', 'verification-link-sent');
+    }
     public function render()
     {
         $user = auth()->user();

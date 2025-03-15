@@ -88,11 +88,11 @@ new class extends Component
         <i class="fa-solid fa-info fa-2xl"></i>
         <div>
             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                {{ __('Profile Information') }}
+                Profile Information
             </h2>
 
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                {{ __("Update your account's profile information") }}
+                Update your account's profile information
             </p>
         </div>
     </header>
@@ -151,14 +151,6 @@ new class extends Component
                 <div class="flex items-center mt-1 text-gray-900 dark:text-gray-100">
                     <i class="fas fa-envelope"></i>
                     <p class="ms-2">{{ auth()->user()->email }}</p>
-                    
-                    @role('user')
-                        @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && auth()->user()->hasVerifiedEmail())
-                            <p class="px-2 py-1 ml-3 text-sm font-medium text-green-600 bg-green-100 rounded-full dark:text-green-400 dark:bg-green-900/30">
-                                Verified
-                            </p>
-                        @endif
-                    @endrole
                 </div>
             </div>
 
@@ -169,31 +161,39 @@ new class extends Component
                     <p class="ms-2">{{ auth()->user()->username }}</p>
                 </div>
             </div>
+            @role('user')
             @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
                 <div>
                     <p class="mt-2 text-sm text-gray-800 dark:text-gray-200">
-                        {{ __('Your email address is unverified.') }}
+                        Your email address is unverified.
 
                         <button wire:click.prevent="sendVerification" class="text-sm text-gray-600 underline rounded-md dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
-                            {{ __('Click here to send the verification email.') }}
+                            Click here to send the verification email.
                         </button>
                     </p>
 
                     @if (session('status') === 'verification-link-sent')
                         <p class="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
-                            {{ __('A new verification link has been sent to your email address.') }}
+                            A new verification link has been sent to your email address.
                         </p>
                     @endif
                 </div>
+            @else
+            <div>
+                <p class="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
+                    Verified At. {{ auth()->user()->email_verified_at->timezone(auth()->user()->timezone ??$globalSettings['APP_TIMEZONE'])->format('d, M Y H:i') }}
+                </p>
+            </div>
             @endif
+            @endrole
 
         </div>
 
         <div class="flex gap-4 items-center">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <x-primary-button>Save</x-primary-button>
 
             <x-action-message class="me-3" on="profile-updated">
-                {{ __('Saved.') }}
+                Saved.
             </x-action-message>
         </div>
     </form>

@@ -18,9 +18,30 @@
                     <p class="mt-1 text-xs md:text-sm text-neutral-600 dark:text-neutral-400">
                         {{ now()->format('l, j F Y') }}
                     </p>
+
+                    @role('user')
+                        @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail)
+                            @if (!auth()->user()->hasVerifiedEmail())
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-800 dark:text-gray-200">
+                                    Unverified.
+                                    <button wire:click.prevent="sendVerification"
+                                        class="text-sm text-gray-600 underline rounded-md dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+                                        Click here to resend the verification email.
+                                    </button>
+                                </p>
+                                @if (session('status') === 'verification-link-sent')
+                                <p class="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
+                                    A new verification link has been sent to your email address.
+                                </p>
+                                @endif
+                            </div>
+                            @endif
+                        @endif
+                    @endrole
+
                 </div>
             </div>
-
 
             <!-- Subscription Info -->
             @if($subscription)

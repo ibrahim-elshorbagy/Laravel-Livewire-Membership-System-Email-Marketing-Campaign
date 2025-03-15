@@ -42,6 +42,11 @@ new #[Layout('layouts.app')] class extends Component
             }
             Auth::login($user);
 
+            defer(function() use ($user) {
+                event(new Registered($user));
+            });
+            
+            Session::flash('welcome-flash', 'Please check your email for verification instructions.');
             $this->redirect(route('dashboard', absolute: false), navigate: true);
         }
 }; ?>
