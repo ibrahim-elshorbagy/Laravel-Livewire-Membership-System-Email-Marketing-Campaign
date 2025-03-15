@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Livewire\Pages\Admin\Payment\Paypal\PaypalResponses;
 use App\Livewire\Pages\Admin\Payment\PaypalConfig;
 use App\Livewire\Pages\Admin\Plans\PlanManagement;
 use App\Livewire\Pages\Admin\Plans\PlanManagement\Edit as PlanManagementEdit;
@@ -55,6 +56,7 @@ use Livewire\Volt\Volt;
 
         // Payment Settings
         Route::get('/payment/paypal', PaypalConfig::class)->name('admin.payment.paypal');
+        Route::get('/payment/paypal-responses', PaypalResponses::class)->name('admin.payment.paypal.responses');
 
         Route::get('/transactions', Transactions::class)->name('admin.payment.transactions');
         Route::get('/transactions/{payment}/edit',EditPayment::class)->name('admin.transactions.edit');

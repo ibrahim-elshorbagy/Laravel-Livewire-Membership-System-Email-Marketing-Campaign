@@ -5,10 +5,13 @@ namespace App\Handler;
 use App\Models\EmailList;
 use App\Models\Payment\Payment;
 use App\Notifications\Paypal\SubscriptionActivatedNotification;
+use App\Services\PayPalLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\WebhookClient\Jobs\ProcessWebhookJob;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
+
+
 
 class PayPalWebhookJob extends ProcessWebhookJob
 {
@@ -29,13 +32,11 @@ class PayPalWebhookJob extends ProcessWebhookJob
         $eventType = $event['event_type'] ?? null;
         $resource = $event['resource'] ?? null;
 
-        Log::info('PayPal Webhook Received', [
-            'event_type' => $eventType,
-            'resource_id' => $resource['id'] ?? null,
-        ]);
-
         if (!$eventType || !$resource) {
-            Log::warning('Invalid webhook payload', ['payload' => $event]);
+            $this->logPayPalResponse(null, 'failed', [
+                'error' => 'Invalid webhook payload',
+                'payload' => $event
+            ]);
             return;
         }
 
@@ -49,7 +50,7 @@ class PayPalWebhookJob extends ProcessWebhookJob
                 break;
 
             default:
-                Log::info("Unhandled PayPal event type: {$eventType}");
+                PayPalLogger::info("Unhandled PayPal event type: {$eventType}");
                 break;
         }
     }
@@ -59,7 +60,10 @@ class PayPalWebhookJob extends ProcessWebhookJob
         $orderId = $resource['id'] ?? null;
 
         if (!$orderId) {
-            Log::warning('Order ID not found in resource', ['resource' => $resource]);
+            $this->logPayPalResponse(null, 'failed', [
+                'error' => 'Order ID not found in resource',
+                'resource' => $resource
+            ]);
             return;
         }
 
@@ -69,11 +73,14 @@ class PayPalWebhookJob extends ProcessWebhookJob
                 ->first();
 
             if (!$payment) {
-                Log::warning('Payment not found for order', ['order_id' => $orderId]);
+                $this->logPayPalResponse(null, 'failed', [
+                    'error' => 'No payment Found for this order (Order Approved)',
+                    'order_id' => $orderId
+                ]);
                 return;
             }
 
-            Log::info('CHECKOUT.ORDER.APPROVED : Order Approved by User', [
+            PayPalLogger::info('CHECKOUT.ORDER.APPROVED : Order Approved by User', [
                 'order_id' => $orderId,
                 'payment_id' => $payment->id,
                 'user_id' => $payment->user_id,
@@ -86,15 +93,15 @@ class PayPalWebhookJob extends ProcessWebhookJob
             $paypal = $this->initializePayPal();
             $captureResponse = $paypal->capturePaymentOrder($orderId);
 
-            Log::info('Payment Capture Response', [
+            PayPalLogger::info('Payment Capture Response', [
                 'response' => $captureResponse,
                 'payment_id' => $payment->id
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error processing order approval', [
+            $this->logPayPalResponse(null, 'failed', [
+                'error' => 'Error processing order approval: ' . $e->getMessage(),
                 'order_id' => $orderId,
-                'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
         }
@@ -104,7 +111,10 @@ class PayPalWebhookJob extends ProcessWebhookJob
     {
         $orderId = $resource['supplementary_data']['related_ids']['order_id'] ?? null;
         if (!$orderId) {
-            Log::warning('Order ID not found in payment completion', ['resource' => $resource]);
+            $this->logPayPalResponse(null, 'failed', [
+                'error' => 'Order ID not found in payment completion',
+                'resource' => $resource
+            ]);
             return;
         }
 
@@ -114,7 +124,8 @@ class PayPalWebhookJob extends ProcessWebhookJob
                 ->first();
 
             if (!$payment) {
-                Log::warning('Payment not found for completed payment', [
+                $this->logPayPalResponse(null, 'failed', [
+                    'error' => 'No payment Found for this order (Order Completed)',
                     'order_id' => $orderId,
                     'capture_id' => $resource['id'] ?? null
                 ]);
@@ -131,7 +142,7 @@ class PayPalWebhookJob extends ProcessWebhookJob
                         $payment->user->forceSetConsumption('Subscribers Limit',EmailList::where('user_id', $payment->user->id)->count());
                         $payment->user->forceSetConsumption('Email Sending',0);
 
-                        Log::info('Renew Subscription ', [
+                        PayPalLogger::info('Renew Subscription ', [
                             'payment_id' => $payment->id,
                             'subscription_id' => $subscription->id,
                         ]);
@@ -144,7 +155,7 @@ class PayPalWebhookJob extends ProcessWebhookJob
                         $payment->user->forceSetConsumption('Email Sending',0);
 
 
-                        Log::info('Upgrade Subscription ', [
+                        PayPalLogger::info('Upgrade Subscription ', [
                             'payment_id' => $payment->id,
                             'subscription_id' => $subscription->id,
                         ]);
@@ -162,23 +173,34 @@ class PayPalWebhookJob extends ProcessWebhookJob
                 // Notify user
                 $payment->user->notify(new SubscriptionActivatedNotification($subscription));
 
-                Log::info('handlePaymentCompleted : Payment Processed Successfully', [
+                $this->logPayPalResponse($payment->user_id, 'success', [
+                    'message' => 'Payment processed successfully',
                     'payment_id' => $payment->id,
                     'subscription_id' => $subscription->id,
                     'capture_id' => $resource['id'] ?? null,
-                    'amount' => $resource['amount']['value'] ?? null,
+                    'amount' => $resource['amount']['value'] ?? null
                 ]);
             });
 
         } catch (\Exception $e) {
-            Log::error('Error processing payment completion', [
+            $this->logPayPalResponse(null, 'failed', [
+                'error' => 'Error processing payment completion: ' . $e->getMessage(),
                 'order_id' => $orderId,
-                'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
         }
     }
 
-
+    protected function logPayPalResponse($userId, $status, array $responseData)
+    {
+        DB::table('paypal_responses')->insert([
+            'user_id' => $userId,
+            'transaction_id' => $responseData['order_id'] ?? $responseData['capture_id'] ?? null,
+            'status' => $status,
+            'response_data' => json_encode($responseData),
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+    }
 
 }

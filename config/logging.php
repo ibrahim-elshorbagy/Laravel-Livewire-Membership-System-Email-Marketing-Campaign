@@ -118,6 +118,13 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'paypal' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/paypal.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
+
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,

@@ -3,11 +3,24 @@
 namespace App\Services;
 
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
-use Illuminate\Support\Facades\Log;
+use App\Services\PayPalLogger;
+use Illuminate\Support\Facades\DB;
 
 trait PaypalPaymentService
 {
     protected $paypal;
+
+    protected function logPayPalResponse($userId, $status, array $responseData)
+    {
+        DB::table('paypal_responses')->insert([
+            'user_id' => $userId,
+            'transaction_id' => $responseData['order_id'] ?? $responseData['capture_id'] ?? null,
+            'status' => $status,
+            'response_data' => json_encode($responseData),
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+    }
 
     /**
      * Initialize PayPal Client with configuration and obtain access token.
@@ -17,21 +30,29 @@ trait PaypalPaymentService
      */
     public function initializePayPal()
     {
-
-        // Validate PayPal configuration
-        $paypalConfig = config('paypal');
-        $this->paypal = new PayPalClient();
-        $this->paypal->setApiCredentials($paypalConfig);
-
-        // Obtain Access Token
         try {
+            // Validate PayPal configuration
+            $paypalConfig = config('paypal');
+            $this->paypal = new PayPalClient();
+            $this->paypal->setApiCredentials($paypalConfig);
+
+            // Obtain Access Token
             $accessToken = $this->paypal->getAccessToken();
+            return $this->paypal;
+
         } catch (\Exception $e) {
-            Log::error('Failed to obtain PayPal Access Token: ' . $e->getMessage());
+            PayPalLogger::error('Failed to initialize PayPal', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            $this->logPayPalResponse(null, 'failed', [
+                'error' => 'PayPal initialization failed: ' . $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             throw $e;
         }
-
-        return $this->paypal;
     }
 
     /**
@@ -46,10 +67,10 @@ trait PaypalPaymentService
             $paypalClient = $this->initializePayPal();
 
             $webhookId = config('paypal.webhook_id');
-            Log::debug('Verifying PayPal Webhook Endpoint.', ['webhook_id' => $webhookId]);
+            PayPalLogger::info('Verifying PayPal Webhook Endpoint', ['webhook_id' => $webhookId]);
 
             $webhookData = $paypalClient->listWebhooks();
-            Log::debug('Retrieved PayPal Webhooks.', ['webhookData' => $webhookData]);
+            PayPalLogger::info('Retrieved PayPal Webhooks', ['webhookData' => $webhookData]);
 
             $webhooks = $webhookData['webhooks'] ?? [];
 
@@ -58,22 +79,41 @@ trait PaypalPaymentService
             });
 
             if (!$webhookExists) {
-                $message = 'Invalid PayPal Webhook configuration: Webhook ID not found.';
-                Log::error($message, ['configured_webhook_id' => $webhookId,"webhookExists"=>$webhookExists,'$webhookData'=>$webhookData]);
+                $message = 'Invalid PayPal Webhook configuration: Webhook Wrong.';
+                PayPalLogger::error($message, [
+                    'configured_webhook_id' => $webhookId,
+                    'webhookExists' => $webhookExists,
+                    'webhookData' => $webhookData
+                ]);
+
+                $this->logPayPalResponse(null, 'failed', [
+                    'error' => $message,
+                    'webhook_id' => $webhookId,
+                    'webhookData' => $webhookData
+                ]);
+
                 throw new \Exception($message);
             }
 
-            Log::info('PayPal Webhook verification successful.');
+            PayPalLogger::info('PayPal Webhook verification successful');
             return true;
+
         } catch (\Exception $e) {
-            // Log::error('PayPal Webhook Verification Error: ' . $e->getMessage(), [
-            //     'exception' => $e
-            // ]);
+            // There is error inside this file
+
+            PayPalLogger::error('Webhook verification failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            $this->logPayPalResponse(null, 'failed', [
+                'error' => 'Webhook verification failed: ' . $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             throw $e;
         }
     }
-
-
 
     public function createPayPalPayment($user, $plan, $payment)
     {
@@ -120,9 +160,29 @@ trait PaypalPaymentService
                 ]
             ];
 
+            PayPalLogger::info('Creating PayPal order', [
+                'user_id' => $user->id,
+                'plan_id' => $plan->id,
+                'payment_id' => $payment->id,
+                'amount' => $price
+            ]);
+
             $order = $this->paypal->createOrder($orderData);
 
             if (isset($order['error'])) {
+                $this->logPayPalResponse($user->id, 'error', [
+                    'order_id' => null,
+                    'error' => $order['error']['message'] ?? 'Unknown error',
+                    'user_id' => $user->id,
+                    'plan_id' => $plan->id,
+                    'payment_id' => $payment->id
+                ]);
+                PayPalLogger::error('Failed to create PayPal order', [
+                    'error' => $order['error']['message'] ?? 'Unknown error',
+                    'user_id' => $user->id,
+                    'plan_id' => $plan->id,
+                    'payment_id' => $payment->id
+                ]);
                 throw new \Exception($order['error']['message'] ?? 'Failed to create PayPal order');
             }
 
@@ -132,6 +192,10 @@ trait PaypalPaymentService
 
             foreach ($order['links'] as $link) {
                 if ($link['rel'] === 'approve') {
+                    PayPalLogger::info('PayPal order created successfully', [
+                        'order_id' => $order['id'],
+                        'payment_id' => $payment->id
+                    ]);
                     return $link['href'];
                 }
             }
@@ -139,14 +203,14 @@ trait PaypalPaymentService
             throw new \Exception('Failed to create PayPal order: No approval URL found');
 
         } catch (\Exception $e) {
-            Log::error('PayPal Payment Error', [
+            PayPalLogger::error('PayPal Payment Error', [
                 'error' => $e->getMessage(),
-                'user' => $user->id,
-                'plan' => $plan->id,
+                'user_id' => $user->id,
+                'plan_id' => $plan->id,
+                'payment_id' => $payment->id,
                 'amount' => $plan->price
             ]);
             throw $e;
         }
     }
-
 }
