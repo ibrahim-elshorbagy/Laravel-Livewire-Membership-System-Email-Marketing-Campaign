@@ -33,7 +33,8 @@ return new class extends Migration
             $table->string('currency')->default('USD');
             $table->enum('status', [
                 'pending',    // Payment initiated but not completed
-                'approved', // Payment successful On gateway
+                'processing', // Payment is being processed by gateway
+                'approved',   // Payment successful On gateway
                 'failed',    // Payment failed
                 'cancelled',  // Payment cancelled by user
                 'refunded'   // Refund initiated

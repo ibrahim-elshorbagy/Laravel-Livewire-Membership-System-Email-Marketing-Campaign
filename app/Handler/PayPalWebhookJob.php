@@ -42,11 +42,11 @@ class PayPalWebhookJob extends ProcessWebhookJob
         }
 
         switch ($eventType) {
-            case 'CHECKOUT.ORDER.APPROVED':
+            case 'CHECKOUT.ORDER.APPROVED': //This Hapends when the user approves the payment on PayPal But the payment is not completed
                 $this->handleOrderApproved($resource);
                 break;
 
-            case 'PAYMENT.CAPTURE.COMPLETED':
+            case 'PAYMENT.CAPTURE.COMPLETED': //This Hapends when the payment is completed
                 $this->handlePaymentCompleted($resource);
                 break;
 
@@ -93,6 +93,11 @@ class PayPalWebhookJob extends ProcessWebhookJob
             // Initialize PayPal and capture payment
             $paypal = $this->initializePayPal();
             $captureResponse = $paypal->capturePaymentOrder($orderId);
+
+            // Update payment status to processing
+            $payment->update([
+                'status' => 'processing'
+            ]);
 
             PayPalLogger::info('Payment Capture Response', [
                 'response' => $captureResponse,
