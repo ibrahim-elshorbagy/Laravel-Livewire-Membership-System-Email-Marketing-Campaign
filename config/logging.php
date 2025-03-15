@@ -125,6 +125,13 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'worker' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/worker.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
+
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,

@@ -3,26 +3,27 @@
 use App\Models\JobProgress;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
 
 
 Schedule::call(function () {
-    Log::info("Cron Works at test_7");
+    Log::channel('worker')->info('Cron Works at test_8');
 });
 
 Schedule::command('queue:work --queue=default,high --tries=5 --stop-when-empty', [])
     ->everyTenSeconds()
     ->withoutOverlapping()
     ->before(function () {
-        Log::info('Starting queue:work...');
+        Log::channel('worker')->info('Starting queue:work...');
     })
     ->after(function () {
-        Log::info('Queue worker completed successfully.');
+        Log::channel('worker')->info('Queue worker completed successfully.');
     })
     ->onFailure(function () {
-        Log::error('Queue worker failed.');
+        Log::channel('worker')->error('Queue worker failed.');
     })
     ->then(function () {
-        Log::info('Closed queue worker.');
+        Log::channel('worker')->info('Closed queue worker.');
     });
 
 
