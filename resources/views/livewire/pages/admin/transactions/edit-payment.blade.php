@@ -132,8 +132,8 @@
                     <x-primary-select-input wire:model="status" id="status" class="w-full">
                         <option>Select Status</option>
                         <option value="pending"> Pending</option>
-                        <option value="approved"> Approved</option>
                         <option value="processing">Processing</option>
+                        <option value="approved"> Approved</option>
                         <option value="failed"> Failed</option>
                         <option value="cancelled"> Cancelled</option>
                         <option value="refunded"> Refunded</option>

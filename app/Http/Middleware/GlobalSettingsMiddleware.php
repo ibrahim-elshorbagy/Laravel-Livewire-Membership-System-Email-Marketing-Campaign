@@ -61,8 +61,6 @@ class GlobalSettingsMiddleware
             'APP_TIMEZONE' => SiteSetting::getValue('APP_TIMEZONE'),
 
 
-            // Add more settings as needed...
-
             'footer_first_line' => SiteSetting::getValue('footer_first_line'),
             'footer_second_line' => SiteSetting::getValue('footer_second_line'),
         ];

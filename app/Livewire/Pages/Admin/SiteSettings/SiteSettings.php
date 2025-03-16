@@ -16,7 +16,7 @@ class SiteSettings extends Component
 {
     use WithFileUploads, LivewireAlert;
 
-    
+
     public $site_name;
     public $support_email;
     public $support_phone;
@@ -43,13 +43,18 @@ class SiteSettings extends Component
     public $footer_first_line;
     public $footer_second_line;
 
+    public $auth_image;
+    public $new_auth_image;
+    public $auth_image_preview;
+
 
     protected $rules = [
         'site_name' => 'required|string|max:255',
         'support_email' => 'required|email',
         'support_phone' => 'required|string|max:20',
-        'new_logo' => 'nullable|image|max:2048',
-        'new_favicon' => 'nullable|image|max:1024',
+        'new_logo' => 'nullable|image',
+        'new_favicon' => 'nullable|image',
+        'new_auth_image' => 'nullable|image',
         'meta_title' => 'nullable|string|max:255',
         'meta_description' => 'nullable|string|max:500',
         'meta_keywords' => 'nullable|string|max:255',
@@ -68,6 +73,7 @@ class SiteSettings extends Component
         $this->support_phone = SiteSetting::getValue('support_phone');
         $this->logo = SiteSetting::getValue('logo');
         $this->favicon = SiteSetting::getValue('favicon');
+        $this->auth_image = SiteSetting::getValue('auth_image');
         $this->meta_title = SiteSetting::getValue('meta_title');
         $this->meta_description = SiteSetting::getValue('meta_description');
         $this->meta_keywords = SiteSetting::getValue('meta_keywords');
@@ -78,6 +84,16 @@ class SiteSettings extends Component
         $this->our_devices = SiteSetting::getValue('our_devices');
     }
 
+    // Preview auth image
+    public function updatedNewAuthImage()
+    {
+        $this->validate([
+            'new_auth_image' => 'image|max:2048'
+        ]);
+
+        // Create a temporary preview
+        $this->auth_image_preview = $this->new_auth_image->temporaryUrl();
+    }
     // Preview logo
     public function updatedNewLogo()
     {
@@ -93,7 +109,7 @@ class SiteSettings extends Component
     public function updatedNewFavicon()
     {
         $this->validate([
-            'new_favicon' => 'image|max:1024'
+            'new_favicon' => 'image'
         ]);
 
         // Create a temporary preview
@@ -183,6 +199,22 @@ class SiteSettings extends Component
                 $this->favicon_preview = null; // Clear preview
             }
 
+
+            // Handle Auth Image Upload
+            if ($this->new_auth_image) {
+                // Delete old auth image if exists
+                if ($this->auth_image) {
+                    Storage::disk('public')->delete($this->auth_image);
+                }
+
+                // Store new auth image
+                $authImagePath = $this->new_auth_image->store('site/auth', 'public');
+                $this->updateSettingWithEnvironment('auth_image', $authImagePath, [
+                    'AUTH_IMAGE' => 'app.auth_image'
+                ]);
+                $this->auth_image = $authImagePath;
+                $this->auth_image_preview = null; // Clear preview
+            }
 
             // Clear the global settings cache
             GlobalSettingsMiddleware::clearCache();

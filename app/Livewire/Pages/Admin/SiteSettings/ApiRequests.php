@@ -6,12 +6,15 @@ use App\Models\Admin\Site\ApiRequest;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Livewire\Attributes\Url;
 
 class ApiRequests extends Component
 {
     use WithPagination, LivewireAlert;
 
+    #[Url]
     public $search = '';
+    
     public $sortField = 'request_time';
     public $sortDirection = 'desc';
     public $perPage = 10;

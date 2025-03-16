@@ -18,11 +18,13 @@ class CampaignList extends Component
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
     public $perPage = 10;
+    public $statusFilter = '';
 
     protected $queryString = [
         'search' => ['except' => ''],
         'sortField' => ['except' => 'created_at'],
         'sortDirection' => ['except' => 'desc'],
+        'statusFilter' => ['except' => ''],
     ];
 
     protected function rules()
@@ -32,6 +34,7 @@ class CampaignList extends Component
             'sortField' => 'required|in:title,created_at',
             'sortDirection' => 'required|in:asc,desc',
             'perPage' => 'required|integer|in:10,25,50',
+            'statusFilter' => 'nullable|string|in:Sending,Pause,Completed',
         ];
     }
 
@@ -96,6 +99,9 @@ class CampaignList extends Component
                           $messageQuery->where('message_title', 'like', '%' . $this->search . '%');
                       });
                 });
+            })
+            ->when($this->statusFilter, function ($query) {
+                $query->where('status', $this->statusFilter);
             })
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);

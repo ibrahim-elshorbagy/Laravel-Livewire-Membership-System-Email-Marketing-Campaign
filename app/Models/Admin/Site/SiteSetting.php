@@ -47,4 +47,10 @@ class SiteSetting extends Model
         return $faviconPath ? Storage::url($faviconPath) : asset($default);
     }
 
+    public static function getAuthImage(string $default = '/images/default-logo.png'): string
+    {
+        $auth_image_Path = self::getValue('auth_image');
+        return $auth_image_Path ? Storage::url($auth_image_Path) : asset($default);
+    }
+
 }

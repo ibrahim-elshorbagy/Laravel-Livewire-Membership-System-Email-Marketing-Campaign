@@ -1,4 +1,4 @@
-<div class="container p-6 mx-auto">
+<div class="container mx-auto">
     <div class="p-6 bg-white rounded-lg shadow-md dark:bg-neutral-800">
         <h2 class="mb-6 text-2xl font-bold text-neutral-800 dark:text-neutral-200">
             Site Settings
@@ -30,6 +30,33 @@
 
 
             <div class="grid gap-6 p-4 rounded-lg border md:grid-cols-2 border-neutral-200 dark:border-neutral-600">
+                <div>
+                    <x-input-label for="auth_image" :value="__('Auth Background Image')" />
+                    <x-primary-upload-button wire:model="new_auth_image" id="auth_image" type="file" accept="image/*"
+                        class="block mt-1 w-full" />
+
+                    <div class="flex items-center mt-2 space-x-4">
+                        @if($auth_image_preview)
+                        <div class="flex flex-col items-center">
+                            <span class="mb-2 text-sm text-neutral-600 dark:text-neutral-300">New Auth Image
+                                Preview</span>
+                            <img src="{{ $auth_image_preview }}" alt="New Auth Image Preview"
+                                class="w-auto h-20 rounded border dark:border-neutral-600">
+                        </div>
+                        @endif
+
+                        @if($auth_image)
+                        <div class="flex flex-col items-center">
+                            <span class="mb-2 text-sm text-neutral-600 dark:text-neutral-300">Current Auth Image</span>
+                            <img src="{{ Storage::url($auth_image) }}" alt="Current Auth Image"
+                                class="w-auto h-20 rounded border dark:border-neutral-600">
+                        </div>
+                        @endif
+                    </div>
+
+                    <x-input-error :messages="$errors->get('new_auth_image')" class="mt-2" />
+                </div>
+
                 <div>
                     <x-input-label for="logo" :value="__('Site Logo')" />
                     <x-primary-upload-button wire:model="new_logo" id="logo" type="file" accept="image/*"
@@ -137,12 +164,12 @@
                 <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
                     Site Access
                 </h3>
-                <div class="flex gap-5">
+                <div class="flex flex-col gap-5 md:flex-row">
                     <div>
                         <label for="maintenance" class="inline-flex gap-3 justify-between items-center px-4 py-1.5 rounded-lg min-w-52 bg-neutral-100 dark:bg-neutral-800">
 
                             <input id="maintenance" wire:model="maintenance" type="checkbox" class="sr-only peer" role="switch" />
-                            <span class="text-sm font-medium trancking-wide text-neutral-600 peer-checked:text-neutral-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-neutral-400 dark:peer-checked:text-neutral-100">Maintenance Mode</span>
+                            <span class="text-xs font-medium md:text-sm trancking-wide text-neutral-600 peer-checked:text-neutral-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-neutral-400 dark:peer-checked:text-neutral-100">Maintenance Mode</span>
 
                             <div class="relative h-6 w-11 after:h-5 after:w-5 peer-checked:after:translate-x-5 rounded-full bg-white after:absolute after:bottom-0 after:left-[0.0625rem] after:top-0 after:my-auto after:rounded-full after:bg-neutral-600 after:transition-all after:content-[''] peer-checked:bg-green-500 peer-checked:after:bg-neutral-100 peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-neutral-800 peer-focus:peer-checked:outline-black peer-active:outline-offset-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:border-neutral-700 dark:bg-neutral-950 dark:after:bg-neutral-400 dark:peer-checked:bg-orange-500 dark:peer-checked:after:bg-black dark:peer-focus:outline-neutral-300 dark:peer-focus:peer-checked:outline-orange-500" aria-hidden="true"></div>
 
@@ -153,7 +180,7 @@
                         <label for="our_devices" class="inline-flex gap-3 justify-between items-center px-4 py-1.5 rounded-lg min-w-52 bg-neutral-100 dark:bg-neutral-800">
 
                             <input id="our_devices" wire:model="our_devices" type="checkbox" class="sr-only peer" role="switch" />
-                            <span class="text-sm font-medium trancking-wide text-neutral-600 peer-checked:text-neutral-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-neutral-400 dark:peer-checked:text-neutral-100">Only Our Devices</span>
+                            <span class="text-xs font-medium md:text-sm trancking-wide text-neutral-600 peer-checked:text-neutral-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-neutral-400 dark:peer-checked:text-neutral-100">Only Our Devices</span>
 
                                 <div class="relative h-6 w-11 after:h-5 after:w-5 peer-checked:after:translate-x-5 rounded-full bg-white after:absolute after:bottom-0 after:left-[0.0625rem] after:top-0 after:my-auto after:rounded-full after:bg-neutral-600 after:transition-all after:content-[''] peer-checked:bg-green-500 peer-checked:after:bg-neutral-100 peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-neutral-800 peer-focus:peer-checked:outline-black peer-active:outline-offset-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:border-neutral-700 dark:bg-neutral-950 dark:after:bg-neutral-400 dark:peer-checked:bg-orange-500 dark:peer-checked:after:bg-black dark:peer-focus:outline-neutral-300 dark:peer-focus:peer-checked:outline-orange-500" aria-hidden="true"></div>
 

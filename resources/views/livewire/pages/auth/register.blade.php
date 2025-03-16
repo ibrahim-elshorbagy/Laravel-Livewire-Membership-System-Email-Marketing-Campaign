@@ -45,7 +45,7 @@ new #[Layout('layouts.app')] class extends Component
             defer(function() use ($user) {
                 event(new Registered($user));
             });
-            
+
             Session::flash('welcome-flash', 'Please check your email for verification instructions.');
             $this->redirect(route('dashboard', absolute: false), navigate: true);
         }
@@ -56,7 +56,7 @@ new #[Layout('layouts.app')] class extends Component
     <div class="hidden relative flex-col p-10 h-full text-white bg-muted lg:flex dark:border-r dark:border-neutral-800">
         <div class="absolute inset-0 bg-[#f7f7f7]"></div>
         <div class="absolute inset-0 bg-center bg-no-repeat bg-contain"
-            style="background-image: url({{ asset('assets/auth/auth.jpeg') }});">
+            style="background-image: url('{{ App\Models\Admin\Site\SiteSetting::getAuthImage() }}');">
         </div>
 
 

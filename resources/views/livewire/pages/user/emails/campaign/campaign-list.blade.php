@@ -36,6 +36,14 @@
                     <option value="created_at">Sort by Date</option>
                 </x-primary-select-input>
 
+                <x-primary-select-input wire:model.live="statusFilter" class="w-full sm:w-48">
+                    <option value="">All Status</option>
+                    <option value="Sending">Sending</option>
+                    <option value="Pause">Pause</option>
+                    <option value="Completed">Completed</option>
+                </x-primary-select-input>
+
+    
                 <x-primary-select-input wire:model.live="sortDirection" class="w-full sm:w-32">
                     <option value="asc">Ascending</option>
                     <option value="desc">Descending</option>

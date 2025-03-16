@@ -186,6 +186,10 @@
                                     <i class="fa-solid fa-note-sticky"></i>
                                 </button>
                             </div>
+                            <a href="{{ route('admin.site-api-requests') }}?search={{ $server->name }}" wire:navigate
+                                class="inline-flex gap-2 items-center px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-500/10 hover:bg-purple-500/20">
+                                API Requests
+                            </a>
                             <a href="{{ route('admin.servers.form', $server->id) }}"
                                 class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
                                 Edit

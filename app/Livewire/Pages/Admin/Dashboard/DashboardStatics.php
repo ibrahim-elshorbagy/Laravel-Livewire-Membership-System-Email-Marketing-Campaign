@@ -32,11 +32,12 @@ class DashboardStatics extends Component
             ->count();
 
         $totalCampaigns = Campaign::count();
-        $totalPayments = Payment::sum('amount');
+
+        $paymentCount = Payment::where('status', 'approved')->count();
+        $totalPayments = Payment::where('status', 'approved')->sum('amount');
 
         // New statistics
         $serverCount = Server::count();
-        $paymentCount = Payment::count();
         $totalEmailLists = EmailListName::count();
         $totalEmails = EmailList::count();
         $storedMessages = EmailMessage::count();
