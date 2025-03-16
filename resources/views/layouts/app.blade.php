@@ -363,7 +363,7 @@
 
             <!-- Footer -->
             <footer
-                class="py-3 mt-auto text-center border-t z-3 border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300">
+                class="py-3 mt-auto text-center border-t border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300">
 
                 <div>{{ $globalSettings['footer_first_line']}}</div>
                 <div>{{ $globalSettings['footer_second_line'] }}</div>

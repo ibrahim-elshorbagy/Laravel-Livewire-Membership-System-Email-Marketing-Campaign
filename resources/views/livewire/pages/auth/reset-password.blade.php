@@ -74,7 +74,7 @@ new #[Layout('layouts.app')] class extends Component
     <div class="hidden relative flex-col p-10 h-full text-white bg-muted lg:flex dark:border-r dark:border-neutral-800">
         <div class="absolute inset-0 bg-[#f7f7f7]"></div>
         <div class="absolute inset-0 bg-center bg-no-repeat bg-contain"
-            style="background-image: url({{ asset('assets/auth/auth.jpeg') }});"></div>
+            style="background-image: url('{{ App\Models\Admin\Site\SiteSetting::getAuthImage() }}');""></div>
 
     </div>
     <div class="flex justify-center items-center w-full h-full">
@@ -84,7 +84,7 @@ new #[Layout('layouts.app')] class extends Component
                 <!-- Email Address -->
                 <div>
                     <x-input-label for="email" :value="__('Email')" />
-                    <x-text-input wire:model="email" id="email" class="block w-full mt-1" type="email" name="email"
+                    <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email"
                         required autofocus autocomplete="username" />
                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                 </div>
@@ -92,7 +92,7 @@ new #[Layout('layouts.app')] class extends Component
                 <!-- Password -->
                 <div class="mt-4">
                     <x-input-label for="password" :value="__('Password')" />
-                    <x-text-input wire:model="password" id="password" class="block w-full mt-1" type="password"
+                    <x-text-input wire:model="password" id="password" class="block mt-1 w-full" type="password"
                         name="password" required autocomplete="new-password" />
                     <x-input-error :messages="$errors->get('password')" class="mt-2" />
                 </div>
@@ -102,13 +102,13 @@ new #[Layout('layouts.app')] class extends Component
                     <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
 
                     <x-text-input wire:model="password_confirmation" id="password_confirmation"
-                        class="block w-full mt-1" type="password" name="password_confirmation" required
+                        class="block mt-1 w-full" type="password" name="password_confirmation" required
                         autocomplete="new-password" />
 
                     <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
                 </div>
 
-                <div class="flex items-center justify-end mt-4">
+                <div class="flex justify-end items-center mt-4">
                     <x-primary-button>
                         {{ __('Reset Password') }}
                     </x-primary-button>
