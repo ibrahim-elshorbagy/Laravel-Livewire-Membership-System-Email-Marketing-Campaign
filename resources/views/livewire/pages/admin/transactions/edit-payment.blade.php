@@ -1,6 +1,6 @@
-    <div class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"">
+    <div class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"">
         <!-- Header -->
-        <div class="flex items-center justify-between mb-6 ">
+        <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Payment #{{ $payment->id }}</h2>
         <x-primary-info-button href="{{ route('admin.payment.transactions') }}" wire:navigate>
             Back to Payments
@@ -10,7 +10,7 @@
     <!-- Customer Info -->
     <div class="mb-6">
         <h3 class="mb-2 text-lg font-semibold text-gray-700 dark:text-gray-300">Customer</h3>
-        <div class="flex items-center gap-2 w-max">
+        <div class="flex gap-2 items-center w-max">
             <img class="object-cover rounded-full size-10" src="{{ $user->image_url ?? 'default-avatar.png' }}"
                 alt="{{ $user->first_name }}" />
             <div class="flex flex-col">
@@ -60,7 +60,7 @@
 
     <div class="space-y-6">
         <!-- Transaction Information Section -->
-        <div class="p-4 bg-white border rounded-lg dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
+        <div class="p-4 bg-white rounded-lg border dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
             <h3 class="mb-4 text-sm font-medium text-neutral-500 dark:text-neutral-400">
                 <span class="font-medium">{{ __('Transaction Information') }} </span>
                 <span
@@ -104,7 +104,7 @@
         </div>
 
         <!-- Payment Details Section -->
-        <div class="p-4 bg-white border rounded-lg dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
+        <div class="p-4 bg-white rounded-lg border dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
             <h3 class="mb-4 text-sm font-medium text-neutral-500 dark:text-neutral-400">
                 Payment Details
             </h3>
@@ -114,12 +114,12 @@
                 <div class="space-y-2">
                     <x-input-label for="amount" :value="__('Amount')" />
                     <div class="relative">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                             <span class="text-neutral-500 sm:text-sm">$</span>
                         </div>
                         <x-text-input wire:model="amount" id="amount" type="number" step="0.01"
-                            class="block w-full pr-12 pl-7" />
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            class="block pr-12 pl-7 w-full" />
+                        <div class="flex absolute inset-y-0 right-0 items-center pr-3 pointer-events-none">
                             <span class="text-neutral-500 sm:text-sm">USD</span>
                         </div>
                     </div>
@@ -133,6 +133,7 @@
                         <option>Select Status</option>
                         <option value="pending"> Pending</option>
                         <option value="approved"> Approved</option>
+                        <option value="processing">Processing</option>
                         <option value="failed"> Failed</option>
                         <option value="cancelled"> Cancelled</option>
                         <option value="refunded"> Refunded</option>

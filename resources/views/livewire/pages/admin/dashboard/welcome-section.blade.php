@@ -4,7 +4,7 @@
     <div class="relative">
         <div class="flex flex-col justify-between items-center md:space-x-4 md:flex-row">
 
-            <div class="flex gap-2 items-center">
+            <div class="flex gap-2 items-center my-2 md:my-0">
                 <div class="p-4 bg-primary-100 dark:bg-primary-500/10">
                     <div class="flex gap-2 items-center rounded-md">
                         <img src="{{ Auth::user()->image_url }}" class="object-cover rounded-md size-14 md:size-28" alt="avatar">
@@ -24,18 +24,31 @@
                             @if (!auth()->user()->hasVerifiedEmail())
                             <div class="mt-2">
                                 <p class="text-sm text-gray-800 dark:text-gray-200">
-                                    Unverified.
+                                    <span class="text-red-500">Unverified.</span>
                                     <button wire:click.prevent="sendVerification"
-                                        class="text-sm text-gray-600 underline rounded-md dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+                                        class="text-xs text-left text-gray-600 underline rounded-md md:text-sm dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
                                         Click here to resend the verification email.
                                     </button>
                                 </p>
                                 @if (session('status') === 'verification-link-sent')
-                                <p class="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
+                                <p class="mt-2 text-xs font-medium text-green-600 md:text-sm dark:text-green-400">
                                     A new verification link has been sent to your email address.
                                 </p>
                                 @endif
                             </div>
+                            @else
+                                <span
+                                    class="inline-flex overflow-hidden mt-2 text-xs font-medium text-blue-500 bg-white rounded-lg w-fit dark:bg-blue-950 dark:text-blue-500">
+                                    <span class="flex gap-1 items-center px-2 py-1 bg-blue-500/10">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"
+                                            class="size-4">
+                                            <path fill-rule="evenodd"
+                                                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                        Verified.
+                                    </span>
+                                </span>
                             @endif
                         @endif
                     @endrole

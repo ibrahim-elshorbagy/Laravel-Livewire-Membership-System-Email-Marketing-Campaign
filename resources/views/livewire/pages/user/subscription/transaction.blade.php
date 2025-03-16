@@ -9,7 +9,7 @@
     <!-- Tabs -->
     <div x-data="{ selectedTab: @entangle('selectedTab') }" class="w-full">
         <!-- Tab buttons -->
-        <div class="flex gap-2 mb-5 overflow-x-auto border-b border-neutral-300 dark:border-neutral-700" role="tablist">
+        <div class="flex overflow-x-auto gap-2 mb-5 border-b border-neutral-300 dark:border-neutral-700" role="tablist">
             <button wire:click="$set('selectedTab', 'all')"
                 :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'all', 'text-neutral-600 dark:text-neutral-400': selectedTab !== 'all'}"
                 class="px-4 py-2 text-sm h-min" role="tab">All Transactions</button>
@@ -59,16 +59,17 @@
                             ${{ number_format($payment->amount, 2) }} {{ $payment->currency }}
                         </td>
                         <td class="p-4">
-                            <span @class([ 'px-2 py-1 text-xs font-medium rounded-full'
-                                , 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'=> $payment->status
-                                === 'approved',
-                                'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' =>
-                                $payment->status === 'pending',
-                                'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' =>
-                                in_array($payment->status, ['failed', 'cancelled']),
-                                ])>
-                                {{ ucfirst($payment->status) }}
-                            </span>
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full
+                            @switch($payment->status)
+                                @case('approved') text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-100 @break
+                                @case('pending') text-yellow-800 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-100 @break
+                                @case('processing') text-blue-800 bg-blue-100 dark:bg-blue-900 dark:text-blue-100 @break
+                                @case('failed') text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-100 @break
+                                @case('cancelled') text-gray-800 bg-gray-100 dark:bg-gray-700 dark:text-gray-100 @break
+                                @case('refunded') text-purple-800 bg-purple-100 dark:bg-purple-900 dark:text-purple-100 @break
+                            @endswitch">
+                            {{ ucfirst($payment->status) }}
+                        </span>
                         </td>
 
                         <td class="p-4">

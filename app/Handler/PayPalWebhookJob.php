@@ -69,9 +69,7 @@ class PayPalWebhookJob extends ProcessWebhookJob
         }
 
         try {
-            $payment = Payment::where('gateway_subscription_id', $orderId)
-                ->where('status', 'pending')
-                ->first();
+            $payment = Payment::where('gateway_subscription_id', $orderId)->first();
 
             if (!$payment) {
                 $this->logPayPalResponse(null, 'failed', [
@@ -156,9 +154,7 @@ class PayPalWebhookJob extends ProcessWebhookJob
         }
 
         try {
-            $payment = Payment::where('gateway_subscription_id', $orderId)
-                ->where('status', 'pending')
-                ->first();
+            $payment = Payment::where('gateway_subscription_id', $orderId)->first();
 
             if (!$payment) {
                 $this->logPayPalResponse(null, 'failed', [
@@ -166,67 +162,76 @@ class PayPalWebhookJob extends ProcessWebhookJob
                     'order_id' => $orderId,
                     'capture_id' => $resource['id'] ?? null
                 ]);
+
+                PayPalLogger::info('PAYMENT.CAPTURE.COMPLETED : No payment Found for this order (Order Completed)', [
+                    'order_id' => $orderId,
+                    'amount' => $resource['amount']['value'] ?? 'unknown',
+                    'status' => $resource['status'] ?? 'unknown'
+                ]);
+
                 return;
             }
 
 
             DB::transaction(function () use ($payment, $resource) {
-                if ($payment->user->lastSubscription()) {
+                try {
+                    if ($payment->user->lastSubscription()) {
 
-                    if($payment->user->lastSubscription()->plan->id == $payment->plan_id){// This only work if he renew the subscription
+                        if($payment->user->lastSubscription()->plan->id == $payment->plan_id) {
+                            
+                            $subscription = $payment->user->lastSubscription()->renew();
+                            $payment->user->forceSetConsumption('Subscribers Limit', EmailList::where('user_id', $payment->user->id)->count());
+                            $payment->user->forceSetConsumption('Email Sending', 0);
 
-                        $subscription = $payment->user->lastSubscription()->renew();
-                        $payment->user->forceSetConsumption('Subscribers Limit',EmailList::where('user_id', $payment->user->id)->count());
-                        $payment->user->forceSetConsumption('Email Sending',0);
+                            PayPalLogger::info('Renew Subscription ', [
+                                'payment_id' => $payment->id,
+                                'subscription_id' => $subscription->id,
+                            ]);
 
-                        PayPalLogger::info('Renew Subscription ', [
-                            'payment_id' => $payment->id,
-                            'subscription_id' => $subscription->id,
-                        ]);
+                            $payment->user->notify(new SubscriptionRenewedNotification($subscription));
+                        } else {
+                            $payment->user->lastSubscription()->suppress();
+                            $subscription = $payment->user->subscribeTo($payment->plan);
+                            $payment->user->forceSetConsumption('Subscribers Limit', EmailList::where('user_id', $payment->user->id)->count());
+                            $payment->user->forceSetConsumption('Email Sending', 0);
 
-                        $payment->user->notify(new SubscriptionRenewedNotification($subscription));
+                            $payment->user->notify(new SubscriptionActivatedNotification($subscription));
 
-                    }else{ //New Subscription or Upgrade
-
-                        $payment->user->lastSubscription()->suppress();
-                        $subscription = $payment->user->subscribeTo($payment->plan);
-                        $payment->user->forceSetConsumption('Subscribers Limit',EmailList::where('user_id', $payment->user->id)->count());
-                        $payment->user->forceSetConsumption('Email Sending',0);
-
-                        // Notify user
-                        $payment->user->notify(new SubscriptionActivatedNotification($subscription));
-
-                        PayPalLogger::info('Upgrade Subscription ', [
-                            'payment_id' => $payment->id,
-                            'subscription_id' => $subscription->id,
-                        ]);
+                            PayPalLogger::info('Upgrade Subscription ', [
+                                'payment_id' => $payment->id,
+                                'subscription_id' => $subscription->id,
+                            ]);
+                        }
                     }
+
+                    $payment->update([
+                        'subscription_id' => $subscription->id,
+                        'status' => 'approved',
+                        'transaction_id' => $resource['id'] ?? null,
+                    ]);
+
+                    $this->logPayPalResponse($payment->user_id, 'success', [
+                        'message' => 'Payment processed successfully',
+                        'payment_id' => $payment->id,
+                        'subscription_id' => $subscription->id,
+                        'capture_id' => $resource['id'] ?? null,
+                        'amount' => $resource['amount']['value'] ?? null
+                    ]);
+                } catch (\Exception $e) {
+                    PayPalLogger::error('Transaction failed', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    throw $e;
                 }
-                // Create subscription
-
-                // Update payment with capture details
-                $payment->update([
-                    'subscription_id' => $subscription->id,
-                    'status' => 'approved',
-                    'transaction_id' =>  $resource['id'] ?? null,
-                ]);
-
-
-                $this->logPayPalResponse($payment->user_id, 'success', [
-                    'message' => 'Payment processed successfully',
-                    'payment_id' => $payment->id,
-                    'subscription_id' => $subscription->id,
-                    'capture_id' => $resource['id'] ?? null,
-                    'amount' => $resource['amount']['value'] ?? null
-                ]);
             });
-
         } catch (\Exception $e) {
             $this->logPayPalResponse(null, 'failed', [
                 'error' => 'Error processing payment completion: ' . $e->getMessage(),
                 'order_id' => $orderId,
                 'trace' => $e->getTraceAsString()
             ]);
+            throw $e; // This will ensure the job is moved to failed_jobs table
         }
     }
 

@@ -1,5 +1,5 @@
 <div
-    class="flex flex-col p-3 border rounded-md sm:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+    class="flex flex-col p-3 rounded-md border sm:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <!-- Header -->
     <div class="mb-4 sm:mb-6 md:flex md:items-center md:justify-between">
         <div class="flex-1 min-w-0">
@@ -16,8 +16,8 @@
 
     <div class="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
         <!-- Plan Management (New Section) -->
-        <div class="p-4 border rounded-md sm:p-6 border-neutral-300 dark:border-neutral-700">
-            <div class="flex items-center justify-between mb-4">
+        <div class="p-4 rounded-md border sm:p-6 border-neutral-300 dark:border-neutral-700">
+            <div class="flex justify-between items-center mb-4">
                 <h3 class="font-semibold text-gray-900 md:text-md dark:text-white">Plan Management</h3>
                 <x-primary-create-button type="button" x-data="" x-on:click="$dispatch('open-modal', 'edit-plan')">
                     Switch Plan
@@ -31,8 +31,8 @@
                         Current Plan
                     </span>
                     <div
-                        class="p-3 mt-2 bg-white border border-gray-200 rounded-lg dark:bg-gray-900 dark:border-gray-700">
-                        <div class="flex items-center justify-between">
+                        class="p-3 mt-2 bg-white rounded-lg border border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+                        <div class="flex justify-between items-center">
                             <span class="font-semibold text-gray-900 md:text-md dark:text-white">
                                 {{ $currentPlan->name }}
                             </span>
@@ -55,7 +55,7 @@
                     </span>
                     <div class="mt-2 space-y-2">
                         @foreach($currentPlan->features as $feature)
-                        <div class="flex items-center justify-between p-2 rounded">
+                        <div class="flex justify-between items-center p-2 rounded">
                             <span class="text-sm text-gray-700 dark:text-gray-300">
                                 - {{ $feature->name }}
                             </span>
@@ -70,8 +70,8 @@
         </div>
 
         <!-- Subscription Management -->
-        <div class="p-3 border rounded-md sm:p-6 border-neutral-300 dark:border-neutral-700">
-            <div class="flex items-center justify-between mb-3 sm:mb-4">
+        <div class="p-3 rounded-md border sm:p-6 border-neutral-300 dark:border-neutral-700">
+            <div class="flex justify-between items-center mb-3 sm:mb-4">
                 <h3 class="font-semibold text-gray-900 md:text-md dark:text-white">Subscription Management</h3>
                 <x-primary-create-button type="button" x-data=""
                     x-on:click="$dispatch('open-modal', 'edit-subscription')">
@@ -134,7 +134,7 @@
                     </p>
                 </div>
 
-                <div class="flex items-center gap-5 py-4 border-t border-neutral-300 dark:border-neutral-700">
+                <div class="flex gap-5 items-center py-4 border-t border-neutral-300 dark:border-neutral-700">
                     <span class="block text-sm font-medium text-gray-700 md:text-lg dark:text-gray-300">ServerStatus</span>
                     <span
                         class="px-2 py-1 text-xs font-semibold rounded-full
@@ -168,8 +168,8 @@
                 @endif
                 <!-- Reactive Button (Conditional) -->
                 @if($subscription->suppressed_at || $subscription->canceled_at)
-                {{-- <div class="w-full col-span-full sm:col-span-2 lg:col-span-1"> --}}
-                <div class="w-full col-span-full">
+                {{-- <div class="col-span-full w-full sm:col-span-2 lg:col-span-1"> --}}
+                <div class="col-span-full w-full">
                     <x-primary-create-button class="justify-center w-full" wire:click="reActiveSubscription"
                         wire:confirm="Are you sure you want to reactivate this subscription?">
                         <span class="text-center">Reactivate Subscription</span>
@@ -179,7 +179,7 @@
             </div>
 
             <!-- Warning Message -->
-            <div class="p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20">
+            <div class="p-4 bg-yellow-50 rounded-lg dark:bg-yellow-900/20">
                 <div class="flex flex-col sm:flex-row">
                     <!-- Icon -->
                     <div class="flex-shrink-0 sm:mr-3">
@@ -214,8 +214,8 @@
         </div>
 
         <!-- Payment Details -->
-        <div class="p-3 border rounded-md sm:p-6 border-neutral-300 dark:border-neutral-700">
-            <div class="flex items-center justify-between mb-3 sm:mb-4">
+        <div class="p-3 rounded-md border sm:p-6 border-neutral-300 dark:border-neutral-700">
+            <div class="flex justify-between items-center mb-3 sm:mb-4">
                 <h3 class="font-semibold text-gray-900 md:text-md dark:text-white">Payment Details</h3>
                 <x-primary-create-button type="button" x-data="" x-on:click="$dispatch('open-modal', 'edit-payment')">
                     Update
@@ -302,7 +302,7 @@
                             dateFormat: 'Y-m-d',
                             defaultDate: '{{ $started_at }}',
                             allowInput: true
-                        })" wire:model="started_at" type="text" class="block w-full mt-1" placeholder="YYYY-MM-DD" />
+                        })" wire:model="started_at" type="text" class="block mt-1 w-full" placeholder="YYYY-MM-DD" />
                     <x-input-error :messages="$errors->get('started_at')" class="mt-2" />
                 </div>
 
@@ -313,7 +313,7 @@
                             dateFormat: 'Y-m-d',
                             defaultDate: '{{ $expired_at }}',
                             allowInput: true
-                        })" wire:model="expired_at" type="text" class="block w-full mt-1" placeholder="YYYY-MM-DD" />
+                        })" wire:model="expired_at" type="text" class="block mt-1 w-full" placeholder="YYYY-MM-DD" />
                     <x-input-error :messages="$errors->get('expired_at')" class="mt-2" />
                 </div>
 
@@ -326,7 +326,7 @@
                             time_24hr: true,
                             defaultDate: '{{ $grace_days_ended_at }}',
                             allowInput: true
-                        })" wire:model="grace_days_ended_at" type="text" class="block w-full mt-1" placeholder="YYYY-MM-DD HH:MM" />
+                        })" wire:model="grace_days_ended_at" type="text" class="block mt-1 w-full" placeholder="YYYY-MM-DD HH:MM" />
                     <x-input-error :messages="$errors->get('grace_days_ended_at')" class="mt-2" />
                 </div>
                 <!-- Server Status -->
@@ -363,7 +363,7 @@
                 <!-- Amount -->
                 <div>
                     <x-input-label for="amount" :value="__('Amount')" />
-                    <x-text-input wire:model="amount" id="amount" type="number" step="0.01" class="block w-full mt-1" />
+                    <x-text-input wire:model="amount" id="amount" type="number" step="0.01" class="block mt-1 w-full" />
                     <x-input-error :messages="$errors->get('amount')" class="mt-2" />
                 </div>
 
@@ -374,6 +374,7 @@
                         <option>Select Status</option>
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
+                        <option value="processing">Processing</option>
                         <option value="failed">Failed</option>
                         <option value="cancelled">Cancelled</option>
                         <option value="refunded">Refunded</option>
@@ -433,7 +434,7 @@
                 </div>
 
                 <!-- Warning Message -->
-                <div class="p-4 mt-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20">
+                <div class="p-4 mt-4 bg-yellow-50 rounded-lg dark:bg-yellow-900/20">
                     <div class="flex">
                         <div class="flex-shrink-0">
                             <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">

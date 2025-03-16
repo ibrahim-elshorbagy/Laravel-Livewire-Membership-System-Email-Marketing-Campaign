@@ -73,6 +73,7 @@
                             @switch($payment->status)
                                 @case('approved') text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-100 @break
                                 @case('pending') text-yellow-800 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-100 @break
+                                @case('processing') text-blue-800 bg-blue-100 dark:bg-blue-900 dark:text-blue-100 @break
                                 @case('failed') text-red-800 bg-red-100 dark:bg-red-900 dark:text-red-100 @break
                                 @case('cancelled') text-gray-800 bg-gray-100 dark:bg-gray-700 dark:text-gray-100 @break
                                 @case('refunded') text-purple-800 bg-purple-100 dark:bg-purple-900 dark:text-purple-100 @break
