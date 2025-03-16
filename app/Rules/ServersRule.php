@@ -27,9 +27,9 @@ class ServersRule implements ValidationRule
             // Remove all spaces from the server name
             $processedName = str_replace(' ', '', $serverName);
 
-            // Check if the server name contains only English letters, dots, and hyphens
-            if (!preg_match('/^[a-zA-Z.-]+$/', $processedName)) {
-                $fail("The server name '$serverName' must contain only English letters, . , and -");
+            // Check if the server name contains only English letters, numbers, and dots
+            if (!preg_match('/^[a-zA-Z0-9.]+$/', $processedName)) {
+                $fail("The server name '$serverName' must contain only English letters, numbers, and .");
                 return;
             }
         }

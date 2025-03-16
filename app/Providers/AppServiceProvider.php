@@ -49,9 +49,9 @@ class AppServiceProvider extends ServiceProvider
         ));
 
         // Check if the value contains only English letters, dots, and hyphens
-        if (!preg_match('/^[a-zA-Z.-]+$/', $processedValue)) {
+        if (!preg_match('/^[a-zA-Z0-9.]+$/', $processedValue)) {
             $validator->setCustomMessages([
-                'without_space' => 'The :attribute must contain only English letters, . , and -'
+                'without_space' => '"The server name must contain only English letters, numbers, and ."'
             ]);
             return false;
         }
