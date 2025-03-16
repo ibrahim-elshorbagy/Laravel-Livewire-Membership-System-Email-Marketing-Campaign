@@ -115,12 +115,12 @@ trait PaypalPaymentService
         }
     }
 
-    public function createPayPalPayment($user, $plan, $payment)
+    public function createPayPalPayment($user, $plan,$PaymentCalculation, $payment)
     {
         try {
             $this->initializePayPal();
 
-            $price = number_format($plan->price, 2, '.', '');
+            $price = number_format($PaymentCalculation, 2, '.', '');
 
             $orderData = [
                 'intent' => 'CAPTURE',

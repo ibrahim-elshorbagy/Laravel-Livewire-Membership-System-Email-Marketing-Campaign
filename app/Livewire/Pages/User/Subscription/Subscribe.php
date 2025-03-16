@@ -4,6 +4,7 @@ namespace App\Livewire\Pages\User\Subscription;
 
 use App\Models\Payment\Payment;
 use App\Services\PaypalPaymentService;
+use App\Traits\PlanPriceCalculator;
 use Illuminate\Database\DeadlockException;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Component;
@@ -15,17 +16,38 @@ use Illuminate\Support\Facades\Log;
 
 class Subscribe extends Component
 {
-    use LivewireAlert, PaypalPaymentService;
+    use LivewireAlert, PaypalPaymentService, PlanPriceCalculator;
 
     public $selectedPlan;
     public $selectedTab = 'monthly';
     public $paymentUrl;
     public $isProcessing = false;
+    public $upgradeCalculation = null;
 
     protected $listeners = [
         'confirmed' => 'handleConfirmed',
         'cancelled' => 'handleCancelled'
     ];
+
+    public function updatedSelectedPlan($value)
+    {
+        $this->validateOnly('selectedPlan');
+        $this->calculateUpgradeCost();
+    }
+
+    protected function calculateUpgradeCost()
+    {
+        $user = auth()->user();
+        if ($user && $this->selectedPlan) {
+            $currentSubscription = $user->lastSubscription();
+            if ($currentSubscription) {
+                $newPlan = Plan::find($this->selectedPlan);
+                if ($newPlan) {
+                    $this->upgradeCalculation = $this->calculateUpgradePrice($newPlan, $currentSubscription);
+                }
+            }
+        }
+    }
 
     protected function rules()
     {
@@ -44,11 +66,6 @@ class Subscribe extends Component
     }
 
 
-
-    public function updatedSelectedPlan($value)
-    {
-        $this->validateOnly('selectedPlan');
-    }
 
     public function initiatePayment()
     {
@@ -121,18 +138,20 @@ class Subscribe extends Component
             $user = auth()->user();
             $plan = Plan::findOrFail($this->selectedPlan);
 
+            $this->calculateUpgradeCost();
+            $PaymentCalculation =$this->upgradeCalculation['upgrade_cost'];
             // Create payment record
             $payment = Payment::create([
                 'user_id' => $user->id,
                 'plan_id' => $plan->id,
                 'gateway' => 'paypal',
-                'amount' => $plan->price,
+                'amount' => $PaymentCalculation,
                 'currency' => 'USD',
                 'status' => 'pending',
             ]);
 
             // Create PayPal subscription and get approval URL
-            $approvalUrl = $this->createPayPalPayment($user, $plan, $payment);
+            $approvalUrl = $this->createPayPalPayment($user, $plan,$PaymentCalculation, $payment);
 
             if (!$approvalUrl) {
                 throw new \Exception('PayPal approval URL not found');
@@ -178,7 +197,7 @@ class Subscribe extends Component
             'monthlyPlans' => $monthlyPlans,
             'yearlyPlans' => $yearlyPlans,
             'currentPlanId' => $currentPlanId,
-
+            'upgradeCalculation' => $this->upgradeCalculation
         ])->layout('layouts.app',['title' => 'Plans']);
     }
 }

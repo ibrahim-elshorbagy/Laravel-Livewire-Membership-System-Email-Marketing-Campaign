@@ -150,22 +150,55 @@
 
     <!-- Payment Button -->
     @auth
-        @if($selectedPlan)
-        <div class="flex justify-center mt-8">
-            <button wire:click="initiatePayment" wire:loading.attr="disabled"
-                class="px-6 py-3 text-sm font-semibold text-white bg-black rounded-lg transition hover:bg-black/80 dark:bg-orange-500 dark:text-black dark:hover:bg-orange-600">
-                <span wire:loading.remove>Proceed to Payment</span>
-                <span wire:loading>Processing...</span>
-            </button>
+    @if($selectedPlan)
+    <div class="flex flex-col gap-4 items-center mt-8">
+        @if($upgradeCalculation['title']=="Upgrade" && $currentPlanId !== 1)
+        <div
+            class="p-4 w-full max-w-md text-sm rounded-lg bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
+            <p class="mb-4 text-sm text-neutral-600 dark:text-neutral-400">
+                When upgrading to a higher plan, the cost is based on the difference between the new plan's price and what you've
+                already paid, ensuring you only pay the remaining amount.
+            </p>
+            <h4 class="mb-2 font-medium text-neutral-900 dark:text-neutral-100">{{ $upgradeCalculation['title'] }} Cost
+                Calculation</h4>
+            <ul class="space-y-1">
+                <li>Unused amount from current plan: ${{ $upgradeCalculation['unused_amount'] }}</li>
+                <li>Remaining days: {{ $upgradeCalculation['remaining_days'] }} days</li>
+                <li>New daily rate: ${{ $upgradeCalculation['new_daily_rate'] }}/day</li>
+                <li>Old daily rate: ${{ $upgradeCalculation['current_daily_rate'] }}/day</li>
+                <li class="pt-2 mt-2 font-medium border-t border-neutral-200 dark:border-neutral-700">
+                    payment required: ${{ $upgradeCalculation['upgrade_cost'] }}
+                </li>
+            </ul>
         </div>
         @endif
+
+        <button wire:click="initiatePayment" wire:loading.attr="disabled"
+            class="inline-flex justify-center items-center px-8 py-3 min-w-[200px] max-w-xs text-sm font-semibold text-white bg-black rounded-lg transition hover:bg-black/80 dark:bg-orange-500 dark:text-black dark:hover:bg-orange-600">
+            <span wire:loading.remove>
+                @if($upgradeCalculation && $currentPlanId !== 1)
+                @if($upgradeCalculation['title'] === 'Upgrade')
+                Pay ${{ $upgradeCalculation['upgrade_cost'] }} to Upgrade Plan
+                @else
+                Pay ${{ $upgradeCalculation['upgrade_cost'] }} to Subscribe
+                @endif
+                @else
+                Pay ${{ $selectedPlan ? (collect($monthlyPlans)->merge($yearlyPlans))->firstWhere('id',
+                $selectedPlan)->price : '0.00' }} to Subscribe
+                @endif
+            </span>
+            <span wire:loading>Processing...</span>
+        </button>
+    </div>
+    @endif
     @else
-        <div class="flex justify-center mt-8">
-            <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                Please <a href="{{ route('login') }}" class="font-medium text-black hover:underline dark:text-orange-500">sign
-                    in</a> to purchase a subscription
-            </p>
-        </div>
+    <div class="flex justify-center mt-8">
+        <p class="text-sm text-neutral-600 dark:text-neutral-400">
+            Please <a href="{{ route('login') }}"
+                class="font-medium text-black hover:underline dark:text-orange-500">sign in</a> to purchase a
+            subscription
+        </p>
+    </div>
     @endauth
 
     <!-- Payment Modal -->
@@ -183,4 +216,4 @@
         }
     }" @paypalPayment.window="openPaymentWindow($event.detail.url)">
 
-</div>
+    </div>
