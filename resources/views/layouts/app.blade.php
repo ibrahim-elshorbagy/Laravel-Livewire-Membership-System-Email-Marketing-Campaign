@@ -112,38 +112,51 @@
 
             </div>
 
+
             @role('admin')
             @persist('sidebar')
-            <div x-data="{ isExpanded: false }" class="flex flex-col">
-                <button type="button" x-on:click="isExpanded = ! isExpanded"
+            <div x-data="{ isPaymentExpanded: false, isSettingsExpanded: false }" class="flex flex-col space-y-2">
+                <!-- Payment Settings Dropdown -->
+                <button type="button" x-on:click="isPaymentExpanded = ! isPaymentExpanded"
                     class="flex gap-2 justify-between items-center px-2 py-1.5 text-sm font-medium rounded-md underline-offset-2 focus:outline-none focus-visible:underline"
-                    x-bind:class="isExpanded ? 'text-neutral-900 bg-black/10 dark:text-white dark:bg-white/10' :  'text-neutral-600 hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/5'">
-                    <i class="fa-solid fa-user"></i>
-                    <span class="mr-auto text-left">Settings</span>
+                    x-bind:class="isPaymentExpanded ? 'text-neutral-900 bg-black/10 dark:text-white dark:bg-white/10' :  'text-neutral-600 hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/5'">
+                    <span class="mr-auto text-left">Payment</span>
                     <i class="transition-transform fa-solid fa-angle-up"
-                        x-bind:class="isExpanded ? 'rotate-0' : 'rotate-180'" aria-hidden="true"></i>
+                        x-bind:class="isPaymentExpanded ? 'rotate-0' : 'rotate-180'" aria-hidden="true"></i>
                 </button>
 
-                <ul x-cloak x-collapse x-show="isExpanded">
+                <ul x-cloak x-collapse x-show="isPaymentExpanded">
                     <li class="px-1 py-0.5 first:mt-2">
                         <x-nav-link :active="request()->routeIs('admin.payment.paypal')"
                             href="{{ route('admin.payment.paypal') }}" wire:navigate>
                             <span>Payment Settings</span>
                         </x-nav-link>
                     </li>
-                    <li class="px-1 py-0.5 first:mt-2">
+                    <li class="px-1 py-0.5">
                         <x-nav-link :active="request()->routeIs('admin.payment.paypal.responses')"
                             href="{{ route('admin.payment.paypal.responses') }}" wire:navigate>
                             <span>Paypal Responses</span>
                         </x-nav-link>
                     </li>
-                    <li class="px-1 py-0.5 first:mt-2">
+                    <li class="px-1 py-0.5">
                         <x-nav-link :active="request()->routeIs('admin.offline-payment-methods')"
                             href="{{ route('admin.offline-payment-methods') }}" wire:navigate>
                             <span>Offline Payment Methods</span>
                         </x-nav-link>
                     </li>
-                    <li class="px-1 py-0.5">
+                </ul>
+
+                <!-- System Settings Dropdown -->
+                <button type="button" x-on:click="isSettingsExpanded = ! isSettingsExpanded"
+                    class="flex gap-2 justify-between items-center px-2 py-1.5 text-sm font-medium rounded-md underline-offset-2 focus:outline-none focus-visible:underline"
+                    x-bind:class="isSettingsExpanded ? 'text-neutral-900 bg-black/10 dark:text-white dark:bg-white/10' :  'text-neutral-600 hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/5'">
+                    <span class="mr-auto text-left">Settings</span>
+                    <i class="transition-transform fa-solid fa-angle-up"
+                        x-bind:class="isSettingsExpanded ? 'rotate-0' : 'rotate-180'" aria-hidden="true"></i>
+                </button>
+
+                <ul x-cloak x-collapse x-show="isSettingsExpanded">
+                    <li class="px-1 py-0.5 first:mt-2">
                         <x-nav-link :active="request()->routeIs('admin.site-settings')"
                             href="{{ route('admin.site-settings') }}" wire:navigate>
                             <span>Site Settings</span>
@@ -171,6 +184,8 @@
             </div>
             @endpersist('sidebar')
             @endrole
+
+
         </nav>
 
         <!-- Main content area -->
@@ -258,8 +273,10 @@
                             wire:navigate>
                             <span>Servers</span>
                         </x-nav-link>
-                        <!-- Dropdown menu -->
-                        <x-primary-dropdown label="Settings">
+
+
+                        <!-- Dropdown menus -->
+                        <x-primary-dropdown label="Payment">
                             <x-nav-link :active="request()->routeIs('admin.payment.paypal')"
                                 href="{{ route('admin.payment.paypal') }}" wire:navigate>
                                 <span>Payment Settings</span>
@@ -272,11 +289,13 @@
                                 href="{{ route('admin.offline-payment-methods') }}" wire:navigate>
                                 <span>Offline Payment Methods</span>
                             </x-nav-link>
+                        </x-primary-dropdown>
+
+                        <x-primary-dropdown label="Settings">
                             <x-nav-link :active="request()->routeIs('admin.site-settings')"
                                 href="{{ route('admin.site-settings') }}" wire:navigate>
                                 <span>Site Settings</span>
                             </x-nav-link>
-
                             <x-nav-link :active="request()->routeIs('admin.site-prohibited-words')"
                                 href="{{ route('admin.site-prohibited-words') }}" wire:navigate>
                                 <span>Prohibited Words</span>
@@ -290,6 +309,9 @@
                                 <span>Api Requests</span>
                             </x-nav-link>
                         </x-primary-dropdown>
+
+
+
                         @endrole
 
 

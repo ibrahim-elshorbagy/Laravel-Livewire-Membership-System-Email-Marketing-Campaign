@@ -1,5 +1,5 @@
 <div class="container mx-auto">
-    <div class="p-6 bg-white rounded-lg shadow-md dark:bg-neutral-800">
+    <div class="p-3 bg-white rounded-lg shadow-md dark:bg-neutral-800">
         <h2 class="mb-6 text-2xl font-bold text-neutral-800 dark:text-neutral-200">
             Site Settings
         </h2>
