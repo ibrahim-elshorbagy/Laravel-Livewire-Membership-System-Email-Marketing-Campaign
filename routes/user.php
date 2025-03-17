@@ -12,6 +12,7 @@ use App\Livewire\Pages\User\Server\ServerList;
 use App\Livewire\Pages\User\Subscription\MySubscription;
 use App\Livewire\Pages\User\Subscription\Subscribe;
 use App\Livewire\Pages\User\Subscription\Transaction;
+use App\Livewire\Pages\User\Subscription\Transaction\TransactionInfo;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -40,6 +41,7 @@ Route::middleware(['auth','role:user'])->group(function () {
     //Subscription
     Route::get('/my-subscription', MySubscription::class)->name('user.my-subscription');
     Route::get('/my-transactions', Transaction::class)->name('user.my-transactions');
+    Route::get('/my-transactions/{payment}/info',TransactionInfo::class)->name('user.my-transaction.info');
 
 
 

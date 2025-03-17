@@ -10,20 +10,24 @@ use LucasDotVin\Soulbscription\Models\Plan;
 use LucasDotVin\Soulbscription\Models\Subscription;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Session;
 
 class EditPayment extends Component
 {
     use LivewireAlert;
 
     public Payment $payment;
-    public $user;
+    public $user; //admin can see anything about user
     public $plan;
     public $subscription;
 
+    public $gateway_subscription_id;
+    public $transaction_id;
     // Form fields
     public $amount;
     public $status;
     public $gateway;
+    public $previewImageUrl;
 
     public $offlinePaymentMethods;
 
@@ -31,9 +35,14 @@ class EditPayment extends Component
         'amount' => 'required|numeric|min:0',
         'status' => 'required|in:pending,approved,failed,cancelled,refunded',
         'gateway' => 'required',
+        'gateway_subscription_id' => 'nullable',
+        'transaction_id' => 'nullable',
     ];
 
-
+    public function getImagesProperty()
+    {
+        return $this->payment->images;
+    }
 // In the mount function, add:
     public function mount(Payment $payment) {
         $this->payment = $payment;
@@ -46,6 +55,8 @@ class EditPayment extends Component
         $this->amount = $payment->amount;
         $this->status = $payment->status;
         $this->gateway = $payment->gateway;
+        $this->gateway_subscription_id = $payment->gateway_subscription_id;
+        $this->transaction_id = $payment->transaction_id;
 
         if ($this->subscription) {
             $this->subscription->started_at = $this->subscription->created_at->toDateTimeString();
@@ -63,17 +74,26 @@ class EditPayment extends Component
         $this->validate();
 
         try {
-            $this->payment->update([
+            $updateData = [
                 'amount' => $this->amount,
                 'status' => $this->status,
                 'gateway' => $this->gateway,
-            ]);
+            ];
 
-            $this->alert('success', 'Payment updated successfully!', [
-                'position' => 'bottom-end',
-                'timer' => 3000,
-                'toast' => true,
-            ]);
+
+
+            if ($this->gateway != 'paypal') {
+
+                $updateData['gateway_subscription_id'] = $this->gateway_subscription_id;
+                $updateData['transaction_id'] = $this->transaction_id;
+            }
+
+            $this->payment->update($updateData);
+
+            Session::flash('success', 'Payment updated successfully!.');
+
+            return $this->redirect(route('admin.payment.transactions'), navigate: true);
+
         } catch (\Exception $e) {
             $this->alert('error', 'Error updating payment: ' . $e->getMessage(), [
                 'position' => 'bottom-end',

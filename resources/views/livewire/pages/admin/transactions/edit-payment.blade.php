@@ -1,4 +1,4 @@
-    <div class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"">
+<div class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Payment #{{ $payment->id }}</h2>
@@ -72,8 +72,8 @@
                 <div class="space-y-2">
                     <x-input-label for="gateway_subscription_id" :value="__('Gateway Subscription ID')" />
                     <div class="flex items-center">
-                        <x-text-input value="{{ $payment->gateway_subscription_id }}"
-                            class="block w-full bg-neutral-50 dark:bg-neutral-900" readonly />
+                        <x-text-input wire:model="gateway_subscription_id" :readonly="$payment->gateway == 'paypal'" :disabled="$payment->gateway == 'paypal'"
+                            class="block w-full bg-neutral-50 dark:bg-neutral-900"  />
                         <button type="button"
                             class="ml-2 text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
                             onclick="navigator.clipboard.writeText('{{ $payment->gateway_subscription_id }}')">
@@ -86,10 +86,10 @@
                 </div>
 
                 <div class="space-y-2">
-                    <x-input-label for="transaction_id" :value="__('Transaction ID')" />
+                    <x-input-label  for="transaction_id" :value="__('Transaction ID')" />
                     <div class="flex items-center">
-                        <x-text-input value="{{ $payment->transaction_id }}"
-                            class="block w-full bg-neutral-50 dark:bg-neutral-900" readonly />
+                        <x-text-input wire:model="transaction_id" :readonly="$payment->gateway == 'paypal'" :disabled="$payment->gateway == 'paypal'"
+                            class="block w-full bg-neutral-50 dark:bg-neutral-900"  />
                         <button type="button"
                             class="ml-2 text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
                             onclick="navigator.clipboard.writeText('{{ $payment->transaction_id }}')">
@@ -167,5 +167,35 @@
     </div>
 </form>
 
+<!-- Payment Images Section -->
+@if($payment->images && count($payment->images) > 0)
+<div class="p-4 mt-6 bg-white rounded-lg border dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
+    <h3 class="mb-4 text-lg font-semibold text-neutral-700 dark:text-neutral-300">Payment Images</h3>
+    
+    <!-- Display Existing Images -->
+    <div x-cloak class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        @foreach($payment->images as $image)
+        <div class="relative group">
+            <img src="{{ Storage::url($image->image_path) }}" alt="Payment Image"
+                class="object-cover w-full h-full rounded-lg cursor-pointer hover:opacity-90"
+                @click="$dispatch('open-modal', 'image-preview-modal'); $wire.previewImageUrl = '{{ Storage::url($image->image_path) }}'" />
+        </div>
+        @endforeach
+    </div>
+
+    <!-- Image Preview Modal -->
+    <x-modal name="image-preview-modal" maxWidth="4xl">
+        <div class="relative p-2">
+            <button type="button" @click="$dispatch('close-modal', 'image-preview-modal')"
+                class="absolute top-2 right-2 p-1 text-white rounded-full bg-neutral-800 hover:bg-neutral-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <img :src="$wire.previewImageUrl" alt="Preview Image" class="w-full h-auto rounded-lg" />
+        </div>
+    </x-modal>
+</div>
+@endif
 
 </div>

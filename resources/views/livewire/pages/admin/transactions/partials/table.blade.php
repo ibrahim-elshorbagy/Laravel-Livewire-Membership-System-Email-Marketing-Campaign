@@ -60,16 +60,16 @@
                             </div>
                         </div>
                     </td>
-                    <td class="p-4 font-mono text-sm">{{ $payment->transaction_id }}</td>
-                    <td class="p-4">{{ number_format($payment->amount, 2) }} {{ $payment->currency }}</td>
+                    <td class="p-4 font-mono text-sm text-nowrap">{{ $payment->transaction_id }}</td>
+                    <td class="p-4 text-nowrap">{{ number_format($payment->amount, 2) }} {{ $payment->currency }}</td>
                     <td class="p-4">
                         <span
-                            class="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-100">
+                            class="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-100 text-nowrap">
                             {{ ucfirst($payment->gateway) }}
                         </span>
                     </td>
                     <td class="p-4">
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full text-nowrap
                             @switch($payment->status)
                                 @case('approved') text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-100 @break
                                 @case('pending') text-yellow-800 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-100 @break

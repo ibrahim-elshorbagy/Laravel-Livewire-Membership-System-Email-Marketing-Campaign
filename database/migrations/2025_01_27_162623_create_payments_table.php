@@ -25,7 +25,7 @@ return new class extends Migration
 
             // Payment Gateway Info
             $table->string('gateway')->default('paypal');
-            $table->string('gateway_subscription_id')->nullable(); // PayPal subscription ID
+            $table->string('gateway_subscription_id')->nullable(); //  subscription ID
             $table->string('transaction_id')->nullable();
 
             // Payment Details
