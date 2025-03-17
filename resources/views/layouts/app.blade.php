@@ -137,6 +137,12 @@
                             <span>Paypal Responses</span>
                         </x-nav-link>
                     </li>
+                    <li class="px-1 py-0.5 first:mt-2">
+                        <x-nav-link :active="request()->routeIs('admin.offline-payment-methods')"
+                            href="{{ route('admin.offline-payment-methods') }}" wire:navigate>
+                            <span>Offline Payment Methods</span>
+                        </x-nav-link>
+                    </li>
                     <li class="px-1 py-0.5">
                         <x-nav-link :active="request()->routeIs('admin.site-settings')"
                             href="{{ route('admin.site-settings') }}" wire:navigate>
@@ -262,7 +268,10 @@
                                 href="{{ route('admin.payment.paypal.responses') }}" wire:navigate>
                                 <span>Paypal Responses</span>
                             </x-nav-link>
-
+                            <x-nav-link :active="request()->routeIs('admin.offline-payment-methods')"
+                                href="{{ route('admin.offline-payment-methods') }}" wire:navigate>
+                                <span>Offline Payment Methods</span>
+                            </x-nav-link>
                             <x-nav-link :active="request()->routeIs('admin.site-settings')"
                                 href="{{ route('admin.site-settings') }}" wire:navigate>
                                 <span>Site Settings</span>

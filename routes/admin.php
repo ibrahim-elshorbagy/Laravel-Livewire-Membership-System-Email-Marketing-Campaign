@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Livewire\Pages\Admin\Payment\Offline\OfflinPaymenteMethods;
+use App\Livewire\Pages\Admin\Payment\Offline\OfflinPaymenteMethodsForm;
 use App\Livewire\Pages\Admin\Payment\Paypal\PaypalResponses;
 use App\Livewire\Pages\Admin\Payment\PaypalConfig;
 use App\Livewire\Pages\Admin\Plans\PlanManagement;
@@ -57,6 +59,11 @@ use Livewire\Volt\Volt;
         // Payment Settings
         Route::get('/payment/paypal', PaypalConfig::class)->name('admin.payment.paypal');
         Route::get('/payment/paypal-responses', PaypalResponses::class)->name('admin.payment.paypal.responses');
+
+        Route::get('/payment/offline', OfflinPaymenteMethods::class)->name('admin.offline-payment-methods');
+        Route::get('/payment/offline-form/{method?}', OfflinPaymenteMethodsForm::class)->name('admin.offline-payment-methods.form');
+
+
 
         Route::get('/transactions', Transactions::class)->name('admin.payment.transactions');
         Route::get('/transactions/{payment}/edit',EditPayment::class)->name('admin.transactions.edit');

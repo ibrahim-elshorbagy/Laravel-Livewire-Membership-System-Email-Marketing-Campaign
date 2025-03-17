@@ -146,7 +146,9 @@
                     <x-input-label for="gateway" :value="__('Payment Gateway')" />
                     <x-primary-select-input wire:model="gateway" id="gateway" class="w-full">
                         <option value="paypal">PayPal</option>
-                        <option value="cash">Cash</option>
+                        @foreach($offlinePaymentMethods as $method)
+                            <option value="{{ $method->slug }}">{{ $method->name }}</option>
+                        @endforeach
                     </x-primary-select-input>
                     <x-input-error :messages="$errors->get('gateway')" class="mt-1" />
                 </div>

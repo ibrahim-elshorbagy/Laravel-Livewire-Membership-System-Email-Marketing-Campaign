@@ -74,9 +74,6 @@
 
                         <td class="p-4">
                             <div class="flex items-center">
-                                @if($payment->gateway === 'paypal')
-                                <i class="mr-2 fab fa-paypal"></i>
-                                @endif
                                 {{ ucfirst($payment->gateway) }}
                             </div>
                         </td>

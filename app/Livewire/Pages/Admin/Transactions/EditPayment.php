@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages\Admin\Transactions;
 
+use App\Models\Payment\Offline\OfflinePaymentMethod;
 use Livewire\Component;
 use App\Models\Payment\Payment;
 use App\Models\User;
@@ -24,10 +25,12 @@ class EditPayment extends Component
     public $status;
     public $gateway;
 
+    public $offlinePaymentMethods;
+
     protected $rules = [
         'amount' => 'required|numeric|min:0',
         'status' => 'required|in:pending,approved,failed,cancelled,refunded',
-        'gateway' => 'required|in:paypal,cash',
+        'gateway' => 'required',
     ];
 
 
@@ -37,6 +40,7 @@ class EditPayment extends Component
         $this->user = $payment->user;
         $this->plan = $payment->plan;
         $this->subscription = $payment->subscription;
+        $this->offlinePaymentMethods = OfflinePaymentMethod::select('id', 'name','slug')->get();
 
         // Initialize form fields
         $this->amount = $payment->amount;
