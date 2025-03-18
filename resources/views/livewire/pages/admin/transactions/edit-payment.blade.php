@@ -157,7 +157,7 @@
     </div>
 
     <!-- Form Actions -->
-    <div class="flex justify-end pt-4 mt-6 space-x-3 border-t border-neutral-200 dark:border-neutral-700">
+    <div class="flex justify-end pb-4 my-6 space-x-3 border-b border-neutral-200 dark:border-neutral-700">
         <x-secondary-button href="{{ route('admin.payment.transactions') }}" wire:navigate class="px-4 py-2">
             Cancel
         </x-secondary-button>
