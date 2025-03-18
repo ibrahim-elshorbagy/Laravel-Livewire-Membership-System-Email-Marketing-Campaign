@@ -94,7 +94,7 @@
 
 
     <!-- job progress  -->
-    
+
     <livewire:pages.user.emails.partials.job-progress-component />
 
 

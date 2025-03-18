@@ -98,9 +98,10 @@ class TransactionInfo extends Component
         $this->validate([
             'images.*' => 'image|max:2048'
         ]);
-
+        
+        $userId = auth()->id();
         foreach ($this->images as $image) {
-            $path = $image->store('users/' . auth()->id() . '/payments/' . $this->payment->id, 'public');
+            $path = $image->store('users/' . $userId . '/payments/' . $this->payment->id, 'public');
             $this->payment->images()->create([
                 'image_path' => $path
             ]);

@@ -8,6 +8,7 @@ use App\Traits\PlanPriceCalculator;
 use Illuminate\Database\DeadlockException;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Illuminate\Support\Facades\DB;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use LucasDotVin\Soulbscription\Models\Plan;
@@ -21,7 +22,6 @@ class Subscribe extends Component
     public $selectedPlan;
     public $selectedTab = 'monthly';
     public $paymentUrl;
-    public $isProcessing = false;
     public $upgradeCalculation = null;
 
     protected $listeners = [
@@ -67,9 +67,9 @@ class Subscribe extends Component
 
 
 
+    // Start with confirm the user with his step
     public function initiatePayment()
     {
-        $this->isProcessing = true;
 
 
         if (!auth()->user()->hasVerifiedEmail()) {
@@ -113,21 +113,21 @@ class Subscribe extends Component
     public function handleConfirmed()
     {
         // Log::info('Confirmation received - proceeding with payment');
-        $this->proceedWithPayment();
+        $this->dispatch('payment-method',$this->selectedPlan);
+        // $this->proceedWithPayment();
     }
 
     // New method to handle cancellation
     public function handleCancelled()
     {
-        // Log::info('Cancellation received');
-        $this->isProcessing = false;
         $this->selectedPlan = null;
-        // $this->alert('info', 'Subscription change cancelled');
     }
+
+    // Paypal payment
+    #[On('paypal-payment')]
     public function proceedWithPayment()
     {
         // Log::info('proceedWithPayment called');
-        $this->isProcessing = true;
 
         try {
             // Verify webhook first
@@ -166,7 +166,6 @@ class Subscribe extends Component
             return redirect()->away($approvalUrl);
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->isProcessing = false;
             $this->alert('error', 'Failed to initiate payment: ' . $e->getMessage());
         }
     }

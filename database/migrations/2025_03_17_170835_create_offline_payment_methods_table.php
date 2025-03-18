@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('logo')->nullable();
             $table->text('instructions')->nullable();
             $table->boolean('receipt_image')->default(true);
+            $table->boolean('active')->default(true);
             $table->timestamps();
         });
     }

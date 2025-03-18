@@ -1,8 +1,8 @@
 <div
     class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Transaction #{{ $payment->id }}</h2>
+    <div class="flex flex-col justify-between items-center mb-6 md:flex-row">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Transaction </h2>
         <x-primary-info-button href="{{ route('user.my-transactions') }}" wire:navigate>
             Back to Transactions
         </x-primary-info-button>
@@ -10,7 +10,7 @@
 
     <!-- Plan Info -->
     <div class="mb-6">
-        <h3 class="mb-2 text-lg font-semibold text-neutral-700 dark:text-neutral-300">Plan</h3>
+        <h3 class="mb-2 font-semibold text-md md:text-lg text-neutral-700 dark:text-neutral-300">Plan</h3>
         <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
             <span class="font-medium">{{ $plan->name }}</span>
             <span class="text-sm text-neutral-600 dark:text-neutral-400">
@@ -43,10 +43,10 @@
     <!-- Payment Details Form -->
     <form wire:submit.prevent="updatePaymentDetails" class="mb-6">
         <div class="p-4 bg-white rounded-lg border dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
-            <h3 class="mb-4 text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                <span class="font-medium">{{ __('Transaction Information') }} </span>
+            <h3 class="flex flex-col gap-2 items-center mb-4 text-xs font-medium md:text-sm text-neutral-500 dark:text-neutral-400 md:flex-row w-fit">
+                <span class="text-sm font-semibold md:text-lg text-neutral-700 dark:text-neutral-300">Transaction Information </span>
                 <span
-                    class="px-2 py-1 ml-2 text-xs font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-100">
+                    class="px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-100">
                     {{ $payment->gateway }}
                 </span>
             </h3>
@@ -98,7 +98,7 @@
     <!-- Payment Images Section -->
     @if($showImageSection)
     <div class="p-4 bg-white rounded-lg border dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
-        <h3 class="mb-4 text-lg font-semibold text-neutral-700 dark:text-neutral-300">Payment Images</h3>
+        <h3 class="mb-4 text-sm font-semibold md:text-lg text-neutral-700 dark:text-neutral-300">Payment Images</h3>
 
         <!-- Image Upload Form -->
         <form wire:submit.prevent="uploadImages" class="mb-6">

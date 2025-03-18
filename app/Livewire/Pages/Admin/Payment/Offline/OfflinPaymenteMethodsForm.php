@@ -22,6 +22,7 @@ class OfflinPaymenteMethodsForm extends Component
     public $new_logo = null;
     public $logo_preview = null;
     public $slug = '';
+    public $active = true;
 
     protected function rules()
     {
@@ -30,7 +31,8 @@ class OfflinPaymenteMethodsForm extends Component
             'instructions' => 'required|string',
             'receipt_image' => 'boolean',
             'new_logo' => 'nullable|image',
-            'slug' => 'required|string'
+            'slug' => 'required|string',
+            'active' => 'boolean'
         ];
     }
 
@@ -68,7 +70,8 @@ class OfflinPaymenteMethodsForm extends Component
                     'name' => $validatedData['name'],
                     'slug' => $validatedData['slug'],
                     'instructions' => $validatedData['instructions'],
-                    'receipt_image' => $validatedData['receipt_image']
+                    'receipt_image' => $validatedData['receipt_image'],
+                    'active' => $validatedData['active']
                 ];
 
                 if ($this->new_logo) {
@@ -94,6 +97,8 @@ class OfflinPaymenteMethodsForm extends Component
                     'instructions' => $validatedData['instructions'],
                     'receipt_image' => $validatedData['receipt_image'],
                     'logo' => $logoPath,
+                    'active' => $validatedData['active']
+
                 ]);
 
                 Session::flash('success', 'Payment method created successfully!.');

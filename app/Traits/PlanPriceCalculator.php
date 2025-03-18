@@ -24,19 +24,16 @@ trait PlanPriceCalculator
 
         // Calculate daily rates
         $currentDailyRate = $currentPlan->price / $totalPeriodDays;
-        // $newDailyRate = $newPlan->price / $totalPeriodDays;
+        $newDailyRate = $newPlan->price / $totalPeriodDays;
 
         // Calculate unused amount from current plan
         $unusedAmount = $currentPlan->price - ($currentDailyRate * $consumedDays);
 
         // Calculate cost for remaining days at new plan rate
-        // $remainingCost = $newDailyRate * $remainingDays;
+        $remainingCost = $newDailyRate * $remainingDays;
 
         // Calculate final upgrade cost
-        // $upgradeCostpro = max(0, $remainingCost - $unusedAmount);
-
-        $upgradeCost = $newPlan->price - $unusedAmount ;
-
+        $upgradeCost = max(0, $remainingCost - $unusedAmount);
         $title =  "Upgrade";
         // Only calculate if upgrading to a higher-priced plan
         if ($newPlan->price <= $currentSubscription->plan->price) {
@@ -44,15 +41,15 @@ trait PlanPriceCalculator
             $title =  "Downgrade";
         }
 
+
         return [
             'title' => $title,
             'upgrade_cost' => round($upgradeCost, 2),
             'remaining_days' => $remainingDays,
             'unused_amount' => round($unusedAmount, 2),
-            // 'new_daily_rate' => round($newDailyRate, 2),
+            'new_daily_rate' => round($newDailyRate, 2),
             'current_daily_rate' => round($currentDailyRate, 2),
             'totalPeriodDays'=>$totalPeriodDays,
-            // 'upgradeCostpro'=>$upgradeCostpro
         ];
     }
 }

@@ -12,10 +12,10 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 lg:grid-cols-4">
+        <div class="grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 lg:grid-cols-5">
             <!-- Server Count -->
             <div
-                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
+                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-purple-500/20"></div>
                 <div class="relative p-3 lg:p-6">
                     <div class="flex justify-between items-center">
@@ -35,7 +35,7 @@
 
             <!-- Combined Email Stats -->
             <div
-                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
+                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-teal-500/20"></div>
                 <div class="relative p-3 lg:p-6">
                     <div class="flex justify-between items-center">
@@ -60,7 +60,7 @@
 
             <!-- Combined Campaign Stats -->
             <div
-                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
+                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-indigo-500/20"></div>
                 <div class="relative p-3 lg:p-6">
                     <div class="flex justify-between items-center">
@@ -92,7 +92,7 @@
 
             <!-- Combined Payment Stats -->
             <div
-                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
+                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-green-500/20"></div>
                 <div class="relative p-3 lg:p-6">
                     <div class="flex justify-between items-center">
@@ -118,8 +118,7 @@
             </div>
 
             <!-- Active Campaigns Section -->
-            <div class="mt-8">
-                <div
+            <div
                     class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
                     <div class="absolute inset-0 bg-gradient-to-br to-transparent from-blue-500/20"></div>
                     <div class="relative p-3 lg:p-6">
@@ -165,7 +164,6 @@
                             @endif
                         </div>
                     </div>
-                </div>
             </div>
         </div>
 

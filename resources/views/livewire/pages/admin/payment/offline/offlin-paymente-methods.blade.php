@@ -69,6 +69,7 @@
                     <th scope="col" class="p-4">Name</th>
                     <th scope="col" class="p-4">Slug</th>
                     <th scope="col" class="p-4">Receipt Required</th>
+                    <th scope="col" class="p-4">Active</th>
                     <th scope="col" class="p-4">Added At</th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
@@ -95,6 +96,11 @@
                     <td class="p-4">
                         <span class="px-2 py-1 text-xs rounded-full {{ $method->receipt_image ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }}">
                             {{ $method->receipt_image ? 'Yes' : 'No' }}
+                        </span>
+                    </td>
+                    <td class="p-4">
+                        <span class="px-2 py-1 text-xs rounded-full {{ $method->active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }}">
+                            {{ $method->active ? 'Yes' : 'No' }}
                         </span>
                     </td>
                     <td class="p-4">{{ $method->created_at?->format('d/m/Y h:i:s A') }}</td>

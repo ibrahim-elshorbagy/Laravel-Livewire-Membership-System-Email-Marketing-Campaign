@@ -61,16 +61,29 @@
 
                 <x-input-error :messages="$errors->get('new_logo')" class="mt-2" />
             </div>
-            <div>
-                <x-input-label for="receipt_image">Receipt Image Required</x-input-label>
-                <label class="inline-flex relative items-center mt-3 cursor-pointer">
-                    <input type="checkbox" wire:model="receipt_image" class="sr-only peer" checked>
-                    <div
-                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
-                    </div>
-                </label>
-                <x-input-error :messages="$errors->get('receipt_image')" class="mt-2" />
+            <div class="grid gap-6 lg:grid-cols-2">
+                <div>
+                    <x-input-label for="receipt_image">Receipt Image Required</x-input-label>
+                    <label class="inline-flex relative items-center mt-3 cursor-pointer">
+                        <input type="checkbox" wire:model="receipt_image" class="sr-only peer" checked>
+                        <div
+                            class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                        </div>
+                    </label>
+                    <x-input-error :messages="$errors->get('receipt_image')" class="mt-2" />
+                </div>
+                <div>
+                    <x-input-label for="active">Active</x-input-label>
+                    <label class="inline-flex relative items-center mt-3 cursor-pointer">
+                        <input type="checkbox" wire:model="active" class="sr-only peer" checked>
+                        <div
+                            class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600">
+                        </div>
+                    </label>
+                    <x-input-error :messages="$errors->get('active')" class="mt-2" />
             </div>
+            </div>
+
         </div>
 
         <div class="flex justify-end mt-6">

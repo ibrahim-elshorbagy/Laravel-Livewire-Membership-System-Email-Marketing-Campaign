@@ -8,4 +8,9 @@ class OfflinePaymentMethod extends Model
 {
     protected $guarded = ['id'];
 
+        protected $casts = [
+        'receipt_image' => 'boolean',
+        'active' => 'boolean'
+
+    ];
 }

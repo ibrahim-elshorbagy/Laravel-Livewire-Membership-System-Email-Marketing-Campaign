@@ -61,8 +61,8 @@
     <div class="space-y-6">
         <!-- Transaction Information Section -->
         <div class="p-4 bg-white rounded-lg border dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
-            <h3 class="mb-4 text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                <span class="font-medium">{{ __('Transaction Information') }} </span>
+            <h3 class="mb-4 text-xs font-medium md:text-sm text-neutral-500 dark:text-neutral-400">
+                <span class="font-medium">Transaction Information </span>
                 <span
                     class="px-2 py-1 ml-2 text-xs font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-100">
                     {{ $payment->gateway }}
@@ -170,8 +170,8 @@
 <!-- Payment Images Section -->
 @if($payment->images && count($payment->images) > 0)
 <div class="p-4 mt-6 bg-white rounded-lg border dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
-    <h3 class="mb-4 text-lg font-semibold text-neutral-700 dark:text-neutral-300">Payment Images</h3>
-    
+    <h3 class="mb-4 text-sm font-semibold md:text-lg text-neutral-700 dark:text-neutral-300">Payment Images</h3>
+
     <!-- Display Existing Images -->
     <div x-cloak class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         @foreach($payment->images as $image)
