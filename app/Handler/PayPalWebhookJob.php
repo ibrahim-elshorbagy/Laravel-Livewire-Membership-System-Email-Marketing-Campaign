@@ -178,7 +178,6 @@ class PayPalWebhookJob extends ProcessWebhookJob
                     if ($payment->user->lastSubscription()) {
 
                         if($payment->user->lastSubscription()->plan->id == $payment->plan_id) {
-                            
                             $subscription = $payment->user->lastSubscription()->renew();
                             $payment->user->forceSetConsumption('Subscribers Limit', EmailList::where('user_id', $payment->user->id)->count());
                             $payment->user->forceSetConsumption('Email Sending', 0);
@@ -190,8 +189,24 @@ class PayPalWebhookJob extends ProcessWebhookJob
 
                             $payment->user->notify(new SubscriptionRenewedNotification($subscription));
                         } else {
+
+                            $started_at = $payment->user->lastSubscription()->started_at;
+                            $expired_at = $payment->user->lastSubscription()->expired_at;
+
                             $payment->user->lastSubscription()->suppress();
+
+
                             $subscription = $payment->user->subscribeTo($payment->plan);
+                            $payment->user->lastSubscription();
+
+                            if( $payment->amount < $payment->plan->price ) {
+                                    $payment->user->lastSubscription()->update([
+                                    'started_at' => $started_at,
+                                    'expired_at' => $expired_at,
+                                ]);
+                            }
+
+
                             $payment->user->forceSetConsumption('Subscribers Limit', EmailList::where('user_id', $payment->user->id)->count());
                             $payment->user->forceSetConsumption('Email Sending', 0);
 

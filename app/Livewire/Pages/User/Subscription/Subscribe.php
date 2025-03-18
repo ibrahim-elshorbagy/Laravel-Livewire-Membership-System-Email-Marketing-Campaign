@@ -122,7 +122,7 @@ class Subscribe extends Component
         // Log::info('Cancellation received');
         $this->isProcessing = false;
         $this->selectedPlan = null;
-        $this->alert('info', 'Subscription change cancelled');
+        // $this->alert('info', 'Subscription change cancelled');
     }
     public function proceedWithPayment()
     {

@@ -86,7 +86,7 @@
         </div>
 
         <!-- Yearly Plans -->
-        <div x-cloak x-show="selectedTab === 'yearly'" class="grid grid-cols-1 gap-6 md:grid-cols-4">
+        <div x-cloak x-show="selectedTab === 'yearly'" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             @foreach($yearlyPlans as $plan)
             <article
                 class="flex overflow-hidden flex-col p-3 w-full rounded-lg md:p-6 group bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
@@ -163,9 +163,8 @@
                 Calculation</h4>
             <ul class="space-y-1">
                 <li>Unused amount from current plan: ${{ $upgradeCalculation['unused_amount'] }}</li>
+                <li>total Period Days: {{ $upgradeCalculation['totalPeriodDays'] }} days</li>
                 <li>Remaining days: {{ $upgradeCalculation['remaining_days'] }} days</li>
-                <li>New daily rate: ${{ $upgradeCalculation['new_daily_rate'] }}/day</li>
-                <li>Old daily rate: ${{ $upgradeCalculation['current_daily_rate'] }}/day</li>
                 <li class="pt-2 mt-2 font-medium border-t border-neutral-200 dark:border-neutral-700">
                     payment required: ${{ $upgradeCalculation['upgrade_cost'] }}
                 </li>
