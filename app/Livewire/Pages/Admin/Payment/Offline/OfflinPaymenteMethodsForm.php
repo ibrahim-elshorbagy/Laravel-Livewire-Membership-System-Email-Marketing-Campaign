@@ -23,6 +23,7 @@ class OfflinPaymenteMethodsForm extends Component
     public $logo_preview = null;
     public $slug = '';
     public $active = true;
+    public $temp_folder;
 
     protected function rules()
     {
@@ -42,6 +43,50 @@ class OfflinPaymenteMethodsForm extends Component
             $this->method_id = $method;
             $methodModel = OfflinePaymentMethod::findOrFail($method);
             $this->fill($methodModel->toArray());
+            $this->temp_folder = $method;
+        } else {
+            // Generate a random folder name for new methods
+            $this->temp_folder =  "offline-payment-temp-" . now()->timestamp;
+        }
+    }
+
+    public $fileData;
+    public function uploadCKEditorImage($fileData)
+    {
+
+        $this->fileData = $fileData;
+        try {
+
+            $validatedData = $this->validate([
+                'fileData' => ['required', 'string', 'regex:/^data:image\/[a-zA-Z]+;base64,[a-zA-Z0-9\/\+]+={0,2}$/'],
+            ]);
+
+            $image = $validatedData['fileData'];
+
+            // Extract image data
+            list($type, $data) = explode(';', $image);
+            list(, $data) = explode(',', $data);
+            $fileContent = base64_decode($data);
+            $imageType = str_replace('data:image/', '', $type);
+
+
+            // Generate a unique filename
+            $fileName = 'editor_' . Str::random(10) . '.' . $imageType;
+
+            // Store in the same folder structure as logo
+            $path = "admin/offline-payment-methods/{$this->temp_folder}/{$fileName}";
+            Storage::disk('public')->put($path, $fileContent);
+
+            return [
+                'success' => true,
+                'url' => Storage::url($path),
+                'path' => $path
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'Upload failed: ' . $e->getMessage()
+            ];
         }
     }
 
@@ -78,38 +123,44 @@ class OfflinPaymenteMethodsForm extends Component
                     if ($method->logo) {
                         Storage::disk('public')->delete($method->logo);
                     }
-                    $updateData['logo'] = $this->new_logo->store('payment-methods', 'public');
+                    // Store logo in the same folder structure
+                    $logoPath = $this->new_logo->storeAs(
+                        "admin/offline-payment-methods/{$this->temp_folder}",
+                        "logo_" . time() . "." . $this->new_logo->getClientOriginalExtension(),
+                        'public'
+                    );
+                    $updateData['logo'] = $logoPath;
                 }
 
                 $method->update($updateData);
-
-                Session::flash('success', 'Payment method updated successfully!.');
+                Session::flash('success', 'Payment method updated successfully!');
 
             } else {
                 $logoPath = null;
                 if ($this->new_logo) {
-                    $logoPath = $this->new_logo->store('payment-methods', 'public');
+                    // Store logo in the same folder structure
+                    $logoPath = $this->new_logo->storeAs(
+                        "admin/offline-payment-methods/{$this->temp_folder}",
+                        "logo_" . time() . "." . $this->new_logo->getClientOriginalExtension(),
+                        'public'
+                    );
                 }
 
-                OfflinePaymentMethod::create([
+                $newMethod = OfflinePaymentMethod::create([
                     'name' => $validatedData['name'],
                     'slug' => $validatedData['slug'],
                     'instructions' => $validatedData['instructions'],
                     'receipt_image' => $validatedData['receipt_image'],
                     'logo' => $logoPath,
                     'active' => $validatedData['active']
-
                 ]);
 
-                Session::flash('success', 'Payment method created successfully!.');
-
+                Session::flash('success', 'Payment method created successfully!');
             }
 
             return $this->redirect(route('admin.offline-payment-methods'), navigate: true);
         } catch (\Exception $e) {
-
-            Session::flash('success', 'Failed to save payment method!.'.$e->getMessage());
-
+            Session::flash('error', 'Failed to save payment method: ' . $e->getMessage());
         }
     }
 

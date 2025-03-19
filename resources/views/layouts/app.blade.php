@@ -19,6 +19,7 @@
         integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+    @stack('styles')
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 

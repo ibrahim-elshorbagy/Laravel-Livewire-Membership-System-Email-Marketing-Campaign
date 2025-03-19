@@ -29,10 +29,12 @@
             </div>
 
 
-
             <div class="lg:col-span-2">
                 <x-input-label for="instructions" required>Instructions</x-input-label>
-                <x-textarea-input wire:model="instructions" id="instructions" rows="4" class="block mt-1 w-full" required />
+                <div wire:ignore>
+                    <textarea id="instructions" class="block mt-1 w-full"></textarea>
+                </div>
+                <input type="hidden" wire:model="instructions">
                 <x-input-error :messages="$errors->get('instructions')" class="mt-2" />
             </div>
 
@@ -93,3 +95,79 @@
         </div>
     </form>
 </div>
+
+
+@push('scripts')
+<script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
+<script>
+    document.addEventListener('livewire:initialized', function () {
+        let editor;
+
+        ClassicEditor
+            .create(document.querySelector('#instructions'), {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'insertTable', 'imageUpload', 'undo', 'redo'],
+                image: {
+                    upload: {
+                        types: ['jpeg', 'png', 'gif', 'jpg', 'webp']
+                    }
+                }
+            })
+            .then(newEditor => {
+                editor = newEditor;
+
+                // Set initial data if it exists
+                if (@this.instructions) {
+                    editor.setData(@this.instructions);
+                }
+
+                // Update Livewire model when content changes
+                editor.model.document.on('change:data', () => {
+                    @this.set('instructions', editor.getData());
+                });
+
+                // Handle file uploads using Livewire component method
+                editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+                    return {
+                        upload: async () => {
+                            const file = await loader.file;
+
+                            // Convert file to base64
+                            return new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.readAsDataURL(file);
+                                reader.onload = async () => {
+                                    // Send the base64 data to the Livewire component
+                                    const fileData = reader.result;
+
+                                    try {
+                                        const result = await @this.uploadCKEditorImage(fileData);
+
+                                        if (result.success) {
+                                            resolve({
+                                                default: result.url
+                                            });
+                                        } else {
+                                            reject(result.error);
+                                        }
+                                    } catch (error) {
+                                        reject('Upload failed');
+                                    }
+                                };
+                                reader.onerror = () => reject('Failed to read file');
+                            });
+                        },
+                        abort: () => {}
+                    };
+                };
+            })
+            .catch(error => console.error(error));
+
+        // Clean up on component disconnect
+        Livewire.on('disconnected', () => {
+            if (editor) {
+                editor.destroy();
+            }
+        });
+    });
+</script>
+@endpush
