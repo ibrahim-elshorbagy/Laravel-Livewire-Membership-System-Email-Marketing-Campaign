@@ -21,6 +21,8 @@ class CampaignForm extends Component
     public $message_id = null;
     public $selectedServers = [];
     public $selectedLists = [];
+    public $selectAllServers = false;
+    public $selectAllLists = false;
 
     // Search inputs
     public $messageSearch = '';
@@ -53,6 +55,29 @@ class CampaignForm extends Component
             $this->message_id = $campaignModel->message_id;
             $this->selectedServers = $campaignModel->servers->pluck('id')->toArray();
             $this->selectedLists = $campaignModel->emailLists->pluck('id')->toArray();
+        }
+    }
+
+    public function updatedSelectAllServers($value)
+    {
+        if ($value) {
+            $this->selectedServers = $this->availableServers
+                ->filter(function($server) {
+                    return !$server->is_used;
+                })
+                ->pluck('id')
+                ->toArray();
+        } else {
+            $this->selectedServers = [];
+        }
+    }
+
+    public function updatedSelectAllLists($value)
+    {
+        if ($value) {
+            $this->selectedLists = $this->availableLists->pluck('id')->toArray();
+        } else {
+            $this->selectedLists = [];
         }
     }
 

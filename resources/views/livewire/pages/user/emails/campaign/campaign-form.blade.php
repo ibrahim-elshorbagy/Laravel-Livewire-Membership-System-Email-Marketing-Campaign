@@ -69,6 +69,8 @@
                 <!-- Selected servers tags -->
                 @if(count($selectedServers) > 0)
                 <div class="flex flex-wrap gap-2 mt-2">
+
+
                     @foreach($availableServers->whereIn('id', $selectedServers) as $server)
                     <span class="inline-flex items-center px-2 py-1 text-sm bg-blue-100 rounded-full dark:bg-blue-900">
                         {{ $server->name }}
@@ -90,6 +92,12 @@
                             placeholder="Search servers...">
 
                         <div class="overflow-y-auto mt-2 max-h-48">
+                            <label
+                                class="flex items-center px-3 py-2 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700 border-b border-neutral-200 dark:border-neutral-700">
+                                <input type="checkbox" wire:model.live="selectAllServers"
+                                    class="rounded border-neutral-300 dark:border-neutral-700">
+                                <span class="ml-2 font-medium">Select All Available Servers</span>
+                            </label>
                             @foreach($availableServers as $server)
                             <label
                                 class="flex justify-between items-center px-3 py-2 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700">
@@ -150,6 +158,12 @@
                             placeholder="Search lists...">
 
                         <div class="overflow-y-auto mt-2 max-h-48">
+                            <label
+                                class="flex items-center px-3 py-2 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700 border-b border-neutral-200 dark:border-neutral-700">
+                                <input type="checkbox" wire:model.live="selectAllLists"
+                                    class="rounded border-neutral-300 dark:border-neutral-700">
+                                <span class="ml-2 font-medium">Select All Email Lists</span>
+                            </label>
                             @foreach($availableLists as $list)
                             <label
                                 class="flex items-center px-3 py-2 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700">

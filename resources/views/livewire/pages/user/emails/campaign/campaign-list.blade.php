@@ -43,7 +43,7 @@
                     <option value="Completed">Completed</option>
                 </x-primary-select-input>
 
-    
+
                 <x-primary-select-input wire:model.live="sortDirection" class="w-full sm:w-32">
                     <option value="asc">Ascending</option>
                     <option value="desc">Descending</option>
@@ -83,31 +83,41 @@
                                 {{ $campaign->title }}
                             </span>
                             <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                                {{ $campaign->message->message_title }}
+                                {{ Str::limit($campaign->message->message_title, 25) }}
                             </span>
                             <span class="text-xs text-neutral-600 dark:text-neutral-400">
-                                {{ $campaign->message->email_subject }}
+                                {{ Str::limit($campaign->message->email_subject, 25) }}
                             </span>
                         </div>
                     </td>
                     <td class="p-4">
                         <div class="flex flex-wrap gap-1 text-nowrap">
-                            @foreach($campaign->servers as $server)
+                            @foreach($campaign->servers->take(4) as $server)
                             <span class="px-2 py-1 text-xs text-blue-500 rounded-full bg-blue-500/10">
                                 {{ $server->name }}
                             </span>
                             @endforeach
+                            @if($campaign->servers->count() > 4)
+                            <span class="px-2 py-1 text-xs text-blue-500 rounded-full bg-blue-500/10">
+                                +{{ $campaign->servers->count() - 4 }} more
+                            </span>
+                            @endif
                         </div>
                     </td>
                     <td class="p-4">
                         <div class="flex flex-wrap gap-1 text-nowrap">
-                            @foreach($campaign->emailLists as $list)
+                            @foreach($campaign->emailLists->take(4) as $list)
                             <a href="{{ route('user.emails.index') }}?selectedList={{ $list->name }}">
                                 <span class="px-2 py-1 text-xs text-green-500 rounded-full bg-green-500/10">
                                     {{ $list->name }}
                                 </span>
                             </a>
                             @endforeach
+                            @if($campaign->emailLists->count() > 4)
+                            <span class="px-2 py-1 text-xs text-green-500 rounded-full bg-green-500/10">
+                                +{{ $campaign->emailLists->count() - 4 }} more
+                            </span>
+                            @endif
                         </div>
                     </td>
                     <td class="p-4 text-nowrap">
@@ -157,7 +167,8 @@
                                     </button>
                                     @if(!$campaign->canBeActive())
                                     <!-- Tooltip -->
-                                    <div x-show="showTooltip" x-cloak x-transition:enter="transition ease-out duration-200"
+                                    <div x-show="showTooltip" x-cloak
+                                        x-transition:enter="transition ease-out duration-200"
                                         x-transition:enter-start="opacity-0 translate-y-1"
                                         x-transition:enter-end="opacity-100 translate-y-0"
                                         x-transition:leave="transition ease-in duration-150"
