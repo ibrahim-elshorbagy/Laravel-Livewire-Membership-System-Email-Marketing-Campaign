@@ -91,8 +91,8 @@
             <!-- Payment Instructions -->
             <div x-show="$wire.selectedMethod" class="p-4 mt-6 rounded-lg bg-neutral-50 dark:bg-neutral-800">
                 <h4 class="text-sm font-medium md:text-md text-neutral-900 dark:text-neutral-100">Payment Instructions</h4>
-                <div class="mt-2 text-sm whitespace-pre-line text-neutral-600 dark:text-neutral-400"
-                    x-text="$wire.selectedMethod === 'paypal' ? 'Follow PayPal instructions to complete your payment securely.' : offlineMethods.find(m => m.slug === $wire.selectedMethod)?.instructions || ''">
+                <div class="mt-2 text-sm text-neutral-600 dark:text-neutral-400 no-tailwindcss-base"
+                    x-html="$wire.selectedMethod === 'paypal' ? 'Follow PayPal instructions to complete your payment securely.' : offlineMethods.find(m => m.slug === $wire.selectedMethod)?.instructions || ''">
                 </div>
             </div>
 

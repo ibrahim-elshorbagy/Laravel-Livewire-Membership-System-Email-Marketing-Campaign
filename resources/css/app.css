@@ -1,6 +1,112 @@
 @tailwind base;
+
+@layer base {
+    .no-tailwindcss-base {
+        /* Reset all core typography elements */
+        h1, h2, h3, h4, h5, h6 {
+            font-size: revert;
+            font-weight: revert;
+            margin: revert;
+        }
+
+        p {
+            margin: revert;
+            line-height: revert;
+        }
+
+        ol, ul {
+            list-style: revert;
+            margin: revert;
+            padding: revert;
+            padding-left: 1.5em;
+        }
+
+        li {
+            margin: revert;
+        }
+
+        a {
+            color: revert;
+            text-decoration: revert;
+        }
+
+        blockquote {
+            margin: revert;
+            padding: revert;
+            border-left: revert;
+            quotes: revert;
+        }
+
+        pre {
+            font-family: revert;
+            margin: revert;
+            overflow: revert;
+            white-space: revert;
+            background: revert;
+            padding: revert;
+            border-radius: revert;
+        }
+
+        code {
+            font-family: revert;
+            padding: revert;
+            background: revert;
+            border-radius: revert;
+        }
+
+        img {
+            max-width: revert;
+            height: revert;
+            vertical-align: revert;
+        }
+
+        hr {
+            border: revert;
+            margin: revert;
+        }
+
+        /* Form elements reset */
+        button, input, optgroup, select, textarea {
+            font: revert;
+            color: revert;
+            margin: revert;
+            padding: revert;
+            background: revert;
+            border: revert;
+        }
+
+        /* Table elements reset */
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: revert;
+            margin: revert;
+            border: 1px solid #e0e0e0;
+        }
+
+        th, td {
+            padding: revert;
+            border: 1px solid #e0e0e0; 
+            background: revert;
+        }
+        /* Additional text elements */
+        strong {
+            font-weight: revert;
+        }
+
+        em {
+            font-style: revert;
+        }
+
+        /* Remove Tailwind's focus ring reset */
+        *:focus {
+            outline: revert;
+        }
+    }
+}
 @tailwind components;
 @tailwind utilities;
+
 
 .cm-editor {
     height: 100%;
@@ -46,3 +152,7 @@
 }
 
 [x-cloak] { display: none !important; }
+
+.no-tailwind {
+all: unset;
+}
