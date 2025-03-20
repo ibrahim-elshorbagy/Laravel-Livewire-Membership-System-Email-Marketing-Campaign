@@ -12,7 +12,7 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 lg:grid-cols-5">
+        <div class="grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 lg:grid-cols-4">
             <!-- Server Count -->
             <div
                 class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
@@ -117,56 +117,53 @@
                 </div>
             </div>
 
-            <!-- Active Campaigns Section -->
-            <div
-                    class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
-                    <div class="absolute inset-0 bg-gradient-to-br to-transparent from-blue-500/20"></div>
-                    <div class="relative p-3 lg:p-6">
-                        <div class="flex justify-between items-center">
-                            <i class="text-blue-500 md:text-3xl dark:text-blue-400 fas fa-rocket"></i>
-                            <span
-                                class="px-3 py-1.5 text-xs font-medium text-blue-500 bg-blue-50 rounded-full md:text-sm dark:text-blue-400 dark:bg-blue-500/10">
-                                Active Campaigns
-                            </span>
-                        </div>
-                        <div class="mt-4">
-                            @if($activeCampaigns->isEmpty())
-                            <p class="text-sm text-neutral-600 dark:text-neutral-400">No active campaigns at the moment
-                            </p>
-                            @else
-                            <div class="space-y-4">
-                                @foreach($activeCampaigns as $campaign)
-                                <div
-                                    class="p-4 bg-white rounded-xl shadow-lg dark:bg-neutral-800 dark:border-neutral-500">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <h3 class="font-medium text-neutral-800 dark:text-white">{{
-                                            $campaign['title'] }}</h3>
-                                        <span class="text-sm text-neutral-600 dark:text-white">{{
-                                            $campaign['sent_emails']
-                                            }}/{{ $campaign['total_emails'] }}</span>
-                                    </div>
-                                    <div x-data="{ currentVal: {{ $campaign['percentage'] }}, minVal: 0, maxVal: 100, calcPercentage(min, max, val){ return ((val-min)/(max-min))*100 } }"
-                                        class="flex overflow-hidden w-full h-2.5 rounded-lg bg-neutral-100 dark:bg-neutral-300"
-                                        role="progressbar" aria-label="campaign progress"
-                                        x-bind:aria-valuenow="currentVal" x-bind:aria-valuemin="minVal"
-                                        x-bind:aria-valuemax="maxVal">
-                                        <div class="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-lg"
-                                            x-bind:style="`width: ${calcPercentage(minVal, maxVal, currentVal)}%`">
-                                        </div>
-                                    </div>
-                                    <div class="mt-1 text-right">
-                                        <span class="text-sm font-medium text-neutral-600 dark:text-white">{{
-                                            $campaign['percentage'] }}%</span>
+
+        </div>
+        <!-- Active Campaigns Section -->
+        <div class="mt-4 overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
+                <div class="absolute inset-0 bg-gradient-to-br to-transparent from-blue-500/20"></div>
+                <div class="relative p-3 lg:p-6">
+                    <div class="flex justify-between items-center">
+                        <i class="text-blue-500 md:text-3xl dark:text-blue-400 fas fa-rocket"></i>
+                        <span
+                            class="px-3 py-1.5 text-xs font-medium text-blue-500 bg-blue-50 rounded-full md:text-sm dark:text-blue-400 dark:bg-blue-500/10">
+                            Active Campaigns
+                        </span>
+                    </div>
+                    <div class="mt-4">
+                        @if($activeCampaigns->isEmpty())
+                        <p class="text-sm text-neutral-600 dark:text-neutral-400">No active campaigns at the moment
+                        </p>
+                        @else
+                        <div class="grid grid-cols-1 gap-4 mt-8 md:grid-cols-3 lg:grid-cols-4">
+                            @foreach($activeCampaigns as $campaign)
+                            <div class="p-4 bg-white rounded-xl shadow-lg dark:bg-neutral-800 dark:border-neutral-500">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h3 class="font-medium text-neutral-800 dark:text-white">{{
+                                        $campaign['title'] }}</h3>
+                                    <span class="text-sm text-neutral-600 dark:text-white">{{
+                                        $campaign['sent_emails']
+                                        }}/{{ $campaign['total_emails'] }}</span>
+                                </div>
+                                <div x-data="{ currentVal: {{ $campaign['percentage'] }}, minVal: 0, maxVal: 100, calcPercentage(min, max, val){ return ((val-min)/(max-min))*100 } }"
+                                    class="flex overflow-hidden w-full h-2.5 rounded-lg bg-neutral-100 dark:bg-neutral-300"
+                                    role="progressbar" aria-label="campaign progress" x-bind:aria-valuenow="currentVal"
+                                    x-bind:aria-valuemin="minVal" x-bind:aria-valuemax="maxVal">
+                                    <div class="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-lg"
+                                        x-bind:style="`width: ${calcPercentage(minVal, maxVal, currentVal)}%`">
                                     </div>
                                 </div>
-                                @endforeach
+                                <div class="mt-1 text-right">
+                                    <span class="text-sm font-medium text-neutral-600 dark:text-white">{{
+                                        $campaign['percentage'] }}%</span>
+                                </div>
                             </div>
-                            @endif
+                            @endforeach
                         </div>
+                        @endif
                     </div>
-            </div>
+                </div>
         </div>
-
 
     </div>
 </div>
