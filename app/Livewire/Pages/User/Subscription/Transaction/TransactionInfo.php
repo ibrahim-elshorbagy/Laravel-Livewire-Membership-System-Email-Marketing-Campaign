@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Storage;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class TransactionInfo extends Component
 {
@@ -96,18 +101,61 @@ class TransactionInfo extends Component
         }
 
         $this->validate([
-            'images.*' => 'image|max:2048'
+            'images.*' => 'image'
         ]);
-        
+
         $userId = auth()->id();
+        $manager = new ImageManager(new Driver());
+
         foreach ($this->images as $image) {
-            $path = $image->store('users/' . $userId . '/payments/' . $this->payment->id, 'public');
-            $this->payment->images()->create([
-                'image_path' => $path
-            ]);
+            try {
+                // Read the uploaded image
+                $img = $manager->read($image);
+
+                // Generate a unique filename
+                $fileName = 'payment_' . Str::random(10) . '.' . $image->getClientOriginalExtension();
+
+                // Define the storage path
+                $storagePath = 'users/' . $userId . '/payments/' . $this->payment->id;
+                $fullPath = Storage::disk('public')->path($storagePath);
+
+                // Ensure the directory exists
+                if (!File::exists($fullPath)) {
+                    File::makeDirectory($fullPath, 0755, true, true);
+                }
+
+                // Full path for saving
+                $fullFilePath = $fullPath . '/' . $fileName;
+                $savedPath = $storagePath . '/' . $fileName;
+
+                // Save the image with compression
+                $img->save($fullFilePath, [
+                    'quality' => 80,  // Adjust quality (0-100)
+                    'optimize' => true
+                ]);
+
+                // Create image record
+                $this->payment->images()->create([
+                    'image_path' => $savedPath
+                ]);
+
+
+            } catch (\Exception $e) {
+
+                $this->alert('error', 'Failed to upload an image: ' . $e->getMessage(), [
+                    'position' => 'bottom-end',
+                    'timer' => 3000,
+                    'toast' => true,
+                ]);
+
+                // Continue to next image if one fails
+                continue;
+            }
         }
 
+        // Reset images array
         $this->images = [];
+
         $this->alert('success', 'Images uploaded successfully!', [
             'position' => 'bottom-end',
             'timer' => 3000,

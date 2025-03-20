@@ -13,11 +13,15 @@ use Livewire\WithFileUploads;
 use LucasDotVin\Soulbscription\Models\Plan;
 use Livewire\Attributes\On;
 use App\Traits\PlanPriceCalculator;
-
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 class PaymentMethodSelection extends Component
 {
     use LivewireAlert, WithFileUploads;
-    use  PlanPriceCalculator;
+    use PlanPriceCalculator;
 
     public $selectedMethod = 'paypal';
     public $offlineMethod = null;
@@ -74,6 +78,7 @@ class PaymentMethodSelection extends Component
             }
         }
     }
+
     public function processPayment()
     {
         $this->validate();
@@ -83,16 +88,15 @@ class PaymentMethodSelection extends Component
             return;
         }
 
-
         try {
             DB::beginTransaction();
-
 
             $user = auth()->user();
             $plan = Plan::findOrFail($this->selectedPlan);
 
             $this->calculateUpgradeCost();
-            $PaymentCalculation =$this->upgradeCalculation['upgrade_cost'];
+            $PaymentCalculation = $this->upgradeCalculation['upgrade_cost'];
+
             // Create payment record
             $payment = Payment::create([
                 'user_id' => $user->id,
@@ -104,13 +108,51 @@ class PaymentMethodSelection extends Component
             ]);
 
             $userId = auth()->id();
+            $manager = new ImageManager(new Driver());
 
             if (!empty($this->images)) {
                 foreach ($this->images as $image) {
-                    $path = $image->store('users/' . $userId . '/payments/' . $payment->id, 'public');
-                    $payment->images()->create([
-                        'image_path' => $path
-                    ]);
+                    try {
+                        // Read the uploaded image
+                        $img = $manager->read($image);
+
+                        // Generate a unique filename
+                        $fileName = 'payment_' . Str::random(10) . '.' . $image->getClientOriginalExtension();
+
+                        // Define the storage path
+                        $storagePath = 'users/' . $userId . '/payments/' . $payment->id;
+                        $fullPath = Storage::disk('public')->path($storagePath);
+
+                        // Ensure the directory exists
+                        if (!File::exists($fullPath)) {
+                            File::makeDirectory($fullPath, 0755, true, true);
+                        }
+
+                        // Full path for saving
+                        $fullFilePath = $fullPath . '/' . $fileName;
+                        $savedPath = $storagePath . '/' . $fileName;
+
+                        // Save the image with compression
+                        $img->save($fullFilePath, [
+                            'quality' => 80,
+                            'optimize' => true
+                        ]);
+
+                        // Create image record
+                        $payment->images()->create([
+                            'image_path' => $savedPath
+                        ]);
+
+
+                    } catch (\Exception $e) {
+                        $this->alert('error', 'Failed to upload an image: ' . $e->getMessage(), [
+                            'position' => 'bottom-end',
+                            'timer' => 3000,
+                            'toast' => true,
+                        ]);
+
+                        continue;
+                    }
                 }
             }
 
@@ -122,6 +164,9 @@ class PaymentMethodSelection extends Component
         } catch (\Exception $e) {
             DB::rollBack();
             $this->alert('error', 'Failed to process payment: ' . $e->getMessage());
+
+            // Optional: Log the full error
+            Log::error('Payment Processing Error: ' . $e->getMessage());
         }
     }
 
