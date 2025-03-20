@@ -269,8 +269,37 @@ class EmailGatewayController extends Controller
             // Validate server assignment
             $server = Server::where('name', $request->serverid)->first();
 
-            // Find and validate user
+
             $user = User::where('id', $server->assigned_to_user_id)->first();
+
+            if (!$user) {
+                try {
+                    ApiError::create([
+                        'serverid' => $request->serverid,
+                        'error_data' => [
+                            'error' => 'Invalid user',
+                            'message' => 'No Assigned user found',
+                            'error_number' => 10
+                        ]
+                    ]);
+
+                    return response()->json([
+                        'error' => 'Invalid user',
+                        'message' => 'No Assigned user found',
+                        'error_number' => 10,
+                        'server' => [
+                            'id' => $request->serverid
+                        ]
+                    ], 404);
+                } finally {
+                    $executionTime = microtime(true) - $startTime;
+                    ApiRequest::create([
+                        'serverid' => $serverid,
+                        'execution_time' => $executionTime,
+                        'status' => 'failed'
+                    ]);
+                }
+            }
 
             if (!$user->active) {
 
