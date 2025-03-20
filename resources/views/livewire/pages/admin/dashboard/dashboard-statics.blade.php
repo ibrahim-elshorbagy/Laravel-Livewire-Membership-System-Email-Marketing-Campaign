@@ -26,23 +26,24 @@
                             Management</span>
                     </div>
                     <div class="flex items-center mt-4">
-                        <div class="flex-1">
-                            <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400"> Users</p>
+                        <a href="{{ route('admin.users') }}" wire:navigate
+                            class="flex-1 cursor-pointer hover:opacity-75 transition-opacity">
+                            <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Users</p>
                             <p class="font-bold text-blue-600 md:text-2xl dark:text-blue-400">{{$totalUsers}}</p>
-                        </div>
+                        </a>
                         <div class="mx-4 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
-                        <div class="flex-1">
-                            <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Subscriptions
-                            </p>
+                        <a href="{{ route('admin.subscriptions') }}" wire:navigate
+                            class="flex-1 cursor-pointer hover:opacity-75 transition-opacity">
+                            <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Subscriptions</p>
                             <p class="font-bold text-blue-600 md:text-2xl dark:text-blue-400">{{$activeSubscriptions}}
                             </p>
-                        </div>
+                        </a>
                     </div>
                 </div>
             </div>
 
             <!-- Server Count -->
-            <div
+            <a href="{{ route('admin.servers') }}" wire:navigate
                 class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-purple-500/20"></div>
                 <div class="relative p-3 lg:p-6">
@@ -57,7 +58,7 @@
                         <p class="font-bold text-purple-600 md:text-2xl dark:text-purple-400">{{$serverCount}}</p>
                     </div>
                 </div>
-            </div>
+            </a>
 
             <!-- Combined Campaign Stats -->
             <div
@@ -113,7 +114,7 @@
             </div>
 
             <!-- Combined Payment Stats -->
-            <div
+            <a href="{{ route('admin.payment.transactions') }}" wire:navigate
                 class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-green-500/20"></div>
                 <div class="relative p-3 lg:p-6">
@@ -136,7 +137,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 </div>

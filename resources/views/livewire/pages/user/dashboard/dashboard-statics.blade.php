@@ -14,8 +14,8 @@
 
         <div class="grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 lg:grid-cols-4">
             <!-- Server Count -->
-            <div
-                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
+            <a href="{{ route('user.servers') }}" wire:navigate
+                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md cursor-pointer hover:opacity-85 transition-opacity">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-purple-500/20"></div>
                 <div class="relative p-3 lg:p-6">
                     <div class="flex justify-between items-center">
@@ -31,11 +31,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
 
-            <!-- Combined Email Stats -->
-            <div
-                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
+            <a href="{{ route('user.emails.index') }}" wire:navigate
+                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md cursor-pointer hover:opacity-85 transition-opacity">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-teal-500/20"></div>
                 <div class="relative p-3 lg:p-6">
                     <div class="flex justify-between items-center">
@@ -56,7 +55,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
 
             <!-- Combined Campaign Stats -->
             <div
@@ -70,19 +69,21 @@
                             Management</span>
                     </div>
                     <div class="flex items-center mt-4">
-                        <div class="flex-1">
+                        <a href="{{ route('user.campaigns.list') }}" wire:navigate
+                            class="flex-1 cursor-pointer hover:opacity-85 transition-opacity">
                             <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Campaigns
                             </p>
                             <p class="font-bold text-indigo-600 md:text-2xl dark:text-indigo-400">{{ $totalCampaigns }}
                             </p>
-                        </div>
+                        </a>
                         <div class="mx-4 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
-                        <div class="flex-1">
+                        <a href="{{ route('user.email-messages') }}" wire:navigate
+                            class="flex-1 cursor-pointer hover:opacity-85 transition-opacity">
                             <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Messages
                             </p>
                             <p class="font-bold text-indigo-600 md:text-2xl dark:text-indigo-400">{{ $storedMessages }}
                             </p>
-                        </div>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -91,8 +92,8 @@
 
 
             <!-- Combined Payment Stats -->
-            <div
-                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
+            <a href="{{ route('user.my-transactions') }}" wire:navigate
+                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md cursor-pointer hover:opacity-85 transition-opacity">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-green-500/20"></div>
                 <div class="relative p-3 lg:p-6">
                     <div class="flex justify-between items-center">
@@ -115,7 +116,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
 
 
         </div>
@@ -137,7 +138,8 @@
                         @else
                         <div class="grid grid-cols-1 gap-4 mt-8 md:grid-cols-3 lg:grid-cols-4">
                             @foreach($activeCampaigns as $campaign)
-                            <div class="p-4 bg-white rounded-xl shadow-lg dark:bg-neutral-800 dark:border-neutral-500">
+                            <a href="{{ route('user.campaigns.progress', ['campaign' => $campaign['id']]) }}" wire:navigate
+                                class="p-4 bg-white rounded-xl shadow-lg dark:bg-neutral-800 dark:border-neutral-500 cursor-pointer hover:opacity-85 transition-opacity">
                                 <div class="flex justify-between items-center mb-2">
                                     <h3 class="font-medium text-neutral-800 dark:text-white">{{
                                         $campaign['title'] }}</h3>
@@ -157,7 +159,7 @@
                                     <span class="text-sm font-medium text-neutral-600 dark:text-white">{{
                                         $campaign['percentage'] }}%</span>
                                 </div>
-                            </div>
+                            </a>
                             @endforeach
                         </div>
                         @endif
