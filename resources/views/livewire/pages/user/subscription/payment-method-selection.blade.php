@@ -155,11 +155,10 @@
                     class="px-2 py-1 text-xs font-medium bg-white rounded-lg border md:text-sm md:py-2 md:px-4 text-neutral-700 border-neutral-300 hover:bg-neutral-50 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-600 dark:hover:bg-neutral-700">
                     Cancel
                 </button>
-                <button type="button" wire:click="processPayment" wire:loading.attr="disabled"
-                    class="px-2 py-1 text-xs font-medium text-white bg-black rounded-lg md:px-4 md:py-2 md:text-sm hover:bg-black/80 dark:bg-orange-500 dark:text-black dark:hover:bg-orange-600">
+                <x-primary-create-button type="button" wire:click="processPayment" wire:loading.attr="disabled">
                     <span wire:loading.remove>Continue with Payment</span>
                     <span wire:loading>Processing...</span>
-                </button>
+                </x-primary-create-button>
             </div>
         </div>
     </x-modal>

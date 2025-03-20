@@ -112,9 +112,7 @@ class Subscribe extends Component
         // New method to handle confirmation
     public function handleConfirmed()
     {
-        // Log::info('Confirmation received - proceeding with payment');
         $this->dispatch('payment-method',$this->selectedPlan);
-        // $this->proceedWithPayment();
     }
 
     // New method to handle cancellation

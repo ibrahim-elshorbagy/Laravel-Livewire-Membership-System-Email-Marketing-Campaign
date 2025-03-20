@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use LucasDotVin\Soulbscription\Models\Plan;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\On;
 
 class Renew extends Component
 {
@@ -64,23 +65,22 @@ class Renew extends Component
 
     }
 
-        // New method to handle confirmation
+    // New method to handle confirmation
     public function handleConfirmed()
     {
-        // Log::info('Confirmation received - proceeding with payment');
-        $this->proceedWithPayment();
+        $selectedPlan = auth()->user()->lastSubscription()->plan_id;
+        $this->dispatch('payment-method',$selectedPlan);
     }
 
     // New method to handle cancellation
     public function handleCancelled()
     {
-
         $this->alert('info', 'Subscription change cancelled',['position' => 'center']);
     }
 
+    #[On('paypal-payment')]
     public function proceedWithPayment()
     {
-        // Log::info('proceedWithPayment called');
 
         try {
             // Verify webhook first
@@ -103,8 +103,9 @@ class Renew extends Component
                 'status' => 'pending',
             ]);
 
+            $PaymentCalculation = $plan->price;
             // Create PayPal subscription and get approval URL
-            $approvalUrl = $this->createPayPalPayment($user, $plan, $payment);
+            $approvalUrl = $this->createPayPalPayment($user, $plan,$PaymentCalculation, $payment);
 
             if (!$approvalUrl) {
                 throw new \Exception('PayPal approval URL not found');
