@@ -2,7 +2,7 @@
     <div x-data="{ refreshing: false }" @refresh-statics.window="$wire.refresh()">
         <!-- Header with Refresh Button -->
         <div class="flex justify-between items-center mb-6">
-            <h2 class="font-bold md:md:text-2xl text-neutral-900 dark:text-neutral-100">Dashboard Statistics</h2>
+            <h2 class="font-bold md:text-2xl text-neutral-900 dark:text-neutral-100">Dashboard Statistics</h2>
             <button
                 @click="refreshing = true; $wire.refresh().then(() => { refreshing = false; $dispatch('refresh-statics', {}) })"
                 :class="{ 'opacity-50 cursor-not-allowed': refreshing }"
@@ -15,7 +15,7 @@
         <div class="grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 lg:grid-cols-4">
             <!-- Server Count -->
             <a href="{{ route('user.servers') }}" wire:navigate
-                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md cursor-pointer hover:opacity-85 transition-opacity">
+                class="overflow-hidden relative h-full rounded-lg border shadow-sm transition-all transition-opacity duration-300 cursor-pointer bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md hover:opacity-85">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-purple-500/20"></div>
                 <div class="relative p-3 lg:p-6">
                     <div class="flex justify-between items-center">
@@ -27,14 +27,13 @@
                     <div class="flex items-center mt-4">
                         <div class="flex-1">
                             <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Servers</p>
-                            <p class="font-bold text-purple-600 md:text-2xl dark:text-purple-400">{{ $serverCount }}</p>
+                            <p class="font-bold text-purple-600 md:text-sm dark:text-purple-400">{{ $serverCount }}</p>
                         </div>
                     </div>
                 </div>
             </a>
-
             <a href="{{ route('user.emails.index') }}" wire:navigate
-                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md cursor-pointer hover:opacity-85 transition-opacity">
+                class="overflow-hidden relative h-full rounded-lg border shadow-sm transition-all transition-opacity duration-300 cursor-pointer bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md hover:opacity-85">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-teal-500/20"></div>
                 <div class="relative p-3 lg:p-6">
                     <div class="flex justify-between items-center">
@@ -45,13 +44,15 @@
                     </div>
                     <div class="flex items-center mt-4">
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Lists</p>
-                            <p class="font-bold text-teal-600 md:text-2xl dark:text-teal-400">{{ $totalEmailLists }}</p>
+                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Sent Count</p>
+                            <p class="font-bold text-teal-600 md:text-sm dark:text-teal-400">{{ (int)auth()->user()->balance('Email Sending') }} / {{
+                            (int)$email_sending }}</p>
                         </div>
                         <div class="mx-4 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400"> Emails</p>
-                            <p class="font-bold text-teal-600 md:text-2xl dark:text-teal-400">{{ $totalEmails }}</p>
+                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Contacts</p>
+                            <p class="font-bold text-teal-600 md:text-sm dark:text-teal-400">{{ (int)auth()->user()->balance('Subscribers Limit') }} / {{
+                            (int)$subscribers_limit }}</p>
                         </div>
                     </div>
                 </div>
@@ -59,7 +60,7 @@
 
             <!-- Combined Campaign Stats -->
             <div
-                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
+                class="overflow-hidden relative h-full rounded-lg border shadow-sm transition-all duration-300 bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-indigo-500/20"></div>
                 <div class="relative p-3 lg:p-6">
                     <div class="flex justify-between items-center">
@@ -70,18 +71,18 @@
                     </div>
                     <div class="flex items-center mt-4">
                         <a href="{{ route('user.campaigns.list') }}" wire:navigate
-                            class="flex-1 cursor-pointer hover:opacity-85 transition-opacity">
+                            class="flex-1 transition-opacity cursor-pointer hover:opacity-85">
                             <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Campaigns
                             </p>
-                            <p class="font-bold text-indigo-600 md:text-2xl dark:text-indigo-400">{{ $totalCampaigns }}
+                            <p class="font-bold text-indigo-600 md:text-sm dark:text-indigo-400">{{ $totalCampaigns }}
                             </p>
                         </a>
                         <div class="mx-4 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
                         <a href="{{ route('user.email-messages') }}" wire:navigate
-                            class="flex-1 cursor-pointer hover:opacity-85 transition-opacity">
+                            class="flex-1 transition-opacity cursor-pointer hover:opacity-85">
                             <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Messages
                             </p>
-                            <p class="font-bold text-indigo-600 md:text-2xl dark:text-indigo-400">{{ $storedMessages }}
+                            <p class="font-bold text-indigo-600 md:text-sm dark:text-indigo-400">{{ $storedMessages }}
                             </p>
                         </a>
                     </div>
@@ -93,7 +94,7 @@
 
             <!-- Combined Payment Stats -->
             <a href="{{ route('user.my-transactions') }}" wire:navigate
-                class="overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 h-fit bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md cursor-pointer hover:opacity-85 transition-opacity">
+                class="overflow-hidden relative h-full rounded-lg border shadow-sm transition-all transition-opacity duration-300 cursor-pointer bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md hover:opacity-85">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-green-500/20"></div>
                 <div class="relative p-3 lg:p-6">
                     <div class="flex justify-between items-center">
@@ -106,12 +107,12 @@
                         <div class="flex-1">
                             <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Payments
                             </p>
-                            <p class="font-bold text-green-600 md:text-2xl dark:text-green-400">{{ $paymentCount }}</p>
+                            <p class="font-bold text-green-600 md:text-sm dark:text-green-400">{{ $paymentCount }}</p>
                         </div>
                         <div class="mx-4 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
                         <div class="flex-1">
                             <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400"> Amount</p>
-                            <p class="font-bold text-green-600 md:text-2xl dark:text-green-400">${{
+                            <p class="font-bold text-green-600 md:text-sm dark:text-green-400">${{
                                 number_format($totalPayments, 2) }}</p>
                         </div>
                     </div>
@@ -121,7 +122,7 @@
 
         </div>
         <!-- Active Campaigns Section -->
-        <div class="mt-4 overflow-hidden relative rounded-lg border shadow-sm transition-all duration-300 bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
+        <div class="overflow-hidden relative mt-4 rounded-lg border shadow-sm transition-all duration-300 bg-white/90 dark:bg-neutral-800/90 border-neutral-200 dark:border-neutral-700 group hover:shadow-md">
                 <div class="absolute inset-0 bg-gradient-to-br to-transparent from-blue-500/20"></div>
                 <div class="relative p-3 lg:p-6">
                     <div class="flex justify-between items-center">
@@ -139,7 +140,7 @@
                         <div class="grid grid-cols-1 gap-4 mt-8 md:grid-cols-3 lg:grid-cols-4">
                             @foreach($activeCampaigns as $campaign)
                             <a href="{{ route('user.campaigns.progress', ['campaign' => $campaign['id']]) }}" wire:navigate
-                                class="p-4 bg-white rounded-xl shadow-lg dark:bg-neutral-800 dark:border-neutral-500 cursor-pointer hover:opacity-85 transition-opacity">
+                                class="p-4 bg-white rounded-xl shadow-lg transition-opacity cursor-pointer dark:bg-neutral-800 dark:border-neutral-500 hover:opacity-85">
                                 <div class="flex justify-between items-center mb-2">
                                     <h3 class="font-medium text-neutral-800 dark:text-white">{{
                                         $campaign['title'] }}</h3>

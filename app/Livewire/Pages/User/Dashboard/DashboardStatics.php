@@ -43,29 +43,34 @@ class DashboardStatics extends Component
 
     public function render()
     {
-        $user = auth()->user();
+        $userId = auth()->user()->id;
+        $subscribers_limit = auth()->user()->lastSubscription()->plan->features->where('name', 'Subscribers Limit')->first()->pivot->charges;
+        $email_sending = auth()->user()->lastSubscription()->plan->features->where('name', 'Email Sending')->first()->pivot->charges;
 
         // Get user-specific statistics
-        $paymentCount = Payment::where('user_id', $user->id)->where('status', 'approved')->count();
-        $totalPayments = Payment::where('user_id', $user->id)->where('status', 'approved')->sum('amount');
-        $serverCount = Server::where('assigned_to_user_id', $user->id)->count();
-        $totalEmailLists = EmailListName::where('user_id', $user->id)->count();
-        $totalEmails = EmailList::whereHas('emailListName', function($query) use ($user) {
-            $query->where('user_id', $user->id);
-        })->count();
-        $storedMessages = EmailMessage::where('user_id', $user->id)->count();
-        $totalCampaigns = Campaign::where('user_id', $user->id)->count();
+        $paymentCount = Payment::where('user_id', $userId)->where('status', 'approved')->count();
+        $totalPayments = Payment::where('user_id', $userId)->where('status', 'approved')->sum('amount');
+        $serverCount = Server::where('assigned_to_user_id', $userId)->count();
+        // $totalEmailLists = EmailListName::where('user_id', $userId)->count();
+        // $totalEmails = EmailList::whereHas('emailListName', function($query) use ($user) {
+        //     $query->where('user_id', $userId);
+        // })->count();
+        $storedMessages = EmailMessage::where('user_id', $userId)->count();
+        $totalCampaigns = Campaign::where('user_id', $userId)->count();
         $activeCampaigns = $this->activeCampaigns;
 
         return view('livewire.pages.user.dashboard.dashboard-statics', [
             'paymentCount' => $paymentCount,
             'totalPayments' => $totalPayments,
             'serverCount' => $serverCount,
-            'totalEmailLists' => $totalEmailLists,
-            'totalEmails' => $totalEmails,
+            // 'totalEmailLists' => $totalEmailLists,
+            // 'totalEmails' => $totalEmails,
             'storedMessages' => $storedMessages,
             'totalCampaigns' => $totalCampaigns,
-            'activeCampaigns' => $activeCampaigns
+            'activeCampaigns' => $activeCampaigns,
+            'subscribers_limit'=>$subscribers_limit,
+            'email_sending'=>$email_sending,
+
         ]);
     }
 }

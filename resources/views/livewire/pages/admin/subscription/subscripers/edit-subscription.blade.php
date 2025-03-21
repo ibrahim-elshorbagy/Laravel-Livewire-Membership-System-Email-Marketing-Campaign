@@ -112,13 +112,13 @@
                     <div>
                         <span class="text-sm md:text-mdtext-neutral-600">Started At</span>
                         <p class="text-sm font-medium sm:text-base">
-                            {{ \Carbon\Carbon::parse($started_at)->format('d, M Y') }}
+                            {{ \Carbon\Carbon::parse($started_at)->format('d/m/Y h:i A') }}
                         </p>
                     </div>
                     <div>
                         <span class="text-sm md:text-mdtext-neutral-600">Expires At</span>
                         <p class="text-sm font-medium sm:text-base">
-                            {{ $expired_at ? \Carbon\Carbon::parse($expired_at)->format('d, M Y') : 'N/A' }}
+                            {{ $expired_at ? \Carbon\Carbon::parse($expired_at)->format('d/m/Y h:i A') : 'N/A' }}
                         </p>
                     </div>
                 </div>

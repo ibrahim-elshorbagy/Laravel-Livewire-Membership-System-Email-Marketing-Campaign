@@ -11,12 +11,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\WebhookClient\Jobs\ProcessWebhookJob;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
+use App\Traits\SubscriptionManagementTrait;
 
 
 
 class PayPalWebhookJob extends ProcessWebhookJob
 {
     protected $paypal;
+    use SubscriptionManagementTrait;
 
     protected function initializePayPal()
     {
@@ -175,54 +177,25 @@ class PayPalWebhookJob extends ProcessWebhookJob
 
             DB::transaction(function () use ($payment, $resource) {
                 try {
-                    if ($payment->user->lastSubscription()) {
-
-                        if($payment->user->lastSubscription()->plan->id == $payment->plan_id) {
-                            $subscription = $payment->user->lastSubscription()->renew();
-                            $payment->user->forceSetConsumption('Subscribers Limit', EmailList::where('user_id', $payment->user->id)->count());
-                            $payment->user->forceSetConsumption('Email Sending', 0);
-
-                            PayPalLogger::info('Renew Subscription ', [
-                                'payment_id' => $payment->id,
-                                'subscription_id' => $subscription->id,
-                            ]);
-
-                            $payment->user->notify(new SubscriptionRenewedNotification($subscription));
-                        } else {
-
-                            $started_at = $payment->user->lastSubscription()->started_at;
-                            $expired_at = $payment->user->lastSubscription()->expired_at;
-
-                            $payment->user->lastSubscription()->suppress();
 
 
-                            $subscription = $payment->user->subscribeTo($payment->plan);
-                            $payment->user->lastSubscription();
 
-                            if( $payment->amount < $payment->plan->price ) {
-                                    $payment->user->lastSubscription()->update([
-                                    'started_at' => $started_at,
-                                    'expired_at' => $expired_at,
-                                ]);
-                            }
+                    $subscription = $this->handleSubscriptionChange($payment);
 
+                    // Reset user consumption metrics
+                    $payment->user->forceSetConsumption('Subscribers Limit', EmailList::where('user_id', $payment->user->id)->count());
+                    $payment->user->forceSetConsumption('Email Sending', 0);
 
-                            $payment->user->forceSetConsumption('Subscribers Limit', EmailList::where('user_id', $payment->user->id)->count());
-                            $payment->user->forceSetConsumption('Email Sending', 0);
-
-                            $payment->user->notify(new SubscriptionActivatedNotification($subscription));
-
-                            PayPalLogger::info('Upgrade Subscription ', [
-                                'payment_id' => $payment->id,
-                                'subscription_id' => $subscription->id,
-                            ]);
-                        }
-                    }
 
                     $payment->update([
                         'subscription_id' => $subscription->id,
                         'status' => 'approved',
                         'transaction_id' => $resource['id'] ?? null,
+                    ]);
+
+                    PayPalLogger::info('Renew Subscription ', [
+                        'payment_id' => $payment->id,
+                        'subscription_id' => $subscription->id,
                     ]);
 
                     $this->logPayPalResponse($payment->user_id, 'success', [

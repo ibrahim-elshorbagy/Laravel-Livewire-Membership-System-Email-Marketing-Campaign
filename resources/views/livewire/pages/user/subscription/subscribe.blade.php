@@ -152,6 +152,7 @@
     @auth
     @if($selectedPlan)
     <div class="flex flex-col gap-4 items-center mt-8">
+        @isset($upgradeCalculation)
         @if($upgradeCalculation['title']=="Upgrade" && $currentPlanId !== 1)
         <div
             class="p-4 w-full max-w-md text-sm rounded-lg bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
@@ -173,6 +174,7 @@
             </ul>
         </div>
         @endif
+        @endisset
 
         <button wire:click="initiatePayment" wire:loading.attr="disabled"
             class="inline-flex justify-center items-center px-8 py-3 min-w-[200px] max-w-xs text-sm font-semibold text-white bg-black rounded-lg transition hover:bg-black/80 dark:bg-orange-500 dark:text-black dark:hover:bg-orange-600">
@@ -201,6 +203,8 @@
         </p>
     </div>
     @endauth
+
+
 
 
 

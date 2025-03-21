@@ -25,9 +25,9 @@ class DashboardStatics extends Component
 
         // Get active subscriptions excluding trial plan (id=1)
         $activeSubscriptions = Subscription::whereNull('canceled_at')
-            ->whereHas('plan', function($query) {
-                $query->where('id', '!=', 1);
-            })
+            // ->whereHas('plan', function($query) {
+            //     $query->where('id', '!=', 1);
+            // })
             ->count();
 
         $totalCampaigns = Campaign::count();

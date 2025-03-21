@@ -11,10 +11,11 @@ use LucasDotVin\Soulbscription\Models\Subscription;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
+use App\Traits\SubscriptionManagementTrait;
 
 class EditPayment extends Component
 {
-    use LivewireAlert;
+    use LivewireAlert, SubscriptionManagementTrait;
 
     public Payment $payment;
     public $user; //admin can see anything about user
@@ -90,12 +91,40 @@ class EditPayment extends Component
 
             $this->payment->update($updateData);
 
-            Session::flash('success', 'Payment updated successfully!.');
+            Session::flash('success', 'Payment updated successfully!');
 
             return $this->redirect(route('admin.payment.transactions'), navigate: true);
 
         } catch (\Exception $e) {
             $this->alert('error', 'Error updating payment: ' . $e->getMessage(), [
+                'position' => 'bottom-end',
+                'timer' => 5000,
+                'toast' => true,
+            ]);
+        }
+    }
+
+    public function approvePayment()
+    {
+        try {
+            if (!$this->payment) {
+                throw new \Exception('Payment not found');
+            }
+
+            $subscription = $this->handleSubscriptionChange($this->payment);
+
+            $this->payment->update([
+                'status' => 'approved',
+                'subscription_id' => $subscription->id
+            ]);
+
+            Session::flash('success', 'Payment approved and subscription activated successfully!');
+
+
+            return $this->redirect(route('admin.payment.transactions'), navigate: true);
+
+        } catch (\Exception $e) {
+            $this->alert('error', 'Error approving payment: ' . $e->getMessage(), [
                 'position' => 'bottom-end',
                 'timer' => 5000,
                 'toast' => true,

@@ -8,6 +8,40 @@ use LucasDotVin\Soulbscription\Models\Subscription;
 
 trait PlanPriceCalculator
 {
+
+
+    protected function calculateUpgradeCost($newPlan)
+    {
+        $user = auth()->user();
+        $currentSubscription = $user->lastSubscription();
+        $newPlan = Plan::findOrFail($newPlan);
+
+        if($newPlan && $user)
+        {
+
+            if ($currentSubscription) { //If there is Subscription
+
+                return $this->calculateUpgradePrice($newPlan, $currentSubscription);
+
+            }else{ //If there is No Subscription At all
+                    $days = $newPlan->periodicity_type;
+                    $totalPeriodDays = $days === 'Year' ? 365 : 30;
+
+                    return [
+                        'title' => 'Subscribe',
+                        'upgrade_cost' => round($newPlan->price, 2),
+                        'remaining_days' => 0,
+                        'unused_amount' => 0,
+                        'new_daily_rate' => round($newPlan->price / $totalPeriodDays, 2),
+                        'current_daily_rate' => 0,
+                        'totalPeriodDays'=> $totalPeriodDays,
+                    ];
+            }
+
+        }
+    }
+
+
     public function calculateUpgradePrice(Plan $newPlan, Subscription $currentSubscription): ?array
     {
 

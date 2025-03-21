@@ -32,22 +32,10 @@ class Subscribe extends Component
     public function updatedSelectedPlan($value)
     {
         $this->validateOnly('selectedPlan');
-        $this->calculateUpgradeCost();
+
+        $this->upgradeCalculation = $this->calculateUpgradeCost($this->selectedPlan);
     }
 
-    protected function calculateUpgradeCost()
-    {
-        $user = auth()->user();
-        if ($user && $this->selectedPlan) {
-            $currentSubscription = $user->lastSubscription();
-            if ($currentSubscription) {
-                $newPlan = Plan::find($this->selectedPlan);
-                if ($newPlan) {
-                    $this->upgradeCalculation = $this->calculateUpgradePrice($newPlan, $currentSubscription);
-                }
-            }
-        }
-    }
 
     protected function rules()
     {
@@ -106,12 +94,13 @@ class Subscribe extends Component
         }
 
         // If no active subscription, proceed directly
-        $this->proceedWithPayment();
+        $this->handleConfirmed();
     }
 
-        // New method to handle confirmation
+    // New method to handle confirmation
     public function handleConfirmed()
     {
+        $this->validateOnly('selectedPlan');
         $this->dispatch('payment-method',$this->selectedPlan);
     }
 
@@ -136,7 +125,7 @@ class Subscribe extends Component
             $user = auth()->user();
             $plan = Plan::findOrFail($this->selectedPlan);
 
-            $this->calculateUpgradeCost();
+            $this->upgradeCalculation = $this->calculateUpgradeCost($plan->id);
             $PaymentCalculation =$this->upgradeCalculation['upgrade_cost'];
             // Create payment record
             $payment = Payment::create([
@@ -147,6 +136,7 @@ class Subscribe extends Component
                 'currency' => 'USD',
                 'status' => 'pending',
             ]);
+
 
             // Create PayPal subscription and get approval URL
             $approvalUrl = $this->createPayPalPayment($user, $plan,$PaymentCalculation, $payment);

@@ -130,7 +130,7 @@
                     <li class="px-1 py-0.5 first:mt-2">
                         <x-nav-link :active="request()->routeIs('admin.payment.paypal')"
                             href="{{ route('admin.payment.paypal') }}" wire:navigate>
-                            <span>Payment Settings</span>
+                            <span>PayPal settings</span>
                         </x-nav-link>
                     </li>
                     <li class="px-1 py-0.5">
@@ -280,7 +280,7 @@
                         <x-primary-dropdown label="Payment">
                             <x-nav-link :active="request()->routeIs('admin.payment.paypal')"
                                 href="{{ route('admin.payment.paypal') }}" wire:navigate>
-                                <span>Payment Settings</span>
+                                <span>PayPal settings</span>
                             </x-nav-link>
                             <x-nav-link :active="request()->routeIs('admin.payment.paypal.responses')"
                                 href="{{ route('admin.payment.paypal.responses') }}" wire:navigate>

@@ -18,6 +18,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Facades\Validator;
+
+
 class PaymentMethodSelection extends Component
 {
     use LivewireAlert, WithFileUploads;
@@ -46,6 +49,17 @@ class PaymentMethodSelection extends Component
     #[On('payment-method')]
     public function setSelectedPlan($selectedPlan)
     {
+        // Validate using Laravel's Validator
+        $validator = Validator::make(
+            ['selectedPlan' => $selectedPlan],
+            ['selectedPlan' => 'required|exists:plans,id']
+        );
+
+        if ($validator->fails()) {
+            $this->alert('error', 'Please select a valid plan.');
+            return;
+        }
+
         $this->selectedPlan = $selectedPlan;
         $this->dispatch('open-modal', 'payment-method-modal');
     }
@@ -65,19 +79,7 @@ class PaymentMethodSelection extends Component
         }
     }
 
-    protected function calculateUpgradeCost()
-    {
-        $user = auth()->user();
-        if ($user && $this->selectedPlan) {
-            $currentSubscription = $user->lastSubscription();
-            if ($currentSubscription) {
-                $newPlan = Plan::find($this->selectedPlan);
-                if ($newPlan) {
-                    $this->upgradeCalculation = $this->calculateUpgradePrice($newPlan, $currentSubscription);
-                }
-            }
-        }
-    }
+
 
     public function processPayment()
     {
@@ -92,22 +94,20 @@ class PaymentMethodSelection extends Component
             DB::beginTransaction();
 
             $user = auth()->user();
-            $plan = Plan::findOrFail($this->selectedPlan);
-
-            $this->calculateUpgradeCost();
+            $this->upgradeCalculation = $this->calculateUpgradeCost($this->selectedPlan);
             $PaymentCalculation = $this->upgradeCalculation['upgrade_cost'];
 
             // Create payment record
             $payment = Payment::create([
                 'user_id' => $user->id,
-                'plan_id' => $plan->id,
+                'plan_id' => $this->selectedPlan,
                 'gateway' => $this->selectedMethod,
                 'amount' => $PaymentCalculation,
                 'currency' => 'USD',
                 'status' => 'pending',
             ]);
 
-            $userId = auth()->id();
+            $userId = $user->id;
             $manager = new ImageManager(new Driver());
 
             if (!empty($this->images)) {

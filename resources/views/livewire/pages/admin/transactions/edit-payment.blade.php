@@ -1,56 +1,88 @@
 <div class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"">
         <!-- Header -->
         <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Payment #{{ $payment->id }}</h2>
-        <x-primary-info-button href="{{ route('admin.payment.transactions') }}" wire:navigate>
-            Back to Payments
-        </x-primary-info-button>
-    </div>
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Payment #{{ $payment->id }}</h2>
+    <x-primary-info-button href="{{ route('admin.payment.transactions') }}" wire:navigate>
+        Back to Payments
+    </x-primary-info-button>
+</div>
 
-    <!-- Customer Info -->
-    <div class="mb-6">
-        <h3 class="mb-2 text-lg font-semibold text-gray-700 dark:text-gray-300">Customer</h3>
-        <div class="flex gap-2 items-center w-max">
-            <img class="object-cover rounded-full size-10" src="{{ $user->image_url ?? 'default-avatar.png' }}"
-                alt="{{ $user->first_name }}" />
-            <div class="flex flex-col">
-                <span class="font-medium">{{ $user->first_name }} {{ $user->last_name }}</span>
-                <span class="text-sm text-neutral-500">{{ $user->email }}</span>
-            </div>
+<!-- Customer Info -->
+<div class="mb-6">
+    <h3 class="mb-2 text-lg font-semibold text-gray-700 dark:text-gray-300">Customer</h3>
+    <div class="flex gap-2 items-center w-max">
+        <img class="object-cover rounded-full size-10" src="{{ $user->image_url ?? 'default-avatar.png' }}"
+            alt="{{ $user->first_name }}" />
+        <div class="flex flex-col">
+            <span class="font-medium">{{ $user->first_name }} {{ $user->last_name }}</span>
+            <span class="text-sm text-neutral-500">{{ $user->email }}</span>
         </div>
     </div>
+</div>
 
-    <!-- Plan Info -->
-    <div class="mb-6">
-        <h3 class="mb-2 text-lg font-semibold text-neutral-700 dark:text-neutral-300">Plan</h3>
-        <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
-            <span class="font-medium">{{ $plan->name }}</span>
+<!-- Plan Info -->
+<div class="mb-6">
+    <h3 class="mb-2 text-lg font-semibold text-neutral-700 dark:text-neutral-300">Plan</h3>
+    <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+        <span class="font-medium">{{ $plan->name }}</span>
+        <span class="text-sm text-neutral-600 dark:text-neutral-400">
+            - ${{ number_format($plan->price, 2) }} USD
+        </span>
+    </div>
+</div>
+
+<!-- Subscription Info -->
+@if($plan->id != 1)
+@if($subscription)
+<div class="mb-6">
+    <h3 class="mb-2 text-lg font-semibold text-neutral-700 dark:text-neutral-300">Subscription</h3>
+    <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+        <div class="flex flex-col gap-2">
             <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                - ${{ number_format($plan->price, 2) }} USD
+                Period: {{ Carbon\Carbon::parse($subscription->started_at)->format('d/m/Y h:i A') }}
+                to
+                {{ Carbon\Carbon::parse($subscription->expired_at)->format('d/m/Y h:i A') }}
+            </span>
+            <span class="text-sm text-neutral-500 dark:text-neutral-400">
+                Remaining time: {{ $subscription->remaining_time }}
             </span>
         </div>
     </div>
-
-    <!-- Subscription Info -->
-    @if($plan->id != 1)
-    @if($subscription)
-    <div class="mb-6">
-        <h3 class="mb-2 text-lg font-semibold text-neutral-700 dark:text-neutral-300">Subscription</h3>
-        <div class="p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800">
-            <div class="flex flex-col gap-2">
-                <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                    Period: {{ Carbon\Carbon::parse($subscription->started_at)->format('d / m / Y') }}
-                    to
-                    {{ Carbon\Carbon::parse($subscription->expired_at)->format('d / m / Y') }}
-                </span>
-                <span class="text-sm text-neutral-500 dark:text-neutral-400">
-                    Remaining time: {{ $subscription->remaining_time }}
-                </span>
+</div>
+@else
+<div class="mb-6">
+    <div class="p-4 bg-blue-50 rounded-lg dark:bg-blue-900">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                        clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-lg font-medium text-blue-800 dark:text-blue-200">Approve Payment</h3>
+                <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                    <p>Approving this payment will:</p>
+                    <ul class="mt-1 ml-4 list-disc list-inside">
+                        <li>Suppress any existing subscription</li>
+                        <li>Activate a new subscription immediately (With Right Dates)</li>
+                    </ul>
+                </div>
+                <div class="mt-4">
+                    <button type="button" wire:click="approvePayment"
+                        wire:confirm="Are you sure you want to approve this payment? This action cannot be undone."
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md border border-transparent hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <span wire:loading.remove>Approve Payment</span>
+                        <span wire:loading>Processing...</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-    @endif
-    @endif
+</div>
+@endif
+@endif
 
 <!-- Payment Details Form -->
 <form wire:submit.prevent="updatePayment" class="rounded-lg bg-neutral-50 dark:bg-neutral-900">
@@ -72,8 +104,9 @@
                 <div class="space-y-2">
                     <x-input-label for="gateway_subscription_id" :value="__('Gateway Subscription ID')" />
                     <div class="flex items-center">
-                        <x-text-input wire:model="gateway_subscription_id" :readonly="$payment->gateway == 'paypal'" :disabled="$payment->gateway == 'paypal'"
-                            class="block w-full bg-neutral-50 dark:bg-neutral-900"  />
+                        <x-text-input wire:model="gateway_subscription_id" :readonly="$payment->gateway == 'paypal'"
+                            :disabled="$payment->gateway == 'paypal'"
+                            class="block w-full bg-neutral-50 dark:bg-neutral-900" />
                         <button type="button"
                             class="ml-2 text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
                             onclick="navigator.clipboard.writeText('{{ $payment->gateway_subscription_id }}')">
@@ -86,10 +119,11 @@
                 </div>
 
                 <div class="space-y-2">
-                    <x-input-label  for="transaction_id" :value="__('Transaction ID')" />
+                    <x-input-label for="transaction_id" :value="__('Transaction ID')" />
                     <div class="flex items-center">
-                        <x-text-input wire:model="transaction_id" :readonly="$payment->gateway == 'paypal'" :disabled="$payment->gateway == 'paypal'"
-                            class="block w-full bg-neutral-50 dark:bg-neutral-900"  />
+                        <x-text-input wire:model="transaction_id" :readonly="$payment->gateway == 'paypal'"
+                            :disabled="$payment->gateway == 'paypal'"
+                            class="block w-full bg-neutral-50 dark:bg-neutral-900" />
                         <button type="button"
                             class="ml-2 text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
                             onclick="navigator.clipboard.writeText('{{ $payment->transaction_id }}')">
@@ -147,7 +181,7 @@
                     <x-primary-select-input wire:model="gateway" id="gateway" class="w-full">
                         <option value="paypal">PayPal</option>
                         @foreach($offlinePaymentMethods as $method)
-                            <option value="{{ $method->slug }}">{{ $method->name }}</option>
+                        <option value="{{ $method->slug }}">{{ $method->name }}</option>
                         @endforeach
                     </x-primary-select-input>
                     <x-input-error :messages="$errors->get('gateway')" class="mt-1" />
