@@ -25,7 +25,6 @@ class EditSubscription extends Component
     public $amount;
     public $status;
     public $grace_days_ended_at;
-    public $server_status;
     public $started_at;
     public $expired_at;
 
@@ -37,7 +36,6 @@ class EditSubscription extends Component
         'amount' => 'required|numeric|min:0',
         'status' => 'required|in:pending,approved,failed,cancelled,refunded',
         'grace_days_ended_at' => 'nullable|date|after:now',
-        'server_status' => 'required|in:running,hold',
         'started_at' => 'required|date',
         'expired_at' => 'nullable|date|after:started_at',
         'selectedPlan' => 'required|exists:plans,id',
@@ -65,7 +63,6 @@ class EditSubscription extends Component
         }
 
         $this->grace_days_ended_at = $subscription->grace_days_ended_at?->format('Y-m-d\TH:i');
-        $this->server_status = $subscription->server_status ?? 'running';
         $this->started_at = $subscription->started_at->format('Y-m-d');
         $this->expired_at = $subscription->expired_at?->format('Y-m-d');
 
@@ -164,7 +161,6 @@ class EditSubscription extends Component
     public function updateSubscriptionDetails()
     {
         $this->validate([
-            'server_status' => 'required|in:running,hold',
             'started_at' => 'required|date',
             'expired_at' => 'nullable|date|after:started_at',
             'grace_days_ended_at' => 'nullable|date|after:now',
@@ -173,7 +169,6 @@ class EditSubscription extends Component
         DB::beginTransaction();
         try {
             $this->subscription->update([
-                'server_status' => $this->server_status,
                 'started_at' => $this->started_at,
                 'expired_at' => $this->expired_at,
                 'grace_days_ended_at' => $this->grace_days_ended_at,
@@ -196,7 +191,6 @@ class EditSubscription extends Component
             $this->subscription->update([
                 'canceled_at' => now(),
                 'suppressed_at' => null,
-                'server_status' => 'hold',
                 'grace_days_ended_at' => null,
             ]);
             $this->subscription->subscriber->notify(new AdminSubscriptionCancelledNotification($this->subscription));

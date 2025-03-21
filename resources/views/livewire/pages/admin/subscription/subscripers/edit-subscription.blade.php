@@ -129,20 +129,12 @@
                         Set a date until when the subscription will remain active after expiration.
                     </p>
                     <p class="text-sm font-medium sm:text-base">
-                        {{ $grace_days_ended_at ? \Carbon\Carbon::parse($grace_days_ended_at)->format('d, M Y H:i') :
+                        {{ $grace_days_ended_at ? \Carbon\Carbon::parse($grace_days_ended_at)->format('d/m/Y h:i A') :
                         'N/A' }}
                     </p>
                 </div>
 
-                <div class="flex gap-5 items-center py-4 border-t border-neutral-300 dark:border-neutral-700">
-                    <span class="block text-sm font-medium text-gray-700 md:text-lg dark:text-gray-300">ServerStatus</span>
-                    <span
-                        class="px-2 py-1 text-xs font-semibold rounded-full
-                        {{ $server_status === 'running' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100' }}">
-                        {{ ucfirst($server_status) }}
-                    </span>
 
-                </div>
             </div>
 
         <!-- Action Buttons -->
@@ -329,15 +321,7 @@
                         })" wire:model="grace_days_ended_at" type="text" class="block mt-1 w-full" placeholder="YYYY-MM-DD HH:MM" />
                     <x-input-error :messages="$errors->get('grace_days_ended_at')" class="mt-2" />
                 </div>
-                <!-- Server Status -->
-                <div>
-                    <x-input-label for="server_status" :value="__('Server Status')" />
-                    <x-primary-select-input wire:model="server_status" id="server_status">
-                        <option value="running">Running</option>
-                        <option value="hold">Hold</option>
-                    </x-primary-select-input>
-                    <x-input-error :messages="$errors->get('server_status')" class="mt-2" />
-                </div>
+
             </div>
 
             <div class="flex justify-end mt-6 space-x-3">

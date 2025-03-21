@@ -181,7 +181,7 @@ new class extends Component
             @else
             <div>
                 <p class="mt-2 text-sm font-medium text-green-600 dark:text-green-400">
-                    Verified On. {{ auth()->user()->email_verified_at->timezone(auth()->user()->timezone ??$globalSettings['APP_TIMEZONE'])->format('d, M Y H:i') }}
+                    Verified On. {{ auth()->user()->email_verified_at->timezone(auth()->user()->timezone ??$globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i A') }}
                 </p>
             </div>
             @endif
