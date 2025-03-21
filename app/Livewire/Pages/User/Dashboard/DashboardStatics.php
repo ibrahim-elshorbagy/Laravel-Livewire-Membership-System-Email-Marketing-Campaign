@@ -38,7 +38,10 @@ class DashboardStatics extends Component
                     'sent_emails' => $sentEmails,
                     'percentage' => $percentage
                 ];
-            });
+            })
+            ->sortBy('percentage')
+            ->take(4)
+            ->values();
     }
 
     public function render()
