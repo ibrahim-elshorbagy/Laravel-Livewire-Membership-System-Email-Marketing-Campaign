@@ -45,13 +45,13 @@
                     <div class="flex items-center mt-4">
                         <div class="flex-1">
                             <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Sent Count</p>
-                            <p class="font-bold text-teal-600 md:text-sm dark:text-teal-400">{{ (int)auth()->user()->balance('Email Sending') }} / {{
-                            (int)$email_sending }}</p>
+                            <p class="font-bold text-teal-600 md:text-sm dark:text-teal-400">{{ $email_sending }} / {{
+                            (int)$email_sending_limit }}</p>
                         </div>
                         <div class="mx-4 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
                         <div class="flex-1">
                             <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Contacts</p>
-                            <p class="font-bold text-teal-600 md:text-sm dark:text-teal-400">{{ (int)auth()->user()->balance('Subscribers Limit') }} / {{
+                            <p class="font-bold text-teal-600 md:text-sm dark:text-teal-400">{{ $subscribers }} / {{
                             (int)$subscribers_limit }}</p>
                         </div>
                     </div>
