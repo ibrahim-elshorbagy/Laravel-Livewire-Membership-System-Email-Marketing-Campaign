@@ -48,9 +48,9 @@ class DashboardStatics extends Component
     {
         $userId = auth()->user()->id;
         $subscribers_limit = auth()->user()->lastSubscription()?->plan->features->where('name', 'Subscribers Limit')->first()->pivot->charges;
-        $subscribers = auth()->user()->balance('Subscribers Limit');
+        $subscribers = $subscribers_limit - auth()->user()->balance('Subscribers Limit');
         $email_sending_limit = auth()->user()->lastSubscription()?->plan->features->where('name', 'Email Sending')->first()->pivot->charges;
-        $email_sending = auth()->user()->balance('Email Sending');
+        $email_sending = $email_sending_limit -auth()->user()->balance('Email Sending');
 
         // Get user-specific statistics
         $paymentCount = Payment::where('user_id', $userId)->where('status', 'approved')->count();
