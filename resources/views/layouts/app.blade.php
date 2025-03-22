@@ -113,6 +113,10 @@
                     wire:navigate>
                     <span>Servers</span>
                 </x-nav-link>
+                <x-nav-link :active="request()->routeIs('admin.support.tickets')" href="{{ route('admin.support.tickets') }}"
+                    wire:navigate>
+                    <span class="text-nowrap">Support Tickets</span>
+                </x-nav-link>
                 @endrole
 
             </div>
@@ -285,7 +289,7 @@
 
                         <x-nav-link :active="request()->routeIs('admin.support.tickets')" href="{{ route('admin.support.tickets') }}"
                             wire:navigate>
-                            <span>Support Tickets</span>
+                            <span class="text-nowrap">Support Tickets</span>
                         </x-nav-link>
 
                         <!-- Dropdown menus -->
