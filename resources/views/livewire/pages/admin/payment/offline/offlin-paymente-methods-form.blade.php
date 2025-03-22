@@ -29,7 +29,7 @@
             </div>
 
 
-            <div class="lg:col-span-2 no-tailwindcss-base">
+            <div class="lg:col-span-2 no-tailwindcss-support-display">
                 <x-input-label for="instructions" required>Instructions</x-input-label>
                 <div wire:ignore>
                     <textarea id="instructions" class="block mt-1 w-full"></textarea>

@@ -77,9 +77,14 @@
                     href="{{ route('user.campaigns.list') }}" wire:navigate>
                     <span>Campaigns</span>
                 </x-nav-link>
-                <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}">
-                    <span>Support</span>
-                </x-nav-link>
+                <x-primary-dropdown label="Support">
+                    <x-nav-link :active="request()->routeIs('user.support.tickets')" href="{{ route('user.support.tickets') }}" wire:navigate>
+                        <span>My Tickets</span>
+                    </x-nav-link>
+                    <x-nav-link :active="request()->routeIs('user.support.create')" href="{{ route('user.support.create') }}" wire:navigate>
+                        <span>Create Ticket</span>
+                    </x-nav-link>
+                </x-primary-dropdown>
                 @endrole
 
 
@@ -239,9 +244,14 @@
                             href="{{ route('user.campaigns.list') }}" wire:navigate>
                             <span>Campaigns</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}">
-                            <span class="text-nowrap">Support</span>
-                        </x-nav-link>
+                        <x-primary-dropdown label="Support">
+                            <x-nav-link :active="request()->routeIs('user.support.tickets')" href="{{ route('user.support.tickets') }}" wire:navigate>
+                                <span>My Tickets</span>
+                            </x-nav-link>
+                            <x-nav-link :active="request()->routeIs('user.support.create')" href="{{ route('user.support.create') }}">
+                                <span>Create Ticket</span>
+                            </x-nav-link>
+                        </x-primary-dropdown>
                         @endrole
 
 
@@ -273,6 +283,10 @@
                             <span>Servers</span>
                         </x-nav-link>
 
+                        <x-nav-link :active="request()->routeIs('admin.support.tickets')" href="{{ route('admin.support.tickets') }}"
+                            wire:navigate>
+                            <span>Support Tickets</span>
+                        </x-nav-link>
 
                         <!-- Dropdown menus -->
                         <x-primary-dropdown label="Payment">

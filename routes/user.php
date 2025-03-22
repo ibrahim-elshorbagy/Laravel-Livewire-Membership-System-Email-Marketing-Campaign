@@ -13,6 +13,8 @@ use App\Livewire\Pages\User\Subscription\MySubscription;
 use App\Livewire\Pages\User\Subscription\Subscribe;
 use App\Livewire\Pages\User\Subscription\Transaction;
 use App\Livewire\Pages\User\Subscription\Transaction\TransactionInfo;
+use App\Livewire\Pages\User\Support\TicketDetail;
+use App\Livewire\Pages\User\Support\TicketList;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -68,7 +70,9 @@ Route::middleware(['auth','role:user'])->group(function () {
 
 
     //Support
-    Route::get('/support', Support::class)->name('user.support');
+    Route::get('/support/create-ticket', Support::class)->name('user.support.create');
+    Route::get('/support/tickets', TicketList::class)->name('user.support.tickets');
+    Route::get('/support/ticket/{ticket}', TicketDetail::class)->name('user.support.ticket');
 
 
 

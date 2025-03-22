@@ -28,7 +28,7 @@
                 </div>
 
                 <!-- Message -->
-                <div x-cloak class="lg:col-span-2 no-tailwindcss-base">
+                <div x-cloak class="lg:col-span-2 no-tailwindcss-support-display">
                     <x-input-label for="message" required>Message</x-input-label>
                     <div wire:ignore>
                         <textarea id="message" class="block mt-1 w-full"></textarea>

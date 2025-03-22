@@ -82,7 +82,7 @@
 
                             <a href="{{ route('user.my-transaction.info', $payment->id) }}"
                                 class="inline-flex items-center px-2 py-1 text-xs text-green-500 rounded-md bg-green-500/10 hover:bg-green-500/20">
-                                Veiw
+                                View
                             </a>
                         </td>
                         {{-- <td class="p-4">

@@ -8,11 +8,14 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\SupportMessage;
 use App\Models\User;
 use App\Mail\SupportMail;
+use App\Models\Admin\SupportTicket;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Mews\Purifier\Facades\Purifier;
 
 class Support extends Component
 {
@@ -88,6 +91,15 @@ class Support extends Component
         $admin = User::find(1);
         $adminEmail = $admin->email;
 
+        $cleanMessage = Purifier::clean($this->message);
+        // Create support ticket
+        $ticket = SupportTicket::create([
+            'user_id' => auth()->id(),
+            'subject' => $this->subject,
+            'message' => $cleanMessage,
+            'status' => 'open'
+        ]);
+
         // Prepare mail data
         $mailData = [
             'name' => $this->name,
@@ -102,11 +114,9 @@ class Support extends Component
         Mail::to($admin->email)->queue(new SupportMail($mailData));
 
 
-        // Reset form
-        $this->reset(['subject', 'message']);
+        Session::flash('success', 'Message sent successfully.');
+        return $this->redirect(route('user.support.tickets'), navigate: true);
 
-        // Show success message
-        $this->alert('success', 'Message sent successfully.',['position' => 'bottom-end']);
 
     }
 

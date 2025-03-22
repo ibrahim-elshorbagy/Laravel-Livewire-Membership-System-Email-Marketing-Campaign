@@ -17,6 +17,8 @@ use App\Livewire\Pages\Admin\SiteSettings\ProhibitedWords;
 use App\Livewire\Pages\Admin\SiteSettings\SiteSettings;
 use App\Livewire\Pages\Admin\Subscription\Subscripers;
 use App\Livewire\Pages\Admin\Subscription\Subscripers\EditSubscription;
+use App\Livewire\Pages\Admin\Support\TicketDetail;
+use App\Livewire\Pages\Admin\Support\TicketManagement;
 use App\Livewire\Pages\Admin\Transactions\EditPayment;
 use App\Livewire\Pages\Admin\Transactions\Transactions;
 use App\Livewire\Pages\Admin\Transactions\User\UserTransactions;
@@ -73,6 +75,10 @@ use Livewire\Volt\Volt;
         // Servers
         Route::get('/servers', ServerList::class)->name('admin.servers');
         Route::get('/servers/form/{server?}', ServerForm::class)->name('admin.servers.form');
+
+        // Support Ticket Management
+        Route::get('/support/tickets', TicketManagement::class)->name('admin.support.tickets');
+        Route::get('/support/ticket/{ticket}', TicketDetail::class)->name('admin.support.ticket-detail');
 
     });
 
