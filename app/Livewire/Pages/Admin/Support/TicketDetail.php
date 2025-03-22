@@ -96,7 +96,7 @@ class TicketDetail extends Component
         $cleanResponse = Purifier::clean($this->response);
 
         $this->ticket->update([
-            'admin_response' => $this->cleanResponse,
+            'admin_response' => $cleanResponse,
             'status' => 'closed',
             'responded_at'=> now(),
             'closed_at' => now()
