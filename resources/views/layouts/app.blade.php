@@ -77,8 +77,7 @@
                     href="{{ route('user.campaigns.list') }}" wire:navigate>
                     <span>Campaigns</span>
                 </x-nav-link>
-                <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}"
-                    wire:navigate>
+                <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}">
                     <span>Support</span>
                 </x-nav-link>
                 @endrole
@@ -240,8 +239,7 @@
                             href="{{ route('user.campaigns.list') }}" wire:navigate>
                             <span>Campaigns</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}"
-                            wire:navigate>
+                        <x-nav-link :active="request()->routeIs('user.support')" href="{{ route('user.support') }}">
                             <span class="text-nowrap">Support</span>
                         </x-nav-link>
                         @endrole

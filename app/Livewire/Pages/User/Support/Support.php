@@ -8,12 +8,15 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\SupportMessage;
 use App\Models\User;
 use App\Mail\SupportMail;
-
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Str;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class Support extends Component
 {
-    use LivewireAlert;
+    use LivewireAlert, WithFileUploads;
 
     public $name;
     public $email;
@@ -32,9 +35,54 @@ class Support extends Component
         'message' => 'required|min:10',
     ];
 
+    public $fileData;
+    public function uploadCKEditorImage($fileData)
+    {
+
+        $this->fileData = $fileData;
+        try {
+
+            $validatedData = $this->validate([
+                'fileData' => ['required', 'string', 'regex:/^data:image\/[a-zA-Z]+;base64,[a-zA-Z0-9\/\+]+={0,2}$/'],
+            ]);
+
+            $image = $validatedData['fileData'];
+
+            // Extract image data
+            list($type, $data) = explode(';', $image);
+            list(, $data) = explode(',', $data);
+            $fileContent = base64_decode($data);
+            $imageType = str_replace('data:image/', '', $type);
+
+
+            // Generate a unique filename
+            $fileName = 'support_' . now()->timestamp . '.' . $imageType;
+            $userId = auth()->user()->id;
+            // Store in the same folder structure as logo
+            $path = "admin/support/{$userId}/{$fileName}";
+            Storage::disk('public')->put($path, $fileContent);
+
+            return [
+                'success' => true,
+                'url' => Storage::url($path),
+                'path' => $path
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'Upload failed: ' . $e->getMessage()
+            ];
+        }
+    }
+
     public function sendSupportMessage()
     {
         $this->validate();
+
+        // Extract and process images
+        // Log::debug('Original message content', ['message' => $this->message]);
+
+        $processedMessage = $this->processEmailImages($this->message);
 
         // Get admin email from settings
         $admin = User::find(1);
@@ -45,7 +93,9 @@ class Support extends Component
             'name' => $this->name,
             'email' => $this->email,
             'subject' => $this->subject,
-            'message' => $this->message
+            'message' => $processedMessage['message'],
+            'attachments' => $processedMessage['attachments']
+
         ];
 
         // Send mail
@@ -58,6 +108,54 @@ class Support extends Component
         // Show success message
         $this->alert('success', 'Message sent successfully.',['position' => 'bottom-end']);
 
+    }
+
+    private function processEmailImages($message)
+    {
+        $attachments = [];
+        $storagePath = storage_path('app/public/');
+
+        preg_match_all('/<img[^>]+src="([^"]+)"[^>]*>/i', $message, $matches);
+
+        foreach ($matches[1] as $imageSrc) {
+            // Handle both absolute and relative storage paths
+            if (str_contains($imageSrc, '/storage/')) {
+                // Convert URL to filesystem path
+                $relativePath = str_replace(url('storage/'), '', $imageSrc);
+                $relativePath = ltrim(str_replace('/storage/', '', $imageSrc), '/');
+                $fullPath = $storagePath . $relativePath;
+
+                // Add debug logging
+                // Log::debug('Image processing', [
+                //     'src' => $imageSrc,
+                //     'relative_path' => $relativePath,
+                //     'full_path' => $fullPath,
+                //     'exists' => file_exists($fullPath)
+                // ]);
+
+                if (file_exists($fullPath)) {
+                    $filename = basename($fullPath);
+
+                    // Replace with CID reference
+                    $message = str_replace(
+                        $imageSrc,
+                        'cid:' . $filename,
+                        $message
+                    );
+
+                    $attachments[] = [
+                        'path' => $fullPath,
+                        'name' => $filename
+                    ];
+                }
+            }
+        }
+
+        // Log::debug('Processed attachments', $attachments);
+        return [
+            'message' => $message,
+            'attachments' => $attachments
+        ];
     }
 
     public function render()

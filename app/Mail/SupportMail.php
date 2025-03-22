@@ -3,13 +3,11 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
-class SupportMail extends Mailable implements ShouldQueue
+class SupportMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -20,17 +18,46 @@ class SupportMail extends Mailable implements ShouldQueue
         $this->data = $data;
     }
 
-    public function envelope(): Envelope
+    public function build()
     {
-        return new Envelope(
-            subject: $this->data['subject'],
-        );
+        // Debug logging
+        // logger('Mail attachments:', $this->data['attachments'] ?? []);
+
+        return $this->subject($this->data['subject'])
+            ->view('emails.support', [
+                'name' => $this->data['name'],
+                'email' => $this->data['email'],
+                'subject' => $this->data['subject'],
+                'messageContent' => $this->data['message']
+            ])
+            ->withSymfonyMessage(function ($message) {
+                if (!empty($this->data['attachments'])) {
+                    foreach ($this->data['attachments'] as $attachment) {
+                        $message->embedFromPath(
+                            $attachment['path'],
+                            $attachment['name']
+                        );
+                    }
+                }
+            });
     }
 
-    public function content(): Content
+    protected function attachImages()
     {
-        return new Content(
-            markdown: 'emails.support',
-        );
+        if (empty($this->data['attachments'])) return $this;
+
+        foreach ($this->data['attachments'] as $attachment) {
+            $this->embedData(
+                file_get_contents($attachment['path']),
+                $attachment['name'], // Use the stored filename
+                [
+                    'mime' => mime_content_type($attachment['path']),
+                    'cid' => $attachment['name'] // Must match CID in HTML
+                ]
+            );
+        }
+
+        return $this;
     }
+
 }

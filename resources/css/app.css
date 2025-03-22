@@ -86,7 +86,7 @@
 
         th, td {
             padding: revert;
-            border: 1px solid #e0e0e0; 
+            border: 1px solid #e0e0e0;
             background: revert;
         }
         /* Additional text elements */
@@ -155,4 +155,104 @@
 
 .no-tailwind {
 all: unset;
+}
+
+
+
+
+/* CKEditor Dark Theme Styles */
+.dark .ck.ck-editor__main > .ck-editor__editable {
+    min-height: 400px !important;
+    background-color: rgb(38 38 38); /* neutral-800 */
+    color: rgb(229 229 229); /* neutral-200 */
+    border-color: rgb(82 82 82) !important; /* neutral-600 */
+}
+
+.dark .ck.ck-toolbar {
+    background-color: rgb(64 64 64); /* neutral-700 */
+    border-color: rgb(82 82 82); /* neutral-600 */
+}
+
+.dark .ck.ck-button {
+    color: rgb(229 229 229); /* neutral-200 */
+    background-color: rgb(64 64 64); /* neutral-700 */
+}
+
+.dark .ck.ck-button:hover:not(.ck-disabled) {
+    background-color: rgb(82 82 82); /* neutral-600 */
+}
+
+.dark .ck.ck-button.ck-on {
+    background-color: rgb(115 115 115); /* neutral-500 */
+    color: rgb(245 245 245); /* neutral-100 */
+}
+
+.dark .ck.ck-icon :not([fill]) {
+    fill: currentColor;
+}
+
+.dark .ck.ck-dropdown__panel {
+    background-color: rgb(38 38 38); /* neutral-800 */
+    border-color: rgb(82 82 82); /* neutral-600 */
+}
+
+.dark .ck.ck-list__item .ck-button:hover:not(.ck-disabled) {
+    background-color: rgb(82 82 82); /* neutral-600 */
+}
+
+.dark .ck.ck-list__item .ck-button.ck-on {
+    background-color: rgb(115 115 115); /* neutral-500 */
+    color: rgb(245 245 245); /* neutral-100 */
+}
+
+.dark .ck.ck-input {
+    background-color: rgb(38 38 38); /* neutral-800 */
+    color: rgb(229 229 229); /* neutral-200 */
+    border-color: rgb(82 82 82); /* neutral-600 */
+}
+
+.dark .ck.ck-dropdown .ck-dropdown__arrow {
+    color: rgb(229 229 229); /* neutral-200 */
+}
+
+.dark .ck.ck-balloon-panel {
+    background-color: rgb(38 38 38); /* neutral-800 */
+    border-color: rgb(82 82 82); /* neutral-600 */
+}
+
+.dark .ck.ck-toolbar .ck.ck-toolbar__separator {
+    background-color: rgb(115 115 115); /* neutral-500 */
+}
+
+.dark .ck.ck-reset_all * {
+    color: rgb(229 229 229); /* neutral-200 */
+}
+
+.dark .ck-content .table table {
+    border-color: rgb(82 82 82); /* neutral-600 */
+}
+
+.dark .ck-content .table table td,
+.dark .ck-content .table table th {
+    border-color: rgb(82 82 82); /* neutral-600 */
+    background-color: rgb(38 38 38); /* neutral-800 */
+}
+
+.dark .ck.ck-link-form {
+    background-color: rgb(38 38 38); /* neutral-800 */
+}
+
+.dark .ck.ck-link-form .ck-input {
+    background-color: rgb(64 64 64); /* neutral-700 */
+}
+
+/* Fix for the content editable area in dark mode */
+.dark .ck-content h1,
+.dark .ck-content h2,
+.dark .ck-content h3,
+.dark .ck-content h4,
+.dark .ck-content h5,
+.dark .ck-content h6,
+.dark .ck-content p {
+    color: rgb(229 229 229) !important; /* neutral-200 */
 }
