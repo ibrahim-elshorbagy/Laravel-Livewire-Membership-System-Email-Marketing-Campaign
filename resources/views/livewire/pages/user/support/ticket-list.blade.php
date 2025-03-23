@@ -1,11 +1,11 @@
 <div class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
-    <header class="flex flex-col justify-between items-center mb-6 md:flex-row">
+    <header class="flex flex-col gap-3 justify-between items-center mb-6 md:flex-row">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
             My Support Tickets
         </h2>
         <a href="{{ route('user.support.create') }}"
-            class="inline-flex items-center px-4 py-2 text-sm font-semibold tracking-widest text-white bg-sky-600 rounded-md border border-sky-300 transition duration-150 ease-in-out cursor-pointer dark:bg-sky-900 dark:border-sky-700 dark:text-sky-300 hover:bg-sky-700 dark:hover:bg-sky-100 focus:bg-sky-700 dark:focus:bg-sky-100 active:bg-sky-900 dark:active:bg-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-sky-800">
-            <i class="fas fa-plus mr-2"></i> New Ticket
+            class="inline-flex flex-col items-center px-2 py-1 text-xs font-semibold tracking-widest text-white bg-sky-600 rounded-md border border-sky-300 transition duration-150 ease-in-out md:px-4 md:py-2 text-nowrap dark:bg-sky-900 group dark:border-sky-700 dark:text-sky-300 hover:bg-sky-700 dark:hover:bg-sky-100 focus:bg-sky-700 dark:focus:bg-sky-100 active:bg-sky-900 dark:active:bg-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 dark:focus:ring-offset-sky-800'">
+            New Ticket
         </a>
     </header>
 
@@ -21,7 +21,7 @@
             </div>
 
             <div class="flex flex-wrap gap-2">
-                <x-primary-select-input wire:model.live="perPage" class="w-full sm:w-32">
+                <x-primary-select-input wire:model.live="perPage" class="w-[150px]">
                     <option value="10">10 per page</option>
                     <option value="25">25 per page</option>
                     <option value="50">50 per page</option>

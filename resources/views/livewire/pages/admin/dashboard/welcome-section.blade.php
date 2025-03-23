@@ -12,8 +12,8 @@
                 </div>
 
                 <div>
-                    <h1 class="text-sm font-bold md:text-2xl text-neutral-900 dark:text-neutral-100">
-                        Welcome back, {{ Auth::user()->first_name }} {{ Auth::user()->last_name }}!
+                    <h1 class="text-sm font-bold  md:flex-row md:text-2xl text-neutral-900 dark:text-neutral-100">
+                        <p>Welcome back,</p> <p> {{ Auth::user()->first_name }} {{ Auth::user()->last_name }}!</p>
                     </h1>
                     <p class="mt-1 text-xs md:text-sm text-neutral-600 dark:text-neutral-400">
                         {{ now()->format('l, j F Y') }}
