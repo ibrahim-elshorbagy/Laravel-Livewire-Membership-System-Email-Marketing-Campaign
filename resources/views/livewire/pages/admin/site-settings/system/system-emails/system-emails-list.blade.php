@@ -65,7 +65,7 @@
                     </th>
                     <th scope="col" class="p-4">Name</th>
                     <th scope="col" class="p-4">Subject</th>
-                    <th scope="col" class="p-4">Created At</th>
+                    <th scope="col" class="p-4">Updated</th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
             </thead>
@@ -78,17 +78,16 @@
                     </td>
                     <td class="p-4">
                         <div>
-                            <p class="text-xs">{{ $email->name }}</p>
-                            <p class="text-xs text-neutral-500">{{ $email->slug }}</p>
+                            <p >{{ $email->name }}</p>
+                            <p class="text-sm text-neutral-500">{{ $email->slug }}</p>
                         </div>
                     </td>
-                    <td class="p-4">
-                        <div>
-                            <p class="text-xs">{{ $email->message_title }}</p>
-                            <p>{{ $email->email_subject }}</p>
-                        </div>
+                    <td class="p-4 text-nowrap">
+                        {{ $email->email_subject }}
                     </td>
-                    <td class="p-4">{{ $email->created_at->format('d/m/Y h:i A') }}</td>
+                    <td class="p-4 text-nowrap">
+                        {{ $email->updated_at->format('d/m/Y H:i:s') }}
+                    </td>
                     <td class="p-4">
                         <div class="flex space-x-2">
                             {{-- <a href="{{ route('admin.site-system-emails.show', $email->id) }}" wire:navigate

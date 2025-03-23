@@ -43,7 +43,7 @@ class WelcomeSection extends Component
                 'plan_name' => $subscription->plan->name,
                 'price' => $subscription->plan->price,
                 'periodicity_type' => $subscription->plan->periodicity_type,
-                'started_at' => $subscription->created_at->timezone($time_zone)->format('d/m/Y h:i:s A'),
+                'started_at' => $subscription->started_at->timezone($time_zone)->format('d/m/Y h:i:s A'),
                 'expired_at' => $subscription->expired_at->timezone($time_zone)->format('d/m/Y h:i:s A'),
                 'remaining_time' => Carbon::parse($subscription->expired_at->timezone($time_zone))->diffForHumans(Carbon::now()->timezone($time_zone), [
                     'parts' => 3,

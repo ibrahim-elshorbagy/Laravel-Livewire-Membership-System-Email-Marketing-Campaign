@@ -26,11 +26,6 @@
                     </div>
                 </div>
                 <div>
-                    <x-input-label for="message_title">Message Title</x-input-label>
-                    <x-text-input wire:model="message_title" id="message_title" type="text" class="block mt-1 w-full" />
-                    <x-input-error :messages="$errors->get('message_title')" class="mt-2" />
-                </div>
-                <div>
                     <x-input-label for="email_subject">Email Subject</x-input-label>
                     <x-text-input wire:model="email_subject" id="email_subject" type="text" class="block mt-1 w-full" />
                     <x-input-error :messages="$errors->get('email_subject')" class="mt-2" />
@@ -40,50 +35,13 @@
                     <div class="mt-1 space-y-2">
                         <!-- Make container resizable -->
                         <div id="editor-container" class="overflow-hidden rounded-md border dark:border-neutral-700"
-                            style="height: 400px; min-height: 200px; max-height: 800px; resize: vertical;"> </div>
+                            style="height: 800px; min-height: 200px; max-height: 800px; resize: vertical;"> </div>
                         <!-- Hidden textarea bound to Livewire --> <textarea id="editor" wire:model.live="message_html"
                             class="hidden"></textarea>
                     </div>
                     <x-input-error :messages="$errors->get('message_html')" class="mt-2" />
                 </div>
-                <div>
-                    <x-input-label for="message_plain_text">Message Plain Text</x-input-label>
-                    <x-primary-textarea wire:model="message_plain_text" id="message_plain_text" rows="16"
-                        class="block mt-1 w-full"> </x-primary-textarea>
-                    <x-input-error :messages="$errors->get('message_plain_text')" class="mt-2" />
-                </div>
 
-                <div class="p-4 mb-4 bg-white rounded-lg border dark:bg-neutral-800 dark:border-neutral-700">
-                    <div class="flex items-start">
-                        <div class="flex-shrink-0">
-                            <i class="w-5 h-5 text-blue-500 fas fa-info-circle"></i>
-                        </div>
-                        <div class="ml-3">
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                                Message Personalization
-                            </h3>
-                            <div class="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                                <p class="mb-3">
-                                    You can personalize system emails using template variables that will be replaced
-                                    with actual values when the email is sent.
-                                    Include these variables in your email template to make it dynamic and personalized.
-                                </p>
-                                <div class="mt-3 space-y-2">
-                                    <div class="flex items-center">
-                                        <code
-                                            class="px-2 py-1 font-mono text-sm bg-gray-100 rounded dark:bg-neutral-700">%FullName%</code>
-                                        <span class="ml-2">Replaced with the recipient's full name</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <code
-                                            class="px-2 py-1 font-mono text-sm bg-gray-100 rounded dark:bg-neutral-700">%Email%</code>
-                                        <span class="ml-2">Replaced with the recipient's email address</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="flex sticky bottom-0 justify-end py-4 space-x-3 bg-neutral-50 dark:bg-neutral-900">
                     <x-secondary-button type="button" wire:navigate href="{{ route('admin.site-system-emails') }}">
@@ -132,6 +90,13 @@
         </div>
     </div>
     @endif
+
+
+
+    @include('livewire.pages.admin.site-settings.system.system-emails.partials.rules')
+
+
+
 </div>
 @push('scripts')
 @vite('resources/js/codeEditor.js')

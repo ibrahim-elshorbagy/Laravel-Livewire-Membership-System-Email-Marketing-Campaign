@@ -50,7 +50,7 @@ class TransactionInfo extends Component
         $this->transaction_id = $payment->transaction_id;
 
         if ($this->subscription) {
-            $this->subscription->started_at = $this->subscription->created_at->toDateTimeString();
+            $this->subscription->started_at = $this->subscription->started_at->toDateTimeString();
             $this->subscription->expired_at = $this->subscription->expired_at->toDateTimeString();
             $this->subscription->remaining_time = Carbon::parse($this->subscription->expired_at)->diffForHumans(Carbon::now(), [
                 'parts' => 3,

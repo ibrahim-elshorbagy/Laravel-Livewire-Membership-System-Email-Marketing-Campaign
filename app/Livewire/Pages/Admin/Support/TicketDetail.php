@@ -2,11 +2,11 @@
 
 namespace App\Livewire\Pages\Admin\Support;
 
+use App\Mail\SupportResponseMail;
 use App\Models\Admin\SupportTicket;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\SupportMail;
 use Illuminate\Support\Facades\Storage;
 use Mews\Purifier\Facades\Purifier;
 
@@ -87,6 +87,54 @@ class TicketDetail extends Component
         }
     }
 
+    private function processEmailImages($message)
+    {
+        $attachments = [];
+        $storagePath = storage_path('app/public/');
+
+        preg_match_all('/<img[^>]+src="([^"]+)"[^>]*>/i', $message, $matches);
+
+        foreach ($matches[1] as $imageSrc) {
+            // Handle both absolute and relative storage paths
+            if (str_contains($imageSrc, '/storage/')) {
+                // Convert URL to filesystem path
+                $relativePath = str_replace(url('storage/'), '', $imageSrc);
+                $relativePath = ltrim(str_replace('/storage/', '', $imageSrc), '/');
+                $fullPath = $storagePath . $relativePath;
+
+                // Add debug logging
+                // Log::debug('Image processing', [
+                //     'src' => $imageSrc,
+                //     'relative_path' => $relativePath,
+                //     'full_path' => $fullPath,
+                //     'exists' => file_exists($fullPath)
+                // ]);
+
+                if (file_exists($fullPath)) {
+                    $filename = basename($fullPath);
+
+                    // Replace with CID reference
+                    $message = str_replace(
+                        $imageSrc,
+                        'cid:' . $filename,
+                        $message
+                    );
+
+                    $attachments[] = [
+                        'path' => $fullPath,
+                        'name' => $filename
+                    ];
+                }
+            }
+        }
+
+        // Log::debug('Processed attachments', $attachments);
+        return [
+            'message' => $message,
+            'attachments' => $attachments
+        ];
+    }
+
 
     public function sendResponse()
     {
@@ -94,6 +142,8 @@ class TicketDetail extends Component
 
         // Update ticket with response
         $cleanResponse = Purifier::clean($this->response);
+
+        $processedMessage = $this->processEmailImages($cleanResponse);
 
         $this->ticket->update([
             'admin_response' => $cleanResponse,
@@ -107,10 +157,12 @@ class TicketDetail extends Component
             'name' => $this->ticket->user->first_name . ' ' . $this->ticket->user->last_name,
             'email' => $this->ticket->user->email,
             'subject' => 'Re: ' . $this->ticket->subject,
-            'message' => $this->response
+            'message' => $processedMessage['message'],
+            'attachments' => $processedMessage['attachments']
         ];
 
-        // Remeber To add mail
+        Mail::to($this->ticket->user->email)->queue(new SupportResponseMail($mailData));
+
 
         // Reset form and show success message
         $this->reset('response');

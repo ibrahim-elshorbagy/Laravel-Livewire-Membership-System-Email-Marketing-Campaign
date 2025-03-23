@@ -85,13 +85,14 @@ class Support extends Component
         // Extract and process images
         // Log::debug('Original message content', ['message' => $this->message]);
 
-        $processedMessage = $this->processEmailImages($this->message);
 
         // Get admin email from settings
         $admin = User::find(1);
         $adminEmail = $admin->email;
 
         $cleanMessage = Purifier::clean($this->message);
+        $processedMessage = $this->processEmailImages($cleanMessage);
+
         // Create support ticket
         $ticket = SupportTicket::create([
             'user_id' => auth()->id(),

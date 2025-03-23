@@ -101,8 +101,7 @@ class SystemEmailsList extends Component
     {
         return SystemEmail::when($this->search, function ($query) {
                 $query->where(function($q) {
-                    $q->where('message_title', 'like', '%' . $this->search . '%')
-                      ->orWhere('email_subject', 'like', '%' . $this->search . '%')
+                    $q->orWhere('email_subject', 'like', '%' . $this->search . '%')
                       ->orWhere('name', 'like', '%' . $this->search . '%')
                       ->orWhere('slug', 'like', '%' . $this->search . '%');
                 });

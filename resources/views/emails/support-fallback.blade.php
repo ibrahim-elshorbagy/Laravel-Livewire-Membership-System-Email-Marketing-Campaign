@@ -10,10 +10,13 @@
         .email-container {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: #2d3748;
             max-width: 800px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 2.5rem;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         /* Headings */
@@ -23,9 +26,11 @@
         h4,
         h5,
         h6 {
-            color: #1a237e;
+            color: #2c5282;
             margin: 1.5em 0 0.5em;
-            font-weight: 500;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            line-height: 1.3;
         }
 
         h1 {
@@ -140,16 +145,17 @@
 
 <body>
     <div class="email-container">
-        <header style="border-bottom: 2px solid #3f51b5; padding-bottom: 1rem; margin-bottom: 2rem;">
-            <h1 style="margin: 0 0 0.5rem;">Subject : {{ $subject }}</h1>
-            <div style="color: #666; font-size: 0.9rem;">
+        <header
+            style="border-bottom: 2px solid #4299e1; padding-bottom: 1.5rem; margin-bottom: 2.5rem; background: linear-gradient(to right, #4299e1, #667eea); margin: -2.5rem -2.5rem 2.5rem -2.5rem; padding: 2.5rem; border-radius: 8px 8px 0 0;">
+            <h1 style="margin: 0 0 0.5rem; color: #ffffff; font-size: 1.875rem;">{{ $subject }}</h1>
+            <div style="color: rgba(255, 255, 255, 0.9); font-size: 0.95rem;">
                 <p style="margin: 0;">From: {{ $name }} &lt;{{ $email }}&gt;</p>
-                <p style="margin: 0.5rem 0 0;">Sent: {{ now()->format('M j, Y H:i') }}</p>
+                <p style="margin: 0.5rem 0 0;">Sent: {{ now()->format('d/m/Y H:i:s') }}</p>
             </div>
         </header>
 
         <main>
-            <div class="email-content">
+            <div class="email-content" style="line-height: 1.8; color: #4a5568;">
                 {!! $messageContent !!}
             </div>
         </main>

@@ -65,7 +65,7 @@
                                         <code class="px-2 py-1 font-mono text-sm bg-gray-100 rounded dark:bg-neutral-700">%FullName%</code>
                                         <span class="ml-2">Replaced with the Full Name of the member</span>
                                     </div>
-                                    
+
                                     <p class="mb-3">
                                         Full Name field is filled automatically when retrieving e-mail addresses if the information is available.
                                     </p>

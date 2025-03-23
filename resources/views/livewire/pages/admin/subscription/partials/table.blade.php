@@ -106,8 +106,8 @@
 
                         </div>
                     </td>
-                    <td class="p-4">{{ $subscription->started_at->format('d/m/Y') }}</td>
-                    <td class="p-4">{{ $subscription->expired_at?->format('d/m/Y') }}</td>
+                    <td class="p-4">{{ $subscription->started_at->format('d/m/Y h:i:s A') }}</td>
+                    <td class="p-4">{{ $subscription->expired_at?->format('d/m/Y h:i:s A') }}</td>
                     <td class="p-4">
                         @if($payment)
                         <span class="px-2 py-1 text-xs font-semibold rounded-full text-nowrap

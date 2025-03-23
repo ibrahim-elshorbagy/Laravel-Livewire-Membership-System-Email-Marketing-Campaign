@@ -9,7 +9,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 
-class SupportMail extends Mailable
+class SupportResponseMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -23,8 +23,8 @@ class SupportMail extends Mailable
     public function build()
     {
 
-        $emailTemplate = SystemEmail::where('slug', 'support-ticket-user-request')->first();
-    
+        $emailTemplate = SystemEmail::where('slug', 'support-ticket-admin-response')->first();
+        
         // Check if template was found
         if (!$emailTemplate) {
             // Use fallback template
@@ -47,7 +47,6 @@ class SupportMail extends Mailable
             });
         }
 
-
         // Get the HTML template
         $templateHtml = $emailTemplate->message_html;
         
@@ -55,7 +54,7 @@ class SupportMail extends Mailable
         $data = [
             'name' => $this->data['name'],
             'email' => $this->data['email'],
-            'subject' => $this->data['subject'],
+            'subject' => $emailTemplate->email_subject,
             'messageContent' => $this->data['message']
         ];
         

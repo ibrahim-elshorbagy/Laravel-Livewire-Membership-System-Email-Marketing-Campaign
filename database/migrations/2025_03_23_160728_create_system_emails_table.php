@@ -15,10 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug');
-            $table->string('message_title');
             $table->string('email_subject');
             $table->text('message_html')->nullable();
-            $table->text('message_plain_text')->nullable();
             $table->timestamps();
         });
     }

@@ -15,10 +15,8 @@ class SystemEmailsForm extends Component
     public $email_id;
     public $name = '';
     public $slug = '';
-    public $message_title = '';
     public $email_subject = '';
     public $message_html = '';
-    public $message_plain_text = '';
     public $showPreview = false;
 
     public function rules(): array
@@ -27,10 +25,8 @@ class SystemEmailsForm extends Component
         return [
             'name' => ['required', 'string'],
             'slug' => ['required', 'string'],
-            'message_title' => ['required', 'string'],
             'email_subject' => ['required', 'string'],
             'message_html'  => ['nullable', 'string'],
-            'message_plain_text' => ['nullable', 'string'],
         ];
     }
 
