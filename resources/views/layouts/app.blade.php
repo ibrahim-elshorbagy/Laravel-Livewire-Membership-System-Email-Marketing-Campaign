@@ -113,10 +113,6 @@
                     wire:navigate>
                     <span>Servers</span>
                 </x-nav-link>
-                <x-nav-link :active="request()->routeIs('admin.support.tickets')" href="{{ route('admin.support.tickets') }}"
-                    wire:navigate>
-                    <span class="text-nowrap">Support Tickets</span>
-                </x-nav-link>
                 @endrole
 
             </div>
@@ -124,7 +120,28 @@
 
             @role('admin')
             @persist('sidebar')
-            <div x-data="{ isPaymentExpanded: false, isSettingsExpanded: false }" class="flex flex-col space-y-2">
+            <div x-data="{ isEmailExpanded: false, isSettingsExpanded: false }" class="flex flex-col space-y-2">
+                <!-- Payment Settings Dropdown -->
+                <button type="button" x-on:click="isEmailExpanded = ! isEmailExpanded"
+                    class="flex gap-2 justify-between items-center px-2 py-1.5 text-sm font-medium rounded-md underline-offset-2 focus:outline-none focus-visible:underline"
+                    x-bind:class="isEmailExpanded ? 'text-neutral-900 bg-black/10 dark:text-white dark:bg-white/10' :  'text-neutral-600 hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/5'">
+                    <span class="mr-auto text-left">Emails</span>
+                    <i class="transition-transform fa-solid fa-angle-up" x-bind:class="isEmailExpanded ? 'rotate-0' : 'rotate-180'"
+                        aria-hidden="true"></i>
+                </button>
+
+                <ul x-cloak x-collapse x-show="isEmailExpanded">
+                    <li class="px-1 py-0.5 first:mt-2">
+                        <x-nav-link :active="request()->routeIs('admin.support.tickets')" href="{{ route('admin.support.tickets') }}"
+                            wire:navigate>
+                            <span>Support Tickets</span>
+                        </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('admin.site-system-emails')" href="{{ route('admin.site-system-emails') }}"
+                            wire:navigate>
+                            <span>Emails</span>
+                        </x-nav-link>
+                    </li>
+                </ul>
                 <!-- Payment Settings Dropdown -->
                 <button type="button" x-on:click="isPaymentExpanded = ! isPaymentExpanded"
                     class="flex gap-2 justify-between items-center px-2 py-1.5 text-sm font-medium rounded-md underline-offset-2 focus:outline-none focus-visible:underline"
@@ -287,10 +304,15 @@
                             <span>Servers</span>
                         </x-nav-link>
 
-                        <x-nav-link :active="request()->routeIs('admin.support.tickets')" href="{{ route('admin.support.tickets') }}"
-                            wire:navigate>
-                            <span class="text-nowrap">Support Tickets</span>
-                        </x-nav-link>
+                        <x-primary-dropdown label="Emails">
+                            <x-nav-link :active="request()->routeIs('admin.support.tickets')" href="{{ route('admin.support.tickets') }}"
+                                wire:navigate>
+                                <span>Support Tickets</span>
+                            </x-nav-link>
+                            <x-nav-link :active="request()->routeIs('admin.site-system-emails')" href="{{ route('admin.site-system-emails') }}">
+                                <span>Emails</span>
+                            </x-nav-link>
+                        </x-primary-dropdown>
 
                         <!-- Dropdown menus -->
                         <x-primary-dropdown label="Payment">

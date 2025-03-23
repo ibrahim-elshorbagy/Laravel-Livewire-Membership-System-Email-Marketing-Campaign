@@ -8,14 +8,8 @@ use App\Models\User;
 
 class SupportTicket extends Model
 {
-    protected $fillable = [
-        'user_id',
-        'subject',
-        'message',
-        'status',
-        'admin_response',
-        'closed_at'
-    ];
+    protected $guarded = ['id'];
+
 
     protected $casts = [
         'closed_at' => 'datetime',
