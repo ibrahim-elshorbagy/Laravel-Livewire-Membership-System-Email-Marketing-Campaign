@@ -25,7 +25,7 @@ class SubscriptionCancelledNotification extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
-        $endDate = $this->subscription->created_at->addMonth()->format('F j, Y');
+        $endDate = $this->subscription->expired_at->addMonth()->format('F j, Y');
 
         return (new MailMessage)
             ->subject('Subscription Cancellation Confirmation')

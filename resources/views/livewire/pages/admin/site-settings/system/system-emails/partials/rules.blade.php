@@ -4,7 +4,8 @@
 
     <div class="space-y-2">
 
-        <x-primary-accordion title="(support-ticket-user-request) When a user sent support ticket or Message" :isExpandedByDefault="false">
+        <x-primary-accordion title="(support-ticket-user-request) When a user sent support ticket or Message"
+            :isExpandedByDefault="false">
             <div class="p-4 mb-4 rounded-lg bg-neutral-50 dark:bg-neutral-700">
                 <h4 class="mb-2 text-lg font-semibold text-neutral-800 dark:text-neutral-200">Notes:</h4>
                 <ul class="list-disc list-inside text-neutral-600 dark:text-neutral-300">
@@ -40,14 +41,15 @@
             </table>
         </x-primary-accordion>
 
-        <x-primary-accordion title="(support-ticket-admin-response) When Admin Response To Support Ticket or Message" :isExpandedByDefault="false">
+        <x-primary-accordion title="(support-ticket-admin-response) When Admin Response To Support Ticket or Message"
+            :isExpandedByDefault="false">
             <div class="p-4 mb-4 rounded-lg bg-neutral-50 dark:bg-neutral-700">
                 <h4 class="mb-2 text-lg font-semibold text-neutral-800 dark:text-neutral-200">Notes:</h4>
                 <ul class="list-disc list-inside text-neutral-600 dark:text-neutral-300">
                     <li>Email Subject is Being use here</li>
                 </ul>
             </div>
-        
+
             <table class="w-full text-gray-600 dark:text-gray-300">
                 <thead class="bg-neutral-50 dark:bg-neutral-700">
                     <tr>
@@ -74,6 +76,208 @@
                     </tr>
                 </tbody>
             </table>
+        </x-primary-accordion>
+
+        <x-primary-accordion title="For Subscription Notifications" :isExpandedByDefault="false">
+            <div class="p-4 mb-4 rounded-lg bg-neutral-50 dark:bg-neutral-700">
+                <h4 class="mb-2 text-lg font-semibold text-neutral-800 dark:text-neutral-200">Notes:</h4>
+                <ul class="list-disc list-inside text-neutral-600 dark:text-neutral-300">
+                    <li>These variables are available for all subscription-related notifications</li>
+                    <li>Subscription slugs: subscription-activated, subscription-renewed, subscription-cancelled,
+                        subscription-suppressed, subscription-reactivated</li>
+                    <li>All dates are formatted as 'd/m/Y h:i:s A' (01/01/2024 12:00:00 AM)</li>
+                    <li>Price values are automatically formatted with 2 decimal places</li>
+                </ul>
+            </div>
+
+            <!-- User Information Section -->
+            <div class="mb-8">
+                <table class="w-full text-gray-600 dark:text-gray-300">
+                    <thead class="bg-neutral-50 dark:bg-neutral-700">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Variable</th>
+                            <th class="px-4 py-2 text-left">Description</th>
+                            <th class="px-4 py-2 text-left">Example Usage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- User Information Section Header -->
+                        <tr class="bg-blue-50 border-b border-neutral-200 dark:border-neutral-700 dark:bg-blue-900">
+                            <td colspan="3" class="px-6 py-4">
+                                <h4 class="text-lg font-semibold text-blue-800 dark:text-blue-200">User Information</h4>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $first_name }}</td>
+                            <td class="px-4 py-2">User's first name</td>
+                            <td class="px-4 py-2 italic">"Dear @{{ $first_name }},"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $last_name }}</td>
+                            <td class="px-4 py-2">User's last name</td>
+                            <td class="px-4 py-2 italic">"Mr/Ms @{{ $last_name }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $full_name }}</td>
+                            <td class="px-4 py-2">User's full name</td>
+                            <td class="px-4 py-2 italic">"Welcome, @{{ $full_name }}!"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $email }}</td>
+                            <td class="px-4 py-2">User's email address</td>
+                            <td class="px-4 py-2 italic">"Your registered email: @{{ $email }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $username }}</td>
+                            <td class="px-4 py-2">User's username</td>
+                            <td class="px-4 py-2 italic">"Username: @{{ $username }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $whatsapp }}</td>
+                            <td class="px-4 py-2">User's WhatsApp number</td>
+                            <td class="px-4 py-2 italic">"WhatsApp: @{{ $whatsapp }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $country }}</td>
+                            <td class="px-4 py-2">User's country</td>
+                            <td class="px-4 py-2 italic">"Location: @{{ $country }}"</td>
+                        </tr>
+
+                        <!-- Subscription Details Section Header -->
+                        <tr class="bg-green-50 border-b border-neutral-200 dark:border-neutral-700 dark:bg-green-900">
+                            <td colspan="3" class="px-6 py-4">
+                                <h4 class="text-lg font-semibold text-green-800 dark:text-green-200">Subscription
+                                    Details</h4>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $subscription_status }}</td>
+                            <td class="px-4 py-2">subscription status</td>
+                            <td class="px-4 py-2 italic">"Status: @{{ $subscription_status }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $plan_name }}</td>
+                            <td class="px-4 py-2">Name of the subscription plan</td>
+                            <td class="px-4 py-2 italic">"Plan: @{{ $plan_name }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $plan_duration }}</td>
+                            <td class="px-4 py-2">Plan duration type</td>
+                            <td class="px-4 py-2 italic">"Billing cycle: @{{ $plan_duration }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ number_format($plan_price, 2) }}</td>
+                            <td class="px-4 py-2">Plan price with 2 decimal places</td>
+                            <td class="px-4 py-2 italic">"Price: $@{{ number_format($plan_price, 2) }}"</td>
+                        </tr>
+
+                        <!-- Important Dates Section Header -->
+                        <tr class="bg-purple-50 border-b border-neutral-200 dark:border-neutral-700 dark:bg-purple-900">
+                            <td colspan="3" class="px-6 py-4">
+                                <h4 class="text-lg font-semibold text-purple-800 dark:text-purple-200">Important Dates (please use it with the '?' mark)
+                                </h4>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $subscription_start_date }}</td>
+                            <td class="px-4 py-2">Subscription start date</td>
+                            <td class="px-4 py-2 italic">"Started: @{{ $subscription_start_date?->format('d/m/Y h:i:s A')
+                                }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $subscription_end_date }}</td>
+                            <td class="px-4 py-2">Subscription end date</td>
+                            <td class="px-4 py-2 italic">"Ends: @{{ $subscription_end_date?->format('d/m/Y h:i:s A') }}"
+                            </td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $subscription_grace_days_ended_date }}</td>
+                            <td class="px-4 py-2">Grace period end date</td>
+                            <td class="px-4 py-2 italic">"Grace period ends: @{{
+                                $subscription_grace_days_ended_date?->format('d/m/Y h:i:s A') }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ now()->format('d/m/Y h:i:s A') }}</td>
+                            <td class="px-4 py-2">Current date and time</td>
+                            <td class="px-4 py-2 italic">"Generated on: @{{ now()->format('d/m/Y h:i:s A') }}"</td>
+                        </tr>
+
+                        <!-- Payment Information Section Header -->
+                        <tr class="bg-amber-50 border-b border-neutral-200 dark:border-neutral-700 dark:bg-amber-900">
+                            <td colspan="3" class="px-6 py-4">
+                                <h4 class="text-lg font-semibold text-amber-800 dark:text-amber-200">Payment Information
+                                </h4>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $payment_gateway }}</td>
+                            <td class="px-4 py-2">Payment gateway used</td>
+                            <td class="px-4 py-2 italic">"Paid via @{{ $payment_gateway }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $payment_transaction_id }}</td>
+                            <td class="px-4 py-2">Transaction ID</td>
+                            <td class="px-4 py-2 italic">"Transaction ID: @{{ $payment_transaction_id }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $payment_note_or_gateway_order_id }}</td>
+                            <td class="px-4 py-2">Paypal Order ID Or Note</td>
+                            <td class="px-4 py-2 italic">"Paypal Order ID: @{{ $payment_note_or_gateway_order_id }}"
+                            </td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $payment_amount }}</td>
+                            <td class="px-4 py-2">Payment amount</td>
+                            <td class="px-4 py-2 italic">"Amount paid: @{{ $payment_amount }} @{{ $payment_currency }}"
+                            </td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $payment_currency }}</td>
+                            <td class="px-4 py-2">Payment currency</td>
+                            <td class="px-4 py-2 italic">"Currency: @{{ $payment_currency }}"</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+
+            <!-- Complete Examples Section -->
+            <div class="p-4 mt-4 bg-blue-50 rounded-lg dark:bg-blue-900">
+                <h4 class="mb-4 text-lg font-semibold text-blue-800 dark:text-blue-200">Complete Template Examples</h4>
+                <div class="space-y-4 text-blue-700 dark:text-blue-300">
+                    <div class="p-3 bg-white rounded dark:bg-blue-800">
+                        <h5 class="mb-2 font-medium">Welcome Email</h5>
+                        <pre class="text-sm whitespace-pre-wrap">Dear @{{ $first_name }},
+Welcome to our service! Your @{{ $plan_name }} subscription has been successfully activated.
+
+    Subscription Details:
+        - Plan: @{{ $plan_name }}
+        - Duration: @{{ $plan_duration }}
+        - Amount: $@{{ number_format($plan_price, 2) }}
+        - Start Date: @{{ $subscription_start_date->format('d/m/Y h:i:s A') }}
+
+Best regards,
+The Team</pre>
+                    </div>
+
+                    <div class="p-3 bg-white rounded dark:bg-blue-800">
+                        <h5 class="mb-2 font-medium">Payment Confirmation</h5>
+                        <pre class="text-sm whitespace-pre-wrap">Hello @{{ $full_name }},
+Your payment has been successfully processed:
+
+    Transaction Details:
+        - Amount: @{{ $payment_amount }} @{{ $payment_currency }}
+        - Gateway: @{{ $payment_gateway }}
+        - Transaction ID: @{{ $payment_transaction_id }}
+        - Date: @{{ now()->format('d/m/Y h:i:s A') }}
+
+Thank you for your business!</pre>
+                    </div>
+                </div>
+            </div>
+
+
         </x-primary-accordion>
     </div>
 </div>

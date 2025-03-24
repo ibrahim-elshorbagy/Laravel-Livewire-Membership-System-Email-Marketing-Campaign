@@ -4,8 +4,6 @@ namespace App\Handler;
 
 use App\Models\EmailList;
 use App\Models\Payment\Payment;
-use App\Notifications\Paypal\SubscriptionActivatedNotification;
-use App\Notifications\Paypal\SubscriptionRenewedNotification;
 use App\Services\PayPalLogger;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

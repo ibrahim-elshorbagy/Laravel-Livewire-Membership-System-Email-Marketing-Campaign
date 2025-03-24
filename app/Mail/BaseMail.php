@@ -3,66 +3,131 @@
 namespace App\Mail;
 
 use App\Models\Admin\Site\SystemSetting\SystemEmail;
+use App\Models\Payment\Payment;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Log;
+use LucasDotVin\Soulbscription\Models\Subscription;
+use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
+use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
 
 class BaseMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $data;
+    public $user;
+    public $subscription;
 
     public function __construct($data)
     {
         $this->data = $data;
+        $user_id = $data['user_id'] ?? null;
+        $subscription_id = $data['subscription_id'] ?? null;
+
+        if($user_id){
+            $this->user = User::find($user_id);
+        }
+
+        if($subscription_id){
+            $this->subscription = Subscription::with(['plan'])->withoutGlobalScopes([SuppressingScope::class, StartingScope::class])
+            ->find($subscription_id);
+        }
+
+    }
+
+    private function getSubscriptionStatus(): ?string
+    {
+        if (!$this->subscription) {
+            return null;
+        }
+
+        $subscription = $this->subscription;
+
+        if ($subscription->suppressed_at) {
+            return 'Suppressed';
+        }
+
+        if ($subscription->canceled_at) {
+            return 'Canceled';
+        }
+
+        if ($subscription->expired_at && now()->gt($subscription->expired_at)) {
+            return 'Expired';
+        }
+
+        return 'Active';
     }
 
     public function build()
     {
-        // Get email template from database
-        $emailInfo = SystemEmail::where('slug', $this->data['slug'])
-            ->firstOrFail();
+        $emailTemplate = SystemEmail::where('slug', $this->data['slug'])->first();
 
-        // Build email with dynamic content
-        $mail = $this->subject($this->data['subject'])
-            ->view('emails.base', [
-                'htmlContent' => $emailInfo->message_html,
-                'plainContent' => $emailInfo->message_plain_text,
-                'data' => $this->data
-            ])
-            ->text('emails.base_plain', [
-                'plainContent' => $emailInfo->message_plain_text,
-                'data' => $this->data
+        // Get the HTML template
+        $templateHtml = $emailTemplate->message_html;
+
+        // Create data array with all variables needed in the template
+        $payment = null;
+        if ($this->subscription) {
+            $payment = Payment::where('subscription_id', $this->subscription->id)
+                ->latest()
+                ->first();
+        }
+
+        $data = [
+            // subject
+            'subject' => $emailTemplate->email_subject,
+
+            // user profile information
+            'full_name' => $this->user ? "{$this->user->first_name} {$this->user->last_name}" : null,
+            'first_name' => $this->user?->first_name,
+            'last_name' => $this->user?->last_name,
+            'email' => $this->user?->email,
+            'username' => $this->user?->username,
+            'whatsapp' => $this->user?->whatsapp,
+            'country' => $this->user?->country,
+
+            // Subscription information
+            'subscription_status' => $this->getSubscriptionStatus(),
+            'subscription_start_date' => $this->subscription ? Carbon::parse($this->subscription->started_at) : null,
+            'subscription_end_date' => $this->subscription ? Carbon::parse($this->subscription->expired_at) : null,
+            'subscription_grace_days_ended_date' => $this->subscription ? Carbon::parse($this->subscription->grace_days_ended_at) : null,
+
+            // Plan information
+            'plan_name' => $this->subscription?->plan?->name,
+            'plan_price' => $this->subscription?->plan?->price,
+            'plan_duration' => $this->subscription?->plan?->periodicity_type,
+
+            // Payment information
+            'payment_gateway' => $payment?->gateway,
+            'payment_note_or_gateway_order_id' => $payment?->gateway_subscription_id,
+            'payment_transaction_id' => $payment?->transaction_id,
+            'payment_amount' => $payment?->amount,
+            'payment_currency' => $payment?->currency,
+        ];
+
+
+        // Render the template string directly with the data
+        try {
+            // Render the template string directly with the data
+            $renderedHtml = Blade::render($templateHtml, $data);
+
+            return $this->subject($emailTemplate->email_subject)
+                ->html($renderedHtml);
+        } catch (\Exception $e) {
+            Log::error('Failed to render email template: ' . $e->getMessage(), [
+                'template_slug' => $this->data['slug'],
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
-
-        // Handle CID-based attachments
-        if (!empty($this->data['attachments'])) {
-            $this->attachImages();
+            throw $e;
         }
-
-        return $mail;
-    }
-
-    protected function attachImages()
-    {
-        if (empty($this->data['attachments'])) return $this;
-
-        foreach ($this->data['attachments'] as $attachment) {
-            $this->embedData(
-                file_get_contents($attachment['path']),
-                $attachment['name'], // Use the stored filename
-                [
-                    'mime' => mime_content_type($attachment['path']),
-                    'cid' => $attachment['name'] // Must match CID in HTML
-                ]
-            );
-        }
-
-        return $this;
     }
 }

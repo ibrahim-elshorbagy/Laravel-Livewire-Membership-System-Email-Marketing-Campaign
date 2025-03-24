@@ -7,6 +7,11 @@ use App\Notifications\Paypal\SubscriptionActivatedNotification;
 use App\Notifications\Paypal\SubscriptionRenewedNotification;
 use App\Services\PayPalLogger;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BaseMail;
+use App\Models\Admin\Site\SystemSetting\SystemEmail;
+use Illuminate\Support\Facades\Log;
+
 trait SubscriptionManagementTrait
 {
     public function handleSubscriptionChange(Payment $payment)
@@ -27,7 +32,7 @@ trait SubscriptionManagementTrait
                     ]);
                 }
 
-                $payment->user->notify(new SubscriptionRenewedNotification($subscription));
+                $this->sentBuyNotification($payment->user,$subscription,$slug='user-renew-subscription');
                 return $subscription;
             }
             // Case 2: User is changing to a different plan
@@ -52,7 +57,7 @@ trait SubscriptionManagementTrait
                 // If coming from a trial plan, treat it as a new subscription
                 if ($isTrial) {
                     // No changes needed - default dates will be used (starts today)
-                    $payment->user->notify(new SubscriptionActivatedNotification($subscription));
+                    $this->sentBuyNotification($payment->user,$subscription);
                     return $subscription;
                 }
                 // Case 2.1: User is upgrading to any YEARLY plan (and not from trial)
@@ -66,14 +71,15 @@ trait SubscriptionManagementTrait
                                 'started_at' => $started_at,
                                 'expired_at' => $expired_at
                             ]);
-                            $payment->user->notify(new SubscriptionActivatedNotification($subscription));
+
+                            $this->sentBuyNotification($payment->user,$subscription);
                             return $subscription;
                         }
                         // If it's a downgrade to a lower-priced yearly plan
                         else {
                             // Keep the new subscription dates
                             // No update needed as the system already sets appropriate defaults
-                            $payment->user->notify(new SubscriptionActivatedNotification($subscription));
+                            $this->sentBuyNotification($payment->user,$subscription);
                             return $subscription;
                         }
                     }
@@ -84,7 +90,8 @@ trait SubscriptionManagementTrait
                             'started_at' => $started_at,
                             'expired_at' => $expired_at->copy()->addYear()
                         ]);
-                        $payment->user->notify(new SubscriptionActivatedNotification($subscription));
+
+                        $this->sentBuyNotification($payment->user,$subscription);
                         return $subscription;
                     }
                 }
@@ -97,7 +104,8 @@ trait SubscriptionManagementTrait
                             'started_at' => $started_at,
                             'expired_at' => $expired_at
                         ]);
-                        $payment->user->notify(new SubscriptionActivatedNotification($subscription));
+
+                        $this->sentBuyNotification($payment->user,$subscription);
                         return $subscription;
                     }
                     // If downgrading to a lower plan (full payment)
@@ -105,7 +113,8 @@ trait SubscriptionManagementTrait
                         // Keep new subscription dates (default behavior)
                         // This means they pay full price for the new plan duration
                         // No changes needed here as the system already sets default dates
-                        $payment->user->notify(new SubscriptionActivatedNotification($subscription));
+
+                        $this->sentBuyNotification($payment->user,$subscription);
                         return $subscription;
                     }
                 }
@@ -115,8 +124,25 @@ trait SubscriptionManagementTrait
             // There is no subscription at all - first time user
             $subscription = $payment->user->subscribeTo($payment->plan);
             $subscription->update(['started_at' => now()]);
-            $payment->user->notify(new SubscriptionActivatedNotification($subscription));
+            $this->sentBuyNotification($payment->user,$subscription);
             return $subscription;
+        }
+    }
+
+
+    private function sentBuyNotification($user,$subscription,$slug ='user-start-new-subscription'){
+        $emailTemplate = SystemEmail::where('slug', $slug)->select('id')->first();
+        if ($emailTemplate) {
+
+            $mailData = [
+                'slug' => $slug,
+                'user_id' => $user->id,
+                'subscription_id' => $subscription->id,
+            ];
+            Mail::to($user->email)->queue(new BaseMail($mailData));
+
+        }else{
+            $user->notify(new SubscriptionActivatedNotification($subscription));
         }
     }
 }

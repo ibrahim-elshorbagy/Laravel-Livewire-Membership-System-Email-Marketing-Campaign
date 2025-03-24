@@ -120,7 +120,7 @@
 
             @role('admin')
             @persist('sidebar')
-            <div x-data="{ isEmailExpanded: false, isSettingsExpanded: false }" class="flex flex-col space-y-2">
+            <div x-data="{ isEmailExpanded: false, isSettingsExpanded: false ,isPaymentExpanded: false}" class="flex flex-col space-y-2">
                 <!-- Payment Settings Dropdown -->
                 <button type="button" x-on:click="isEmailExpanded = ! isEmailExpanded"
                     class="flex gap-2 justify-between items-center px-2 py-1.5 text-sm font-medium rounded-md underline-offset-2 focus:outline-none focus-visible:underline"

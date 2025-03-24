@@ -16,6 +16,11 @@ use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
 use Carbon\Carbon;
 use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BaseMail;
+use App\Models\Admin\Site\SystemSetting\SystemEmail;
+use Illuminate\Support\Facades\Log;
+
 class EditSubscription extends Component
 {
      use LivewireAlert;
@@ -193,7 +198,27 @@ class EditSubscription extends Component
                 'suppressed_at' => null,
                 'grace_days_ended_at' => null,
             ]);
-            $this->subscription->subscriber->notify(new AdminSubscriptionCancelledNotification($this->subscription));
+
+            $slug ='admin-cancelled-subscription';
+            $emailTemplate = SystemEmail::where('slug', $slug)->select('id')->first();
+            if ($emailTemplate) {
+
+                $user = $this->subscription->subscriber;
+
+                $mailData = [
+                    'slug' => 'admin-cancelled-subscription',
+                    'user_id' => $user->id,
+                    'subscription_id' => $this->subscription->id,
+                ];
+                Mail::to($user->email)->queue(new BaseMail($mailData));
+
+
+            }else{
+                $this->subscription->subscriber->notify(new AdminSubscriptionCancelledNotification($this->subscription));
+            }
+
+
+
             $this->alert('success', 'Subscription cancelled successfully.' , ['position' => 'bottom-end']);
 
             DB::commit();
@@ -209,7 +234,26 @@ class EditSubscription extends Component
         DB::beginTransaction();
         try {
             $this->subscription->suppress();
-            $this->subscription->subscriber->notify(new AdminSubscriptionSuppressNotification($this->subscription));
+
+
+            $slug ='admin-suppressed-subscription';
+            $emailTemplate = SystemEmail::where('slug', $slug)->select('id')->first();
+
+            if ($emailTemplate) {
+
+                $user = $this->subscription->subscriber;
+                $mailData = [
+                    'slug' => 'admin-suppressed-subscription',
+                    'user_id' => $user->id,
+                    'subscription_id' => $this->subscription->id,
+                ];
+                Mail::to($user->email)->queue(new BaseMail($mailData));
+
+            }else{
+                $this->subscription->subscriber->notify(new AdminSubscriptionSuppressNotification($this->subscription));
+            }
+
+
             DB::commit();
             $this->alert('success', 'Subscription suppressed successfully.', ['position' => 'bottom-end']);
         } catch (\Exception $e) {
@@ -226,7 +270,26 @@ class EditSubscription extends Component
                 'suppressed_at' => null,
                 'canceled_at' => null,
             ]);
-            $this->subscription->subscriber->notify(new AdminSubscriptionReactiveNotification($this->subscription));
+
+
+            $slug ='admin-reactivated-subscription';
+            $emailTemplate = SystemEmail::where('slug', $slug)->select('id')->first();
+
+
+            if ($emailTemplate) {
+
+                $user = $this->subscription->subscriber;
+                $mailData = [
+                    'slug' => 'admin-reactivated-subscription',
+                    'user_id' => $user->id,
+                    'subscription_id' => $this->subscription->id,
+                ];
+                Mail::to($user->email)->queue(new BaseMail($mailData));
+
+            }else{
+                $this->subscription->subscriber->notify(new AdminSubscriptionReactiveNotification($this->subscription));
+            }
+
 
             DB::commit();
             $this->alert('success', 'Subscription reactivated successfully.', ['position' => 'bottom-end']);

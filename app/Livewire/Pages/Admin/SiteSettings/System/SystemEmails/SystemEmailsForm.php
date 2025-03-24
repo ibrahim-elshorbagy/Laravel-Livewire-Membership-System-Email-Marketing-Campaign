@@ -24,7 +24,7 @@ class SystemEmailsForm extends Component
 
         return [
             'name' => ['required', 'string'],
-            'slug' => ['required', 'string'],
+            'slug' => ['required', 'string','unique:system_emails,slug,'.$this->email_id],
             'email_subject' => ['required', 'string'],
             'message_html'  => ['nullable', 'string'],
         ];
