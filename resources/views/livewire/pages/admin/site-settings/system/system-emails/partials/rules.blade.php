@@ -4,6 +4,89 @@
 
     <div class="space-y-2">
 
+        <x-primary-accordion title="All System Emails" :isExpandedByDefault="false">
+            <div class="p-4 mb-4 rounded-lg bg-neutral-50 dark:bg-neutral-700">
+                <h4 class="mb-2 text-lg font-semibold text-neutral-800 dark:text-neutral-200">Notes:</h4>
+                <ul class="list-disc list-inside text-neutral-600 dark:text-neutral-300">
+                    <li>All of these Emails Must Be Built.</li>
+                </ul>
+            </div>
+
+            <table class="w-full text-gray-600 dark:text-gray-300">
+                <thead class="bg-neutral-50 dark:bg-neutral-700">
+                    <tr>
+                        <th class="px-4 py-2 text-left">Email Slug</th>
+                        <th class="px-4 py-2 text-left">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Support Emails -->
+                    <tr class="bg-blue-50 border-b border-neutral-200 dark:border-neutral-700 dark:bg-blue-900">
+                        <td colspan="3" class="px-6 py-4">
+                            <h4 class="text-lg font-semibold text-blue-800 dark:text-blue-200">Support Emails</h4>
+                        </td>
+                    </tr>
+                    <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                        <td class="px-4 py-2 font-mono">support-ticket-user-request</td>
+                        <td class="px-4 py-2">Sent to admin when a user submits a new support ticket</td>
+                    </tr>
+                    <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                        <td class="px-4 py-2 font-mono">support-ticket-admin-response</td>
+                        <td class="px-4 py-2">Sent to user when an admin responds to their support ticket</td>
+                    </tr>
+
+                    <!-- Subscription Emails -->
+                    <tr class="bg-green-50 border-b border-neutral-200 dark:border-neutral-700 dark:bg-green-900">
+                        <td colspan="3" class="px-6 py-4">
+                            <h4 class="text-lg font-semibold text-green-800 dark:text-green-200">Subscription Emails</h4>
+                        </td>
+                    </tr>
+                    <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                        <td class="px-4 py-2 font-mono">admin-cancelled-subscription</td>
+                        <td class="px-4 py-2">Notification to user when admin cancels their subscription</td>
+                    </tr>
+                    <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                        <td class="px-4 py-2 font-mono">admin-suppressed-subscription</td>
+                        <td class="px-4 py-2">Notification to user when admin suppresses their subscription</td>
+                    </tr>
+                    <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                        <td class="px-4 py-2 font-mono">admin-reactivated-subscription</td>
+                        <td class="px-4 py-2">Notification to user when admin reactivates their subscription</td>
+                    </tr>
+                    <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                        <td class="px-4 py-2 font-mono">user-start-new-subscription</td>
+                        <td class="px-4 py-2">Confirmation email when user starts a new subscription</td>
+                    </tr>
+                    <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                        <td class="px-4 py-2 font-mono">user-renew-subscription</td>
+                        <td class="px-4 py-2">Confirmation email when user renews their subscription</td>
+                    </tr>
+                    <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                        <td class="px-4 py-2 font-mono">user-cancel-subscription</td>
+                        <td class="px-4 py-2">Confirmation email when user cancels their subscription</td>
+                    </tr>
+
+                    <!-- System Emails -->
+                    <tr class="bg-amber-50 border-b border-neutral-200 dark:border-neutral-700 dark:bg-amber-900">
+                        <td colspan="3" class="px-6 py-4">
+                            <h4 class="text-lg font-semibold text-amber-800 dark:text-amber-200">System Emails
+                            </h4>
+                        </td>
+                    </tr>
+                    <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                        <td class="px-4 py-2 font-mono">user-email-verification</td>
+                        <td class="px-4 py-2">Email containing verification link for new user registration</td>
+                    </tr>
+                    <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                        <td class="px-4 py-2 font-mono">user-forgot-password</td>
+                        <td class="px-4 py-2">Email containing password reset link for forgot password requests</td>
+                    </tr>
+                </tbody>
+            </table>
+        </x-primary-accordion>
+
+
+
         <x-primary-accordion title="(support-ticket-user-request) When a user sent support ticket or Message"
             :isExpandedByDefault="false">
             <div class="p-4 mb-4 rounded-lg bg-neutral-50 dark:bg-neutral-700">
@@ -180,23 +263,20 @@
                             </td>
                         </tr>
                         <tr class="border-b border-neutral-200 dark:border-neutral-700">
-                            <td class="px-4 py-2 font-mono">@{{ $subscription_start_date }}</td>
+                            <td class="px-4 py-2 font-mono">@{{ $subscription_start_date?->format('d/m/Y h:i:sA') }}</td>
                             <td class="px-4 py-2">Subscription start date</td>
-                            <td class="px-4 py-2 italic">"Started: @{{ $subscription_start_date?->format('d/m/Y h:i:s
-                                A')
-                                }}"</td>
+                            <td class="px-4 py-2 italic">"Started: @{{ $subscription_start_date?->format('d/m/Y h:i:sA') }}"</td>
                         </tr>
                         <tr class="border-b border-neutral-200 dark:border-neutral-700">
-                            <td class="px-4 py-2 font-mono">@{{ $subscription_end_date }}</td>
+                            <td class="px-4 py-2 font-mono">@{{ $subscription_end_date?->format('d/m/Y h:i:s A') }}</td>
                             <td class="px-4 py-2">Subscription end date</td>
                             <td class="px-4 py-2 italic">"Ends: @{{ $subscription_end_date?->format('d/m/Y h:i:s A') }}"
                             </td>
                         </tr>
                         <tr class="border-b border-neutral-200 dark:border-neutral-700">
-                            <td class="px-4 py-2 font-mono">@{{ $subscription_grace_days_ended_date }}</td>
+                            <td class="px-4 py-2 font-mono">@{{ $subscription_grace_days_ended_date?->format('d/m/Y h:i:s A') }}</td>
                             <td class="px-4 py-2">Grace period end date</td>
-                            <td class="px-4 py-2 italic">"Grace period ends: @{{
-                                $subscription_grace_days_ended_date?->format('d/m/Y h:i:s A') }}"</td>
+                            <td class="px-4 py-2 italic">"Grace period ends: @{{ $subscription_grace_days_ended_date?->format('d/m/Y h:i:s A') }}"</td>
                         </tr>
                         <tr class="border-b border-neutral-200 dark:border-neutral-700">
                             <td class="px-4 py-2 font-mono">@{{ now()->format('d/m/Y h:i:s A') }}</td>
@@ -395,7 +475,7 @@ Thank you for your business!</pre>
 
                     <div class="p-3 bg-white rounded dark:bg-blue-800">
                         <h5 class="mb-2 font-medium">Verify Email Address</h5>
-<pre class="text-sm whitespace-pre-wrap">
+                        <pre class="text-sm whitespace-pre-wrap">
 Hello @{{ $full_name }},
 
 Subject: Verify Your Email Address
@@ -405,10 +485,10 @@ Hi @{{ $email }},
 Thank you for signing up! Please verify your email address by Entering the link below:
 
 </pre>
-<div class="px-2 py-1 my-2 text-sm text-white bg-blue-600 rounded-lg w-fit">
-&lt;a href="@{{ $verification_url }}"&gt;Verify&lt;/a&gt;
-</div>
-<pre class="text-sm whitespace-pre-wrap">
+                        <div class="px-2 py-1 my-2 text-sm text-white bg-blue-600 rounded-lg w-fit">
+                            &lt;a href="@{{ $verification_url }}"&gt;Verify&lt;/a&gt;
+                        </div>
+                        <pre class="text-sm whitespace-pre-wrap">
 
 This link will expire in @{{ $url_expired_after }}.
 
@@ -417,9 +497,9 @@ If you did not create an account, please ignore this email.
 Best regards,
 The Support Team
 </pre>
-                            </div>
-                        </div>
                     </div>
+                </div>
+            </div>
 
 
 
