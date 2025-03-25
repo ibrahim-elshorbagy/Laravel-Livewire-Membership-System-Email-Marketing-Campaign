@@ -37,7 +37,7 @@
         <nav x-cloak
             class="flex fixed left-0 z-30 flex-col p-4 w-60 border-r transition-transform duration-300 h-svh shrink-0 border-neutral-300 bg-neutral-50 md:hidden md:w-64 md:translate-x-0 dark:border-neutral-700 dark:bg-neutral-900"
             x-bind:class="sidebarIsOpen ? 'translate-x-0' : '-translate-x-60'">
-            <a href="https://www.gemailapp.com/"
+            <a href="https://my.bulkemailapp.com/"
                 class="mb-4 ml-2 w-12 text-2xl font-bold text-neutral-900 dark:text-white">
                 <x-application-logo />
             </a>
@@ -78,10 +78,12 @@
                     <span>Campaigns</span>
                 </x-nav-link>
                 <x-primary-dropdown label="Support">
-                    <x-nav-link :active="request()->routeIs('user.support.tickets')" href="{{ route('user.support.tickets') }}" wire:navigate>
+                    <x-nav-link :active="request()->routeIs('user.support.tickets')"
+                        href="{{ route('user.support.tickets') }}" wire:navigate>
                         <span>My Tickets</span>
                     </x-nav-link>
-                    <x-nav-link :active="request()->routeIs('user.support.create')" href="{{ route('user.support.create') }}" wire:navigate>
+                    <x-nav-link :active="request()->routeIs('user.support.create')"
+                        href="{{ route('user.support.create') }}" wire:navigate>
                         <span>Create Ticket</span>
                     </x-nav-link>
                 </x-primary-dropdown>
@@ -120,24 +122,25 @@
 
             @role('admin')
             @persist('sidebar')
-            <div x-data="{ isEmailExpanded: false, isSettingsExpanded: false ,isPaymentExpanded: false}" class="flex flex-col space-y-2">
+            <div x-data="{ isEmailExpanded: false, isSettingsExpanded: false ,isPaymentExpanded: false}"
+                class="flex flex-col space-y-2">
                 <!-- Payment Settings Dropdown -->
                 <button type="button" x-on:click="isEmailExpanded = ! isEmailExpanded"
                     class="flex gap-2 justify-between items-center px-2 py-1.5 text-sm font-medium rounded-md underline-offset-2 focus:outline-none focus-visible:underline"
                     x-bind:class="isEmailExpanded ? 'text-neutral-900 bg-black/10 dark:text-white dark:bg-white/10' :  'text-neutral-600 hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/5'">
                     <span class="mr-auto text-left">Emails</span>
-                    <i class="transition-transform fa-solid fa-angle-up" x-bind:class="isEmailExpanded ? 'rotate-0' : 'rotate-180'"
-                        aria-hidden="true"></i>
+                    <i class="transition-transform fa-solid fa-angle-up"
+                        x-bind:class="isEmailExpanded ? 'rotate-0' : 'rotate-180'" aria-hidden="true"></i>
                 </button>
 
                 <ul x-cloak x-collapse x-show="isEmailExpanded">
                     <li class="px-1 py-0.5 first:mt-2">
-                        <x-nav-link :active="request()->routeIs('admin.support.tickets')" href="{{ route('admin.support.tickets') }}"
-                            wire:navigate>
+                        <x-nav-link :active="request()->routeIs('admin.support.tickets')"
+                            href="{{ route('admin.support.tickets') }}" wire:navigate>
                             <span>Support Tickets</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('admin.site-system-emails')" href="{{ route('admin.site-system-emails') }}"
-                            wire:navigate>
+                        <x-nav-link :active="request()->routeIs('admin.site-system-emails')"
+                            href="{{ route('admin.site-system-emails') }}" wire:navigate>
                             <span>Emails</span>
                         </x-nav-link>
                     </li>
@@ -222,7 +225,7 @@
                 <div class="container flex justify-between items-center mx-3 h-14">
                     <!-- Site name + Logo -->
                     <div class="flex gap-4 items-center">
-                        <a href="https://www.gemailapp.com/" class="w-24 text-neutral-600 dark:text-neutral-300">
+                        <a href="https://my.bulkemailapp.com/" class="w-24 text-neutral-600 dark:text-neutral-300">
                             <x-application-logo />
                         </a>
                     </div>
@@ -266,10 +269,12 @@
                             <span>Campaigns</span>
                         </x-nav-link>
                         <x-primary-dropdown label="Support">
-                            <x-nav-link :active="request()->routeIs('user.support.tickets')" href="{{ route('user.support.tickets') }}" wire:navigate>
+                            <x-nav-link :active="request()->routeIs('user.support.tickets')"
+                                href="{{ route('user.support.tickets') }}" wire:navigate>
                                 <span>My Tickets</span>
                             </x-nav-link>
-                            <x-nav-link :active="request()->routeIs('user.support.create')" href="{{ route('user.support.create') }}">
+                            <x-nav-link :active="request()->routeIs('user.support.create')"
+                                href="{{ route('user.support.create') }}">
                                 <span>Create Ticket</span>
                             </x-nav-link>
                         </x-primary-dropdown>
@@ -305,11 +310,12 @@
                         </x-nav-link>
 
                         <x-primary-dropdown label="Emails">
-                            <x-nav-link :active="request()->routeIs('admin.support.tickets')" href="{{ route('admin.support.tickets') }}"
-                                wire:navigate>
+                            <x-nav-link :active="request()->routeIs('admin.support.tickets')"
+                                href="{{ route('admin.support.tickets') }}" wire:navigate>
                                 <span>Support Tickets</span>
                             </x-nav-link>
-                            <x-nav-link :active="request()->routeIs('admin.site-system-emails')" href="{{ route('admin.site-system-emails') }}">
+                            <x-nav-link :active="request()->routeIs('admin.site-system-emails')"
+                                href="{{ route('admin.site-system-emails') }}">
                                 <span>Emails</span>
                             </x-nav-link>
                         </x-primary-dropdown>

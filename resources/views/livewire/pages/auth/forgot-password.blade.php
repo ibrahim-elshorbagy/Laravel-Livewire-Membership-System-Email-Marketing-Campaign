@@ -68,7 +68,7 @@ new #[Layout('layouts.app')] class extends Component
     </div>
     <div class="flex justify-center items-center w-full h-full">
         <div class="mx-auto flex w-full flex-col justify-evenly space-y-6 sm:w-[350px] h-full">
-            <a href="https://gemailapp.com/" class="flex flex-col gap-2 items-center font-medium z-5 lg:hidden"
+            <a href="https://my.bulkemailapp.com/" class="flex flex-col gap-2 items-center font-medium z-5 lg:hidden"
                 wire:navigate>
                 <span class="flex justify-center items-center w-[200px]   rounded-md">
                     <x-application-logo class="text-black fill-current size-9 dark:text-white" />
@@ -85,7 +85,7 @@ new #[Layout('layouts.app')] class extends Component
 
 
             <form wire:submit="sendPasswordResetLink" class="space-y-6">
-                <div class="space-y-4 ">
+                <div class="space-y-4">
                     <!-- Email Address -->
                     <div>
                         <x-input-label for="email" :value="__('Email')" class="text-sm font-medium" />

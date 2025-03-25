@@ -36,7 +36,7 @@ new #[Layout('layouts.app')] class extends Component
     </div>
     <div class="flex justify-center items-center w-full h-full">
         <div class="mx-auto flex w-full flex-col justify-evenly h-full space-y-6 sm:w-[350px] ">
-            <a href="https://gemailapp.com/" class="flex flex-col gap-2 items-center font-medium z-5 lg:hidden"
+            <a href="https://my.bulkemailapp.com/" class="flex flex-col gap-2 items-center font-medium z-5 lg:hidden"
                 wire:navigate>
                 <span class="flex justify-center items-center w-[200px] rounded-md">
                     <x-application-logo class="text-black fill-current size-9 dark:text-white" />
