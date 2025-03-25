@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EmailVerificationMail;
 
 new class extends Component
 {
@@ -77,7 +79,7 @@ new class extends Component
             return;
         }
 
-        $user->sendEmailVerificationNotification();
+        Mail::to($user->email)->queue(new EmailVerificationMail($user));
 
         Session::flash('status', 'verification-link-sent');
     }

@@ -174,14 +174,16 @@
                         <!-- Important Dates Section Header -->
                         <tr class="bg-purple-50 border-b border-neutral-200 dark:border-neutral-700 dark:bg-purple-900">
                             <td colspan="3" class="px-6 py-4">
-                                <h4 class="text-lg font-semibold text-purple-800 dark:text-purple-200">Important Dates (please use it with the '?' mark)
+                                <h4 class="text-lg font-semibold text-purple-800 dark:text-purple-200">Important Dates
+                                    (please use it with the '?' mark)
                                 </h4>
                             </td>
                         </tr>
                         <tr class="border-b border-neutral-200 dark:border-neutral-700">
                             <td class="px-4 py-2 font-mono">@{{ $subscription_start_date }}</td>
                             <td class="px-4 py-2">Subscription start date</td>
-                            <td class="px-4 py-2 italic">"Started: @{{ $subscription_start_date?->format('d/m/Y h:i:s A')
+                            <td class="px-4 py-2 italic">"Started: @{{ $subscription_start_date?->format('d/m/Y h:i:s
+                                A')
                                 }}"</td>
                         </tr>
                         <tr class="border-b border-neutral-200 dark:border-neutral-700">
@@ -276,6 +278,131 @@ Thank you for your business!</pre>
                     </div>
                 </div>
             </div>
+
+
+        </x-primary-accordion>
+
+        <x-primary-accordion title="For Email Verification" :isExpandedByDefault="false">
+            <div class="p-4 mb-4 rounded-lg bg-neutral-50 dark:bg-neutral-700">
+                <h4 class="mb-2 text-lg font-semibold text-neutral-800 dark:text-neutral-200">Notes:</h4>
+                <ul class="list-disc list-inside text-neutral-600 dark:text-neutral-300">
+                    <li>User Variables</li>
+                    <li>Email Verification Variables</li>
+                </ul>
+            </div>
+
+            <!-- User Information Section -->
+            <div class="mb-8">
+                <table class="w-full text-gray-600 dark:text-gray-300">
+                    <thead class="bg-neutral-50 dark:bg-neutral-700">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Variable</th>
+                            <th class="px-4 py-2 text-left">Description</th>
+                            <th class="px-4 py-2 text-left">Example Usage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- User Information Section Header -->
+                        <tr class="bg-blue-50 border-b border-neutral-200 dark:border-neutral-700 dark:bg-blue-900">
+                            <td colspan="3" class="px-6 py-4">
+                                <h4 class="text-lg font-semibold text-blue-800 dark:text-blue-200">User Information</h4>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $first_name }}</td>
+                            <td class="px-4 py-2">User's first name</td>
+                            <td class="px-4 py-2 italic">"Dear @{{ $first_name }},"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $last_name }}</td>
+                            <td class="px-4 py-2">User's last name</td>
+                            <td class="px-4 py-2 italic">"Mr/Ms @{{ $last_name }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $full_name }}</td>
+                            <td class="px-4 py-2">User's full name</td>
+                            <td class="px-4 py-2 italic">"Welcome, @{{ $full_name }}!"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $email }}</td>
+                            <td class="px-4 py-2">User's email address</td>
+                            <td class="px-4 py-2 italic">"Your registered email: @{{ $email }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $username }}</td>
+                            <td class="px-4 py-2">User's username</td>
+                            <td class="px-4 py-2 italic">"Username: @{{ $username }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $whatsapp }}</td>
+                            <td class="px-4 py-2">User's WhatsApp number</td>
+                            <td class="px-4 py-2 italic">"WhatsApp: @{{ $whatsapp }}"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $country }}</td>
+                            <td class="px-4 py-2">User's country</td>
+                            <td class="px-4 py-2 italic">"Location: @{{ $country }}"</td>
+                        </tr>
+
+
+
+                        <!-- Payment Information Section Header -->
+                        <tr class="bg-amber-50 border-b border-neutral-200 dark:border-neutral-700 dark:bg-amber-900">
+                            <td colspan="3" class="px-6 py-4">
+                                <h4 class="text-lg font-semibold text-amber-800 dark:text-amber-200">Email Verification
+                                </h4>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ "<a href=\"@{{ $verification_url }}\">@{{
+                                    $verification_url }}</a>" }}
+                            </td <td class="px-4 py-2">Verification Link</td>
+                            <td class="px-4 py-2 italic">"Use @{{ $verification_url }} To Verify Your Email"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $url_expired_after }}</td>
+                            <td class="px-4 py-2">Link Expired After</td>
+                            <td class="px-4 py-2 italic">"Link Expired After @{{ $url_expired_after }} (60 minute)"</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+
+            <!-- Complete Examples Section -->
+            <div class="p-4 mt-4 bg-blue-50 rounded-lg dark:bg-blue-900">
+                <h4 class="mb-4 text-lg font-semibold text-blue-800 dark:text-blue-200">Complete Template Examples</h4>
+                <div class="space-y-4 text-blue-700 dark:text-blue-300">
+
+                    <div class="p-3 bg-white rounded dark:bg-blue-800">
+                        <h5 class="mb-2 font-medium">Password Reset Request</h5>
+<pre class="text-sm whitespace-pre-wrap">
+Hello @{{ $full_name }},
+
+Subject: Verify Your Email Address
+
+Hi @{{ $email }},
+
+Thank you for signing up! Please verify your email address by Entering the link below:
+
+</pre>
+<div class="text-sm my-2 bg-blue-600 text-white px-2 py-1 rounded-lg w-fit">
+&lt;a href="@{{ $verification_url }}"&gt;Verify&lt;/a&gt;
+</div>
+<pre class="text-sm whitespace-pre-wrap">
+
+This link will expire in @{{ $url_expired_after }}.
+
+If you did not create an account, please ignore this email.
+
+Best regards,
+The Support Team
+</pre>
+                            </div>
+                        </div>
+                    </div>
+
 
 
         </x-primary-accordion>

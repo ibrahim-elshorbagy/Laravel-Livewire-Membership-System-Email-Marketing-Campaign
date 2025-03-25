@@ -24,7 +24,7 @@ class SupportMail extends Mailable
     {
 
         $emailTemplate = SystemEmail::where('slug', 'support-ticket-user-request')->first();
-    
+
         // Check if template was found
         if (!$emailTemplate) {
             // Use fallback template
@@ -50,7 +50,7 @@ class SupportMail extends Mailable
 
         // Get the HTML template
         $templateHtml = $emailTemplate->message_html;
-        
+
         // Create data array with all variables needed in the template
         $data = [
             'name' => $this->data['name'],
@@ -58,9 +58,9 @@ class SupportMail extends Mailable
             'subject' => $this->data['subject'],
             'messageContent' => $this->data['message']
         ];
-        
+
         // Render the template string directly with the data
-        $renderedHtml = Blade::render($templateHtml, $data);
+        $renderedHtml = html_entity_decode(Blade::render($templateHtml, $data));
 
         return $this->subject($this->data['subject'])
             ->html($renderedHtml)

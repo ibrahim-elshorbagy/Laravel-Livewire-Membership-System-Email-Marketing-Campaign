@@ -8,6 +8,8 @@ use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 use LucasDotVin\Soulbscription\Models\Plan;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EmailVerificationMail;
 
 new #[Layout('layouts.app')] class extends Component
 {
@@ -43,7 +45,7 @@ new #[Layout('layouts.app')] class extends Component
             Auth::login($user);
 
             defer(function() use ($user) {
-                event(new Registered($user));
+                Mail::to($user->email)->queue(new EmailVerificationMail($user));
             });
 
             Session::flash('welcome-flash', 'Please check your email for verification instructions.');

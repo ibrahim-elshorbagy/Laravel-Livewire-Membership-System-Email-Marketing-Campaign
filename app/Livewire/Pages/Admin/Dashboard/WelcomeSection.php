@@ -7,6 +7,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
+use App\Mail\EmailVerificationMail;
+use Illuminate\Support\Facades\Mail;
 
 class WelcomeSection extends Component
 {
@@ -25,7 +27,8 @@ class WelcomeSection extends Component
             return;
         }
 
-        $user->sendEmailVerificationNotification();
+        Mail::to($user->email)->queue(new EmailVerificationMail($user));
+
 
         Session::flash('status', 'verification-link-sent');
     }

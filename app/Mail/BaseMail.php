@@ -81,6 +81,7 @@ class BaseMail extends Mailable
                 ->first();
         }
 
+        // Initialize base data array
         $data = [
             // subject
             'subject' => $emailTemplate->email_subject,
@@ -114,10 +115,15 @@ class BaseMail extends Mailable
         ];
 
 
+        // Merge any additional custom data from child classes
+        if (isset($this->data['data']) && is_array($this->data['data'])) {
+            $data = array_merge($data, $this->data['data']);
+        }
+
         // Render the template string directly with the data
         try {
             // Render the template string directly with the data
-            $renderedHtml = Blade::render($templateHtml, $data);
+            $renderedHtml = html_entity_decode(Blade::render($templateHtml, $data));
 
             return $this->subject($emailTemplate->email_subject)
                 ->html($renderedHtml);
