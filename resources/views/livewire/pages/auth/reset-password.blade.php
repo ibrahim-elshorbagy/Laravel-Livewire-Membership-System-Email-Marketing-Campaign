@@ -9,7 +9,6 @@ use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Volt\Component;
-
 new #[Layout('layouts.app')] class extends Component
 {
     #[Locked]
@@ -63,7 +62,7 @@ new #[Layout('layouts.app')] class extends Component
             return;
         }
 
-        Session::flash('status', __($status));
+        Session::flash('success', __($status));
 
         $this->redirectRoute('login', navigate: true);
     }

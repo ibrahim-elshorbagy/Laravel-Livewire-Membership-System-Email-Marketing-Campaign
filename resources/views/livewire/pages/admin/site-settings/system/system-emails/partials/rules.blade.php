@@ -282,12 +282,13 @@ Thank you for your business!</pre>
 
         </x-primary-accordion>
 
-        <x-primary-accordion title="For Email Verification" :isExpandedByDefault="false">
+        <x-primary-accordion title="For Email Verification And Forget Password" :isExpandedByDefault="false">
             <div class="p-4 mb-4 rounded-lg bg-neutral-50 dark:bg-neutral-700">
                 <h4 class="mb-2 text-lg font-semibold text-neutral-800 dark:text-neutral-200">Notes:</h4>
                 <ul class="list-disc list-inside text-neutral-600 dark:text-neutral-300">
                     <li>User Variables</li>
-                    <li>Email Verification Variables</li>
+                    <li>Email Verification Variables (user-email-verification)</li>
+                    <li>Forget Password Variables (user-forgot-password)</li>
                 </ul>
             </div>
 
@@ -354,10 +355,27 @@ Thank you for your business!</pre>
                             </td>
                         </tr>
                         <tr class="border-b border-neutral-200 dark:border-neutral-700">
-                            <td class="px-4 py-2 font-mono">@{{ "<a href=\"@{{ $verification_url }}\">@{{
-                                    $verification_url }}</a>" }}
-                            </td <td class="px-4 py-2">Verification Link</td>
+                            <td class="px-4 py-2 font-mono">@{{ $verification_url }}
+                            <td class="px-4 py-2">Verification Link</td>
                             <td class="px-4 py-2 italic">"Use @{{ $verification_url }} To Verify Your Email"</td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $url_expired_after }}</td>
+                            <td class="px-4 py-2">Link Expired After</td>
+                            <td class="px-4 py-2 italic">"Link Expired After @{{ $url_expired_after }} (60 minute)"</td>
+                        </tr>
+
+                        <!-- Payment Information Section Header -->
+                        <tr class="bg-amber-50 border-b border-neutral-200 dark:border-neutral-700 dark:bg-amber-900">
+                            <td colspan="3" class="px-6 py-4">
+                                <h4 class="text-lg font-semibold text-amber-800 dark:text-amber-200">Forget Password
+                                </h4>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $reset_url }}
+                            <td class="px-4 py-2">Reset Password Link</td>
+                            <td class="px-4 py-2 italic">"Use @{{ $reset_url }} To Reset Your Password"</td>
                         </tr>
                         <tr class="border-b border-neutral-200 dark:border-neutral-700">
                             <td class="px-4 py-2 font-mono">@{{ $url_expired_after }}</td>
@@ -376,7 +394,7 @@ Thank you for your business!</pre>
                 <div class="space-y-4 text-blue-700 dark:text-blue-300">
 
                     <div class="p-3 bg-white rounded dark:bg-blue-800">
-                        <h5 class="mb-2 font-medium">Password Reset Request</h5>
+                        <h5 class="mb-2 font-medium">Verify Email Address</h5>
 <pre class="text-sm whitespace-pre-wrap">
 Hello @{{ $full_name }},
 
@@ -387,7 +405,7 @@ Hi @{{ $email }},
 Thank you for signing up! Please verify your email address by Entering the link below:
 
 </pre>
-<div class="text-sm my-2 bg-blue-600 text-white px-2 py-1 rounded-lg w-fit">
+<div class="px-2 py-1 my-2 text-sm text-white bg-blue-600 rounded-lg w-fit">
 &lt;a href="@{{ $verification_url }}"&gt;Verify&lt;/a&gt;
 </div>
 <pre class="text-sm whitespace-pre-wrap">

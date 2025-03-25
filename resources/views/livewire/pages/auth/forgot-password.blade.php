@@ -5,11 +5,14 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendResetLinkMail;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 new #[Layout('layouts.app')] class extends Component
 {
     public string $email = '';
-
+    use LivewireAlert;
     /**
      * Send a password reset link to the provided email address.
      */
@@ -45,22 +48,12 @@ new #[Layout('layouts.app')] class extends Component
             }
         }
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $this->only('email')
-        );
 
-        if ($status != Password::RESET_LINK_SENT) {
-            $this->addError('email', __($status));
-
-            return;
-        }
+        Mail::to($user->email)->queue(new SendResetLinkMail($user));
 
         $this->reset('email');
 
-        session()->flash('status', __($status));
+        $this->alert('success', 'We have emailed your password reset link!', ['position' => 'bottom-end']);
     }
 }; ?>
 
@@ -90,11 +83,9 @@ new #[Layout('layouts.app')] class extends Component
                 </p>
             </div>
 
-            <!-- Session Status -->
-            <x-auth-session-status class="mb-4" :status="session('status')" />
 
             <form wire:submit="sendPasswordResetLink" class="space-y-6">
-                <div class="space-y-4 rounded-md shadow-sm">
+                <div class="space-y-4 ">
                     <!-- Email Address -->
                     <div>
                         <x-input-label for="email" :value="__('Email')" class="text-sm font-medium" />
@@ -105,7 +96,7 @@ new #[Layout('layouts.app')] class extends Component
                     <div>
                         <button type="submit"
                             class="flex justify-center px-4 py-2 w-full text-sm font-medium text-white bg-blue-600 rounded-lg border border-transparent shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                            {{ __('Send Reset Link') }}
+                            Send Reset Link
                         </button>
                     </div>
 
