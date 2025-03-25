@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login')->name('welcome');
+Route::redirect('/main-site', 'https://bulkemailapp.com/')->name('main-site');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth'])
@@ -26,3 +27,6 @@ Route::get('/payment/close', function () {
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
 require __DIR__.'/user.php';
+
+
+

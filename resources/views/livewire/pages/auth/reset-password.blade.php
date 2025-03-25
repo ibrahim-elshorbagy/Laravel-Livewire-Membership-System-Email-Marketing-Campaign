@@ -69,7 +69,7 @@ new #[Layout('layouts.app')] class extends Component
 }; ?>
 
 <div
-    class="grid relative flex-col justify-center items-center px-8 h-screen sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
+    class="grid relative flex-col px-4 md:px-8 min-h-[85vh] sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
     <div class="hidden relative flex-col p-10 h-full text-white bg-muted lg:flex dark:border-r dark:border-neutral-800">
         <div class="absolute inset-0 bg-[#f7f7f7]"></div>
         <div class="absolute inset-0 bg-center bg-no-repeat bg-contain"
@@ -77,41 +77,57 @@ new #[Layout('layouts.app')] class extends Component
 
     </div>
     <div class="flex justify-center items-center w-full h-full">
-        <div
-            class="flex flex-col p-6 border rounded-md w-46 md:w-[32rem] group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
-            <form wire:submit="resetPassword">
-                <!-- Email Address -->
-                <div>
-                    <x-input-label for="email" :value="__('Email')" />
-                    <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email"
-                        required autofocus autocomplete="username" />
-                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                </div>
+        <div class="mx-auto flex w-full flex-col justify-evenly space-y-6 sm:w-[350px] h-full">
+            <!-- Logo/Brand -->
+            <a href="{{ route('main-site') }}" class="flex flex-col gap-2 items-center font-medium z-5 lg:hidden" wire:navigate>
+                <span class="flex justify-center items-center w-[200px]   rounded-md">
+                    <x-application-logo class="text-black fill-current size-9 dark:text-white" />
+                </span>
+                <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
+            </a>
 
-                <!-- Password -->
-                <div class="mt-4">
-                    <x-input-label for="password" :value="__('Password')" />
-                    <x-text-input wire:model="password" id="password" class="block mt-1 w-full" type="password"
-                        name="password" required autocomplete="new-password" />
-                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                </div>
+            <div class="text-center">
+                <h2 class="text-3xl font-extrabold text-neutral-900 dark:text-white">Reset Password</h2>
+                <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">Enter your new password below</p>
+            </div>
 
-                <!-- Confirm Password -->
-                <div class="mt-4">
-                    <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+            <form wire:submit="resetPassword" class="space-y-6">
+                <div class="space-y-4">
+                    <!-- Email Address -->
+                    <div>
+                        <x-input-label for="email" :value="__('Email')" class="text-sm font-medium" />
+                        <x-text-input wire:model="email" id="email" type="email" name="email" required autofocus autocomplete="username" />
+                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                    </div>
 
-                    <x-text-input wire:model="password_confirmation" id="password_confirmation"
-                        class="block mt-1 w-full" type="password" name="password_confirmation" required
-                        autocomplete="new-password" />
+                    <!-- Password -->
+                    <div>
+                        <x-input-label for="password" :value="__('Password')" class="text-sm font-medium" />
+                        <x-text-input wire:model="password" id="password" type="password" name="password" required autocomplete="new-password" />
+                        <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                    </div>
 
-                    <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-                </div>
+                    <!-- Confirm Password -->
+                    <div>
+                        <x-input-label for="password_confirmation" :value="__('Confirm Password')" class="text-sm font-medium" />
+                        <x-text-input wire:model="password_confirmation" id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" />
+                        <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                    </div>
 
-                <div class="flex justify-end items-center mt-4">
-                    <x-primary-button>
-                        {{ __('Reset Password') }}
-                    </x-primary-button>
+                    <div>
+                        <button type="submit" class="flex justify-center px-4 py-2 w-full text-sm font-medium text-white bg-blue-600 rounded-lg border border-transparent shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Reset Password
+                        </button>
+                    </div>
+
+                    <div class="text-sm text-center">
+                        <span class="text-neutral-600 dark:text-neutral-400">Remember your password? </span>
+                        <a class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300" href="{{ route('login') }}" wire:navigate>
+                            Sign in here
+                        </a>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
+</div>
