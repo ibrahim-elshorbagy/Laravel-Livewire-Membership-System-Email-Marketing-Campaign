@@ -106,17 +106,20 @@
                     </x-primary-create-button>
                 </div>
             </div> <!-- Preview Section -->
-            <div class="rounded-lg border dark:border-neutral-700">
+            <div class="h-full rounded-lg border dark:border-neutral-700">
                 <div class="flex justify-between items-center p-4 border-b dark:border-neutral-700">
-                    <h3 class="text-lg font-semibold">Preview</h3> <button type="button" x-data
-                        @click="updatePreview($wire.message_html)"
+                    <h3 class="text-lg font-semibold">Preview</h3>
+                    <button type="button" x-data @click="updatePreview($wire.message_html)"
                         class="px-3 py-1 text-sm text-blue-600 rounded-md border border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900">
-                        Refresh Preview </button>
+                        Refresh Preview
+                    </button>
                 </div>
-                <div class="h-[calc(100%-60px)] overflow-hidden"> <iframe id="preview-frame"
-                        class="w-full h-full bg-white border-0 dark:bg-neutral-800"
+                <div class="h-[calc(100vh-200px)] md:h-[calc(100%-60px)] overflow-hidden">
+                    <iframe id="preview-frame" class="w-full h-full bg-white border-0 dark:bg-neutral-800"
                         sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"
-                        referrerpolicy="no-referrer"> </iframe> </div>
+                        referrerpolicy="no-referrer">
+                    </iframe>
+                </div>
             </div>
         </div>
     </form>
