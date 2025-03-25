@@ -25,7 +25,8 @@
 
             <div class="flex flex-wrap gap-2">
                 <x-primary-select-input wire:model.live="sortField" class="w-full sm:w-40">
-                    <option value="created_at">Sort by Date</option>
+                    <option value="updated_at">Sort by Date</option>
+                    <option value="slug">Sort by Title</option>
                 </x-primary-select-input>
 
                 <x-primary-select-input wire:model.live="sortDirection" class="w-full sm:w-32">

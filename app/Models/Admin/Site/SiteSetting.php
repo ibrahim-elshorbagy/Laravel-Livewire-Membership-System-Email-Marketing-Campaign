@@ -40,6 +40,12 @@ class SiteSetting extends Model
         return $logoPath ? Storage::url($logoPath) : asset($default);
     }
 
+    public static function getLogoUrl(string $default = '/images/default-logo.png'): string
+    {
+        $logoPath = self::getValue('logo');
+        return $logoPath ? url(Storage::url($logoPath)) : url($default);
+    }
+
 
     public static function getFavicon(string $default = '/favicon.ico'): string
     {

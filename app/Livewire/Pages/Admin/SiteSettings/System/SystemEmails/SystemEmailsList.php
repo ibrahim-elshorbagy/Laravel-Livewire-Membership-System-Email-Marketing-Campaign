@@ -13,7 +13,7 @@ class SystemEmailsList extends Component
     use WithPagination, LivewireAlert;
 
     public $search = '';
-    public $sortField = 'created_at';
+    public $sortField = 'updated_at';
     public $sortDirection = 'desc';
     public $perPage = 10;
     public $selectedTemplates = [];
@@ -22,7 +22,7 @@ class SystemEmailsList extends Component
 
     protected $queryString = [
         'search' => ['except' => ''],
-        'sortField' => ['except' => 'created_at'],
+        'sortField' => ['except' => 'updated_at'],
         'sortDirection' => ['except' => 'desc'],
     ];
 
@@ -30,7 +30,7 @@ class SystemEmailsList extends Component
     {
         return [
             'search' => 'nullable|string|max:255',
-            'sortField' => ['required', Rule::in(['message_title', 'created_at', 'sending_status'])],
+            'sortField' => ['required', Rule::in(['slug', 'updated_at', 'sending_status'])],
             'sortDirection' => ['required', Rule::in(['asc', 'desc'])],
             'perPage' => ['required', 'integer', Rule::in([10, 25, 50])],
             'selectedTemplates' => 'array',

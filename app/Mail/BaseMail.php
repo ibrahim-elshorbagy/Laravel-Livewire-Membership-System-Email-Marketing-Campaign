@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use LucasDotVin\Soulbscription\Models\Subscription;
 use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
 use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
+use App\Models\Admin\Site\SiteSetting;
 
 class BaseMail extends Mailable
 {
@@ -83,6 +84,11 @@ class BaseMail extends Mailable
 
         // Initialize base data array
         $data = [
+
+            //General Info
+            'site_name' => SiteSetting::getValue('site_name', config('app.name')),
+            'site_logo' => SiteSetting::getLogoUrl(),
+
             // subject
             'subject' => $emailTemplate->email_subject,
 
