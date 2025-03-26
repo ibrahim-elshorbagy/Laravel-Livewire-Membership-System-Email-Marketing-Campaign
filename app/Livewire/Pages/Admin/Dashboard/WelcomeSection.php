@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 use App\Mail\EmailVerificationMail;
+use App\Models\Payment\Payment;
 use Illuminate\Support\Facades\Mail;
 
 class WelcomeSection extends Component
@@ -39,6 +40,11 @@ class WelcomeSection extends Component
 
         $subscription = $user->lastSubscription();
 
+        $showWarning = Payment::where('user_id', $user->id)
+            ->where('status','pending')
+            ->latest()
+            ->first();
+
         $subscriptionData = null;
         if ($subscription) {
             $subscriptionData = [
@@ -57,6 +63,8 @@ class WelcomeSection extends Component
         }
         return view('livewire.pages.admin.dashboard.welcome-section',[
             'subscription' => $subscriptionData,
+            'showWarning'=>$showWarning,
+
         ]);
     }
 }

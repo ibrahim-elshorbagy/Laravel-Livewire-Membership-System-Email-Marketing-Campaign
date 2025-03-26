@@ -108,6 +108,10 @@
                 class="mt-6">
                 <h4 class="mb-4 text-sm font-medium md:text-md text-neutral-900 dark:text-neutral-100">Upload Payment
                     Receipt</h4>
+                <p class="mb-4 text-sm text-neutral-500 dark:text-neutral-400">You can attach a photo/pdf of the payment/transfer notification here now, or later on the transactions page.</p>
+
+
+
                 <div class="space-y-4">
                     <div class="flex justify-center items-center w-full">
                         <label x-data="{ dragOver: false }" x-on:dragover.prevent="dragOver = true"
