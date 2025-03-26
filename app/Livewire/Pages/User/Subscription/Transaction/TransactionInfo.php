@@ -39,6 +39,11 @@ class TransactionInfo extends Component
         'images.*' => 'image|mimes:jpeg,jpg,png'
     ];
 
+    protected $messages = [
+        'gateway_subscription_id.max' => 'field must not be greater than 255 characters',
+        'transaction_id.max' => 'field must not be greater than 255 characters'
+    ];
+
     public function mount(Payment $payment)
     {
         if ($payment->user_id !== auth()->id()) {

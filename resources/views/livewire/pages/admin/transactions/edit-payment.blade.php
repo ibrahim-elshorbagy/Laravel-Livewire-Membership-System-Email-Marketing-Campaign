@@ -94,6 +94,7 @@
 
     <div class="space-y-6">
         <!-- Transaction Information Section -->
+
         <div class="p-4 bg-white rounded-lg border dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
             <h3 class="mb-4 text-xs font-medium md:text-sm text-neutral-500 dark:text-neutral-400">
                 <span class="font-medium">Transaction Information </span>
@@ -104,36 +105,26 @@
             </h3>
             <div class="grid gap-4 md:grid-cols-2">
                 <div class="space-y-2">
-                    <x-input-label for="gateway_subscription_id" :value="__('Gateway Subscription ID')" />
+                    <x-input-label for="gateway_subscription_id"
+                        :value="$payment->gateway == 'paypal' ? __('Gateway Subscription ID') : __('Note')" />
                     <div class="flex items-center">
-                        <x-text-input wire:model="gateway_subscription_id" :readonly="$payment->gateway == 'paypal'"
-                            :disabled="$payment->gateway == 'paypal'"
+                        @if($payment->gateway == 'paypal')
+                        <x-text-input wire:model="gateway_subscription_id" :readonly="true" :disabled="true"
                             class="block w-full bg-neutral-50 dark:bg-neutral-900" />
-                        <button type="button"
-                            class="ml-2 text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
-                            onclick="navigator.clipboard.writeText('{{ $payment->gateway_subscription_id }}')">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                            </svg>
-                        </button>
+                        @else
+                        <x-primary-textarea wire:model="gateway_subscription_id"
+                            class="block w-full bg-neutral-50 dark:bg-neutral-900" />
+                        @endif
                     </div>
                 </div>
 
                 <div class="space-y-2">
-                    <x-input-label for="transaction_id" :value="__('Transaction ID')" />
+                    <x-input-label for="transaction_id"
+                        :value="$payment->gateway == 'paypal' ? __('Transaction ID') : __('Transfer record # and details (MTCN)')" />
                     <div class="flex items-center">
                         <x-text-input wire:model="transaction_id" :readonly="$payment->gateway == 'paypal'"
                             :disabled="$payment->gateway == 'paypal'"
                             class="block w-full bg-neutral-50 dark:bg-neutral-900" />
-                        <button type="button"
-                            class="ml-2 text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
-                            onclick="navigator.clipboard.writeText('{{ $payment->transaction_id }}')">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                            </svg>
-                        </button>
                     </div>
                 </div>
             </div>
