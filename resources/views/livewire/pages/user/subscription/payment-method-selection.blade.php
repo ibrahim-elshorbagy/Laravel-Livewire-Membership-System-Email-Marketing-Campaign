@@ -110,8 +110,14 @@
                     Receipt</h4>
                 <div class="space-y-4">
                     <div class="flex justify-center items-center w-full">
-                        <label
-                            class="flex flex-col justify-center items-center w-full h-32 rounded-lg border-2 border-dashed cursor-pointer border-neutral-300 bg-neutral-50 dark:hover:bg-neutral-800 dark:bg-neutral-700 hover:bg-neutral-100 dark:border-neutral-600 dark:hover:border-neutral-500">
+                        <label x-data="{ dragOver: false }" x-on:dragover.prevent="dragOver = true"
+                            x-on:dragleave.prevent="dragOver = false"
+                            x-on:drop.prevent="dragOver = false; const files = $event.dataTransfer.files; if (files.length) { const input = document.getElementById('images'); const dataTransfer = new DataTransfer(); Array.from(files).forEach(file => dataTransfer.items.add(file)); input.files = dataTransfer.files; const event = new Event('change', { bubbles: true }); input.dispatchEvent(event); }"
+                            class="flex flex-col justify-center items-center w-full h-32 rounded-lg border-2 border-dashed transition-colors duration-200 cursor-pointer"
+                            :class="{
+                                'border-neutral-300 bg-neutral-50 dark:hover:bg-neutral-800 dark:bg-neutral-700 hover:bg-neutral-100 dark:border-neutral-600 dark:hover:border-neutral-500': !dragOver,
+                                'border-blue-500 bg-blue-50 dark:bg-blue-900/20': dragOver
+                            }">
                             <div class="flex flex-col justify-center items-center pt-5 pb-6">
                                 <i
                                     class="mb-4 w-8 h-8 text-2xl text-neutral-500 dark:text-neutral-400 fas fa-cloud-upload-alt"></i>
@@ -119,8 +125,7 @@
                                     <span class="font-semibold">Click to upload</span> or drag and drop
                                 </p>
                                 <p class="text-xs text-neutral-500 dark:text-neutral-400">PNG, JPG, JPEG,JFIF or PDF
-                                    (MAX. 10MB)
-                                </p>
+                                    (MAX. 10MB)</p>
                             </div>
                             <input id="images" type="file" wire:model="images" class="hidden" multiple
                                 accept="image/png,image/jpg,image/jpeg,application/pdf" />
