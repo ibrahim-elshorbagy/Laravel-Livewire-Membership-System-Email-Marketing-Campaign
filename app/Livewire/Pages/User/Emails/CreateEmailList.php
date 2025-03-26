@@ -33,7 +33,7 @@ class CreateEmailList extends Component
 
     protected $rules = [
         'list_id' => 'required|exists:email_list_names,id',
-        'file' => 'nullable|file|mimes:txt,csv,xlsx,xls',
+        'file' => 'nullable|file|mimes:txt,csv,xlsx,xls|max:20480',
     ];
 
     protected $messages = [

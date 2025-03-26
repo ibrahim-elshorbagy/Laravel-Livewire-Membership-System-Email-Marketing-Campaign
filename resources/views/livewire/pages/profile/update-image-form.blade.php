@@ -21,7 +21,7 @@ new class extends Component
     public function updateImage(): void
     {
         $this->validate([
-            'image' => ['required', 'image'],
+            'image' => ['required', 'image','max:5120'],
         ]);
 
         $user = Auth::user();
@@ -48,7 +48,7 @@ new class extends Component
 }; ?>
 
 <section>
-    <header class="flex items-center gap-5">
+    <header class="flex gap-5 items-center">
         <i class="fa-solid fa-image fa-2xl"></i>
         <div>
             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -68,8 +68,8 @@ new class extends Component
 
         <div class="space-y-4">
             <!-- File Input -->
-            <div class="relative flex flex-col w-full max-w-sm gap-1 text-on-surface dark:text-on-surface-dark">
-                <label for="fileInput" class="w-fit pl-0.5 text-sm">Upload File</label>
+            <div class="flex relative flex-col gap-1 w-full max-w-sm text-on-surface dark:text-on-surface-dark">
+                <label for="fileInput" class="pl-0.5 text-sm w-fit">Upload File</label>
                 <x-primary-upload-button id="fileInput" type="file" wire:model="image" accept="image/png,image/jpeg,image/webp" />
                 {{-- <input id="fileInput" type="file" wire:model="image" accept="image/png,image/jpeg,image/webp"
                     class="w-full max-w-md text-sm overflow-clip rounded-radius bg-surface-alt/50 file:mr-4 file:border-none file:bg-surface-alt file:px-4 file:py-2 file:font-medium file:text-on-surface-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-75 dark:bg-surface-dark-alt/50 dark:file:bg-surface-dark-alt dark:file:text-on-surface-dark-strong dark:focus-visible:outline-primary-dark" /> --}}
@@ -80,13 +80,13 @@ new class extends Component
             @if ($image)
             <div class="mt-4">
                 <p class="text-sm text-gray-600 dark:text-gray-400">Preview:</p>
-                <img src="{{ $image->temporaryUrl() }}" class="object-cover w-32 h-32 mt-2 rounded-lg">
+                <img src="{{ $image->temporaryUrl() }}" class="object-cover mt-2 w-32 h-32 rounded-lg">
             </div>
             @endif
 
             <!-- Save Button - Only show when image is selected -->
             @if ($image)
-                <div class="flex items-center gap-4">
+                <div class="flex gap-4 items-center">
                     <x-primary-button>{{ __('Save') }}</x-primary-button>
 
                     <x-action-message class="me-3" on="profile-updated">

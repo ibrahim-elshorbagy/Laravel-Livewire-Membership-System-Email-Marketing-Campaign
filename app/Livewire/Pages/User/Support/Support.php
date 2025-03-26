@@ -46,7 +46,7 @@ class Support extends Component
         try {
 
             $validatedData = $this->validate([
-                'fileData' => ['required', 'string', 'regex:/^data:image\/[a-zA-Z]+;base64,[a-zA-Z0-9\/\+]+={0,2}$/'],
+                'fileData' => ['required', 'string', 'regex:/^data:image\/[a-zA-Z]+;base64,[a-zA-Z0-9\/\+]+={0,2}$/','max:10240'],
             ]);
 
             $image = $validatedData['fileData'];
