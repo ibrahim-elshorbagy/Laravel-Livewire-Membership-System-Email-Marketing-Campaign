@@ -22,26 +22,28 @@ use LucasDotVin\Soulbscription\Models\Subscription;
 class TransactionInfo extends Component
 {
     use LivewireAlert, WithFileUploads;
-    use WithFileUploads;
 
     public Payment $payment;
     public $plan;
     public $subscription;
-    public $images = [];
+    public $files = [];
     public $gateway_subscription_id;
     public $transaction_id;
-    public $showImageSection = false;
-    public $previewImageUrl;
+    public $showFileSection = false;
+    public $previewUrl;
+    public $previewType;
 
     protected $rules = [
         'gateway_subscription_id' => 'nullable|string|max:255',
         'transaction_id' => 'nullable|string|max:255',
-        'images.*' => 'image|mimes:jpeg,jpg,png'
+        'files.*' => 'file|mimes:jpeg,jfif,jpg,png,pdf|max:10240'
     ];
 
     protected $messages = [
         'gateway_subscription_id.max' => 'field must not be greater than 255 characters',
-        'transaction_id.max' => 'field must not be greater than 255 characters'
+        'transaction_id.max' => 'field must not be greater than 255 characters',
+        'files.*.max' => 'File must not be larger than 10MB',
+        'files.*.mimes' => 'File must be a valid image (JPG, JPEG, PNG) or PDF document'
     ];
 
     public function mount(Payment $payment)
@@ -71,10 +73,9 @@ class TransactionInfo extends Component
             ]);
         }
 
-        // Check if images should be shown based on payment gateway
         if ($payment->gateway !== 'paypal') {
             $offlineMethod = OfflinePaymentMethod::where('slug', $payment->gateway)->first();
-            $this->showImageSection = $offlineMethod ? $offlineMethod->receipt_image : false;
+            $this->showFileSection = $offlineMethod ? $offlineMethod->receipt_image : false;
         }
     }
 
@@ -106,101 +107,103 @@ class TransactionInfo extends Component
         ]);
     }
 
-    public function uploadImages()
+    public function uploadFiles()
     {
-        if (!$this->showImageSection) {
+        if (!$this->showFileSection) {
             return;
         }
 
         $this->validate([
-            'images.*' => 'image'
+            'files.*' => 'file|mimes:jpeg,jpg,png,pdf|max:10240'
         ]);
 
         $userId = auth()->id();
         $manager = new ImageManager(new Driver());
 
-        foreach ($this->images as $image) {
+        foreach ($this->files as $file) {
             try {
-                // Read the uploaded image
-                $img = $manager->read($image);
-
-                // Generate a unique filename
-                $fileName = 'payment_' . Str::random(10) . '.' . $image->getClientOriginalExtension();
-
-                // Define the storage path
+                $extension = $file->getClientOriginalExtension();
+                $fileName = 'payment_' . Str::random(10) . '.' . $extension;
                 $storagePath = 'users/' . $userId . '/payments/' . $this->payment->id;
                 $fullPath = Storage::disk('public')->path($storagePath);
 
-                // Ensure the directory exists
                 if (!File::exists($fullPath)) {
                     File::makeDirectory($fullPath, 0755, true, true);
                 }
 
-                // Full path for saving
                 $fullFilePath = $fullPath . '/' . $fileName;
                 $savedPath = $storagePath . '/' . $fileName;
 
-                // Save the image with compression
-                $img->save($fullFilePath, [
-                    'quality' => 80,  // Adjust quality (0-100)
-                    'optimize' => true
-                ]);
+                if (in_array($extension, ['jpg', 'jpeg', 'png','jfif'])) {
+                    $img = $manager->read($file);
+                    $img->save($fullFilePath, [
+                        'quality' => 80,
+                        'optimize' => true
+                    ]);
+                } else {
+                    $file->storeAs($storagePath, $fileName, 'public');
+                }
 
-                // Create image record
                 $this->payment->images()->create([
                     'image_path' => $savedPath
                 ]);
 
-
             } catch (\Exception $e) {
-
-                $this->alert('error', 'Failed to upload an image: ' . $e->getMessage(), [
+                $this->alert('error', 'Failed to upload file: ' . $e->getMessage(), [
                     'position' => 'bottom-end',
                     'timer' => 3000,
                     'toast' => true,
                 ]);
-
-                // Continue to next image if one fails
                 continue;
             }
         }
 
-        // Reset images array
-        $this->images = [];
+        $this->files = [];
 
-        $this->alert('success', 'Images uploaded successfully!', [
+        $this->alert('success', 'Files uploaded successfully!', [
             'position' => 'bottom-end',
             'timer' => 3000,
             'toast' => true,
         ]);
     }
 
-    public function deleteImage(PaymentImage $image)
+    public function deleteFile(PaymentImage $image)
     {
-        if (!$this->showImageSection) {
+        if (!$this->showFileSection) {
             return;
         }
 
+        // Delete the physical file from storage
+        if (Storage::disk('public')->exists($image->image_path)) {
+            Storage::disk('public')->delete($image->image_path);
+        }
+
         $image->delete();
-        $this->alert('success', 'Image deleted successfully!', [
+        $this->alert('success', 'File deleted successfully!', [
             'position' => 'bottom-end',
             'timer' => 3000,
             'toast' => true,
         ]);
     }
 
-    public function removeImage($index)
+    public function removeFile($index)
     {
-        if (isset($this->images[$index])) {
-            unset($this->images[$index]);
-            $this->images = array_values($this->images);
+        if (isset($this->files[$index])) {
+            unset($this->files[$index]);
+            $this->files = array_values($this->files);
         }
+    }
+
+    public function getFileType($path)
+    {
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        return in_array($extension, ['jpg', 'jpeg', 'png','jfif']) ? 'image' : 'pdf';
     }
 
     public function render()
     {
         return view('livewire.pages.user.subscription.transaction.transaction-info', [
-            'paymentImages' => $this->payment->images
+            'paymentFiles' => $this->payment->images
         ])->layout('layouts.app', ['title' => 'Transaction Details']);
     }
 }

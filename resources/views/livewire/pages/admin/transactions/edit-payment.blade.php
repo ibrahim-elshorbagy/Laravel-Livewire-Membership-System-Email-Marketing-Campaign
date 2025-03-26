@@ -203,9 +203,26 @@
     <div x-cloak class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         @foreach($payment->images as $image)
         <div class="relative group">
-            <img src="{{ Storage::url($image->image_path) }}" alt="Payment Image"
+            @php
+            $extension = strtolower(pathinfo($image->image_path, PATHINFO_EXTENSION));
+            $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'jfif']);
+            @endphp
+            @if($isImage)
+            <img src="{{ Storage::url($image->image_path) }}" alt="Payment File"
                 class="object-cover w-full h-full rounded-lg cursor-pointer hover:opacity-90"
-                @click="$dispatch('open-modal', 'image-preview-modal'); $wire.previewImageUrl = '{{ Storage::url($image->image_path) }}'" />
+                @click="$dispatch('open-modal', 'image-preview-modal'); $wire.previewImageUrl = '{{ Storage::url($image->image_path) }}'; $wire.previewType = 'image'" />
+            @else
+            <a href="{{ Storage::url($image->image_path) }}" target="_blank" rel="noopener noreferrer" class="block">
+                <div
+                    class="flex flex-col justify-center items-center p-4 w-full h-full min-h-[200px] rounded-lg hover:opacity-90 bg-neutral-100 dark:bg-neutral-800">
+                    <i class="mb-2 text-4xl text-neutral-500 dark:text-neutral-400 fas fa-file-pdf"></i>
+                    <span class="text-sm text-neutral-600 dark:text-neutral-400">{{ basename($image->image_path) }}</span>
+                    <a href="{{ Storage::url($image->image_path) }}" target="_blank" rel="noopener noreferrer" class="mt-2 text-sm text-blue-500 hover:text-blue-700">
+                        <i class="mr-1 fas fa-download"></i>Download
+                    </a>
+                </div>
+            </a>
+            @endif
         </div>
         @endforeach
     </div>
