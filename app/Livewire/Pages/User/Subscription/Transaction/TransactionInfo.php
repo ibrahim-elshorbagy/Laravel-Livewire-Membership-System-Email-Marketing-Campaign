@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
+use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
+use LucasDotVin\Soulbscription\Models\Subscription;
 
 class TransactionInfo extends Component
 {
@@ -45,6 +48,10 @@ class TransactionInfo extends Component
         $this->payment = $payment;
         $this->plan = $payment->plan;
         $this->subscription = $payment->subscription;
+        if($payment->subscription_id){
+            $this->subscription = Subscription::with(['plan'])->withoutGlobalScopes([SuppressingScope::class, StartingScope::class])
+            ->find($payment->subscription_id);
+        }
 
         $this->gateway_subscription_id = $payment->gateway_subscription_id;
         $this->transaction_id = $payment->transaction_id;

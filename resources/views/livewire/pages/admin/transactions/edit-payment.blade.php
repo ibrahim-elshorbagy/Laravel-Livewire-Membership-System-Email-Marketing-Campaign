@@ -43,9 +43,11 @@
                 to
                 {{ Carbon\Carbon::parse($subscription->expired_at)->format('d/m/Y h:i A') }}
             </span>
+            @empty($subscription->suppressed_at)
             <span class="text-sm text-neutral-500 dark:text-neutral-400">
                 Remaining time: {{ $subscription->remaining_time }}
             </span>
+            @endempty
         </div>
     </div>
 </div>

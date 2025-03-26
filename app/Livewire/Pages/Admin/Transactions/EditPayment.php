@@ -12,7 +12,8 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use App\Traits\SubscriptionManagementTrait;
-
+use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
+use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
 class EditPayment extends Component
 {
     use LivewireAlert, SubscriptionManagementTrait;
@@ -49,7 +50,10 @@ class EditPayment extends Component
         $this->payment = $payment;
         $this->user = $payment->user;
         $this->plan = $payment->plan;
-        $this->subscription = $payment->subscription;
+        if($payment->subscription_id){
+            $this->subscription = Subscription::with(['plan'])->withoutGlobalScopes([SuppressingScope::class, StartingScope::class])
+            ->find($payment->subscription_id);
+        }
         $this->offlinePaymentMethods = OfflinePaymentMethod::select('id', 'name','slug')->get();
 
         // Initialize form fields
