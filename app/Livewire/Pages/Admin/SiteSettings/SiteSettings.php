@@ -25,6 +25,15 @@ class SiteSettings extends Component
     public $new_logo;
     public $new_favicon;
 
+    // Mail settings
+    public $mail_mailer;
+    public $mail_host;
+    public $mail_port;
+    public $mail_username;
+    public $mail_password;
+    public $mail_from_address;
+    public $mail_from_name;
+
     //Settings
     public $APP_TIMEZONE;
     public $maintenance;
@@ -63,12 +72,28 @@ class SiteSettings extends Component
         'footer_second_line' => 'nullable|string|max:255',
         'maintenance' => 'nullable|boolean',
         'our_devices' => 'nullable|boolean',
+        'mail_mailer' => 'required|string',
+        'mail_host' => 'required|string',
+        'mail_port' => 'required|numeric',
+        'mail_username' => 'required|string',
+        'mail_password' => 'required|string',
+        'mail_from_address' => 'required|email',
+        'mail_from_name' => 'required|string',
     ];
 
 
     public function mount()
     {
         $this->site_name = config('app.name');
+
+        // Load mail settings
+        $this->mail_mailer = config('mail.default');
+        $this->mail_host = config('mail.mailers.smtp.host');
+        $this->mail_port = config('mail.mailers.smtp.port');
+        $this->mail_username = config('mail.mailers.smtp.username');
+        $this->mail_password = config('mail.mailers.smtp.password');
+        $this->mail_from_address = config('mail.from.address');
+        $this->mail_from_name = config('mail.from.name');
         $this->support_email = SiteSetting::getValue('support_email');
         $this->support_phone = SiteSetting::getValue('support_phone');
         $this->logo = SiteSetting::getValue('logo');
@@ -146,6 +171,42 @@ class SiteSettings extends Component
                     'value' => $this->APP_TIMEZONE,
                     'env_keys' => [
                         'APP_TIMEZONE' => 'app.timezone'
+                    ]
+                ],
+                'mail_mailer' => [
+                    'value' => $this->mail_mailer,
+                    'env_keys' => [
+                        'MAIL_MAILER' => 'mail.default'
+                    ]
+                ],
+                'mail_host' => [
+                    'value' => $this->mail_host,
+                    'env_keys' => [
+                        'MAIL_HOST' => 'mail.mailers.smtp.host'
+                    ]
+                ],
+                'mail_port' => [
+                    'value' => $this->mail_port,
+                    'env_keys' => [
+                        'MAIL_PORT' => 'mail.mailers.smtp.port'
+                    ]
+                ],
+                'mail_username' => [
+                    'value' => $this->mail_username,
+                    'env_keys' => [
+                        'MAIL_USERNAME' => 'mail.mailers.smtp.username'
+                    ]
+                ],
+                'mail_password' => [
+                    'value' => $this->mail_password,
+                    'env_keys' => [
+                        'MAIL_PASSWORD' => 'mail.mailers.smtp.password'
+                    ]
+                ],
+                'mail_from_name' => [
+                    'value' => $this->mail_from_name,
+                    'env_keys' => [
+                        'MAIL_FROM_NAME' => 'mail.from.name'
                     ]
                 ]
             ];

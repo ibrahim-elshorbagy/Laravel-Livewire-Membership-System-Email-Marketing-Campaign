@@ -14,13 +14,6 @@
                 </div>
 
                 <div>
-                    <x-input-label for="support_email" :value="__('Support Email')" />
-                    <x-text-input wire:model="support_email" id="support_email" type="email" class="block mt-1 w-full"
-                        required />
-                    <x-input-error :messages="$errors->get('support_email')" class="mt-2" />
-                </div>
-
-                <div>
                     <x-input-label for="support_phone" :value="__('Support Phone')" />
                     <x-text-input wire:model="support_phone" id="support_phone" type="text" class="block mt-1 w-full"
                         required />
@@ -189,6 +182,59 @@
                     </div>
                 </div>
             </div>
+            <div class="p-6 rounded-lg border border-neutral-200 dark:border-neutral-600">
+                <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
+                    Mail Settings
+                </h3>
+                <div class="grid gap-6 md:grid-cols-2">
+                    <div>
+                        <x-input-label for="mail_mailer" :value="__('Mail Driver')" />
+                        <x-primary-select-input wire:model="mail_mailer" id="mail_mailer" class="block mt-1 w-full">
+                            <option value="smtp">SMTP</option>
+                            <option value="sendmail">Sendmail</option>
+                            <option value="log">Log</option>
+                        </x-primary-select-input>
+                        <x-input-error :messages="$errors->get('mail_mailer')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="mail_host" :value="__('SMTP Host')" />
+                        <x-text-input wire:model="mail_host" id="mail_host" type="text" class="block mt-1 w-full" required />
+                        <x-input-error :messages="$errors->get('mail_host')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="mail_port" :value="__('SMTP Port')" />
+                        <x-text-input wire:model="mail_port" id="mail_port" type="number" class="block mt-1 w-full" required />
+                        <x-input-error :messages="$errors->get('mail_port')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="mail_username" :value="__('SMTP Username')" />
+                        <x-text-input wire:model="mail_username" id="mail_username" type="text" class="block mt-1 w-full" required />
+                        <x-input-error :messages="$errors->get('mail_username')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="support_email" :value="__('Support Email')" />
+                        <x-text-input wire:model="support_email" id="support_email" type="email" class="block mt-1 w-full" required />
+                        <x-input-error :messages="$errors->get('support_email')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="mail_password" :value="__('SMTP Password')" />
+                        <x-text-input wire:model="mail_password" id="mail_password"  class="block mt-1 w-full" required />
+                        <x-input-error :messages="$errors->get('mail_password')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="mail_from_name" :value="__('From Name')" />
+                        <x-text-input wire:model="mail_from_name" id="mail_from_name" type="text" class="block mt-1 w-full" required />
+                        <x-input-error :messages="$errors->get('mail_from_name')" class="mt-2" />
+                    </div>
+                </div>
+            </div>
+
             <div class="p-6 rounded-lg border border-neutral-200 dark:border-neutral-600">
                 <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
                     Footer Settings
