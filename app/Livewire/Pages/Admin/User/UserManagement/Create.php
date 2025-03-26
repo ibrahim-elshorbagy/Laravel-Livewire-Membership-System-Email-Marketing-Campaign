@@ -79,7 +79,7 @@ class Create extends Component
         ]);
 
         $user->assignRole($this->selectedRole);
-        
+
         // Assign selected permissions
         if (!empty($this->permissions)) {
             $user->syncPermissions($this->permissions);
@@ -88,7 +88,7 @@ class Create extends Component
         if ($this->selectedRole === 'user') {
             $trialPlan = Plan::find(1);
             if ($trialPlan) {
-                $user->subscribeTo($trialPlan);
+                $user->graceSubscribeTo($trialPlan);
             }
         }
         Session::flash('success', 'User created successfully.');

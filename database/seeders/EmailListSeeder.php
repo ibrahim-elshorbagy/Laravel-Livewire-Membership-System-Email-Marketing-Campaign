@@ -17,7 +17,7 @@ class EmailListSeeder extends Seeder
 
         foreach ($users as $user) {
             $user->assignRole('user');
-            $user->subscribeTo(Plan::find(1));
+            $user->graceSubscribeTo(Plan::find(1));
 
             // Create lists for the user
             $lists = [

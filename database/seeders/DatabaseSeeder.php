@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder
             'active' => true
         ]);
         $user->assignRole($userRole);
-        $user->subscribeTo(Plan::find(1));
+        $user->graceSubscribeTo(Plan::find(1));
 
         $this->call(EmailMessageSeeder::class);
         $this->call(ServerSeeder::class);

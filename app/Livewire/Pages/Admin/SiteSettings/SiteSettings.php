@@ -38,6 +38,7 @@ class SiteSettings extends Component
     public $APP_TIMEZONE;
     public $maintenance;
     public $our_devices;
+    public $grace_days;
 
     // New properties for image previews
     public $logo_preview;
@@ -79,6 +80,7 @@ class SiteSettings extends Component
         'mail_password' => 'required|string',
         'mail_from_address' => 'required|email',
         'mail_from_name' => 'required|string',
+        'grace_days' => 'required|integer|min:0',
     ];
 
 
@@ -107,6 +109,7 @@ class SiteSettings extends Component
         $this->footer_second_line = SiteSetting::getValue('footer_second_line');
         $this->maintenance = SiteSetting::getValue('maintenance');
         $this->our_devices = SiteSetting::getValue('our_devices');
+        $this->grace_days = SiteSetting::getValue('grace_days') ?? 0;
     }
 
     // Preview auth image
@@ -276,6 +279,9 @@ class SiteSettings extends Component
                 $this->auth_image = $authImagePath;
                 $this->auth_image_preview = null; // Clear preview
             }
+
+            // Update grace days setting
+            SiteSetting::setValue('grace_days', $this->grace_days);
 
             // Clear the global settings cache
             GlobalSettingsMiddleware::clearCache();

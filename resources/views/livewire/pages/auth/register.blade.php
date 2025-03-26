@@ -10,6 +10,7 @@ use Livewire\Volt\Component;
 use LucasDotVin\Soulbscription\Models\Plan;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\EmailVerificationMail;
+use Illuminate\Support\Facades\Session;
 
 new #[Layout('layouts.app')] class extends Component
 {
@@ -40,7 +41,7 @@ new #[Layout('layouts.app')] class extends Component
             $user->assignRole('user');
             $trialPlan = Plan::find(1);
                 if ($trialPlan) {
-                $user->subscribeTo($trialPlan);
+                $user->graceSubscribeTo($trialPlan);
             }
             Auth::login($user);
 

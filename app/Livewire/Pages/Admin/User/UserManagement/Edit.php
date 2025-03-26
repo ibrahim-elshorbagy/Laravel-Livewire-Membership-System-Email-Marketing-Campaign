@@ -100,7 +100,7 @@ class Edit extends Component
             if ($this->selectedRole === 'user' && !$this->user->lastSubscription()) {
                 $trialPlan = Plan::find(1);
                 if ($trialPlan) {
-                    $this->user->subscribeTo($trialPlan);
+                    $this->user->graceSubscribeTo($trialPlan);
                 }
             }
         }

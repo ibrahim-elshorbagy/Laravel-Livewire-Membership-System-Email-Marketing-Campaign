@@ -50,7 +50,7 @@ trait SubscriptionManagementTrait
                 $oldSubscription->suppress();
 
                 // Create new subscription
-                $subscription = $payment->user->subscribeTo($payment->plan);
+                $subscription = $payment->user->graceSubscribeTo($payment->plan);
                 $newSubscription = $payment->user->lastSubscription();
                 $newSubscription->update(['started_at' => now()]);
 
@@ -122,7 +122,7 @@ trait SubscriptionManagementTrait
         }
         else {
             // There is no subscription at all - first time user
-            $subscription = $payment->user->subscribeTo($payment->plan);
+            $subscription = $payment->user->graceSubscribeTo($payment->plan);
             $subscription->update(['started_at' => now()]);
             $this->sentBuyNotification($payment->user,$subscription);
             return $subscription;

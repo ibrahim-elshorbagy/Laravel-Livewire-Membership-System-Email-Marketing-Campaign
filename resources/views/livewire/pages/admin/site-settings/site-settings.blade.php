@@ -155,6 +155,23 @@
 
             <div class="p-6 rounded-lg border border-neutral-200 dark:border-neutral-600">
                 <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
+                    Plans Settings
+                </h3>
+                <div class="grid gap-6 md:grid-cols-1">
+                    <div>
+                        <x-input-label for="grace_days" :value="__('Grace Days')" />
+                        <x-text-input wire:model="grace_days" id="grace_days" type="number" min="0" class="block mt-1 w-full"
+                            required />
+                        <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+                            Number of days to extend subscription access after expiration
+                        </p>
+                        <x-input-error :messages="$errors->get('grace_days')" class="mt-2" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 rounded-lg border border-neutral-200 dark:border-neutral-600">
+                <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
                     Site Access
                 </h3>
                 <div class="flex flex-col gap-5 md:flex-row">

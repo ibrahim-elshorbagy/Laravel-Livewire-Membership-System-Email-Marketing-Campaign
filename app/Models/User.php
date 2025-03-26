@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use LucasDotVin\Soulbscription\Models\Concerns\HasSubscriptions;
+use App\Traits\GracePeriodTrait;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -18,6 +19,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory, Notifiable;
     use HasRoles,SoftDeletes;
     use HasSubscriptions;
+    use GracePeriodTrait;
     /**
      * The attributes that are mass assignable.
      *

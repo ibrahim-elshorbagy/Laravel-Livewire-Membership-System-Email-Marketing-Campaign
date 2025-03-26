@@ -123,7 +123,7 @@
                     </div>
                 </div>
 
-                <div>
+                <div class="mb-4">
                     <span class="text-sm md:text-mdtext-neutral-600">Grace Period End</span>
                     <p class="mb-2 text-xs sm:text-sm text-neutral-500">
                         Set a date until when the subscription will remain active after expiration.
