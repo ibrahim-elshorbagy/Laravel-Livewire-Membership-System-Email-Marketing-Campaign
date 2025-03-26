@@ -110,7 +110,9 @@ class CreateEmailList extends Component
     {
         try {
             $this->validate([
-                'list_id' => 'required|exists:email_list_names,id'
+                'list_id' => 'required|exists:email_list_names,id',
+                'emails' => 'array',
+                'emails.*' => 'email',
             ]);
 
             $emailsCount = count($emails);

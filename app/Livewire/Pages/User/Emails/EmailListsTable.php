@@ -85,6 +85,7 @@ class EmailListsTable extends Component
             'listName' => [
                 'required',
                 'string',
+                'max:255',
                 Rule::unique('email_list_names', 'name')
                     ->where('user_id', Auth::id())
             ],

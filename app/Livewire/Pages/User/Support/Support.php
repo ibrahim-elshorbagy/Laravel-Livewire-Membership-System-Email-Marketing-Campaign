@@ -34,8 +34,8 @@ class Support extends Component
     }
 
     protected $rules = [
-        'subject' => 'required|min:3',
-        'message' => 'required|min:10',
+        'subject' => 'required|string|min:3|max:255',
+        'message' => 'required|string|min:10',
     ];
 
     public $fileData;
