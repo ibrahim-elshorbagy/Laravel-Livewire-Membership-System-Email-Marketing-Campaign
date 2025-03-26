@@ -28,11 +28,11 @@ class OfflinPaymenteMethodsForm extends Component
     protected function rules()
     {
         return [
-            'name' => 'required|string',
+            'name' => 'required|string|max:255',
             'instructions' => 'required|string',
             'receipt_image' => 'boolean',
             'new_logo' => 'nullable|image',
-            'slug' => 'required|string',
+            'slug' => 'required|string|max:255',
             'active' => 'boolean'
         ];
     }

@@ -34,10 +34,10 @@ class MessageForm extends Component
         }
 
         return [
-            'message_title' => ['required', 'string'],
-            'email_subject' => ['required', 'string'],
-            'sender_name' => ['nullable', 'string'],
-            'reply_to_email' => ['nullable', 'email'],
+            'message_title' => ['required', 'string','max:255'],
+            'email_subject' => ['required', 'string','max:255'],
+            'sender_name' => ['nullable', 'string','max:255'],
+            'reply_to_email' => ['nullable', 'email','max:255'],
             'sending_status' => ['in:RUN,PAUSE'],
             'message_html'  => $messageHtmlRules,
             'message_plain_text' => $messagePlainTextRules,

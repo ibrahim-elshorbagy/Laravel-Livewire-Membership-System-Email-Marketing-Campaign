@@ -23,10 +23,10 @@ class SystemEmailsForm extends Component
     {
 
         return [
-            'name' => ['required', 'string'],
+            'name' => ['required', 'string','max:255'],
             'slug' => ['required', 'string','unique:system_emails,slug,'.$this->email_id],
-            'email_subject' => ['required', 'string'],
-            'message_html'  => ['nullable', 'string'],
+            'email_subject' => ['required', 'string','max:255'],
+            'message_html'  => ['nullable', 'string','max:255'],
         ];
     }
 

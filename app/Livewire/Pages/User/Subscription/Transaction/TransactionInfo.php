@@ -34,8 +34,8 @@ class TransactionInfo extends Component
     public $previewImageUrl;
 
     protected $rules = [
-        'gateway_subscription_id' => 'nullable|string',
-        'transaction_id' => 'nullable|string',
+        'gateway_subscription_id' => 'nullable|string|max:255',
+        'transaction_id' => 'nullable|string|max:255',
         'images.*' => 'image|mimes:jpeg,jpg,png'
     ];
 
@@ -85,8 +85,8 @@ class TransactionInfo extends Component
         }
 
         $this->validate([
-            'gateway_subscription_id' => 'nullable|string',
-            'transaction_id' => 'nullable|string',
+            'gateway_subscription_id' => 'nullable|string|max:255',
+            'transaction_id' => 'nullable|string|max:255',
         ]);
 
         $this->payment->update([

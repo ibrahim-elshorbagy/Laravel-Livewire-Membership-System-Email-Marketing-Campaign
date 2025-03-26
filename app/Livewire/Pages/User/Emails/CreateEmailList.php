@@ -50,7 +50,7 @@ class CreateEmailList extends Component
         $this->emailLists = EmailListName::where('user_id', $this->user->id)->get();
 
         $listId = request()->validate([
-            'list_id' => 'nullable|string|exists:email_list_names,name'])['list_id'] ?? null;
+            'list_id' => 'nullable|string|max:255|exists:email_list_names,name'])['list_id'] ?? null;
 
         if ($listId) {
 

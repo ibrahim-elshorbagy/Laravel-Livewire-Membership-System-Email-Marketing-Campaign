@@ -43,10 +43,10 @@ new class extends Component
         $user = Auth::user();
 
         $validated = $this->validate([
-            'first_name' => ['required', 'string', 'max:50'],
-            'last_name' => ['required', 'string', 'max:50'],
-            'company' => ['nullable', 'string', 'max:50'],
-            'country' => ['nullable', 'string', 'max:50'],
+            'first_name' => ['required', 'string', 'max:100'],
+            'last_name' => ['required', 'string', 'max:100'],
+            'company' => ['nullable', 'string', 'max:100'],
+            'country' => ['nullable', 'string', 'max:100'],
             'whatsapp' => ['string', 'regex:/^\+?\d{10,13}$/'],
             'timezone' => ['required', 'string', 'timezone'],
         ]);
