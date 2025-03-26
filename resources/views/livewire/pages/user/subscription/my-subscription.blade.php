@@ -14,7 +14,6 @@
         <!-- Subscription Details -->
         <div class="p-6">
             <!-- Price -->
-            @if($subscription->plan->id != 1)
             <div class="flex justify-center items-baseline">
                 <span class="text-4xl font-bold text-neutral-900 dark:text-neutral-100">
                     ${{ number_format($subscription->plan->price, 2) }}
@@ -23,10 +22,8 @@
                     /{{ strtolower($subscription->plan->periodicity_type) }}
                 </span>
             </div>
-            @endif
             <!-- Subscription Info -->
             <div class="mt-8 space-y-4">
-                @if($subscription->plan->id != 1)
                 <!-- Start Date -->
                 <div class="flex justify-between items-center px-4 py-3 bg-white rounded-lg dark:bg-neutral-800">
                     <div class="flex items-center">
@@ -77,7 +74,6 @@
                         {{ $subscription->canceled_at ? 'Cancelled' : 'Active' }}
                     </span>
                 </div>
-                @endif
                 <!-- Features -->
                 <div class="px-4 py-3 bg-white rounded-lg dark:bg-neutral-800">
                     <h3 class="text-sm font-medium text-neutral-900 dark:text-neutral-100">Features Included</h3>

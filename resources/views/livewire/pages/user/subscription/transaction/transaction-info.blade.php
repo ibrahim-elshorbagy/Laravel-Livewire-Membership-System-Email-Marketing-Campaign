@@ -20,7 +20,6 @@
     </div>
 
     <!-- Subscription Info -->
-    @if($plan->id != 1)
     @if($subscription)
     <div class="mb-6">
         <h3 class="mb-2 text-lg font-semibold text-neutral-700 dark:text-neutral-300">Subscription</h3>
@@ -39,7 +38,6 @@
             </div>
         </div>
     </div>
-    @endif
     @endif
 
     <!-- Payment Details Form -->

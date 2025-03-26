@@ -15,6 +15,10 @@ class Transaction extends Component
 
     public function updatedSelectedTab()
     {
+        $this->validateOnly('selectedTab', [
+            'selectedTab' => 'in:all,approved,pending,refunded,failed,cancelled',
+        ]);
+
         $this->resetPage();
     }
 
@@ -24,7 +28,8 @@ class Transaction extends Component
             ->when($this->selectedTab === 'approved', fn($query) => $query->where('status', 'approved'))
             ->when($this->selectedTab === 'pending', fn($query) => $query->where('status', 'pending'))
             ->when($this->selectedTab === 'refunded', fn($query) => $query->where('status', 'refunded'))
-            ->when($this->selectedTab === 'failed', fn($query) => $query->whereIn('status', ['failed', 'cancelled']))
+            ->when($this->selectedTab === 'failed', fn($query) => $query->where('status', 'failed'))
+            ->when($this->selectedTab === 'cancelled', fn($query) => $query->where('status','cancelled'))
             ->with(['plan', 'subscription'])
             ->latest()
             ->paginate(10);

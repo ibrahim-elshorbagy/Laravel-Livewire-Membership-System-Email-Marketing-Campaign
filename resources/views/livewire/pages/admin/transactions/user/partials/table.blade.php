@@ -87,7 +87,6 @@
                                 {{ $payment->subscription->expired_at?->format('d/m/Y h:i A') }}
                             </div>
                             @if($payment->subscription->expired_at && $payment->subscription->expired_at->isFuture())
-                            @if($payment->subscription->plan->id != 1)
                             <div class="mt-1 text-xs text-green-600 dark:text-green-400 text-nowrap">
                                 @if ($payment->subscription)
                                 Expires in {{
@@ -98,7 +97,6 @@
                                 ]) }}
                                 @endif
                             </div>
-                            @endif
                             @endif
                         </div>
                         @else
