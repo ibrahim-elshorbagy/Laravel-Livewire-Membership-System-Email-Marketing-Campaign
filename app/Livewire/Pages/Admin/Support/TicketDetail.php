@@ -4,6 +4,8 @@ namespace App\Livewire\Pages\Admin\Support;
 
 use App\Mail\SupportResponseMail;
 use App\Models\Admin\SupportTicket;
+use App\Models\User;
+use Carbon\Carbon;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Support\Facades\Mail;
@@ -26,6 +28,30 @@ class TicketDetail extends Component
         $cleanResponse = Purifier::clean($ticket->adamin_response);
         $this->ticket->adamin_response = $cleanResponse;
 
+        // Add subscription data
+        $user = $ticket->user;
+        $subscription = $user->lastSubscription();
+
+        if ($subscription) {
+            $subscription->started_at = $subscription->started_at->toDateTimeString();
+            $subscription->expired_at = $subscription->expired_at->toDateTimeString();
+            $subscription->remaining_time = Carbon::parse($subscription->expired_at)->diffForHumans(Carbon::now(), [
+                'parts' => 3,
+                'join' => true,
+                'syntax' => Carbon::DIFF_RELATIVE_TO_NOW,
+            ]);
+            $this->ticket->user_subscription = $subscription;
+        }
+    }
+
+    public function impersonateUser($userId)
+    {
+        $user = User::find($userId);
+        if ($user) {
+            session()->put('impersonated_by', auth()->id());
+            auth()->login($user);
+            return redirect()->route('dashboard');
+        }
     }
 
     protected $rules = [

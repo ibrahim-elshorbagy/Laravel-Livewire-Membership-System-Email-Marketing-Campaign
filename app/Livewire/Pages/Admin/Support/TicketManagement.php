@@ -45,6 +45,15 @@ class TicketManagement extends Component
         $this->resetPage();
     }
 
+    public function impersonateUser($userId)
+    {
+        $user = User::find($userId);
+        if ($user) {
+            session()->put('impersonated_by', auth()->id());
+            auth()->login($user);
+            return redirect()->route('dashboard');
+        }
+    }
 
     public function getTicketsProperty()
     {

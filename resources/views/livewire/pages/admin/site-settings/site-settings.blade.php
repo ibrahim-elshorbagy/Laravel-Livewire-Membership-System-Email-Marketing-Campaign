@@ -216,17 +216,16 @@
                     </div>
 
                     <div>
-                        <x-input-label for="support_email" :value="__('Support Email')" />
-                        <x-text-input wire:model="support_email" id="support_email" type="email" class="block mt-1 w-full" required />
-                        <x-input-error :messages="$errors->get('support_email')" class="mt-2" />
-                    </div>
-
-                    <div>
                         <x-input-label for="mail_password" :value="__('SMTP Password')" />
                         <x-text-input wire:model="mail_password" id="mail_password"  class="block mt-1 w-full" required />
                         <x-input-error :messages="$errors->get('mail_password')" class="mt-2" />
                     </div>
 
+                    <div>
+                        <x-input-label for="support_email" :value="__('From Support Email')" />
+                        <x-text-input wire:model="support_email" id="support_email" type="email" class="block mt-1 w-full" required />
+                        <x-input-error :messages="$errors->get('support_email')" class="mt-2" />
+                    </div>
                     <div>
                         <x-input-label for="mail_from_name" :value="__('From Name')" />
                         <x-text-input wire:model="mail_from_name" id="mail_from_name" type="text" class="block mt-1 w-full" required />

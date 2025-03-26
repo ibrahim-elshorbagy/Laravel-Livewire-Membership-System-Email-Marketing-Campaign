@@ -10,12 +10,12 @@
                 <div class="grid col-span-2 gap-6 md:grid-cols-2">
                     <div>
                         <x-input-label for="name" :value="__('Name')" />
-                        <x-text-input wire:model="name" id="name" type="text" class="block mt-1 w-full" readonly />
+                        <x-text-input wire:model="name" id="name" type="text" class="block mt-1 w-full bg-neutral-50 dark:bg-neutral-900" disabled />
                     </div>
 
                     <div>
                         <x-input-label for="email" :value="__('Email')" />
-                        <x-text-input wire:model="email" id="email" type="email" class="block mt-1 w-full" readonly />
+                        <x-text-input wire:model="email" id="email" type="email" class="block mt-1 w-full bg-neutral-50 dark:bg-neutral-900" disabled />
                 </div>
                 </div>
 

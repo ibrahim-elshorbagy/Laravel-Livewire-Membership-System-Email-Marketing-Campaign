@@ -55,9 +55,7 @@
                     <th scope="col" class="p-4">Subject</th>
                     <th scope="col" class="p-4">User</th>
                     <th scope="col" class="p-4">Status</th>
-                    <th scope="col" class="p-4">Submitted</th>
-                    <th scope="col" class="p-4">Closed</th>
-                    <th scope="col" class="p-4">Responded</th>
+                    <th scope="col" class="p-4">Timeline</th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
             </thead>
@@ -72,14 +70,12 @@
                     </td>
                     <td class="p-4">
                         <div class="flex gap-2 items-center w-max">
-                            <img class="object-cover rounded-full size-10 text-nowrap"
-                                src="{{ $ticket->user->image_url ?? asset('default-avatar.png') }}"
-                                alt="{{ $ticket->user->first_name }} {{ $ticket->user->last_name }}" />
                             <div class="flex flex-col">
-                                <span class="text-neutral-900 dark:text-neutral-100">
-                                    {{ $ticket->user->first_name }} {{ $ticket->user->last_name }}
-                                    - ({{ $ticket->user->username }})
-                                </span>
+                                <a onclick="confirm('Are you sure you want to impersonate this user?') || event.stopImmediatePropagation()"
+                                    wire:click="impersonateUser({{ $ticket->user->id }})"
+                                    class="text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 cursor-pointer">
+                                    ({{ $ticket->user->username }})
+                                </a>
                                 <span class="text-sm text-neutral-600 opacity-85 dark:text-neutral-400">
                                     {{ $ticket->user->email }}
                                 </span>
@@ -95,9 +91,32 @@
                             {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
                         </span>
                     </td>
-                    <td class="p-4 text-nowrap">{{ $ticket->created_at->format('d/m/Y H:i:s') }} - {{ $ticket->created_at->diffForHumans() }}</td>
-                    <td class="p-4 text-nowrap">{{ $ticket->responded_at?->format('d/m/Y H:i:s') }} - {{ $ticket->responded_at?->diffForHumans() }}</td>
-                    <td class="p-4 text-nowrap">{{ $ticket->closed_at?->format('d/m/Y H:i:s') }} - {{ $ticket->closed_at?->diffForHumans() }}</td>
+                    <td class="p-4">
+                        <div class="flex flex-col gap-1 text-xs">
+                            <div>
+                                <span class="font-semibold text-neutral-700 dark:text-neutral-300">Submitted:</span>
+                                <span class="text-neutral-600 dark:text-neutral-400">{{
+                                    $ticket->created_at->format('d/m/Y H:i:s') }} - {{
+                                    $ticket->created_at->diffForHumans() }}</span>
+                            </div>
+                            @if($ticket->responded_at)
+                            <div>
+                                <span class="font-semibold text-neutral-700 dark:text-neutral-300">Responded:</span>
+                                <span class="text-neutral-600 dark:text-neutral-400">{{
+                                    $ticket->responded_at->format('d/m/Y H:i:s') }} - {{
+                                    $ticket->responded_at->diffForHumans() }}</span>
+                            </div>
+                            @endif
+                            @if($ticket->closed_at)
+                            <div>
+                                <span class="font-semibold text-neutral-700 dark:text-neutral-300">Closed:</span>
+                                <span class="text-neutral-600 dark:text-neutral-400">{{
+                                    $ticket->closed_at->format('d/m/Y H:i:s') }} - {{
+                                    $ticket->closed_at->diffForHumans() }}</span>
+                            </div>
+                            @endif
+                        </div>
+                    </td>
                     <td class="p-4">
                         <div class="flex space-x-2">
                             <a href="{{ route('admin.support.ticket-detail', $ticket) }}"

@@ -1,4 +1,5 @@
-<div class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+<div
+    class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <header class="flex flex-col gap-3 justify-between items-center mb-6 md:flex-row">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
             My Support Tickets
@@ -52,13 +53,12 @@
     <!-- Table Container with Relative Positioning -->
     <div class="overflow-hidden overflow-x-auto relative w-full rounded-lg">
         <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
-            <thead class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
+            <thead
+                class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                 <tr>
                     <th scope="col" class="p-4">Subject</th>
                     <th scope="col" class="p-4">Status</th>
-                    <th scope="col" class="p-4">Submitted</th>
-                    <th scope="col" class="p-4">Closed</th>
-                    <th scope="col" class="p-4">Responded</th>
+                    <th scope="col" class="p-4">Timeline</th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
             </thead>
@@ -72,16 +72,37 @@
                         </a>
                     </td>
                     <td class="p-4">
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full text-nowrap
+                        <span
+                            class="px-2 py-1 text-xs font-semibold rounded-full text-nowrap
                             {{ $ticket->status === 'open' ? 'text-yellow-800 bg-yellow-100 dark:text-yellow-300 dark:bg-yellow-900' : '' }}
                             {{ $ticket->status === 'in_progress' ? 'text-blue-800 bg-blue-100 dark:text-blue-300 dark:bg-blue-900' : '' }}
                             {{ $ticket->status === 'closed' ? 'text-green-800 bg-green-100 dark:text-green-300 dark:bg-green-900' : '' }}">
                             {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
                         </span>
                     </td>
-                    <td class="p-4 text-nowrap">{{ $ticket->created_at->format('d/m/Y H:i:s') }} - {{ $ticket->created_at->diffForHumans() }}</td>
-                    <td class="p-4 text-nowrap">{{ $ticket->responded_at?->format('d/m/Y H:i:s') }} - {{ $ticket->responded_at?->diffForHumans() }}</td>
-                    <td class="p-4 text-nowrap">{{ $ticket->closed_at?->format('d/m/Y H:i:s') }} - {{ $ticket->closed_at?->diffForHumans() }}</td>
+                    <td class="p-4">
+                        <div class="flex flex-col gap-1 text-xs">
+                            <div>
+                                <span class="font-medium">Submitted:</span><br>
+                                {{ $ticket->created_at->format('d/m/Y H:i:s') }}<br>
+                                <span class="text-neutral-500">{{ $ticket->created_at->diffForHumans() }}</span>
+                            </div>
+                            @if($ticket->responded_at)
+                            <div>
+                                <span class="font-medium">Responded:</span><br>
+                                {{ $ticket->responded_at->format('d/m/Y H:i:s') }}<br>
+                                <span class="text-neutral-500">{{ $ticket->responded_at->diffForHumans() }}</span>
+                            </div>
+                            @endif
+                            @if($ticket->closed_at)
+                            <div>
+                                <span class="font-medium">Closed:</span><br>
+                                {{ $ticket->closed_at->format('d/m/Y H:i:s') }}<br>
+                                <span class="text-neutral-500">{{ $ticket->closed_at->diffForHumans() }}</span>
+                            </div>
+                            @endif
+                        </div>
+                    </td>
                     <td class="p-4 text-nowrap">
                         <div class="flex space-x-2">
                             <a href="{{ route('user.support.ticket', $ticket) }}"
