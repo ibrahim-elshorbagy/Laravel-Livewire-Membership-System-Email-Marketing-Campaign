@@ -48,6 +48,13 @@ class Subscribe extends Component
                     if ($currentPlanId === (int)$value) {
                         $fail("You can't select your current plan.");
                     }
+
+                    $selectedPlan = Plan::find($value);
+                    $currentPlanPrice = $this->getCurrentPlanPrice();
+
+                    if ($currentPlanPrice && $selectedPlan && $selectedPlan->price < $currentPlanPrice) {
+                        $fail("You cannot downgrade to a plan with a lower price.");
+                    }
                 },
             ],
         ];
@@ -167,9 +174,19 @@ class Subscribe extends Component
         return null;
     }
 
+    public function getCurrentPlanPrice()
+    {
+        $user = auth()->user();
+        if ($user && $user->lastSubscription()) {
+            return $user->lastSubscription()->plan->price;
+        }
+        return null;
+    }
+
     public function render()
     {
         $currentPlanId = $this->getCurrentPlanId();
+        $currentPlanPrice = $this->getCurrentPlanPrice();
 
         $monthlyPlans = Plan::with('features')
             ->where('periodicity_type', 'Month')
@@ -184,6 +201,7 @@ class Subscribe extends Component
             'monthlyPlans' => $monthlyPlans,
             'yearlyPlans' => $yearlyPlans,
             'currentPlanId' => $currentPlanId,
+            'currentPlanPrice'=>$currentPlanPrice,
             'upgradeCalculation' => $this->upgradeCalculation
         ])->layout('layouts.app',['title' => 'Plans']);
     }

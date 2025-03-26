@@ -1,15 +1,26 @@
 <div
     class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
-    <!-- Processing Overlay -->
-    {{-- <div wire:loading.flex class="fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50">
-        <div class="p-6 bg-white rounded-lg shadow-xl dark:bg-neutral-800">
-            <div class="mx-auto w-12 h-12 rounded-full border-b-2 animate-spin border-primary-500"></div>
-            <p class="mt-4 text-center dark:text-neutral-200">Processing your request...</p>
-        </div>
-    </div> --}}
 
     <!-- Subscription Plans -->
     <div x-data="{ selectedTab: @entangle('selectedTab') }" class="w-full">
+        <!-- Note about downgrading -->
+        @auth
+        <div
+            class="p-4 my-4 text-yellow-800 bg-yellow-50 rounded-lg border border-yellow-200 dark:bg-yellow-900/10 dark:border-yellow-300/10 dark:text-yellow-300">
+            <div class="flex gap-2 items-center">
+                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
+                        clip-rule="evenodd" />
+                </svg>
+                <span class="font-medium">Downgrade Alert!</span>
+            </div>
+            <p class="mt-2 text-sm">To downgrade your current package, we advise you to wait until the current package
+                expires and then
+                choose the new package when renewing your subscription.</p>
+        </div>
+        @endauth
+
         <!-- Tab Navigation -->
         <div class="flex overflow-x-auto gap-2 mb-6 border-b border-neutral-300 dark:border-neutral-700" role="tablist">
             <button x-on:click="selectedTab = 'monthly'"
@@ -61,24 +72,20 @@
                 </ul>
 
                 @auth
-                <button type="button" @if($currentPlanId===$plan->id)
-                    disabled
-                    class="px-4 py-2 mt-12 w-full text-sm font-medium tracking-wide text-center text-white whitespace-nowrap rounded-lg transition cursor-not-allowed bg-neutral-400"
-                    @else
-                    wire:click="$set('selectedPlan', {{ $plan->id }})"
-                    wire:loading.attr="disabled"
-                    @class([
-                    'mt-12 w-full whitespace-nowrap px-4 py-2 text-center text-sm font-medium tracking-wide transition
-                    rounded-lg',
-                    'bg-black text-neutral-100 dark:bg-orange-500 dark:text-black'=> $selectedPlan !== $plan->id,
-                    'bg-green-500 text-white' => $selectedPlan === $plan->id,
-                    ])
-                    @endif>
-                    @if($currentPlanId === $plan->id)
-                    CURRENT
-                    @else
-                    {{ $selectedPlan === $plan->id ? 'Selected' : 'Select Plan' }}
-                    @endif
+                <button type="button" @if($currentPlanId===$plan->id || ($currentPlanId && $plan->price <
+                        $currentPlanPrice)) disabled
+                        class="px-4 py-2 mt-12 w-full text-sm font-medium tracking-wide text-center text-white whitespace-nowrap rounded-lg transition cursor-not-allowed bg-neutral-400"
+                        @else wire:click="$set('selectedPlan', {{ $plan->id }})" wire:loading.attr="disabled" @class([ 'mt-12 w-full whitespace-nowrap px-4 py-2 text-center text-sm font-medium tracking-wide transition
+                    rounded-lg' , 'bg-black text-neutral-100 dark:bg-orange-500 dark:text-black'=> $selectedPlan !==
+                        $plan->id,
+                        'bg-green-500 text-white' => $selectedPlan === $plan->id,
+                        ])
+                        @endif>
+                        @if($currentPlanId === $plan->id)
+                        CURRENT
+                        @elseif($currentPlanId && $plan->price < $currentPlanPrice) DOWNGRADE NOT ALLOWED @else {{
+                            $selectedPlan===$plan->id ? 'Selected' : 'Select Plan' }}
+                            @endif
                 </button>
                 @endauth
             </article>
@@ -123,24 +130,20 @@
                 </ul>
 
                 @auth
-                <button type="button" @if($currentPlanId===$plan->id)
-                    disabled
-                    class="px-4 py-2 mt-12 w-full text-sm font-medium tracking-wide text-center text-white whitespace-nowrap rounded-lg transition cursor-not-allowed bg-neutral-400"
-                    @else
-                    wire:click="$set('selectedPlan', {{ $plan->id }})"
-                    wire:loading.attr="disabled"
-                    @class([
-                    'mt-12 w-full whitespace-nowrap px-4 py-2 text-center text-sm font-medium tracking-wide transition
-                    rounded-lg',
-                    'bg-black text-neutral-100 dark:bg-orange-500 dark:text-black'=> $selectedPlan !== $plan->id,
-                    'bg-green-500 text-white' => $selectedPlan === $plan->id,
-                    ])
-                    @endif>
-                    @if($currentPlanId === $plan->id)
-                    CURRENT
-                    @else
-                    {{ $selectedPlan === $plan->id ? 'Selected' : 'Select Plan' }}
-                    @endif
+                <button type="button" @if($currentPlanId===$plan->id || ($currentPlanId && $plan->price <
+                        $currentPlanPrice)) disabled
+                        class="px-4 py-2 mt-12 w-full text-sm font-medium tracking-wide text-center text-white whitespace-nowrap rounded-lg transition cursor-not-allowed bg-neutral-400"
+                        @else wire:click="$set('selectedPlan', {{ $plan->id }})" wire:loading.attr="disabled" @class([ 'mt-12 w-full whitespace-nowrap px-4 py-2 text-center text-sm font-medium tracking-wide transition
+                    rounded-lg' , 'bg-black text-neutral-100 dark:bg-orange-500 dark:text-black'=> $selectedPlan !==
+                        $plan->id,
+                        'bg-green-500 text-white' => $selectedPlan === $plan->id,
+                        ])
+                        @endif>
+                        @if($currentPlanId === $plan->id)
+                        CURRENT
+                        @elseif($currentPlanId && $plan->price < $currentPlanPrice) DOWNGRADE NOT ALLOWED @else {{
+                            $selectedPlan===$plan->id ? 'Selected' : 'Select Plan' }}
+                            @endif
                 </button>
                 @endauth
             </article>
@@ -157,7 +160,8 @@
         <div
             class="p-4 w-full max-w-md text-sm rounded-lg bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
             <p class="mb-4 text-sm text-neutral-600 dark:text-neutral-400">
-                When upgrading to a higher plan, the cost is based on the difference between the new plan's price and what you've
+                When upgrading to a higher plan, the cost is based on the difference between the new plan's price and
+                what you've
                 already paid, ensuring you only pay the remaining amount.
             </p>
             <h4 class="mb-2 font-medium text-neutral-900 dark:text-neutral-100">{{ $upgradeCalculation['title'] }} Cost
@@ -213,8 +217,8 @@
 
 
 
-    <!-- Payment Modal -->
-    <div x-data="{
+        <!-- Payment Modal -->
+<div x-data="{
         openPaymentWindow(url) {
             const width = 500;
             const height = 600;
@@ -228,4 +232,4 @@
         }
     }" @paypalPayment.window="openPaymentWindow($event.detail.url)">
 
-    </div>
+</div>
