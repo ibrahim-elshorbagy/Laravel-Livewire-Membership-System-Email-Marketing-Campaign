@@ -1,15 +1,18 @@
-<div class="flex flex-col space-y-4 h-full" wire:poll.5000ms="pollForNewMessages">
+<div class="flex flex-col space-y-4 h-full" >
+    {{-- wire:poll.5000ms="pollForNewMessages" --}}
     <div class="overflow-y-auto flex-1 py-2 space-y-3 sm:space-y-4">
         @foreach($conversations as $conversation)
-        <div
-            class="flex items-start gap-2 sm:gap-2.5 {{ $conversation->user->hasRole('admin') ? 'flex-row-reverse' : '' }}">
+        @php
+            $isAdmin = $conversation->user->roles->contains('name', 'admin');
+        @endphp
+        <div wire:key="conversation-{{ $conversation->id }}"
+            class="flex items-start gap-2 sm:gap-2.5 {{ $isAdmin ? 'flex-row-reverse' : '' }}">
             <div
                 class="flex flex-col w-full max-w-[95%] sm:max-w-[95%] leading-1.5 p-3 sm:p-4 border-neutral-200 bg-neutral-100 rounded-e-xl rounded-es-xl dark:bg-neutral-700">
                 <div
                     class="flex flex-col mb-2 space-y-1 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2 rtl:space-x-reverse">
                     <span class="text-sm font-semibold text-neutral-900 dark:text-white">
-                        {{ $conversation->user->hasRole('admin') ? 'Support Team' : $conversation->user->first_name . '
-                        ' . $conversation->user->last_name }}
+                        {{ $isAdmin ? 'Support Team' : $conversation->user->first_name . ' ' . $conversation->user->last_name }}
                     </span>
                     <span class="text-xs font-normal sm:text-sm text-neutral-500 dark:text-neutral-400">
                         {{ $conversation->created_at->timezone($time_zone)->format('d/m/Y h:i A') }} -
@@ -25,10 +28,11 @@
         @endforeach
     </div>
 
-    @if(
-    (auth()->user()->hasRole('admin')) ||
-    (!isset($ticket->closed_at) && auth()->user()->hasRole('user'))
-    )
+    @php
+        $isCurrentUserAdmin = auth()->user()->roles->contains('name', 'admin');
+        $isCurrentUserAllowed = $isCurrentUserAdmin || (!isset($ticket->closed_at) && auth()->user()->roles->contains('name', 'user'));
+    @endphp
+    @if($isCurrentUserAllowed)
     <div class="px-4 py-3 border-t border-neutral-200 dark:border-neutral-700">
         <form wire:submit.prevent="sendMessage" id="messageForm">
             <div x-cloak class="mb-3 no-tailwindcss-support-display">
@@ -40,9 +44,10 @@
             </div>
 
             <div class="flex justify-end">
-                <x-primary-create-button type="submit" wire:loading.attr="disabled" wire:loading.class="opacity-50">
-                    <span wire:loading.remove>Send Message</span>
-                    <span wire:loading>Sending...</span>
+                <x-primary-create-button type="submit" wire:target="sendMessage" wire:loading.attr="disabled"
+                    wire:loading.class="opacity-50">
+                    <span wire:target="sendMessage" wire:loading.remove>Send Message</span>
+                    <span wire:target="sendMessage" wire:loading>Sending...</span>
                 </x-primary-create-button>
             </div>
         </form>

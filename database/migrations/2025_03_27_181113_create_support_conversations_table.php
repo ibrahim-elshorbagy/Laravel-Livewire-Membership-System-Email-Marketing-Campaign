@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->text('message');
             $table->timestamp('created_at')->nullable();
+            $table->index(['support_ticket_id', 'id']);
+
 
         });
     }

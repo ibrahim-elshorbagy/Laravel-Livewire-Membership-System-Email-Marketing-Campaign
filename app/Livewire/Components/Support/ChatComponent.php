@@ -34,14 +34,15 @@ class ChatComponent extends Component
     public function mount(SupportTicket $ticket)
     {
         $this->ticket = $ticket;
+        $user = auth()->user();
         $this->time_zone = $user->timezone ?? SiteSetting::getValue('APP_TIMEZONE');
         $this->loadInitialConversations();
-
     }
 
     protected function loadInitialConversations()
     {
         $this->conversations = $this->ticket->conversations()
+            ->with(['user.roles'])
             ->orderBy('created_at', 'asc')
             ->get();
 
@@ -53,16 +54,17 @@ class ChatComponent extends Component
     public function pollForNewMessages()
     {
         $newMessages = $this->ticket->conversations()
+            ->with(['user.roles'])
             ->where('id', '>', $this->lastMessageId)
             ->orderBy('created_at', 'asc')
             ->get();
 
         if ($newMessages->isNotEmpty()) {
-            $this->conversations = $this->conversations->merge($newMessages);
+            // Append new messages without replacing the collection
+            $this->conversations = $this->conversations->concat($newMessages);
             $this->lastMessageId = $newMessages->last()->id;
         }
     }
-
     public function uploadCKEditorImage($fileData)
     {
         $this->fileData = $fileData;
@@ -201,12 +203,8 @@ class ChatComponent extends Component
 
     public function render()
     {
-        $conversations = $this->ticket->conversations()
-            ->orderBy('created_at', 'asc')
-            ->get();
-
         return view('livewire.components.support.chat-component', [
-            'conversations' => $conversations
+            'conversations' => $this->conversations
         ]);
     }
 }
