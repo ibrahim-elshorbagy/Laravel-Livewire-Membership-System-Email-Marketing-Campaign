@@ -87,13 +87,6 @@
                                 {{ $ticket->created_at->format('d/m/Y H:i:s') }}<br>
                                 <span class="text-neutral-500">{{ $ticket->created_at->diffForHumans() }}</span>
                             </div>
-                            @if($ticket->responded_at)
-                            <div>
-                                <span class="font-medium">Responded:</span><br>
-                                {{ $ticket->responded_at->format('d/m/Y H:i:s') }}<br>
-                                <span class="text-neutral-500">{{ $ticket->responded_at->diffForHumans() }}</span>
-                            </div>
-                            @endif
                             @if($ticket->closed_at)
                             <div>
                                 <span class="font-medium">Closed:</span><br>
@@ -106,7 +99,7 @@
                     <td class="p-4 text-nowrap">
                         <div class="flex space-x-2">
                             <a href="{{ route('user.support.ticket', $ticket) }}"
-                                class="text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300">
+                                class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
                                 <i class="fa-solid fa-eye"></i>
                             </a>
                         </div>

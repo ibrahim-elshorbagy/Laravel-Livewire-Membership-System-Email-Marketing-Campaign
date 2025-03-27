@@ -73,7 +73,7 @@
                             <div class="flex flex-col">
                                 <a onclick="confirm('Are you sure you want to impersonate this user?') || event.stopImmediatePropagation()"
                                     wire:click="impersonateUser({{ $ticket->user->id }})"
-                                    class="text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 cursor-pointer">
+                                    class="text-sky-600 cursor-pointer hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300">
                                     ({{ $ticket->user->username }})
                                 </a>
                                 <span class="text-sm text-neutral-600 opacity-85 dark:text-neutral-400">
@@ -99,14 +99,6 @@
                                     $ticket->created_at->format('d/m/Y H:i:s') }} - {{
                                     $ticket->created_at->diffForHumans() }}</span>
                             </div>
-                            @if($ticket->responded_at)
-                            <div>
-                                <span class="font-semibold text-neutral-700 dark:text-neutral-300">Responded:</span>
-                                <span class="text-neutral-600 dark:text-neutral-400">{{
-                                    $ticket->responded_at->format('d/m/Y H:i:s') }} - {{
-                                    $ticket->responded_at->diffForHumans() }}</span>
-                            </div>
-                            @endif
                             @if($ticket->closed_at)
                             <div>
                                 <span class="font-semibold text-neutral-700 dark:text-neutral-300">Closed:</span>
@@ -120,8 +112,8 @@
                     <td class="p-4">
                         <div class="flex space-x-2">
                             <a href="{{ route('admin.support.ticket-detail', $ticket) }}"
-                                class="text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300">
-                                <i class="fa-solid fa-pen-to-square"></i>
+                                class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
+                                <i class="fa-solid fa-eye"></i>
                             </a>
                         </div>
                     </td>

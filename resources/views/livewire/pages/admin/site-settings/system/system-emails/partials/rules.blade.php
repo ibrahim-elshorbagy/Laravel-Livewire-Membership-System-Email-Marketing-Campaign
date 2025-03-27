@@ -2,7 +2,7 @@
     class="overflow-hidden p-4 my-4 w-full bg-white rounded-lg text-neutral-600 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400">
     <h3 class="mb-4 text-2xl font-bold text-gray-900 dark:text-gray-100">Templates Notes</h3>
 
-    <div >
+    <div>
 
         <x-primary-accordion title="All System Emails" :isExpandedByDefault="false">
             <div class="p-4 mb-4 rounded-lg bg-neutral-50 dark:bg-neutral-700">
@@ -126,6 +126,7 @@
                 <h4 class="mb-2 text-lg font-semibold text-neutral-800 dark:text-neutral-200">Notes:</h4>
                 <ul class="list-disc list-inside text-neutral-600 dark:text-neutral-300">
                     <li>Email Subject is unnecessary - it is defined by the user when creating the ticket.</li>
+                    <li>If you set the email subject, it will be enforced, and the client won't be able to write their own email subject</li>
                 </ul>
             </div>
 

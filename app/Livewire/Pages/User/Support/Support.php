@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages\User\Support;
 
+use App\Mail\BaseSupportMail;
 use Livewire\Component;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Mail;
@@ -102,6 +103,7 @@ class Support extends Component
 
         // Create initial conversation
         $ticket->conversations()->create([
+            'user_id' => auth()->id(),
             'message' => $cleanMessage,
             'created_at' => now()
         ]);
@@ -112,12 +114,13 @@ class Support extends Component
             'email' => $this->email,
             'subject' => $this->subject,
             'message' => $processedMessage['message'],
-            'attachments' => $processedMessage['attachments']
+            'attachments' => $processedMessage['attachments'],
+            'slug' => 'support-ticket-user-request'
 
         ];
 
         // Send mail
-        Mail::to($admin->email)->queue(new SupportMail($mailData));
+        Mail::to($admin->email)->queue(new BaseSupportMail($mailData));
 
 
         Session::flash('success', 'Message sent successfully.');

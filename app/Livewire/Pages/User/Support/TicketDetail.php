@@ -19,8 +19,6 @@ class TicketDetail extends Component
             abort(403);
         }
         $this->ticket = $ticket;
-        $cleanMessage = Purifier::clean($ticket->message);
-        $this->ticket->message = $cleanMessage;
     }
 
     public function render()

@@ -2,14 +2,15 @@
 
 namespace App\Mail;
 
-use App\Models\Admin\Site\SystemSetting\SystemEmail;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
+use App\Models\Admin\Site\SystemSetting\SystemEmail;
 
-class SupportMail extends Mailable
+class BaseSupportMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -23,30 +24,8 @@ class SupportMail extends Mailable
     public function build()
     {
 
-        $emailTemplate = SystemEmail::where('slug', 'support-ticket-user-request')->first();
-
-        // Check if template was found
-        if (!$emailTemplate) {
-            // Use fallback template
-            return $this->subject($this->data['subject'])
-                ->view('emails.support-fallback', [
-                    'name' => $this->data['name'],
-                    'email' => $this->data['email'],
-                    'subject' => $this->data['subject'],
-                    'messageContent' => $this->data['message']
-                ])
-                ->withSymfonyMessage(function ($message) {
-                if (!empty($this->data['attachments'])) {
-                    foreach ($this->data['attachments'] as $attachment) {
-                        $message->embedFromPath(
-                            $attachment['path'],
-                            $attachment['name']
-                        );
-                    }
-                }
-            });
-        }
-
+        $slug =$this->data['slug'];
+        $emailTemplate = SystemEmail::where('slug', $slug)->first();
 
         // Get the HTML template
         $templateHtml = $emailTemplate->message_html;
@@ -54,7 +33,7 @@ class SupportMail extends Mailable
         // Create data array with all variables needed in the template
         $data = [
             'name' => $this->data['name'],
-            'email' => $this->data['email'],
+            'email' => $emailTemplate->email_subject ? $emailTemplate->email_subject :$this->data['email'],
             'subject' => $this->data['subject'],
             'messageContent' => $this->data['message']
         ];
@@ -93,5 +72,4 @@ class SupportMail extends Mailable
 
         return $this;
     }
-
 }
