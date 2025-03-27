@@ -46,7 +46,7 @@ class Support extends Component
         try {
 
             $validatedData = $this->validate([
-                'fileData' => ['required', 'string', 'regex:/^data:image\/[a-zA-Z]+;base64,[a-zA-Z0-9\/\+]+={0,2}$/','max:10240'],
+                'fileData' => ['required', 'string', 'regex:/^data:image\/[a-zA-Z]+;base64,[a-zA-Z0-9\/\+]+={0,2}$/'],
             ]);
 
             $image = $validatedData['fileData'];
@@ -97,8 +97,13 @@ class Support extends Component
         $ticket = SupportTicket::create([
             'user_id' => auth()->id(),
             'subject' => $this->subject,
-            'message' => $cleanMessage,
             'status' => 'open'
+        ]);
+
+        // Create initial conversation
+        $ticket->conversations()->create([
+            'message' => $cleanMessage,
+            'created_at' => now()
         ]);
 
         // Prepare mail data
