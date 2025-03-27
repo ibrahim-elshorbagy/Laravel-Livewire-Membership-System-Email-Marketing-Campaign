@@ -30,12 +30,12 @@
     (!isset($ticket->closed_at) && auth()->user()->hasRole('user'))
     )
     <div class="px-4 py-3 border-t border-neutral-200 dark:border-neutral-700">
-        <form wire:submit.prevent="sendMessage">
+        <form wire:submit.prevent="sendMessage" id="messageForm">
             <div x-cloak class="mb-3 no-tailwindcss-support-display">
                 <div wire:ignore>
                     <textarea id="message" class="block mt-1 w-full"></textarea>
                 </div>
-                <input type="hidden" wire:model="message">
+                <input type="hidden" id="hiddenMessage" wire:model="message">
                 <x-input-error :messages="$errors->get('message')" class="mt-2" />
             </div>
 
@@ -55,6 +55,7 @@
 <script>
     document.addEventListener('livewire:initialized', function () {
         let editor;
+        const form = document.querySelector('#messageForm');
 
         ClassicEditor
             .create(document.querySelector('#message'), {
@@ -68,13 +69,18 @@
             .then(newEditor => {
                 editor = newEditor;
 
-                if (@this.message) {
-                    editor.setData(@this.message);
-                }
+                // if (@this.message) {
+                //     editor.setData(@this.message);
+                // }
 
-                editor.model.document.on('change:data', () => {
-                    @this.set('message', editor.getData());
+                // Update Livewire's message property just before submission
+                form.addEventListener('submit', function(e) {
+                    // Update Livewire's message property before submission
+                    @this.set('message', editor.getData(), true);
                 });
+                // editor.model.document.on('change:data', () => {
+                //     @this.set('message', editor.getData());
+                // });
 
                 editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
                     return {

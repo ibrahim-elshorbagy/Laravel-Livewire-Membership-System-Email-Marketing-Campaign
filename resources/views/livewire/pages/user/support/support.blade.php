@@ -4,7 +4,7 @@
             Support
         </h2>
 
-        <form wire:submit.prevent="sendSupportMessage" class="space-y-6">
+        <form wire:submit.prevent="sendSupportMessage" class="space-y-6" id="messageForm">
             <div class="grid gap-6 p-4 rounded-lg border md:grid-cols-2 border-neutral-200 dark:border-neutral-600">
                 <!-- User Info (Read-only) -->
                 <div class="grid col-span-2 gap-6 md:grid-cols-2">
@@ -53,6 +53,7 @@
 <script>
     document.addEventListener('livewire:initialized', function () {
         let editor;
+        const form = document.querySelector('#messageForm');
 
         ClassicEditor
             .create(document.querySelector('#message'), {
@@ -67,15 +68,19 @@
                 editor = newEditor;
 
                 // Set initial data if it exists
-                if (@this.message) {
-                    editor.setData(@this.message);
-                }
+                // if (@this.message) {
+                //     editor.setData(@this.message);
+                // }
 
-                // Update Livewire model when content changes
-                editor.model.document.on('change:data', () => {
-                    @this.set('message', editor.getData());
+                // // Update Livewire model when content changes
+                // editor.model.document.on('change:data', () => {
+                //     @this.set('message', editor.getData());
+                // });
+
+                form.addEventListener('submit', function(e) {
+                    // Update Livewire's message property before submission
+                    @this.set('message', editor.getData(), true);
                 });
-
                 // Handle file uploads using Livewire component method
                 editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
                     return {
