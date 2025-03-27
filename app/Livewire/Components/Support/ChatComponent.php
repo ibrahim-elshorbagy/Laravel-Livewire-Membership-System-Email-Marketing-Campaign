@@ -117,6 +117,13 @@ class ChatComponent extends Component
 
         // Check if user is ticket owner or admin
         $user = auth()->user();
+
+        // Check if ticket is closed
+        if ((isset($this->ticket->closed_at)) || !$user->hasRole('admin') && $user->id !== $this->ticket->user_id) {
+            $this->alert('error', 'You cannot send more messages. This ticket is closed.', ['position' => 'bottom-end']);
+            return;
+        }
+
         if ($user->id !== $this->ticket->user_id && !$user->hasRole('admin')) {
             $this->alert('error', 'You do not have permission to send messages in this ticket.', ['position' => 'bottom-end']);
             return;
