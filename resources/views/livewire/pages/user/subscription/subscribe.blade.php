@@ -74,7 +74,7 @@
                 @auth
                 <button type="button" @if($currentPlanId===$plan->id || ($currentPlanId && $plan->price <
                         $currentPlanPrice)) disabled
-                        class="px-4 py-2 mt-12 w-full text-sm font-medium tracking-wide text-center text-white whitespace-nowrap rounded-lg transition cursor-not-allowed bg-neutral-400"
+                        class="px-4 py-2 mt-12 w-full text-xs font-medium tracking-wide text-center text-white whitespace-nowrap rounded-lg transition cursor-not-allowed md:text-sm bg-neutral-400"
                         @else wire:click="$set('selectedPlan', {{ $plan->id }})" wire:loading.attr="disabled" @class([ 'mt-12 w-full whitespace-nowrap px-4 py-2 text-center text-sm font-medium tracking-wide transition
                     rounded-lg' , 'bg-black text-neutral-100 dark:bg-orange-500 dark:text-black'=> $selectedPlan !==
                         $plan->id,
@@ -132,7 +132,7 @@
                 @auth
                 <button type="button" @if($currentPlanId===$plan->id || ($currentPlanId && $plan->price <
                         $currentPlanPrice)) disabled
-                        class="px-4 py-2 mt-12 w-full text-sm font-medium tracking-wide text-center text-white whitespace-nowrap rounded-lg transition cursor-not-allowed bg-neutral-400"
+                        class="px-4 py-2 mt-12 w-full text-xs font-medium tracking-wide text-center text-white whitespace-nowrap rounded-lg transition cursor-not-allowed md:text-sm bg-neutral-400"
                         @else wire:click="$set('selectedPlan', {{ $plan->id }})" wire:loading.attr="disabled" @class([ 'mt-12 w-full whitespace-nowrap px-4 py-2 text-center text-sm font-medium tracking-wide transition
                     rounded-lg' , 'bg-black text-neutral-100 dark:bg-orange-500 dark:text-black'=> $selectedPlan !==
                         $plan->id,
