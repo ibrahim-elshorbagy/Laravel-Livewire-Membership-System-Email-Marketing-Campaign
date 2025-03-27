@@ -1,10 +1,10 @@
 <div class="flex flex-col space-y-4 h-full">
-    <div class="overflow-y-auto flex-1 px-2 py-2 space-y-3 sm:px-4 sm:space-y-4">
+    <div class="overflow-y-auto flex-1 py-2 space-y-3 sm:space-y-4">
         @foreach($conversations as $conversation)
         <div
             class="flex items-start gap-2 sm:gap-2.5 {{ $conversation->user->hasRole('admin') ? 'flex-row-reverse' : '' }}">
             <div
-                class="flex flex-col w-full max-w-[85%] sm:max-w-[80%] leading-1.5 p-3 sm:p-4 border-neutral-200 bg-neutral-100 rounded-e-xl rounded-es-xl dark:bg-neutral-700">
+                class="flex flex-col w-full max-w-[95%] sm:max-w-[95%] leading-1.5 p-3 sm:p-4 border-neutral-200 bg-neutral-100 rounded-e-xl rounded-es-xl dark:bg-neutral-700">
                 <div
                     class="flex flex-col mb-2 space-y-1 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2 rtl:space-x-reverse">
                     <span class="text-sm font-semibold text-neutral-900 dark:text-white">
