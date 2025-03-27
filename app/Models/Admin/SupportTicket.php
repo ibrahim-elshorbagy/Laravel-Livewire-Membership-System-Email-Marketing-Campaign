@@ -2,6 +2,7 @@
 
 namespace App\Models\Admin;
 
+use App\Models\Admin\Support\SupportConversation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\User;
@@ -10,11 +11,14 @@ class SupportTicket extends Model
 {
     protected $guarded = ['id'];
 
-
     protected $casts = [
-        'closed_at' => 'datetime',
-        'responded_at' => 'datetime'
+        'closed_at' => 'datetime'
     ];
+
+    public function conversations()
+    {
+        return $this->hasMany(SupportConversation::class);
+    }
 
     public function user(): BelongsTo
     {

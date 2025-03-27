@@ -15,10 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('subject');
-            $table->text('message');
             $table->enum('status', ['open', 'in_progress', 'closed'])->default('open');
-            $table->text('admin_response')->nullable();
-            $table->timestamp('responded_at')->nullable();
             $table->timestamp('closed_at')->nullable();
             $table->timestamps();
         });
