@@ -23,6 +23,10 @@ class ChatComponent extends Component
     public $fileData;
     public $time_zone;
 
+    public $conversations;
+    public $lastMessageId = 0;
+
+
     protected $rules = [
         'message' => 'required|min:1'
     ];
@@ -31,8 +35,33 @@ class ChatComponent extends Component
     {
         $this->ticket = $ticket;
         $this->time_zone = $user->timezone ?? SiteSetting::getValue('APP_TIMEZONE');
+        $this->loadInitialConversations();
+
     }
 
+    protected function loadInitialConversations()
+    {
+        $this->conversations = $this->ticket->conversations()
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        if ($this->conversations->isNotEmpty()) {
+            $this->lastMessageId = $this->conversations->last()->id;
+        }
+    }
+
+    public function pollForNewMessages()
+    {
+        $newMessages = $this->ticket->conversations()
+            ->where('id', '>', $this->lastMessageId)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        if ($newMessages->isNotEmpty()) {
+            $this->conversations = $this->conversations->merge($newMessages);
+            $this->lastMessageId = $newMessages->last()->id;
+        }
+    }
 
     public function uploadCKEditorImage($fileData)
     {
@@ -131,30 +160,39 @@ class ChatComponent extends Component
 
         $cleanMessage = Purifier::clean($this->message);
 
-        SupportConversation::create([
+        $newConversation = SupportConversation::create([
             'support_ticket_id' => $this->ticket->id,
             'user_id' => $user->id,
             'message' => $cleanMessage,
             'created_at' => now()
         ]);
-        $processedMessage = $this->processEmailImages($cleanMessage);
 
-        // Determine recipient based on sender
-        $admin = User::find(1);
-        $recipientEmail = $user->hasRole('admin') ? $this->ticket->user->email : $admin->email;
-        $recipientName = $user->hasRole('admin') ? $this->ticket->user->first_name . ' ' . $this->ticket->user->last_name : $admin->name;
+        defer(function () use($user,$cleanMessage) {
 
-        $mailData = [
-            'name' => $recipientName,
-            'email' => $recipientEmail,
-            'subject' => 'Re: ' . $this->ticket->subject,
-            'message' => $processedMessage['message'],
-            'attachments' => $processedMessage['attachments']
-        ];
+            $processedMessage = $this->processEmailImages($cleanMessage);
 
-        // Send email to appropriate recipient
-        $mailData['slug'] = $user->hasRole('admin') ? 'support-ticket-admin-response' : 'support-ticket-user-request';
-        Mail::to($recipientEmail)->queue(new BaseSupportMail($mailData));
+            // Determine recipient based on sender
+            $admin = User::find(1);
+            $recipientEmail = $user->hasRole('admin') ? $this->ticket->user->email : $admin->email;
+            $recipientName = $user->hasRole('admin') ? $this->ticket->user->first_name . ' ' . $this->ticket->user->last_name : $admin->name;
+
+            $mailData = [
+                'name' => $recipientName,
+                'email' => $recipientEmail,
+                'subject' => 'Re: ' . $this->ticket->subject,
+                'message' => $processedMessage['message'],
+                'attachments' => $processedMessage['attachments']
+            ];
+
+            // Send email to appropriate recipient
+            $mailData['slug'] = $user->hasRole('admin') ? 'support-ticket-admin-response' : 'support-ticket-user-request';
+
+            Mail::to($recipientEmail)->queue(new BaseSupportMail($mailData));
+
+        });
+        // Add new message to local collection
+        $this->conversations->push($newConversation);
+        $this->lastMessageId = $newConversation->id;
 
         $this->reset('message');
         $this->dispatch('resetEditor');

@@ -1,4 +1,4 @@
-<div class="flex flex-col space-y-4 h-full">
+<div class="flex flex-col space-y-4 h-full" wire:poll.5000ms="pollForNewMessages">
     <div class="overflow-y-auto flex-1 py-2 space-y-3 sm:space-y-4">
         @foreach($conversations as $conversation)
         <div
@@ -40,8 +40,9 @@
             </div>
 
             <div class="flex justify-end">
-                <x-primary-create-button type="submit">
-                    Send Message
+                <x-primary-create-button type="submit" wire:loading.attr="disabled" wire:loading.class="opacity-50">
+                    <span wire:loading.remove>Send Message</span>
+                    <span wire:loading>Sending...</span>
                 </x-primary-create-button>
             </div>
         </form>
