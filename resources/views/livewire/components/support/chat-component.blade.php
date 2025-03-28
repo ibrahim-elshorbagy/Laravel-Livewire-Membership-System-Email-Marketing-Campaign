@@ -1,5 +1,4 @@
 <div class="flex flex-col space-y-4 h-full" wire:poll.2s="pollForNewMessages">
-    {{--  --}}
     <div class="overflow-y-auto flex-1 py-2 space-y-3 sm:space-y-4">
         @foreach($conversations as $conversation)
         @php
@@ -15,8 +14,10 @@
                         {{ $isAdmin ? 'Support Team' : $conversation['user']['first_name'] . ' ' .
                         $conversation['user']['last_name'] }}
                     </span>
+                    {{ $conversation['id'] }}
                     <span class="text-xs font-normal sm:text-sm text-neutral-500 dark:text-neutral-400">
-                        {{ \Carbon\Carbon::parse($conversation['created_at'])->timezone($time_zone)->format('d/m/Y h:i A') }} -
+                        {{ \Carbon\Carbon::parse($conversation['created_at'])->timezone($time_zone)->format('d/m/Y h:i
+                        A') }} -
                         {{ \Carbon\Carbon::parse($conversation['created_at'])->timezone($time_zone)->diffForHumans() }}
                     </span>
                 </div>
@@ -29,18 +30,15 @@
         @endforeach
     </div>
 
-    @php
-        $isCurrentUserAdmin = auth()->user()->roles->contains('name', 'admin');
-        $isCurrentUserAllowed = $isCurrentUserAdmin || (!isset($ticket->closed_at) && auth()->user()->roles->contains('name', 'user'));
-    @endphp
     @if($isCurrentUserAllowed)
     <div class="px-4 py-3 border-t border-neutral-200 dark:border-neutral-700">
         <form wire:submit.prevent="sendMessage" id="messageForm">
             <div x-cloak class="mb-3 no-tailwindcss-support-display">
                 <div wire:ignore>
-                    <textarea id="message" class="block mt-1 w-full"></textarea>
+                    <div>
+                        <textarea id="message" class="block mt-1 w-full"></textarea>
+                    </div>
                 </div>
-                <input type="hidden" id="hiddenMessage" wire:model="message">
                 <x-input-error :messages="$errors->get('message')" class="mt-2" />
             </div>
 
@@ -68,95 +66,78 @@
             <span id="upload-progress" class="text-sm text-neutral-700 dark:text-neutral-300"></span>
         </div>
     </div>
-
 </div>
 
 @push('scripts')
-<script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
 <script>
-    document.addEventListener('livewire:initialized', function () {
-        let editor;
-        const form = document.querySelector('#messageForm');
 
-        ClassicEditor
-            .create(document.querySelector('#message'), {
-                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'insertTable', 'imageUpload', 'undo', 'redo'],
-                image: {
-                    upload: {
-                        types: ['jpeg', 'png', 'gif', 'jpg', 'webp']
-                    }
-                }
-            })
-            .then(newEditor => {
-                editor = newEditor;
-
-                // if (@this.message) {
-                //     editor.setData(@this.message);
-                // }
-
-                // Update Livewire's message property just before submission
-                form.addEventListener('submit', function(e) {
-                    // Update Livewire's message property before submission
-                    @this.set('message', editor.getData(), true);
-                });
-                // editor.model.document.on('change:data', () => {
-                //     @this.set('message', editor.getData());
-                // });
-
-                editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-                    return {
-                        upload: async () => {
-
-                            const uploadIndicator = document.getElementById('upload-indicator');
-                            const uploadProgress = document.getElementById('upload-progress');
-                            uploadIndicator.classList.remove('hidden');
-                            uploadProgress.textContent = 'Uploading image...';
-
-                            const file = await loader.file;
-
-                            return new Promise((resolve, reject) => {
-                                const reader = new FileReader();
-                                reader.readAsDataURL(file);
-                                reader.onload = async () => {
-                                    const fileData = reader.result;
-
-                                    try {
-                                        const result = await @this.uploadCKEditorImage(fileData);
-
-                                        if (result.success) {
-                                            uploadProgress.textContent = 'Upload completed!';
-                                            setTimeout(() => uploadIndicator.classList.add('hidden'), 2000);
-                                            resolve({ default: result.url });
-                                        } else {
-                                            uploadProgress.textContent = 'Upload failed: ' + result.error;
-                                            setTimeout(() => uploadIndicator.classList.add('hidden'), 3000);
-                                            reject(result.error);
+    $('#message').summernote({
+                                height: 350,
+                                toolbar: [
+                                    ['style', ['style']],
+                                    ['font', ['bold', 'italic', 'underline', 'clear', 'strikethrough', 'superscript', 'subscript']],
+                                    ['fontname', ['fontname']],
+                                    ['fontsize', ['fontsize']],
+                                    ['color', ['color']],
+                                    ['para', ['ul', 'ol', 'paragraph']],
+                                    ['table', ['table']],
+                                    ['insert', ['link', 'picture', 'video']],
+                                    ['view', ['codeview']],
+                                ],
+                                fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana'],
+                                fontSizes: ['8', '9', '10', '11', '12', '14', '18', '24', '36'],
+                                callbacks: {
+                                    onChange: function(contents) {
+                                        @this.set('message', contents, true);
+                                    },
+                                    onImageUpload: function(files) {
+                                        for(let file of files) {
+                                            uploadImage(file, this);
                                         }
-                                    } catch (error) {
-                                        uploadProgress.textContent = 'Upload error: ' + error;
-                                        setTimeout(() => uploadIndicator.classList.add('hidden'), 3000);
-                                        reject('Upload failed');
                                     }
-                                };
-                                reader.onerror = () => reject('Failed to read file');
+                                }
                             });
-                        },
-                        abort: () => {}
-                    };
-                };
-            })
-            .catch(error => console.error(error));
+    function uploadImage(file, editor) {
+        const uploadIndicator = document.getElementById('upload-indicator');
+        const uploadProgress = document.getElementById('upload-progress');
+        uploadIndicator.classList.remove('hidden');
+        uploadProgress.textContent = 'Uploading image...';
 
-        Livewire.on('disconnected', () => {
-            if (editor) {
-                editor.destroy();
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async () => {
+            const fileData = reader.result;
+            try {
+                const result = await @this.uploadEditorImage(fileData);
+                if (result.success) {
+                    uploadProgress.textContent = 'Upload completed!';
+                    setTimeout(() => uploadIndicator.classList.add('hidden'), 2000);
+                    $(editor).summernote('insertImage', result.url);
+                } else {
+                    uploadProgress.textContent = 'Upload failed: ' + result.error;
+                    setTimeout(() => uploadIndicator.classList.add('hidden'), 3000);
+                }
+            } catch (error) {
+                uploadProgress.textContent = 'Upload error: ' + error;
+                setTimeout(() => uploadIndicator.classList.add('hidden'), 3000);
             }
+        };
+        reader.onerror = () => {
+            uploadProgress.textContent = 'Failed to read file';
+            setTimeout(() => uploadIndicator.classList.add('hidden'), 3000);
+        };
+    }
+
+    document.addEventListener('livewire:initialized', function () {
+        Livewire.on('resetEditor', () => {
+            $('#message').summernote('reset');
         });
 
-        Livewire.on('resetEditor', () => {
-            if (editor) {
-                editor.setData('');
-            }
+        Livewire.on('disconnected', () => {
+            $('#message').summernote('destroy');
         });
     });
 </script>

@@ -17,6 +17,7 @@ class TicketDetail extends Component
     use LivewireAlert;
 
     public $ticket;
+    public $user_subscription;
 
     public function mount(SupportTicket $ticket)
     {
@@ -34,7 +35,7 @@ class TicketDetail extends Component
                 'join' => true,
                 'syntax' => Carbon::DIFF_RELATIVE_TO_NOW,
             ]);
-            $this->ticket->user_subscription = $subscription;
+            $this->user_subscription = $subscription;
         }
     }
 
@@ -65,43 +66,6 @@ class TicketDetail extends Component
         $this->alert('success', 'Ticket status updated successfully.', ['position' => 'bottom-end']);
     }
 
-
-
-
-
-
-    public function sendResponse()
-    {
-        $this->validate();
-
-        // Update ticket with response
-        $cleanResponse = Purifier::clean($this->response);
-
-        $processedMessage = $this->processEmailImages($cleanResponse);
-
-        $this->ticket->update([
-            'admin_response' => $cleanResponse,
-            'status' => 'closed',
-            'responded_at'=> now(),
-            'closed_at' => now()
-        ]);
-
-        // Send email to user
-        $mailData = [
-            'name' => $this->ticket->user->first_name . ' ' . $this->ticket->user->last_name,
-            'email' => $this->ticket->user->email,
-            'subject' => 'Re: ' . $this->ticket->subject,
-            'message' => $processedMessage['message'],
-            'attachments' => $processedMessage['attachments']
-        ];
-
-        Mail::to($this->ticket->user->email)->queue(new SupportResponseMail($mailData));
-
-
-        // Reset form and show success message
-        $this->reset('response');
-        $this->alert('success', 'Response sent successfully.', ['position' => 'bottom-end']);
-    }
 
     public function render()
     {

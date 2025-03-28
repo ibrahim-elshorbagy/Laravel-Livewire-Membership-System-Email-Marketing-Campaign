@@ -40,15 +40,26 @@ class Support extends Component
     ];
 
     public $fileData;
-    public function uploadCKEditorImage($fileData)
+    public function uploadEditorImage($fileData)
     {
 
         $this->fileData = $fileData;
         try {
 
             $validatedData = $this->validate([
-                'fileData' => ['required', 'string', 'regex:/^data:image\/[a-zA-Z]+;base64,[a-zA-Z0-9\/\+]+={0,2}$/'],
-            ]);
+                    'fileData' => [
+                        'required',
+                        'string',
+                        'regex:/^data:image\/(jpeg|png|gif|webp);base64,[a-zA-Z0-9\/\+]+={0,2}$/',
+                        // Add file size validation (e.g., max 5MB)
+                        function ($attribute, $value, $fail) {
+                            $fileSize = strlen(base64_decode(explode(',', $value)[1]));
+                            if ($fileSize > 5 * 1024 * 1024) {
+                                $fail('The image must not be larger than 5MB.');
+                            }
+                        }
+                    ],
+                ]);
 
             $image = $validatedData['fileData'];
 
@@ -63,7 +74,7 @@ class Support extends Component
             $fileName = 'support_' . now()->timestamp . '_' . uniqid() . '.' . $imageType;
             $userId = auth()->user()->id;
             // Store in the same folder structure as logo
-            $path = "admin/support/{$userId}/{$fileName}";
+            $path = "users/{$userId}/support/{$fileName}";
             Storage::disk('public')->put($path, $fileContent);
 
             return [
@@ -83,13 +94,8 @@ class Support extends Component
     {
         $this->validate();
 
-        // Extract and process images
-        // Log::debug('Original message content', ['message' => $this->message]);
 
-
-
-
-        $cleanMessage = Purifier::clean($this->message);
+        $cleanMessage = Purifier::clean($this->message, 'youtube');
 
         // Create support ticket
         $ticket = SupportTicket::create([
@@ -109,8 +115,7 @@ class Support extends Component
         defer(function() use($cleanMessage){
             // Get admin email from settings
             $admin = User::find(1);
-            $adminEmail = $admin->email;
-            
+
             $processedMessage = $this->processEmailImages($cleanMessage);
 
             // Prepare mail data
@@ -150,13 +155,6 @@ class Support extends Component
                 $relativePath = ltrim(str_replace('/storage/', '', $imageSrc), '/');
                 $fullPath = $storagePath . $relativePath;
 
-                // Add debug logging
-                // Log::debug('Image processing', [
-                //     'src' => $imageSrc,
-                //     'relative_path' => $relativePath,
-                //     'full_path' => $fullPath,
-                //     'exists' => file_exists($fullPath)
-                // ]);
 
                 if (file_exists($fullPath)) {
                     $filename = basename($fullPath);
@@ -176,7 +174,6 @@ class Support extends Component
             }
         }
 
-        // Log::debug('Processed attachments', $attachments);
         return [
             'message' => $message,
             'attachments' => $attachments

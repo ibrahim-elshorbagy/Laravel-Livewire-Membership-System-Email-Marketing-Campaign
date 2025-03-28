@@ -25,45 +25,45 @@
                     </div>
                 </div>
 
-                @if($ticket->user_subscription)
-                <div class="p-4 mb-4 bg-white rounded-lg shadow dark:bg-neutral-800">
+                @if($user_subscription)
+                <div  class="p-4 mb-4 bg-white rounded-lg shadow dark:bg-neutral-800">
                     <h3 class="mb-3 text-lg font-medium text-neutral-900 dark:text-neutral-100">Subscription Information
                     </h3>
                     <div class="space-y-3">
                         <div class="flex justify-between items-center">
                             <span class="text-sm text-neutral-600 dark:text-neutral-400">Plan</span>
                             <span class="text-sm font-medium text-neutral-900 dark:text-neutral-100">{{
-                                $ticket->user_subscription->plan->name }}</span>
+                                $user_subscription->plan->name }}</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-sm text-neutral-600 dark:text-neutral-400">Status</span>
                             <span
-                                class="px-2 py-1 text-xs font-medium rounded-full {{ !$ticket->user_subscription->canceled_at ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
-                                {{ $ticket->user_subscription->canceled_at ? 'Cancelled' : 'Active' }}
+                                class="px-2 py-1 text-xs font-medium rounded-full {{ !$user_subscription->canceled_at ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
+                                {{ $user_subscription->canceled_at ? 'Cancelled' : 'Active' }}
                             </span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-sm text-neutral-600 dark:text-neutral-400">Start Date</span>
                             <span class="text-sm text-neutral-900 dark:text-neutral-100">{{
-                                $ticket->user_subscription->started_at }}</span>
+                                $user_subscription->started_at }}</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-sm text-neutral-600 dark:text-neutral-400">Expiry Date</span>
                             <span class="text-sm text-neutral-900 dark:text-neutral-100">{{
-                                $ticket->user_subscription->expired_at }}</span>
+                                $user_subscription->expired_at }}</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-sm text-neutral-600 dark:text-neutral-400">Remaining Time</span>
                             <span class="text-sm text-neutral-900 dark:text-neutral-100">{{
-                                $ticket->user_subscription->remaining_time }}</span>
+                                $user_subscription->remaining_time }}</span>
                         </div>
 
-                        @if($ticket->user_subscription->plan->features->isNotEmpty())
+                        @if($user_subscription->plan->features->isNotEmpty())
                         <div class="mt-4">
                             <h4 class="mb-2 text-sm font-medium text-neutral-900 dark:text-neutral-100">Features Usage
                             </h4>
                             <div class="space-y-3">
-                                @foreach($ticket->user_subscription->plan->features as $feature)
+                                @foreach($user_subscription->plan->features as $feature)
                                 @php
                                 $balance = $ticket->user->balance($feature->name);
                                 $charges = $feature->pivot->charges;

@@ -26,6 +26,8 @@ class ChatComponent extends Component
 
     public $conversations;
     public $lastMessageId = 0;
+    public $isCurrentUserAdmin;
+    public $isCurrentUserAllowed;
 
 
     protected $rules = [
@@ -35,14 +37,24 @@ class ChatComponent extends Component
     public function mount(SupportTicket $ticket)
     {
         $this->ticket = $ticket;
-        $user = auth()->user();
-        $this->time_zone = $user->timezone ?? SiteSetting::getValue('APP_TIMEZONE');
+        $this->time_zone = auth()->user()->timezone ?? SiteSetting::getValue('APP_TIMEZONE');
         $this->loadInitialConversations();
+        $this->WritePermissions();
+        if ($this->conversations->isNotEmpty()) {
+            $this->lastMessageId = $this->conversations->last()['id'];
+        }
+    }
+
+    protected function WritePermissions()
+    {
+        $userRoles = auth()->user()->roles->pluck('name')->toArray();
+        $this->isCurrentUserAdmin = in_array('admin', $userRoles);
+        $this->isCurrentUserAllowed = $this->isCurrentUserAdmin || (!isset($this->ticket->closed_at) && in_array('user', $userRoles));
     }
 
     protected function loadInitialConversations()
     {
-        $this->conversations = $this->ticket->conversations()
+        $this->conversations = collect($this->ticket->conversations()
             ->with(['user.roles'])
             ->orderBy('created_at', 'asc')
             ->get()
@@ -58,7 +70,7 @@ class ChatComponent extends Component
                         'roles' => $conversation->user->roles->toArray(),
                     ],
                 ];
-            });
+            }));
     }
 
     // This way eager  loading work
@@ -89,15 +101,26 @@ class ChatComponent extends Component
         }
     }
 
-    public function uploadCKEditorImage($fileData)
+    public function uploadEditorImage($fileData)
     {
 
         $this->fileData = $fileData;
         try {
 
             $validatedData = $this->validate([
-                'fileData' => ['required', 'string', 'regex:/^data:image\/[a-zA-Z]+;base64,[a-zA-Z0-9\/\+]+={0,2}$/'],
-            ]);
+                    'fileData' => [
+                        'required',
+                        'string',
+                        'regex:/^data:image\/(jpeg|png|gif|webp);base64,[a-zA-Z0-9\/\+]+={0,2}$/',
+                        // Add file size validation (e.g., max 5MB)
+                        function ($attribute, $value, $fail) {
+                            $fileSize = strlen(base64_decode(explode(',', $value)[1]));
+                            if ($fileSize > 5 * 1024 * 1024) {
+                                $fail('The image must not be larger than 5MB.');
+                            }
+                        }
+                    ],
+                ]);
 
             $image = $validatedData['fileData'];
 
@@ -113,6 +136,8 @@ class ChatComponent extends Component
             $userId = $this->ticket->user_id;
             // Store in the same folder structure as logo
             $path = "admin/support/{$userId}/{$fileName}";
+            $path = "users/{$userId}/support/{$fileName}";
+
             Storage::disk('public')->put($path, $fileContent);
 
             return [
@@ -163,7 +188,6 @@ class ChatComponent extends Component
             }
         }
 
-        // Log::debug('Processed attachments', $attachments);
         return [
             'message' => $message,
             'attachments' => $attachments
@@ -173,23 +197,28 @@ class ChatComponent extends Component
 
     public function sendMessage()
     {
-        $this->validate();
+        $startTime = microtime(true);
+        Log::info('Starting message send process');
 
+        $this->validate();
         $user = auth()->user();
 
-        // Check if ticket is closed
-        if ((isset($this->ticket->closed_at)) || !$user->hasRole('admin') && $user->id !== $this->ticket->user_id) {
+        $userRoles = $user->roles->pluck('name')->toArray();
+
+        if ((isset($this->ticket->closed_at)) || !in_array('admin', $userRoles) && $user->id !== $this->ticket->user_id) {
             $this->alert('error', 'You cannot send more messages. This ticket is closed.', ['position' => 'bottom-end']);
             return;
         }
 
-        if ($user->id !== $this->ticket->user_id && !$user->hasRole('admin')) {
+        if ($user->id !== $this->ticket->user_id && !in_array('admin', $userRoles)) {
             $this->alert('error', 'You do not have permission to send messages in this ticket.', ['position' => 'bottom-end']);
             return;
-        }
+}
+        $purifyStart = microtime(true);
+        $cleanMessage = Purifier::clean($this->message, 'youtube');
+        Log::info('Message purification took: ' . round((microtime(true) - $purifyStart) * 1000, 2) . 'ms');
 
-        $cleanMessage = Purifier::clean($this->message);
-
+        $dbStart = microtime(true);
         // Create conversation with minimal data
         $newConversation = SupportConversation::create([
             'support_ticket_id' => $this->ticket->id,
@@ -197,6 +226,7 @@ class ChatComponent extends Component
             'message' => $cleanMessage,
             'created_at' => now()
         ]);
+        Log::info('Database operation took: ' . round((microtime(true) - $dbStart) * 1000, 2) . 'ms');
 
         // Add new message to local collection immediately
         $this->conversations->push([
@@ -207,41 +237,45 @@ class ChatComponent extends Component
                 'id' => $user->id,
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
-                'roles' => $user->roles->map(function($role) {
-                    return [
-                        'name' => $role->name,
-                        'id' => $role->id
-                    ];
-                })->toArray(),
+                'roles' => $user->roles->pluck('name')->toArray(),
             ],
         ]);
         $this->lastMessageId = $newConversation->id;
 
-        // Process email in background
-        defer(function () use ($user, $cleanMessage, $newConversation) {
-            $processedMessage = $this->processEmailImages($cleanMessage);
-            $admin = User::find(1);
-
-            $recipientEmail = $user->hasRole('admin') ? $this->ticket->user->email : $admin->email;
-            $recipientName = $user->hasRole('admin') ? $this->ticket->user->first_name . ' ' . $this->ticket->user->last_name : $admin->name;
-
-            $mailData = [
-                'name' => $recipientName,
-                'email' => $recipientEmail,
-                'subject' => 'Re: ' . $this->ticket->subject,
-                'message' => $processedMessage['message'],
-                'attachments' => $processedMessage['attachments'],
-                'slug' => $user->hasRole('admin') ? 'support-ticket-admin-response' : 'support-ticket-user-request'
-            ];
-
-
-            Mail::to($recipientEmail)->queue(new BaseSupportMail($mailData));
-
-        });
-
+        // Reset form immediately for better UX
         $this->reset('message');
         $this->dispatch('resetEditor');
         $this->alert('success', 'Message sent successfully.', ['position' => 'bottom-end']);
+
+        Log::info('Total message processing time: ' . round((microtime(true) - $startTime) * 1000, 2) . 'ms');
+
+        // Process email and images in background
+        defer(function () use ($user, $cleanMessage,  $userRoles) {
+            $emailStart = microtime(true);
+            try {
+                $processedMessage = $this->processEmailImages($cleanMessage);
+                $admin = User::find(1);
+
+                // Ensure we're working with User model instances and check roles properly
+                $isAdmin =  $userRoles->roles->contains('name', 'admin');
+                $recipientEmail = $isAdmin ? $this->ticket->user->email : $admin->email;
+                $recipientName = $isAdmin ? $this->ticket->user->first_name . ' ' . $this->ticket->user->last_name : $admin->name;
+
+                $mailData = [
+                    'name' => $recipientName,
+                    'email' => $recipientEmail,
+                    'subject' => 'Re: ' . $this->ticket->subject,
+                    'message' => $processedMessage['message'],
+                    'attachments' => $processedMessage['attachments'],
+                    'slug' => $isAdmin ? 'support-ticket-admin-response' : 'support-ticket-user-request'
+                ];
+
+                Mail::to($recipientEmail)->queue(new BaseSupportMail($mailData));
+                Log::info('Email processing and queueing took: ' . round((microtime(true) - $emailStart) * 1000, 2) . 'ms');
+            } catch (\Exception $e) {
+                Log::error('Failed to process email for support ticket: ' . $e->getMessage());
+            }
+        });
     }
 
     public function render()
