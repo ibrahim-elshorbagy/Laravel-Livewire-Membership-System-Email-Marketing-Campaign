@@ -110,7 +110,7 @@ class ChatComponent extends Component
 
             // Generate a unique filename
             $fileName = 'support_' . now()->timestamp . '_' . uniqid() . '.' . $imageType;
-            $userId = auth()->user()->id;
+            $userId = $this->ticket->user_id;
             // Store in the same folder structure as logo
             $path = "admin/support/{$userId}/{$fileName}";
             Storage::disk('public')->put($path, $fileContent);
