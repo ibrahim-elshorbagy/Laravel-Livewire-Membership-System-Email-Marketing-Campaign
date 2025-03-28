@@ -2,18 +2,18 @@
 
 namespace App\Livewire\Components\Support;
 
+use App\Jobs\ProcessSupportTicketEmail;
 use App\Models\Admin\Support\SupportConversation;
 use App\Models\Admin\SupportTicket;
-use Carbon\Carbon;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Support\Facades\Storage;
 use Mews\Purifier\Facades\Purifier;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BaseSupportMail;
 use App\Models\Admin\Site\SiteSetting;
-use Illuminate\Support\Facades\Log;
 
 class ChatComponent extends Component
 {
@@ -23,12 +23,10 @@ class ChatComponent extends Component
     public $message;
     public $fileData;
     public $time_zone;
-
     public $conversations;
     public $lastMessageId = 0;
     public $isCurrentUserAdmin;
     public $isCurrentUserAllowed;
-
 
     protected $rules = [
         'message' => 'required|min:1'
@@ -36,64 +34,40 @@ class ChatComponent extends Component
 
     public function mount(SupportTicket $ticket)
     {
-        $this->ticket = $ticket;
-        $this->time_zone = auth()->user()->timezone ?? SiteSetting::getValue('APP_TIMEZONE');
-        $this->loadInitialConversations();
-        $this->WritePermissions();
-        if ($this->conversations->isNotEmpty()) {
-            $this->lastMessageId = $this->conversations->last()['id'];
-        }
+        $this->ticket = $ticket->load('user.roles');
+        $this->time_zone = auth()->user()->timezone ?? config('app.timezone');
+        $this->loadConversations();
+        $this->determinePermissions();
     }
 
-    protected function WritePermissions()
+    protected function determinePermissions()
     {
-        $userRoles = auth()->user()->roles->pluck('name')->toArray();
-        $this->isCurrentUserAdmin = in_array('admin', $userRoles);
-        $this->isCurrentUserAllowed = $this->isCurrentUserAdmin || (!isset($this->ticket->closed_at) && in_array('user', $userRoles));
+        $user = auth()->user();
+        $this->isCurrentUserAdmin = $user->hasRole('admin');
+        $this->isCurrentUserAllowed = $this->isCurrentUserAdmin ||
+            (!$this->ticket->closed_at && $user->hasRole('user'));
     }
 
-    protected function loadInitialConversations()
+    protected function loadConversations()
     {
-        $this->conversations = collect($this->ticket->conversations()
+        $this->conversations = $this->ticket->conversations()
             ->with(['user.roles'])
-            ->orderBy('created_at', 'asc')
+            ->orderBy('id')
             ->get()
-            ->map(function ($conversation) {
-                return [
-                    'id' => $conversation->id,
-                    'message' => $conversation->message,
-                    'created_at' => $conversation->created_at,
-                    'user' => [
-                        'id' => $conversation->user->id,
-                        'first_name' => $conversation->user->first_name,
-                        'last_name' => $conversation->user->last_name,
-                        'roles' => $conversation->user->roles->toArray(),
-                    ],
-                ];
-            }));
+            ->map($this->mapConversation());
+
+        // Use null coalescing with array access
+        $this->lastMessageId = $this->conversations->last()['id'] ?? 0;
     }
 
-    // This way eager  loading work
     public function pollForNewMessages()
     {
         $newMessages = $this->ticket->conversations()
             ->with(['user.roles'])
             ->where('id', '>', $this->lastMessageId)
-            ->orderBy('created_at', 'asc')
+            ->orderBy('id')
             ->get()
-            ->map(function ($conversation) {
-                return [
-                    'id' => $conversation->id,
-                    'message' => $conversation->message,
-                    'created_at' => $conversation->created_at,
-                    'user' => [
-                        'id' => $conversation->user->id,
-                        'first_name' => $conversation->user->first_name,
-                        'last_name' => $conversation->user->last_name,
-                        'roles' => $conversation->user->roles->toArray(),
-                    ],
-                ];
-            });
+            ->map($this->mapConversation());
 
         if ($newMessages->isNotEmpty()) {
             $this->conversations = $this->conversations->concat($newMessages);
@@ -101,26 +75,39 @@ class ChatComponent extends Component
         }
     }
 
+    protected function mapConversation()
+    {
+        return fn ($conversation) => [
+            'id' => $conversation->id,
+            'message' => $conversation->message,
+            'created_at' => $conversation->created_at,
+            'user' => [
+                'id' => $conversation->user->id,
+                'first_name' => $conversation->user->first_name,
+                'last_name' => $conversation->user->last_name,
+                'roles' => $conversation->user->roles->pluck('name')->toArray(),
+            ],
+        ];
+    }
+
+
     public function uploadEditorImage($fileData)
     {
 
         $this->fileData = $fileData;
         try {
 
-            $validatedData = $this->validate([
-                    'fileData' => [
-                        'required',
-                        'string',
-                        'regex:/^data:image\/(jpeg|png|gif|webp);base64,[a-zA-Z0-9\/\+]+={0,2}$/',
-                        // Add file size validation (e.g., max 5MB)
-                        function ($attribute, $value, $fail) {
-                            $fileSize = strlen(base64_decode(explode(',', $value)[1]));
-                            if ($fileSize > 5 * 1024 * 1024) {
-                                $fail('The image must not be larger than 5MB.');
-                            }
+            $validatedData =  $this->validate(['fileData' => [
+                    'required',
+                    'string',
+                    'regex:/^data:image\/(jpeg|png|gif|webp);base64,[a-zA-Z0-9\/\+]+={0,2}$/',
+                    function ($attribute, $value, $fail) {
+                        $size = strlen(base64_decode(explode(',', $value)[1]));
+                        if ($size > 5 * 1024 * 1024) {
+                            $fail('Image must be less than 5MB');
                         }
-                    ],
-                ]);
+                    }
+                ]]);
 
             $image = $validatedData['fileData'];
 
@@ -136,8 +123,6 @@ class ChatComponent extends Component
             $userId = $this->ticket->user_id;
             // Store in the same folder structure as logo
             $path = "admin/support/{$userId}/{$fileName}";
-            $path = "users/{$userId}/support/{$fileName}";
-
             Storage::disk('public')->put($path, $fileContent);
 
             return [
@@ -153,6 +138,45 @@ class ChatComponent extends Component
         }
     }
 
+    public function sendMessage()
+    {
+        $this->validate();
+        $user = auth()->user();
+
+        if (!$this->validatePermissions($user)) {
+            return;
+        }
+
+        $message = Purifier::clean($this->message, 'youtube');
+        $conversation = $this->createConversation($message);
+        $this->updateUI($conversation, $user);
+
+        defer(function() use($user,$message){
+            $this->ProcessSupportTicketEmail($this->ticket,$user,$message);
+        });
+    }
+
+    private function ProcessSupportTicketEmail($ticket,$user,$message){
+
+        $recipient =$user->hasRole('admin')? $this->ticket->user: User::find(1);
+        $slug = $user->hasRole('admin')? 'support-ticket-admin-response': 'support-ticket-user-request';
+
+        $processedMessage = $this->processEmailImages($message);
+        $recipientEmail =$recipient->email;
+        $recipientName =$recipient->first_name . " " .$recipient->last_name ;
+
+        $mailData = [
+            'name' => $recipientName,
+            'email' => $recipientEmail,
+            'subject' => 'Re: ' . $this->ticket->subject,
+            'message' => $processedMessage['message'],
+            'attachments' => $processedMessage['attachments'],
+            'slug' => $slug
+        ];
+
+        Mail::to($recipientEmail)->queue(new BaseSupportMail($mailData));
+
+    }
 
     private function processEmailImages($message)
     {
@@ -194,96 +218,48 @@ class ChatComponent extends Component
         ];
     }
 
-
-    public function sendMessage()
+    protected function validatePermissions(User $user)
     {
-        $startTime = microtime(true);
-        Log::info('Starting message send process');
-
-        $this->validate();
-        $user = auth()->user();
-
-        $userRoles = $user->roles->pluck('name')->toArray();
-
-        if ((isset($this->ticket->closed_at)) || !in_array('admin', $userRoles) && $user->id !== $this->ticket->user_id) {
-            $this->alert('error', 'You cannot send more messages. This ticket is closed.', ['position' => 'bottom-end']);
-            return;
+        if ($this->ticket->closed_at ||
+            (!$user->hasRole('admin') && $user->id !== $this->ticket->user_id)) {
+            $this->alert('error', 'Action not allowed', ['position' => 'bottom-end']);
+            return false;
         }
+        return true;
+    }
 
-        if ($user->id !== $this->ticket->user_id && !in_array('admin', $userRoles)) {
-            $this->alert('error', 'You do not have permission to send messages in this ticket.', ['position' => 'bottom-end']);
-            return;
-        }
-        $purifyStart = microtime(true);
-        $cleanMessage = Purifier::clean($this->message, 'youtube');
-        Log::info('Message purification took: ' . round((microtime(true) - $purifyStart) * 1000, 2) . 'ms');
-
-        $dbStart = microtime(true);
-        // Create conversation with minimal data
-        $newConversation = SupportConversation::create([
+    protected function createConversation($message)
+    {
+        return SupportConversation::create([
             'support_ticket_id' => $this->ticket->id,
-            'user_id' => $user->id,
-            'message' => $cleanMessage,
+            'user_id' => auth()->id(),
+            'message' => $message,
             'created_at' => now()
         ]);
-        Log::info('Database operation took: ' . round((microtime(true) - $dbStart) * 1000, 2) . 'ms');
+    }
 
-        // Add new message to local collection immediately
+    protected function updateUI($conversation, $user)
+    {
         $this->conversations->push([
-            'id' => $newConversation->id,
-            'message' => $cleanMessage,
-            'created_at' => $newConversation->created_at,
+            'id' => $conversation->id,
+            'message' => $conversation->message,
+            'created_at' => $conversation->created_at,
             'user' => [
                 'id' => $user->id,
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
-                // 'roles' => $user->roles->pluck('name')->toArray(),
-                'roles' => $user->roles->toArray(),
-
+                'roles' => $user->roles->pluck('name')->toArray(),
             ],
         ]);
-        $this->lastMessageId = $newConversation->id;
 
-        // Reset form immediately for better UX
+        $this->lastMessageId = $conversation->id;
         $this->reset('message');
         $this->dispatch('resetEditor');
-        $this->alert('success', 'Message sent successfully.', ['position' => 'bottom-end']);
-
-        Log::info('Total message processing time: ' . round((microtime(true) - $startTime) * 1000, 2) . 'ms');
-
-        // Process email and images in background
-        defer(function () use ($user, $cleanMessage,  $userRoles) {
-            $emailStart = microtime(true);
-            try {
-                $processedMessage = $this->processEmailImages($cleanMessage);
-                $admin = User::find(1);
-
-                // Ensure we're working with User model instances and check roles properly
-                $isAdmin =  in_array('admin', $userRoles);
-                $recipientEmail = $isAdmin ? $this->ticket->user->email : $admin->email;
-                $recipientName = $isAdmin ? $this->ticket->user->first_name . ' ' . $this->ticket->user->last_name : $admin->name;
-
-                $mailData = [
-                    'name' => $recipientName,
-                    'email' => $recipientEmail,
-                    'subject' => 'Re: ' . $this->ticket->subject,
-                    'message' => $processedMessage['message'],
-                    'attachments' => $processedMessage['attachments'],
-                    'slug' => $isAdmin ? 'support-ticket-admin-response' : 'support-ticket-user-request'
-                ];
-
-                Mail::to($recipientEmail)->queue(new BaseSupportMail($mailData));
-                Log::info('Email processing and queueing took: ' . round((microtime(true) - $emailStart) * 1000, 2) . 'ms');
-            } catch (\Exception $e) {
-                Log::error('Failed to process email for support ticket: ' . $e->getMessage());
-            }
-        });
+        $this->alert('success', 'Message sent', ['position' => 'bottom-end']);
     }
 
     public function render()
     {
-        return view('livewire.components.support.chat-component', [
-            'conversations' => $this->conversations
-        ]);
+        return view('livewire.components.support.chat-component');
     }
 }

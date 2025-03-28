@@ -2,7 +2,7 @@
     <div class="overflow-y-auto flex-1 py-2 space-y-3 sm:space-y-4">
         @foreach($conversations as $conversation)
         @php
-        $isAdmin = collect($conversation['user']['roles'])->contains('name', 'admin');
+        $isAdmin = in_array('admin', $conversation['user']['roles']);
         @endphp
         <div wire:key="conversation-{{ $conversation['id'] }}"
             class="flex items-start gap-2 sm:gap-2.5 {{ $isAdmin ? 'flex-row-reverse' : '' }}">
