@@ -207,7 +207,12 @@ class ChatComponent extends Component
                 'id' => $user->id,
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
-                'roles' => $user->roles->toArray(),
+                'roles' => $user->roles->map(function($role) {
+                    return [
+                        'name' => $role->name,
+                        'id' => $role->id
+                    ];
+                })->toArray(),
             ],
         ]);
         $this->lastMessageId = $newConversation->id;

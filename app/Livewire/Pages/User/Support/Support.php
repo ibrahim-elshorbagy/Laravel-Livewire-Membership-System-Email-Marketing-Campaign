@@ -87,12 +87,9 @@ class Support extends Component
         // Log::debug('Original message content', ['message' => $this->message]);
 
 
-        // Get admin email from settings
-        $admin = User::find(1);
-        $adminEmail = $admin->email;
+
 
         $cleanMessage = Purifier::clean($this->message);
-        $processedMessage = $this->processEmailImages($cleanMessage);
 
         // Create support ticket
         $ticket = SupportTicket::create([
@@ -101,6 +98,7 @@ class Support extends Component
             'status' => 'open'
         ]);
 
+
         // Create initial conversation
         $ticket->conversations()->create([
             'user_id' => auth()->id(),
@@ -108,19 +106,27 @@ class Support extends Component
             'created_at' => now()
         ]);
 
-        // Prepare mail data
-        $mailData = [
-            'name' => $this->name,
-            'email' => $this->email,
-            'subject' => $this->subject,
-            'message' => $processedMessage['message'],
-            'attachments' => $processedMessage['attachments'],
-            'slug' => 'support-ticket-user-request'
+        defer(function() use($cleanMessage){
+            // Get admin email from settings
+            $admin = User::find(1);
+            $adminEmail = $admin->email;
+            
+            $processedMessage = $this->processEmailImages($cleanMessage);
 
-        ];
+            // Prepare mail data
+            $mailData = [
+                'name' => $this->name,
+                'email' => $this->email,
+                'subject' => $this->subject,
+                'message' => $processedMessage['message'],
+                'attachments' => $processedMessage['attachments'],
+                'slug' => 'support-ticket-user-request'
 
-        // Send mail
-        Mail::to($admin->email)->queue(new BaseSupportMail($mailData));
+            ];
+
+            // Send mail
+            Mail::to($admin->email)->queue(new BaseSupportMail($mailData));
+        });
 
 
         Session::flash('success', 'Message sent successfully.');
