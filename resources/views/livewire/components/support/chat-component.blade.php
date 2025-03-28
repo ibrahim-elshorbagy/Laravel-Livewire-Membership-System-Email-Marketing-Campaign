@@ -1,4 +1,4 @@
-<div class="flex flex-col space-y-4 h-full" wire:poll.2s="pollForNewMessages">
+<div class="flex flex-col space-y-4 h-full" wire:poll.500ms="pollForNewMessages">
     <div class="overflow-y-auto flex-1 py-2 space-y-3 sm:space-y-4">
         @foreach($conversations as $conversation)
         @php
@@ -14,7 +14,6 @@
                         {{ $isAdmin ? 'Support Team' : $conversation['user']['first_name'] . ' ' .
                         $conversation['user']['last_name'] }}
                     </span>
-                    {{ $conversation['id'] }}
                     <span class="text-xs font-normal sm:text-sm text-neutral-500 dark:text-neutral-400">
                         {{ \Carbon\Carbon::parse($conversation['created_at'])->timezone($time_zone)->format('d/m/Y h:i
                         A') }} -

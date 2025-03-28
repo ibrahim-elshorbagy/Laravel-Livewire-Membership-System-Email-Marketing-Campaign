@@ -213,7 +213,7 @@ class ChatComponent extends Component
         if ($user->id !== $this->ticket->user_id && !in_array('admin', $userRoles)) {
             $this->alert('error', 'You do not have permission to send messages in this ticket.', ['position' => 'bottom-end']);
             return;
-}
+        }
         $purifyStart = microtime(true);
         $cleanMessage = Purifier::clean($this->message, 'youtube');
         Log::info('Message purification took: ' . round((microtime(true) - $purifyStart) * 1000, 2) . 'ms');
@@ -237,7 +237,9 @@ class ChatComponent extends Component
                 'id' => $user->id,
                 'first_name' => $user->first_name,
                 'last_name' => $user->last_name,
-                'roles' => $user->roles->pluck('name')->toArray(),
+                // 'roles' => $user->roles->pluck('name')->toArray(),
+                'roles' => $user->roles->toArray(),
+
             ],
         ]);
         $this->lastMessageId = $newConversation->id;
