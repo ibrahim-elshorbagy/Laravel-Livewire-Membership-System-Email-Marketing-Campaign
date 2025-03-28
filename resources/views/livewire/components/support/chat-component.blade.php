@@ -56,7 +56,7 @@
     @endif
 
     <div id="upload-indicator"
-        class="hidden fixed right-4 bottom-4 p-4 bg-white rounded-lg border shadow-lg dark:bg-neutral-800 dark:border-neutral-700">
+        class="hidden fixed right-4 bottom-4 z-10 p-4 bg-white rounded-lg border shadow-lg dark:bg-neutral-800 dark:border-neutral-700">
         <div class="flex items-center space-x-2">
             <svg class="w-5 h-5 text-sky-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
                 viewBox="0 0 24 24">

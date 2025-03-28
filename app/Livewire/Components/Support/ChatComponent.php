@@ -91,23 +91,28 @@ class ChatComponent extends Component
 
     public function uploadCKEditorImage($fileData)
     {
+
         $this->fileData = $fileData;
         try {
+
             $validatedData = $this->validate([
-                'fileData' => ['required', 'string', 'regex:/^data:image\/[a-zA-Z]+;base64,[a-zA-Z0-9\/\+]+={0,2}$/']
+                'fileData' => ['required', 'string', 'regex:/^data:image\/[a-zA-Z]+;base64,[a-zA-Z0-9\/\+]+={0,2}$/'],
             ]);
 
             $image = $validatedData['fileData'];
 
+            // Extract image data
             list($type, $data) = explode(';', $image);
             list(, $data) = explode(',', $data);
             $fileContent = base64_decode($data);
             $imageType = str_replace('data:image/', '', $type);
 
-            $id = $this->ticket->id;
-            $fileName = 'support_chat_' . $id . now()->timestamp . '.' . $imageType;
-            $userId = $this->ticket->user_id;
-            $path = "support/chat/{$userId}/{$fileName}";
+
+            // Generate a unique filename
+            $fileName = 'support_' . now()->timestamp . '.' . $imageType;
+            $userId = auth()->user()->id;
+            // Store in the same folder structure as logo
+            $path = "admin/support/{$userId}/{$fileName}";
             Storage::disk('public')->put($path, $fileContent);
 
             return [
