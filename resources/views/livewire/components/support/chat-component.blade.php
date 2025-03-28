@@ -54,6 +54,21 @@
         </form>
     </div>
     @endif
+
+    <div id="upload-indicator"
+        class="hidden fixed right-4 bottom-4 p-4 bg-white rounded-lg border shadow-lg dark:bg-neutral-800 dark:border-neutral-700">
+        <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5 text-sky-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+            </svg>
+            <span id="upload-progress" class="text-sm text-neutral-700 dark:text-neutral-300"></span>
+        </div>
+    </div>
+
 </div>
 
 @push('scripts')
@@ -91,6 +106,12 @@
                 editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
                     return {
                         upload: async () => {
+
+                            const uploadIndicator = document.getElementById('upload-indicator');
+                            const uploadProgress = document.getElementById('upload-progress');
+                            uploadIndicator.classList.remove('hidden');
+                            uploadProgress.textContent = 'Uploading image...';
+
                             const file = await loader.file;
 
                             return new Promise((resolve, reject) => {
@@ -103,13 +124,17 @@
                                         const result = await @this.uploadCKEditorImage(fileData);
 
                                         if (result.success) {
-                                            resolve({
-                                                default: result.url
-                                            });
+                                            uploadProgress.textContent = 'Upload completed!';
+                                            setTimeout(() => uploadIndicator.classList.add('hidden'), 2000);
+                                            resolve({ default: result.url });
                                         } else {
+                                            uploadProgress.textContent = 'Upload failed: ' + result.error;
+                                            setTimeout(() => uploadIndicator.classList.add('hidden'), 3000);
                                             reject(result.error);
                                         }
                                     } catch (error) {
+                                        uploadProgress.textContent = 'Upload error: ' + error;
+                                        setTimeout(() => uploadIndicator.classList.add('hidden'), 3000);
                                         reject('Upload failed');
                                     }
                                 };
