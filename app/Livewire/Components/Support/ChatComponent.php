@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BaseSupportMail;
 use App\Models\Admin\Site\SiteSetting;
+use Illuminate\Support\Facades\Log;
 
 class ChatComponent extends Component
 {
@@ -169,7 +170,6 @@ class ChatComponent extends Component
     {
         $this->validate();
 
-        // Check if user is ticket owner or admin
         $user = auth()->user();
 
         // Check if ticket is closed
@@ -185,6 +185,7 @@ class ChatComponent extends Component
 
         $cleanMessage = Purifier::clean($this->message);
 
+        // Create conversation with minimal data
         $newConversation = SupportConversation::create([
             'support_ticket_id' => $this->ticket->id,
             'user_id' => $user->id,
@@ -192,12 +193,25 @@ class ChatComponent extends Component
             'created_at' => now()
         ]);
 
-        defer(function () use($user,$cleanMessage) {
+        // Add new message to local collection immediately
+        $this->conversations->push([
+            'id' => $newConversation->id,
+            'message' => $cleanMessage,
+            'created_at' => $newConversation->created_at,
+            'user' => [
+                'id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'roles' => $user->roles->toArray(),
+            ],
+        ]);
+        $this->lastMessageId = $newConversation->id;
 
+        // Process email in background
+        defer(function () use ($user, $cleanMessage, $newConversation) {
             $processedMessage = $this->processEmailImages($cleanMessage);
-
-            // Determine recipient based on sender
             $admin = User::find(1);
+
             $recipientEmail = $user->hasRole('admin') ? $this->ticket->user->email : $admin->email;
             $recipientName = $user->hasRole('admin') ? $this->ticket->user->first_name . ' ' . $this->ticket->user->last_name : $admin->name;
 
@@ -206,18 +220,14 @@ class ChatComponent extends Component
                 'email' => $recipientEmail,
                 'subject' => 'Re: ' . $this->ticket->subject,
                 'message' => $processedMessage['message'],
-                'attachments' => $processedMessage['attachments']
+                'attachments' => $processedMessage['attachments'],
+                'slug' => $user->hasRole('admin') ? 'support-ticket-admin-response' : 'support-ticket-user-request'
             ];
 
-            // Send email to appropriate recipient
-            $mailData['slug'] = $user->hasRole('admin') ? 'support-ticket-admin-response' : 'support-ticket-user-request';
 
             Mail::to($recipientEmail)->queue(new BaseSupportMail($mailData));
 
         });
-        // Add new message to local collection
-        $this->conversations->push($newConversation);
-        $this->lastMessageId = $newConversation->id;
 
         $this->reset('message');
         $this->dispatch('resetEditor');

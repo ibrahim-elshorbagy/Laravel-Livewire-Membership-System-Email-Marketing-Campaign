@@ -1,4 +1,4 @@
-<div class="flex flex-col space-y-4 h-full" wire:poll.500ms="pollForNewMessages">
+<div class="flex flex-col space-y-4 h-full" wire:poll.2s="pollForNewMessages">
     {{--  --}}
     <div class="overflow-y-auto flex-1 py-2 space-y-3 sm:space-y-4">
         @foreach($conversations as $conversation)
