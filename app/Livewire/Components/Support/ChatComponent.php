@@ -109,7 +109,7 @@ class ChatComponent extends Component
 
 
             // Generate a unique filename
-            $fileName = 'support_' . now()->timestamp . '.' . $imageType;
+            $fileName = 'support_' . now()->timestamp . '_' . uniqid() . '.' . $imageType;
             $userId = auth()->user()->id;
             // Store in the same folder structure as logo
             $path = "admin/support/{$userId}/{$fileName}";
