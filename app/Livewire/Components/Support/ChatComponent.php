@@ -259,7 +259,7 @@ class ChatComponent extends Component
                 $admin = User::find(1);
 
                 // Ensure we're working with User model instances and check roles properly
-                $isAdmin =  $userRoles->roles->contains('name', 'admin');
+                $isAdmin =  in_array('admin', $userRoles);
                 $recipientEmail = $isAdmin ? $this->ticket->user->email : $admin->email;
                 $recipientName = $isAdmin ? $this->ticket->user->first_name . ' ' . $this->ticket->user->last_name : $admin->name;
 
