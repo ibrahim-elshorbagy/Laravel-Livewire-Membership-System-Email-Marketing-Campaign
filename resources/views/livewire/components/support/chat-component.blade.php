@@ -1,27 +1,28 @@
-<div class="flex flex-col space-y-4 h-full" >
-    {{-- wire:poll.5000ms="pollForNewMessages" --}}
+<div class="flex flex-col space-y-4 h-full" wire:poll.500ms="pollForNewMessages">
+    {{--  --}}
     <div class="overflow-y-auto flex-1 py-2 space-y-3 sm:space-y-4">
         @foreach($conversations as $conversation)
         @php
-            $isAdmin = $conversation->user->roles->contains('name', 'admin');
+        $isAdmin = collect($conversation['user']['roles'])->contains('name', 'admin');
         @endphp
-        <div wire:key="conversation-{{ $conversation->id }}"
+        <div wire:key="conversation-{{ $conversation['id'] }}"
             class="flex items-start gap-2 sm:gap-2.5 {{ $isAdmin ? 'flex-row-reverse' : '' }}">
             <div
                 class="flex flex-col w-full max-w-[95%] sm:max-w-[95%] leading-1.5 p-3 sm:p-4 border-neutral-200 bg-neutral-100 rounded-e-xl rounded-es-xl dark:bg-neutral-700">
                 <div
                     class="flex flex-col mb-2 space-y-1 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-2 rtl:space-x-reverse">
                     <span class="text-sm font-semibold text-neutral-900 dark:text-white">
-                        {{ $isAdmin ? 'Support Team' : $conversation->user->first_name . ' ' . $conversation->user->last_name }}
+                        {{ $isAdmin ? 'Support Team' : $conversation['user']['first_name'] . ' ' .
+                        $conversation['user']['last_name'] }}
                     </span>
                     <span class="text-xs font-normal sm:text-sm text-neutral-500 dark:text-neutral-400">
-                        {{ $conversation->created_at->timezone($time_zone)->format('d/m/Y h:i A') }} -
-                        {{ $conversation->created_at->timezone($time_zone)->diffForHumans() }}
+                        {{ \Carbon\Carbon::parse($conversation['created_at'])->timezone($time_zone)->format('d/m/Y h:i A') }} -
+                        {{ \Carbon\Carbon::parse($conversation['created_at'])->timezone($time_zone)->diffForHumans() }}
                     </span>
                 </div>
                 <div
                     class="text-sm font-normal break-words text-neutral-700 dark:text-neutral-200 no-tailwindcss-support-display">
-                    {!! $conversation->message !!}
+                    {!! $conversation['message'] !!}
                 </div>
             </div>
         </div>

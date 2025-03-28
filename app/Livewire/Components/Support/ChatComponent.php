@@ -44,27 +44,50 @@ class ChatComponent extends Component
         $this->conversations = $this->ticket->conversations()
             ->with(['user.roles'])
             ->orderBy('created_at', 'asc')
-            ->get();
-
-        if ($this->conversations->isNotEmpty()) {
-            $this->lastMessageId = $this->conversations->last()->id;
-        }
+            ->get()
+            ->map(function ($conversation) {
+                return [
+                    'id' => $conversation->id,
+                    'message' => $conversation->message,
+                    'created_at' => $conversation->created_at,
+                    'user' => [
+                        'id' => $conversation->user->id,
+                        'first_name' => $conversation->user->first_name,
+                        'last_name' => $conversation->user->last_name,
+                        'roles' => $conversation->user->roles->toArray(),
+                    ],
+                ];
+            });
     }
 
+    // This way eager  loading work
     public function pollForNewMessages()
     {
         $newMessages = $this->ticket->conversations()
             ->with(['user.roles'])
             ->where('id', '>', $this->lastMessageId)
             ->orderBy('created_at', 'asc')
-            ->get();
+            ->get()
+            ->map(function ($conversation) {
+                return [
+                    'id' => $conversation->id,
+                    'message' => $conversation->message,
+                    'created_at' => $conversation->created_at,
+                    'user' => [
+                        'id' => $conversation->user->id,
+                        'first_name' => $conversation->user->first_name,
+                        'last_name' => $conversation->user->last_name,
+                        'roles' => $conversation->user->roles->toArray(),
+                    ],
+                ];
+            });
 
         if ($newMessages->isNotEmpty()) {
-            // Append new messages without replacing the collection
             $this->conversations = $this->conversations->concat($newMessages);
-            $this->lastMessageId = $newMessages->last()->id;
+            $this->lastMessageId = $newMessages->last()['id'];
         }
     }
+
     public function uploadCKEditorImage($fileData)
     {
         $this->fileData = $fileData;
