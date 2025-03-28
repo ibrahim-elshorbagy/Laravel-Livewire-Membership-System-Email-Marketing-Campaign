@@ -44,7 +44,7 @@
 
             <div class="flex justify-end">
                 <x-primary-create-button type="submit" wire:target="sendMessage" wire:loading.attr="disabled"
-                    wire:loading.class="opacity-50">
+                    wire:loading.class="opacity-50" id="sendMessageBtn">
                     <span wire:target="sendMessage" wire:loading.remove>Send Message</span>
                     <span wire:target="sendMessage" wire:loading>Sending...</span>
                 </x-primary-create-button>
@@ -100,11 +100,23 @@
                                     }
                                 }
                             });
+    let activeUploads = 0;
+
+    function updateSendButtonState() {
+        const sendButton = document.getElementById('sendMessageBtn');
+        if (sendButton) {
+            sendButton.disabled = activeUploads > 0;
+            sendButton.classList.toggle('opacity-50', activeUploads > 0);
+        }
+    }
+
     function uploadImage(file, editor) {
         const uploadIndicator = document.getElementById('upload-indicator');
         const uploadProgress = document.getElementById('upload-progress');
         uploadIndicator.classList.remove('hidden');
         uploadProgress.textContent = 'Uploading image...';
+        activeUploads++;
+        updateSendButtonState();
 
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -114,20 +126,36 @@
                 const result = await @this.uploadEditorImage(fileData);
                 if (result.success) {
                     uploadProgress.textContent = 'Upload completed!';
-                    setTimeout(() => uploadIndicator.classList.add('hidden'), 2000);
+                    setTimeout(() => {
+                        uploadIndicator.classList.add('hidden');
+                        activeUploads--;
+                        updateSendButtonState();
+                    }, 2000);
                     $(editor).summernote('insertImage', result.url);
                 } else {
                     uploadProgress.textContent = 'Upload failed: ' + result.error;
-                    setTimeout(() => uploadIndicator.classList.add('hidden'), 3000);
+                    setTimeout(() => {
+                        uploadIndicator.classList.add('hidden');
+                        activeUploads--;
+                        updateSendButtonState();
+                    }, 3000);
                 }
             } catch (error) {
                 uploadProgress.textContent = 'Upload error: ' + error;
-                setTimeout(() => uploadIndicator.classList.add('hidden'), 3000);
+                setTimeout(() => {
+                uploadIndicator.classList.add('hidden');
+                activeUploads--;
+                updateSendButtonState();
+            }, 3000);
             }
         };
         reader.onerror = () => {
             uploadProgress.textContent = 'Failed to read file';
-            setTimeout(() => uploadIndicator.classList.add('hidden'), 3000);
+            setTimeout(() => {
+                uploadIndicator.classList.add('hidden');
+                activeUploads--;
+                updateSendButtonState();
+            }, 3000);
         };
     }
 
