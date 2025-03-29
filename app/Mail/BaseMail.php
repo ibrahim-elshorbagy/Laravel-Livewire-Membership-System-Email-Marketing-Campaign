@@ -84,13 +84,10 @@ class BaseMail extends Mailable
 
         // Initialize base data array
         $data = [
-
             //General Info
             'site_name' => SiteSetting::getValue('site_name', config('app.name')),
             'site_logo' => SiteSetting::getLogoUrl(),
 
-            // subject
-            'subject' => $emailTemplate->email_subject,
 
             // user profile information
             'full_name' => $this->user ? "{$this->user->first_name} {$this->user->last_name}" : null,
@@ -126,12 +123,16 @@ class BaseMail extends Mailable
             $data = array_merge($data, $this->data['data']);
         }
 
+        // email Template subject will be enforced
+        $subject = !empty($emailTemplate->email_subject) ? $emailTemplate->email_subject : ($this->data['data']['subject'] ?? 'No Subject');
+        $data['subject'] = $subject;
+
         // Render the template string directly with the data
         try {
             // Render the template string directly with the data
             $renderedHtml = html_entity_decode(Blade::render($templateHtml, $data));
 
-            return $this->subject($emailTemplate->email_subject)
+            return $this->subject($subject)
                 ->html($renderedHtml);
         } catch (\Exception $e) {
             Log::error('Failed to render email template: ' . $e->getMessage(), [

@@ -120,8 +120,7 @@ class Support extends Component
 
             // Prepare mail data
             $mailData = [
-                'name' => $user->first_name . " " . $user->last_name,
-                'email' => $user->email,
+                'user_id' =>$user->id,
                 'subject' => $validatedData['subject'],
                 'ticket_id' =>$ticket->id,
                 // 'message' => $processedMessage['message'],

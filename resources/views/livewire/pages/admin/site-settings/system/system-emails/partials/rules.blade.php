@@ -125,6 +125,7 @@
             <div class="p-4 mb-4 rounded-lg bg-neutral-50 dark:bg-neutral-700">
                 <h4 class="mb-2 text-lg font-semibold text-neutral-800 dark:text-neutral-200">Notes:</h4>
                 <ul class="list-disc list-inside text-neutral-600 dark:text-neutral-300">
+                    <li><strong>You Can Use All info from subscription tabel</strong>,To show current subscription </li>
                     <li>(support-ticket-user-request) When a user sent support ticket or Message</li>
                     <li>If you set the email subject, it will be enforced, and the client won't be able to write their own email subject</li>
                     <li>(support-ticket-admin-response) When Admin Response To Support Ticket or Message</li>
@@ -143,14 +144,6 @@
                         <tr class="border-b border-neutral-200 dark:border-neutral-700">
                             <td class="px-4 py-2 font-mono">@{{ $subject }}</td>
                             <td class="px-4 py-2">Subject of the email</td>
-                        </tr>
-                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
-                            <td class="px-4 py-2 font-mono">@{{ $name }}</td>
-                            <td class="px-4 py-2">Name of the user submitting the support ticket</td>
-                        </tr>
-                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
-                            <td class="px-4 py-2 font-mono">@{{ $email }}</td>
-                            <td class="px-4 py-2">Email address of the submitter</td>
                         </tr>
                         <tr>
                             <td class="px-4 py-2 font-mono">@{{ $ticket_id }}</td>

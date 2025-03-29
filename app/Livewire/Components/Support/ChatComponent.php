@@ -174,10 +174,9 @@ class ChatComponent extends Component
         // $processedMessage = $this->processEmailImages($message);
 
         $mailData = [
-            'name' => $recipientName,
-            'email' => $recipientEmail,
-            'subject' => 'Re: ' . $this->ticket->subject,
+            'subject' => 'User Re: ' . $this->ticket->subject,
             'ticket_id' =>$ticket->id,
+            'user_id' =>$ticket->user_id,
 
             // 'message' => $processedMessage['message'],
             // 'attachments' => $processedMessage['attachments'],
