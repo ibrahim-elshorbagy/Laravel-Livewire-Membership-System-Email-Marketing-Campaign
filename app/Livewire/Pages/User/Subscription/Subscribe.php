@@ -23,7 +23,7 @@ class Subscribe extends Component
     public $selectedTab = 'monthly';
     public $paymentUrl;
     public $upgradeCalculation = null;
-
+    public $time_zone;
     protected $listeners = [
         'confirmed' => 'handleConfirmed',
         'cancelled' => 'handleCancelled'
@@ -36,6 +36,11 @@ class Subscribe extends Component
         $this->upgradeCalculation = $this->calculateUpgradeCost($this->selectedPlan);
     }
 
+    public function mount(){
+
+        $this->time_zone = auth()->user()->timezone ?? config('app.timezone');
+
+    }
 
     protected function rules()
     {

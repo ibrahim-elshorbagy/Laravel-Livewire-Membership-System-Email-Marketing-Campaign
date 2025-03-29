@@ -1,6 +1,6 @@
 <div class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"">
         <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
+        <div class=" flex justify-between items-center mb-6">
     <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Payment #{{ $payment->id }}</h2>
     <x-primary-info-button href="{{ route('admin.payment.transactions') }}" wire:navigate>
         Back to Payments
@@ -68,8 +68,20 @@
                     <p>Approving this payment will:</p>
                     <ul class="mt-1 ml-4 list-disc list-inside">
                         <li>Suppress any existing subscription</li>
-                        <li>Activate a new subscription immediately (With Right Dates)</li>
+                        <li>Activate a new subscription with the following period:</li>
                     </ul>
+                    <div class="p-3 mt-2 bg-blue-100 rounded dark:bg-blue-800">
+                        <p class="text-sm text-blue-800 dark:text-blue-200">
+                            Start Date: {{ $calculatedDates ?
+                            Carbon\Carbon::parse($calculatedDates['will_started_at'])->format('d/m/Y h:i A') :
+                            'Calculating...' }}
+                        </p>
+                        <p class="text-sm text-blue-800 dark:text-blue-200">
+                            End Date: {{ $calculatedDates ?
+                            Carbon\Carbon::parse($calculatedDates['will_expired_at'])->format('d/m/Y h:i A') :
+                            'Calculating...' }}
+                        </p>
+                    </div>
                 </div>
                 <div class="mt-4">
                     <button type="button" wire:click="approvePayment"
@@ -216,8 +228,10 @@
                 <div
                     class="flex flex-col justify-center items-center p-4 w-full h-full min-h-[200px] rounded-lg hover:opacity-90 bg-neutral-100 dark:bg-neutral-800">
                     <i class="mb-2 text-4xl text-neutral-500 dark:text-neutral-400 fas fa-file-pdf"></i>
-                    <span class="text-sm text-neutral-600 dark:text-neutral-400">{{ basename($image->image_path) }}</span>
-                    <a href="{{ Storage::url($image->image_path) }}" target="_blank" rel="noopener noreferrer" class="mt-2 text-sm text-blue-500 hover:text-blue-700">
+                    <span class="text-sm text-neutral-600 dark:text-neutral-400">{{ basename($image->image_path)
+                        }}</span>
+                    <a href="{{ Storage::url($image->image_path) }}" target="_blank" rel="noopener noreferrer"
+                        class="mt-2 text-sm text-blue-500 hover:text-blue-700">
                         <i class="mr-1 fas fa-download"></i>Download
                     </a>
                 </div>

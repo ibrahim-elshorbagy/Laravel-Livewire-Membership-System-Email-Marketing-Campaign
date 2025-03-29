@@ -12,16 +12,19 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use App\Traits\SubscriptionManagementTrait;
+use App\Traits\PlanPriceCalculator;
 use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
 use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
+
 class EditPayment extends Component
 {
-    use LivewireAlert, SubscriptionManagementTrait;
+    use LivewireAlert, SubscriptionManagementTrait, PlanPriceCalculator;
 
     public Payment $payment;
     public $user; //admin can see anything about user
     public $plan;
     public $subscription;
+    public $calculatedDates;
 
     public $gateway_subscription_id;
     public $transaction_id;
@@ -72,7 +75,30 @@ class EditPayment extends Component
                 'syntax' => Carbon::DIFF_RELATIVE_TO_NOW,
             ]);
         }
-}
+
+        $this->calculateDates();
+    }
+
+    public function calculateDates()
+    {
+        if ($this->user->lastSubscription()) {
+            $startDate = Carbon::parse($this->user->lastSubscription()->started_at);
+            $endDate = Carbon::parse($this->user->lastSubscription()->expired_at);
+            $this->calculatedDates = $this->calculateSubscriptionDates(
+                $this->plan,
+                $this->user->lastSubscription()->plan,
+                $startDate,
+                $endDate,
+                $this->amount
+            );
+        } else {
+
+            $this->calculatedDates = [
+                'will_started_at' => now(),
+                'will_expired_at' => $this->plan->periodicity_type === 'Year' ? now()->addYear() : now()->addMonth()
+            ];
+        }
+    }
 
     public function updatePayment()
     {

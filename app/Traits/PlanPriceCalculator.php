@@ -42,6 +42,7 @@ trait PlanPriceCalculator
     }
 
 
+
     public function calculateUpgradePrice(Plan $newPlan, Subscription $currentSubscription): ?array
     {
 
@@ -79,6 +80,11 @@ trait PlanPriceCalculator
             $title = "Downgrade";
         }
 
+        // Calculate will_started_at and will_expired_at based on subscription change logic
+        $dates = $this->calculateSubscriptionDates($newPlan, $currentPlan, $startDate, $endDate, $upgradeCost);
+        $willStartedAt = $dates['will_started_at'];
+        $willExpiredAt = $dates['will_expired_at'];
+
         return [
             'title' => $title,
             'upgrade_cost' => round($upgradeCost, 2),
@@ -87,6 +93,41 @@ trait PlanPriceCalculator
             'new_daily_rate' => round($newDailyRate, 2),
             'current_daily_rate' => round($currentDailyRate, 2),
             'totalPeriodDays' => $currentTotalPeriodDays,
+            'will_started_at' => $willStartedAt,
+            'will_expired_at' => $willExpiredAt
         ];
     }
+
+    protected function calculateSubscriptionDates(Plan $newPlan, Plan $currentPlan, Carbon $startDate, Carbon $endDate, float $upgradeCost): array
+    {
+        $willStartedAt = now();
+        $willExpiredAt = now();
+
+        // If upgrading to a higher-priced yearly plan, keep original dates
+        if ($newPlan->periodicity_type === 'Year' && $currentPlan->periodicity_type === 'Year' && $newPlan->price >= $currentPlan->price) {
+            $willStartedAt = $startDate;
+            $willExpiredAt = $endDate;
+        }
+        // If upgrading from monthly to yearly
+        else if ($newPlan->periodicity_type === 'Year' && $currentPlan->periodicity_type !== 'Year') {
+            $willStartedAt = $startDate;
+            $willExpiredAt = $endDate->copy()->addYear();
+        }
+        // If it's a pro-rated upgrade (partial payment)
+        else if ($upgradeCost < $newPlan->price) {
+            $willStartedAt = $startDate;
+            $willExpiredAt = $endDate;
+        }
+        // For all other cases (downgrades or full new subscription period)
+        else {
+            $willStartedAt = now();
+            $willExpiredAt = $newPlan->periodicity_type === 'Year' ? now()->addYear() : now()->addMonth();
+        }
+
+        return [
+            'will_started_at' => $willStartedAt,
+            'will_expired_at' => $willExpiredAt
+        ];
+    }
+
 }

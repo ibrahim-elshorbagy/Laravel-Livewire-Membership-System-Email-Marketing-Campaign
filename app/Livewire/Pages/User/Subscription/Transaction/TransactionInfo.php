@@ -5,6 +5,7 @@ namespace App\Livewire\Pages\User\Subscription\Transaction;
 use App\Models\Payment\Payment;
 use App\Models\Payment\PaymentImage;
 use App\Models\Payment\Offline\OfflinePaymentMethod;
+use App\Traits\PlanPriceCalculator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -18,10 +19,13 @@ use Intervention\Image\Drivers\Gd\Driver;
 use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
 use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
 use LucasDotVin\Soulbscription\Models\Subscription;
+use App\Models\Admin\Site\SiteSetting;
 
 class TransactionInfo extends Component
 {
     use LivewireAlert, WithFileUploads;
+    use PlanPriceCalculator;
+
 
     public Payment $payment;
     public $plan;
@@ -32,6 +36,8 @@ class TransactionInfo extends Component
     public $showFileSection = false;
     public $previewUrl;
     public $previewType;
+    public $calculatedDates;
+    public $time_zone;
 
     protected $rules = [
         'gateway_subscription_id' => 'nullable|string|max:255',
@@ -46,11 +52,14 @@ class TransactionInfo extends Component
         'files.*.mimes' => 'File must be a valid image (JPG, JPEG, PNG) or PDF document'
     ];
 
+
     public function mount(Payment $payment)
     {
         if ($payment->user_id !== auth()->id()) {
             abort(403);
         }
+
+        $this->time_zone = auth()->user()->timezone ?? config('app.timezone');
 
         $this->payment = $payment;
         $this->plan = $payment->plan;
@@ -59,6 +68,8 @@ class TransactionInfo extends Component
             $this->subscription = Subscription::with(['plan'])->withoutGlobalScopes([SuppressingScope::class, StartingScope::class])
             ->find($payment->subscription_id);
         }
+
+        $this->calculateDates();
 
         $this->gateway_subscription_id = $payment->gateway_subscription_id;
         $this->transaction_id = $payment->transaction_id;
@@ -198,6 +209,26 @@ class TransactionInfo extends Component
     {
         $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
         return in_array($extension, ['jpg', 'jpeg', 'png','jfif']) ? 'image' : 'pdf';
+    }
+
+    public function calculateDates()
+    {
+        if (auth()->user()->lastSubscription()) {
+            $startDate = Carbon::parse(auth()->user()->lastSubscription()->started_at);
+            $endDate = Carbon::parse(auth()->user()->lastSubscription()->expired_at);
+            $this->calculatedDates = $this->calculateSubscriptionDates(
+                $this->plan,
+                auth()->user()->lastSubscription()->plan,
+                $startDate,
+                $endDate,
+                $this->payment->amount
+            );
+        } else {
+            $this->calculatedDates = [
+                'will_started_at' => now(),
+                'will_expired_at' => $this->plan->periodicity_type === 'Year' ? now()->addYear() : now()->addMonth()
+            ];
+        }
     }
 
     public function render()

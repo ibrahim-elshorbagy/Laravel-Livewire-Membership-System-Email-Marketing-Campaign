@@ -172,6 +172,8 @@
                 <li>Remaining days: {{ $upgradeCalculation['remaining_days'] }} days</li>
                 <li>New daily rate: ${{ $upgradeCalculation['new_daily_rate'] }}/day</li>
                 <li>Old daily rate: ${{ $upgradeCalculation['current_daily_rate'] }}/day</li>
+                <li>Start Date: ${{ $upgradeCalculation['will_started_at']->timezone($time_zone)->format('d/m/Y h:i:s A') }}</li>
+                <li>Expiration Date: ${{ $upgradeCalculation['will_expired_at']->timezone($time_zone)->format('d/m/Y h:i:s A') }}</li>
                 <li class="pt-2 mt-2 font-medium border-t border-neutral-200 dark:border-neutral-700">
                     payment required: ${{ $upgradeCalculation['upgrade_cost'] }}
                 </li>
