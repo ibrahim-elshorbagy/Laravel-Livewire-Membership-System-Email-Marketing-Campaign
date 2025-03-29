@@ -103,8 +103,15 @@ trait PlanPriceCalculator
         $willStartedAt = now();
         $willExpiredAt = now();
 
+        // Case 1: User is renewing the same plan
+        if ($newPlan->id === $currentPlan->id) {
+            $willStartedAt = $startDate;
+            $willExpiredAt = $newPlan->periodicity_type === 'Year' ?
+                $endDate->copy()->addYear() :
+                $endDate->copy()->addMonth();
+        }
         // If upgrading to a higher-priced yearly plan, keep original dates
-        if ($newPlan->periodicity_type === 'Year' && $currentPlan->periodicity_type === 'Year' && $newPlan->price >= $currentPlan->price) {
+        else if ($newPlan->periodicity_type === 'Year' && $currentPlan->periodicity_type === 'Year' && $newPlan->price >= $currentPlan->price) {
             $willStartedAt = $startDate;
             $willExpiredAt = $endDate;
         }
