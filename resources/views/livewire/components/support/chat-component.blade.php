@@ -1,4 +1,5 @@
-<div class="flex flex-col space-y-4 h-full" wire:poll.500ms="pollForNewMessages">
+<div class="flex flex-col space-y-4 h-full" >
+{{-- <div class="flex flex-col space-y-4 h-full" wire:poll.500ms="pollForNewMessages"> --}}
     <div class="overflow-y-auto flex-1 py-2 space-y-3 sm:space-y-4">
         @foreach($conversations as $conversation)
         @php
@@ -89,9 +90,9 @@
                                 fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana'],
                                 fontSizes: ['8', '9', '10', '11', '12', '14', '18', '24', '36'],
                                 callbacks: {
-                                    onChange: function(contents) {
-                                        @this.set('message', contents, true);
-                                    },
+                                    // onChange: function(contents) {
+                                    //     @this.set('message', contents, true);
+                                    // },
                                     onImageUpload: function(files) {
                                         for(let file of files) {
                                             uploadImage(file, this);
@@ -100,6 +101,7 @@
                                 }
                             });
     let activeUploads = 0;
+
 
     function updateSendButtonState() {
         const sendButton = document.getElementById('sendMessageBtn');
@@ -161,6 +163,11 @@
     document.addEventListener('livewire:initialized', function () {
         Livewire.on('resetEditor', () => {
             $('#message').summernote('reset');
+        });
+
+        const form = document.getElementById('messageForm');
+        form.addEventListener('submit', function(e) {
+            @this.set('message', $('#message').summernote('code'), true);
         });
 
         Livewire.on('disconnected', () => {

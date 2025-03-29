@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\SupportMessage;
 use App\Models\User;
 use App\Mail\SupportMail;
+use App\Models\Admin\Site\SiteSetting;
 use App\Models\Admin\SupportTicket;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
@@ -114,7 +115,7 @@ class Support extends Component
 
         defer(function() use($cleanMessage){
             // Get admin email from settings
-            $admin = User::find(1);
+            $adminEmail = SiteSetting::getValue('mail_from_address');
 
             $processedMessage = $this->processEmailImages($cleanMessage);
 
@@ -130,7 +131,7 @@ class Support extends Component
             ];
 
             // Send mail
-            Mail::to($admin->email)->queue(new BaseSupportMail($mailData));
+            Mail::to($adminEmail)->queue(new BaseSupportMail($mailData));
         });
 
 

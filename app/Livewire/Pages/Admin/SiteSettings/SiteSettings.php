@@ -211,7 +211,13 @@ class SiteSettings extends Component
                     'env_keys' => [
                         'MAIL_FROM_NAME' => 'mail.from.name'
                     ]
-                ]
+                ],
+                'mail_from_address' => [
+                                    'value' => $this->mail_from_address,
+                                    'env_keys' => [
+                                        'MAIL_FROM_ADDRESS' => 'mail_from_address'
+                                    ]
+                                ]
             ];
 
             // Update text settings with environment and config updates

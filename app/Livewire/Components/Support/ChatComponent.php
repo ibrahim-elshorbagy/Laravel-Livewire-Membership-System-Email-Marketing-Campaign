@@ -156,14 +156,22 @@ class ChatComponent extends Component
         });
     }
 
-    private function ProcessSupportTicketEmail($ticket,$user,$message){
-
-        $recipient =$user->hasRole('admin')? $this->ticket->user: User::find(1);
-        $slug = $user->hasRole('admin')? 'support-ticket-admin-response': 'support-ticket-user-request';
+    private function ProcessSupportTicketEmail($ticket, $user, $message) {
+        if ($user->hasRole('admin')) {
+            // If admin, send to ticket user
+            $recipientEmail = $this->ticket->user->email;
+            $recipientName = $this->ticket->user->first_name . " " . $this->ticket->user->last_name;
+            $slug = 'support-ticket-admin-response';
+        } else {
+            // If user, send to admin email from settings
+            $adminEmail = SiteSetting::getValue('mail_from_address');
+            $adminName = SiteSetting::getValue('mail_from_name', 'Support Team');
+            $recipientEmail = $adminEmail;
+            $recipientName = $adminName;
+            $slug = 'support-ticket-user-request';
+        }
 
         $processedMessage = $this->processEmailImages($message);
-        $recipientEmail =$recipient->email;
-        $recipientName =$recipient->first_name . " " .$recipient->last_name ;
 
         $mailData = [
             'name' => $recipientName,
@@ -175,7 +183,6 @@ class ChatComponent extends Component
         ];
 
         Mail::to($recipientEmail)->queue(new BaseSupportMail($mailData));
-
     }
 
     private function processEmailImages($message)

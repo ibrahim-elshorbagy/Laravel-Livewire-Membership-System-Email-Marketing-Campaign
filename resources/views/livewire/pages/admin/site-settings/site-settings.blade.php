@@ -239,9 +239,9 @@
                     </div>
 
                     <div>
-                        <x-input-label for="support_email" :value="__('From Support Email')" />
-                        <x-text-input wire:model="support_email" id="support_email" type="email" class="block mt-1 w-full" required />
-                        <x-input-error :messages="$errors->get('support_email')" class="mt-2" />
+                        <x-input-label for="mail_from_address" :value="__('From Support Email')" />
+                        <x-text-input wire:model="mail_from_address" id="mail_from_address" type="email" class="block mt-1 w-full" required />
+                        <x-input-error :messages="$errors->get('mail_from_address')" class="mt-2" />
                     </div>
                     <div>
                         <x-input-label for="mail_from_name" :value="__('From Name')" />

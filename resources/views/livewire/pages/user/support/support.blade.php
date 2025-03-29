@@ -84,9 +84,9 @@
                                 fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana'],
                                 fontSizes: ['8', '9', '10', '11', '12', '14', '18', '24', '36'],
                                 callbacks: {
-                                    onChange: function(contents) {
-                                        @this.set('message', contents, true);
-                                    },
+                                    // onChange: function(contents) {
+                                    //     @this.set('message', contents, true);
+                                    // },
                                     onImageUpload: function(files) {
                                         for(let file of files) {
                                             uploadImage(file, this);
@@ -152,6 +152,11 @@
             }, 3000);
         };
     }
+    
+        const form = document.getElementById('messageForm');
+        form.addEventListener('submit', function(e) {
+            @this.set('message', $('#message').summernote('code'), true);
+        });
 
     document.addEventListener('livewire:initialized', function () {
         Livewire.on('resetEditor', () => {
