@@ -35,11 +35,6 @@ class Support extends Component
         $this->email = auth()->user()->email;
     }
 
-    protected $rules = [
-        'subject' => 'required|string|min:3|max:255',
-        'message' => 'required|string|min:10',
-    ];
-
     public $fileData;
     public function uploadEditorImage($fileData)
     {
@@ -93,14 +88,18 @@ class Support extends Component
 
     public function sendSupportMessage()
     {
-        $this->validate();
+        $validatedData =$this->validate([
+            'subject' => 'required|string|min:3|max:255',
+            'message' => 'required|string|min:10',
+        ]);
 
 
         $cleanMessage = Purifier::clean($this->message, 'youtube');
+        $user =auth()->user();
 
         // Create support ticket
         $ticket = SupportTicket::create([
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
             'subject' => $this->subject,
             'status' => 'open'
         ]);
@@ -108,24 +107,25 @@ class Support extends Component
 
         // Create initial conversation
         $ticket->conversations()->create([
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
             'message' => $cleanMessage,
             'created_at' => now()
         ]);
 
-        defer(function() use($cleanMessage){
+        defer(function() use($cleanMessage ,$validatedData,$user,$ticket){
             // Get admin email from settings
             $adminEmail = SiteSetting::getValue('mail_from_address');
 
-            $processedMessage = $this->processEmailImages($cleanMessage);
+            // $processedMessage = $this->processEmailImages($cleanMessage);
 
             // Prepare mail data
             $mailData = [
-                'name' => $this->name,
-                'email' => $this->email,
-                'subject' => $this->subject,
-                'message' => $processedMessage['message'],
-                'attachments' => $processedMessage['attachments'],
+                'name' => $user->first_name . " " . $user->last_name,
+                'email' => $user->email,
+                'subject' => $validatedData['subject'],
+                'ticket_id' =>$ticket->id,
+                // 'message' => $processedMessage['message'],
+                // 'attachments' => $processedMessage['attachments'],
                 'slug' => 'support-ticket-user-request'
 
             ];
@@ -139,46 +139,6 @@ class Support extends Component
         return $this->redirect(route('user.support.tickets'), navigate: true);
 
 
-    }
-
-    private function processEmailImages($message)
-    {
-        $attachments = [];
-        $storagePath = storage_path('app/public/');
-
-        preg_match_all('/<img[^>]+src="([^"]+)"[^>]*>/i', $message, $matches);
-
-        foreach ($matches[1] as $imageSrc) {
-            // Handle both absolute and relative storage paths
-            if (str_contains($imageSrc, '/storage/')) {
-                // Convert URL to filesystem path
-                $relativePath = str_replace(url('storage/'), '', $imageSrc);
-                $relativePath = ltrim(str_replace('/storage/', '', $imageSrc), '/');
-                $fullPath = $storagePath . $relativePath;
-
-
-                if (file_exists($fullPath)) {
-                    $filename = basename($fullPath);
-
-                    // Replace with CID reference
-                    $message = str_replace(
-                        $imageSrc,
-                        'cid:' . $filename,
-                        $message
-                    );
-
-                    $attachments[] = [
-                        'path' => $fullPath,
-                        'name' => $filename
-                    ];
-                }
-            }
-        }
-
-        return [
-            'message' => $message,
-            'attachments' => $attachments
-        ];
     }
 
     public function render()

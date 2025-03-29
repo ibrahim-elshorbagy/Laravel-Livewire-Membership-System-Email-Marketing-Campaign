@@ -33,43 +33,16 @@ class BaseSupportMail extends Mailable
         // Create data array with all variables needed in the template
         $data = [
             'name' => $this->data['name'],
-            'email' => $emailTemplate->email_subject ? $emailTemplate->email_subject :$this->data['email'],
-            'subject' => $this->data['subject'],
-            'messageContent' => $this->data['message']
+            'email' => $this->data['email'],
+            'ticket_id'=>$this->data['ticket_id'],
+            'subject' => $emailTemplate->email_subject ? $emailTemplate->email_subject :$this->data['subject'],
         ];
 
         // Render the template string directly with the data
         $renderedHtml = html_entity_decode(Blade::render($templateHtml, $data));
 
         return $this->subject($this->data['subject'])
-            ->html($renderedHtml)
-            ->withSymfonyMessage(function ($message) {
-                if (!empty($this->data['attachments'])) {
-                    foreach ($this->data['attachments'] as $attachment) {
-                        $message->embedFromPath(
-                            $attachment['path'],
-                            $attachment['name']
-                        );
-                    }
-                }
-            });
+            ->html($renderedHtml);
     }
 
-    protected function attachImages()
-    {
-        if (empty($this->data['attachments'])) return $this;
-
-        foreach ($this->data['attachments'] as $attachment) {
-            $this->embedData(
-                file_get_contents($attachment['path']),
-                $attachment['name'], // Use the stored filename
-                [
-                    'mime' => mime_content_type($attachment['path']),
-                    'cid' => $attachment['name'] // Must match CID in HTML
-                ]
-            );
-        }
-
-        return $this;
-    }
 }

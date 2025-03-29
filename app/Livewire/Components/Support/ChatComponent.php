@@ -171,59 +171,22 @@ class ChatComponent extends Component
             $slug = 'support-ticket-user-request';
         }
 
-        $processedMessage = $this->processEmailImages($message);
+        // $processedMessage = $this->processEmailImages($message);
 
         $mailData = [
             'name' => $recipientName,
             'email' => $recipientEmail,
             'subject' => 'Re: ' . $this->ticket->subject,
-            'message' => $processedMessage['message'],
-            'attachments' => $processedMessage['attachments'],
+            'ticket_id' =>$ticket->id,
+
+            // 'message' => $processedMessage['message'],
+            // 'attachments' => $processedMessage['attachments'],
             'slug' => $slug
         ];
 
         Mail::to($recipientEmail)->queue(new BaseSupportMail($mailData));
     }
 
-    private function processEmailImages($message)
-    {
-        $attachments = [];
-        $storagePath = storage_path('app/public/');
-
-        preg_match_all('/<img[^>]+src="([^"]+)"[^>]*>/i', $message, $matches);
-
-        foreach ($matches[1] as $imageSrc) {
-            // Handle both absolute and relative storage paths
-            if (str_contains($imageSrc, '/storage/')) {
-                // Convert URL to filesystem path
-                $relativePath = str_replace(url('storage/'), '', $imageSrc);
-                $relativePath = ltrim(str_replace('/storage/', '', $imageSrc), '/');
-                $fullPath = $storagePath . $relativePath;
-
-
-                if (file_exists($fullPath)) {
-                    $filename = basename($fullPath);
-
-                    // Replace with CID reference
-                    $message = str_replace(
-                        $imageSrc,
-                        'cid:' . $filename,
-                        $message
-                    );
-
-                    $attachments[] = [
-                        'path' => $fullPath,
-                        'name' => $filename
-                    ];
-                }
-            }
-        }
-
-        return [
-            'message' => $message,
-            'attachments' => $attachments
-        ];
-    }
 
     protected function validatePermissions(User $user)
     {
