@@ -51,14 +51,17 @@ trait PlanPriceCalculator
         $endDate = $currentSubscription->expired_at;
         $now = Carbon::now();
 
-        // Calculate total period and consumed days
-        $totalPeriodDays = floor($startDate->diffInDays($endDate));
+        // Calculate total period and consumed days for current subscription
+        $currentTotalPeriodDays = floor($startDate->diffInDays($endDate));
         $consumedDays = floor($startDate->diffInDays($now));
-        $remainingDays = max(0, $totalPeriodDays - $consumedDays);
+        $remainingDays = max(0, $currentTotalPeriodDays - $consumedDays);
+
+        // Calculate new plan's total period days
+        $newTotalPeriodDays = $newPlan->periodicity_type === 'Year' ? 365 : 30;
 
         // Calculate daily rates
-        $currentDailyRate = $currentPlan->price / $totalPeriodDays;
-        $newDailyRate = $newPlan->price / $totalPeriodDays;
+        $currentDailyRate = $currentPlan->price / $currentTotalPeriodDays;
+        $newDailyRate = $newPlan->price / $newTotalPeriodDays;
 
         // Calculate unused amount from current plan
         $unusedAmount = $currentPlan->price - ($currentDailyRate * $consumedDays);
@@ -68,13 +71,13 @@ trait PlanPriceCalculator
 
         // Calculate final upgrade cost
         $upgradeCost = max(0, $remainingCost - $unusedAmount);
-        $title =  "Upgrade";
+        $title = "Upgrade";
+
         // Only calculate if upgrading to a higher-priced plan
         if ($newPlan->price <= $currentSubscription->plan->price) {
             $upgradeCost = $newPlan->price;
-            $title =  "Downgrade";
+            $title = "Downgrade";
         }
-
 
         return [
             'title' => $title,
@@ -83,7 +86,7 @@ trait PlanPriceCalculator
             'unused_amount' => round($unusedAmount, 2),
             'new_daily_rate' => round($newDailyRate, 2),
             'current_daily_rate' => round($currentDailyRate, 2),
-            'totalPeriodDays'=>$totalPeriodDays,
+            'totalPeriodDays' => $currentTotalPeriodDays,
         ];
     }
 }
