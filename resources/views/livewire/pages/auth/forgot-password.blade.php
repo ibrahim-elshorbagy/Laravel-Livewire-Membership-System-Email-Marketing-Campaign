@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\SendResetLinkMail;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 
-new #[Layout('layouts.app')] class extends Component
+new #[Layout('layouts.app',['title' => 'Fogot Password | Bulk Email Marketing App'])] class extends Component
 {
     public string $email = '';
     use LivewireAlert;

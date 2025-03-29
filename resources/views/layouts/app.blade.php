@@ -24,6 +24,11 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @livewireStyles
+
+    <meta itemprop="image" content="{{ $globalSettings['logo'] }}" />
+    <meta property="og:image" content="{{ $globalSettings['logo'] }}" />
+    <meta name="twitter:image" content="{{ $globalSettings['logo'] }}" />
+    @stack('seo')
 </head>
 
 <body class="font-sans antialiased">

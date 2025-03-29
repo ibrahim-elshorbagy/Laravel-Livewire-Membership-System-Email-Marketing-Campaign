@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('layouts.app')] class extends Component
+new #[Layout('layouts.app', ['title' => 'Login | Bulk Email Marketing App'])] class extends Component
 {
     public LoginForm $form;
 
@@ -24,6 +24,11 @@ new #[Layout('layouts.app')] class extends Component
     }
 }; ?>
 
+@push('seo')
+<meta itemprop="name" content="Login | Bulk Email Marketing App" />
+<meta property="og:title" content="Login | Bulk Email Marketing App" />
+<meta name="twitter:title" content="Login | Bulk Email Marketing App" />
+@endpush
 
 <div class="grid relative flex-col min-h-[85vh] px-4 md:px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
     <div class="hidden relative flex-col p-10 h-full text-white bg-muted lg:flex dark:border-r dark:border-neutral-800">

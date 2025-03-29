@@ -9,7 +9,7 @@ use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Volt\Component;
-new #[Layout('layouts.app')] class extends Component
+new #[Layout('layouts.app',['title' => 'Reset password | Bulk Email Marketing App'])] class extends Component
 {
     #[Locked]
     public string $token = '';
