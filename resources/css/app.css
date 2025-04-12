@@ -506,3 +506,7 @@ all: unset;
     background-color: rgb(38 38 38); /* neutral-800 */
 }
 
+
+.ck-sticky-panel__content_sticky{
+    margin-top: 50px !important;;
+}

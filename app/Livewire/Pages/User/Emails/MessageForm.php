@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use App\Rules\ProhibitedWords;
+use Mews\Purifier\Facades\Purifier;
+use App\Services\HtmlPurifierService;
+use HTMLPurifier;
 
 class MessageForm extends Component
 {
@@ -63,9 +66,25 @@ class MessageForm extends Component
     {
         return $this->message_html;
     }
+
+
+
+
+
     public function saveMessage()
     {
         $validatedData = $this->validate();
+
+        $cleanMessage = Purifier::clean($validatedData['message_html'], 'youtube');
+        $validatedData['message_html'] = $cleanMessage;
+
+        // $htmlPurifier = new HtmlPurifierService();
+        // $validatedData['message_html'] = $htmlPurifier->purifyFullHtml($validatedData['message_html']);
+
+
+
+
+
 
         try {
             if ($this->message_id) {
