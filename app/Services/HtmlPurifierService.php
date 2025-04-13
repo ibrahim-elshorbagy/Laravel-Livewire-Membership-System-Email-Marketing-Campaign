@@ -23,20 +23,22 @@ class HtmlPurifierService
         $config->set('Core.Encoding', 'UTF-8');
         $config->set('Cache.SerializerPath', storage_path('app/purifier'));
         $config->set('Cache.SerializerPermissions', 0755);
-        $config->set('URI.DisableExternal', true);
-        $config->set('URI.DisableExternalResources', true);
 
         // Preserve the full document structure
         $config->set('Core.ConvertDocumentToFragment', false);
         $config->set('HTML.Parent', '__document_root');
-        $config->set('Core.EscapeInvalidTags', false);  // Allow more tags
+        $config->set('Core.EscapeInvalidTags', false);
         $config->set('Core.LexerImpl', 'DirectLex');
 
-        // Security and feature configuration
-        $config->set('CSS.AllowImportant', false);
-        $config->set('CSS.Trusted', false);
-        $config->set('HTML.Trusted', false);
-        $config->set('URI.AllowedSchemes', ['data' => true, 'http' => true, 'https' => true, 'mailto' => true, 'ftp' => true]);
+        // Allow external URLs (for images in CSS)
+        $config->set('URI.DisableExternal', false);
+        $config->set('URI.DisableExternalResources', false);
+        $config->set('URI.AllowedSchemes', ['http', 'https', 'data']);
+
+        // CSS configuration
+        $config->set('CSS.AllowTricky', true);
+        $config->set('CSS.Trusted', true);
+        $config->set('CSS.AllowedProperties', null);
 
         // Get HTML definition
         $def = $config->getHTMLDefinition(true);

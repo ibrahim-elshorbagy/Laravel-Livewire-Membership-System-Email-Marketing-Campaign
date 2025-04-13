@@ -8,21 +8,4 @@ export default defineConfig({
             refresh: true,
         }),
     ]
-    ,resolve: {
-        alias: {
-            // Ensure tinymce can properly load its resources
-            'tinymce': 'tinymce',
-        },
-    }
-     ,build: {
-        rollupOptions: {
-            output: {
-                manualChunks: {
-                    tinymce: ['tinymce'],
-                },
-            },
-        },
-    }, optimizeDeps: {
-        include: ['tinymce'],
-    },
 });
