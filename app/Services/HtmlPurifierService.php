@@ -10,57 +10,99 @@ class HtmlPurifierService
 {
     public function purifyFullHtml(string $dirtyHtml): string
     {
+        // Preserve DOCTYPE if it exists
+        $doctype = '';
+        $matches = [];
+        if (preg_match('/^(<!DOCTYPE[^>]+>)/i', $dirtyHtml, $matches)) {
+            $doctype = $matches[1];
+        }
+
         $config = HTMLPurifier_Config::createDefault();
 
-        // CSS configurations
-        $config->set('CSS.AllowTricky', true);
-        $config->set('CSS.AllowImportant', true);
-        $config->set('CSS.Trusted', true);
-        $config->set('CSS.AllowedProperties', null);
-        $config->set('CSS.MaxImgLength', null);
-        $config->set('CSS.Proprietary', true);
-        $config->set('CSS.AllowedFonts', null);
+        // Core configuration
+        $config->set('Core.Encoding', 'UTF-8');
+        $config->set('Cache.SerializerPath', storage_path('app/purifier'));
+        $config->set('Cache.SerializerPermissions', 0755);
+        $config->set('URI.DisableExternal', true);
+        $config->set('URI.DisableExternalResources', true);
 
-        // HTML configurations
-        $config->set('HTML.Trusted', true);
-        $config->set('HTML.AllowedElements', null);
-        $config->set('HTML.AllowedAttributes', null);
+        // Preserve the full document structure
+        $config->set('Core.ConvertDocumentToFragment', false);
+        $config->set('HTML.Parent', '__document_root');
+        $config->set('Core.EscapeInvalidTags', false);  // Allow more tags
+        $config->set('Core.LexerImpl', 'DirectLex');
 
+        // Security and feature configuration
+        $config->set('CSS.AllowImportant', false);
+        $config->set('CSS.Trusted', false);
+        $config->set('HTML.Trusted', false);
+        $config->set('URI.AllowedSchemes', ['data' => true, 'http' => true, 'https' => true, 'mailto' => true, 'ftp' => true]);
+
+        // Get HTML definition
         $def = $config->getHTMLDefinition(true);
-        $this->addHtmlElements($def);
+        $this->addFullDocumentSupport($def);
 
         $purifier = new HTMLPurifier($config);
-        return $purifier->purify($dirtyHtml);
+        $cleanHtml = $purifier->purify($dirtyHtml);
+
+        // Reattach the DOCTYPE if it was present
+        return $doctype ? $doctype . "\n" . $cleanHtml : $cleanHtml;
     }
 
-    private function addHtmlElements(HTMLPurifier_HTMLDefinition $def): void
+    private function addFullDocumentSupport(HTMLPurifier_HTMLDefinition $def): void
     {
-        // Basic HTML structure
+        // Add document root element
+        $def->addElement('__document_root', false, 'required: html', null);
+
+        // Define HTML element with all possible attributes
         $def->addElement('html', 'Document', 'required: head | body', null, [
             'dir' => 'Enum#ltr,rtl',
             'lang' => 'Text',
-            'style' => 'Text',
-            'class' => 'Text'
+            'xml:lang' => 'Text',
+            'xmlns' => 'Text',
+            'xmlns:o' => 'Text',
+            'xmlns:v' => 'Text',
+            'xmlns:w' => 'Text',
         ]);
 
-        // Head element
-        $def->addElement('head', false, 'optional: meta | link | style | title', null, [
-            'profile' => 'Text'
+
+        // Define head element with all possible elements - ADD TITLE SUPPORT HERE
+        $def->addElement('head', false, 'optional: title | meta | link | style | script | noscript | xml', null, [
+            'profile' => 'Text',
         ]);
 
-        // Body element
+        // Add title element explicitly
+        $def->addElement('title', false, 'required: #PCDATA', null, [
+            'dir' => 'Enum#ltr,rtl',
+            'lang' => 'Text',
+        ]);
+
+        // Define body element
         $def->addElement('body', false, 'Flow', 'Common', [
             'style' => 'Text',
             'class' => 'Text',
             'dir' => 'Enum#ltr,rtl',
+            'lang' => 'Text',
+            'xml:lang' => 'Text',
             'background' => 'URI',
-            'bgcolor' => 'Color'
+            'bgcolor' => 'Color',
         ]);
 
-        // Style element
-        $def->addElement('style', 'Block', 'required: #PCDATA', null, [
-            'type' => 'Text',
-            'media' => 'Text'
+
+        // Add meta, style, and other elements with their attributes
+        $def->addElement('meta', false, 'Empty', null, [
+            'name' => 'NMTOKENS',
+            'content' => 'Text',
+            'charset' => 'Text',
+            'http-equiv' => 'Text',
+            'itemprop' => 'Text',
+            'property' => 'Text',
         ]);
+
+        $def->addElement('style', 'Inline', 'required: #PCDATA', null, [
+            'type' => 'Text',
+            'media' => 'Text',
+        ]);
+
     }
 }

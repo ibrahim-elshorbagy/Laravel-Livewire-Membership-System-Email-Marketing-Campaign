@@ -27,12 +27,14 @@
                     <x-input-error :messages="$errors->get('email_subject')" class="mt-2" />
                 </div>
                 <div wire:ignore>
-                    <x-input-label for="editor">HTML Template</x-input-label>
+                    <x-input-label for="text-editor">HTML Template</x-input-label>
                     <div class="mt-1 space-y-2">
-                        <div id="editor" class="min-h-[350px]"></div>
+                        <div id="text-editor" class="min-h-[350px]"></div>
                     </div>
                 </div>
-
+                <pre>
+                    {{ $message_html  }}
+                </pre>
                 <div class="no-tailwindcss-support-display">
                     <x-input-label for="message_plain_text">Message Plain Text</x-input-label>
                     <x-primary-textarea wire:model="message_plain_text" id="message_plain_text" rows="16"
@@ -155,10 +157,9 @@
 
 
 @push('scripts')
-@vite('resources/js/AdvanceCodeEditor.js')
+@vite('resources/js/AdvanceTinyMCE.js')
 <script>
     document.addEventListener('livewire:initialized', function() {
-        // Remove the DOMContentLoaded initialization from here
         const form = document.getElementById('messageForm');
         if (form && !window.advanceCodeEditor.initialized) {
             window.advanceCodeEditor.init();
@@ -182,6 +183,7 @@
 </script>
 @endpush
 
-{{-- @push('scripts')
+
+@push('scripts')
 @vite('resources/js/codeEditor.js')
-@endpush --}}
+@endpush

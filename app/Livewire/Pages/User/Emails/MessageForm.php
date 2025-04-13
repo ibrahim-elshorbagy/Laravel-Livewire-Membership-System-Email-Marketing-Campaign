@@ -75,11 +75,11 @@ class MessageForm extends Component
     {
         $validatedData = $this->validate();
 
-        $cleanMessage = Purifier::clean($validatedData['message_html'], 'youtube');
-        $validatedData['message_html'] = $cleanMessage;
+        // $cleanMessage = Purifier::clean($validatedData['message_html'], 'youtube');
+        // $validatedData['message_html'] = $cleanMessage;
 
-        // $htmlPurifier = new HtmlPurifierService();
-        // $validatedData['message_html'] = $htmlPurifier->purifyFullHtml($validatedData['message_html']);
+        $htmlPurifier = new HtmlPurifierService();
+        $validatedData['message_html'] = $htmlPurifier->purifyFullHtml($validatedData['message_html']);
 
 
 

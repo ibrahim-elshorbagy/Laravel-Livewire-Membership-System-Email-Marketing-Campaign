@@ -510,3 +510,7 @@ all: unset;
 .ck-sticky-panel__content_sticky{
     margin-top: 50px !important;;
 }
+
+.tox-promotion{
+    display: none!important;
+}
