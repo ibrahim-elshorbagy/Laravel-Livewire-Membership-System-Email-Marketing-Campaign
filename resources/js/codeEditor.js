@@ -20,8 +20,12 @@ function initializeEditor() {
     const editorElement = document.getElementById('editor');
     if (!editorElement) return;
 
-    // Get initial content from the hidden textarea
-    const initialContent = editorElement.value;
+    // Get initial content from the hidden textarea or TinyMCE if active
+    let initialContent = editorElement.value;
+    const tinyMCEEditor = window.advanceCodeEditor?.editor;
+    if (tinyMCEEditor && tinyMCEEditor.getContent) {
+        initialContent = tinyMCEEditor.getContent();
+    }
 
     // Custom theme extension to force the editor to fill its container
     const customTheme = EditorView.theme({
@@ -48,10 +52,17 @@ function initializeEditor() {
             customTheme,
             EditorView.updateListener.of(update => {
                 if (update.docChanged) {
-                    // Update Livewire model
+                    // Update Livewire model and TinyMCE if active
                     const content = update.state.doc.toString();
                     editorElement.value = content;
                     editorElement.dispatchEvent(new Event('input'));
+
+                    // Sync with TinyMCE if it exists
+                    const tinyMCEEditor = window.advanceCodeEditor?.editor;
+                    if (tinyMCEEditor && tinyMCEEditor.setContent) {
+                        tinyMCEEditor.setContent(content, { format: 'html' });
+                    }
+
                     // Update preview
                     updatePreview(content);
                 }

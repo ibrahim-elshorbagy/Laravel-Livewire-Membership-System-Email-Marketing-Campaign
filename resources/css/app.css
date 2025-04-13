@@ -511,6 +511,6 @@ all: unset;
     margin-top: 50px !important;;
 }
 
-.tox-promotion{
+.tox-promotion,.tox-statusbar__branding{
     display: none!important;
 }

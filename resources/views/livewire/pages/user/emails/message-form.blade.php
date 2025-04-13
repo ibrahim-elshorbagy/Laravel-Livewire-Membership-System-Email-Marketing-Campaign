@@ -26,15 +26,43 @@
                     <x-text-input wire:model="email_subject" id="email_subject" type="text" class="block mt-1 w-full" />
                     <x-input-error :messages="$errors->get('email_subject')" class="mt-2" />
                 </div>
-                <div wire:ignore>
-                    <x-input-label for="text-editor">HTML Template</x-input-label>
-                    <div class="mt-1 space-y-2">
-                        <div id="text-editor" class="min-h-[350px]"></div>
+
+
+                <div class="mb-4" x-data="{ activeEditor: @entangle('activeEditor').live }">
+                    <div class="flex justify-between items-center mb-4">
+                        <x-input-label>HTML Template</x-input-label>
+                        <div class="flex items-center space-x-4">
+                            <button type="button"
+                                @click="$wire.set('activeEditor', 'advanced'); $dispatch('editor-changed', { editor: 'advanced' })"
+                                :class="{'bg-blue-500 text-white': activeEditor === 'advanced', 'bg-gray-200 dark:bg-neutral-700': activeEditor !== 'advanced'}"
+                                class="px-4 py-2 rounded-md transition-colors">
+                                Advanced Editor
+                            </button>
+                            <button type="button"
+                                @click="$wire.set('activeEditor', 'code'); $dispatch('editor-changed', { editor: 'code' })"
+                                :class="{'bg-blue-500 text-white': activeEditor === 'code', 'bg-gray-200 dark:bg-neutral-700': activeEditor !== 'code'}"
+                                class="px-4 py-2 rounded-md transition-colors">
+                                Code Editor
+                            </button>
+                        </div>
+                    </div>
+
+                    <div wire:ignore x-show="activeEditor === 'advanced'">
+                        <div class="mt-1 space-y-2">
+                            <div id="text-editor" class="min-h-[350px]"></div>
+                        </div>
+                    </div>
+
+                    <div wire:ignore x-show="activeEditor === 'code'">
+                        <div class="mt-1 space-y-2">
+                            <div id="editor-container" class="overflow-hidden rounded-md border dark:border-neutral-700"
+                                style="height: 400px; min-height: 200px; max-height: 800px; resize: vertical;"> </div>
+                            <textarea id="editor" wire:model.live="message_html" class="hidden"></textarea>
+                        </div>
                     </div>
                 </div>
-                <pre>
-                    {{ $message_html  }}
-                </pre>
+
+
                 <div class="no-tailwindcss-support-display">
                     <x-input-label for="message_plain_text">Message Plain Text</x-input-label>
                     <x-primary-textarea wire:model="message_plain_text" id="message_plain_text" rows="16"

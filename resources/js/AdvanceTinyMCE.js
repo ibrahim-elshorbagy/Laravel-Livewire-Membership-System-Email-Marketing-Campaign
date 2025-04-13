@@ -8,7 +8,7 @@ class AdvanceTinyMCE {
     init() {
         // Check if editor already exists
         if (this.initialized || this.editor) {
-            return;
+            this.destroyEditor();
         }
 
         const editorElement = document.querySelector('#text-editor');
@@ -47,7 +47,7 @@ class AdvanceTinyMCE {
                     // Start in code view for full HTML editing
                     toolbar_sticky: false,
                     setup: (editor) => {
-                        
+
                         this.editor = editor;
                             editor.on('BeforeSetContent', function(e) {
                                 // Remove script tags
@@ -57,14 +57,19 @@ class AdvanceTinyMCE {
                                 e.content = e.content.replace(/\son\w+\s*=\s*(['"]).*?\1/gi, '');
                             });
 
-                        // Get initial content from Alpine.js data
+                        // Get initial content from Alpine.js data and code editor
                         const form = document.getElementById('messageForm');
+                        const codeEditorTextarea = document.getElementById('editor');
                         if (form && window.Alpine && Alpine.$data) {
-                            const initialContent = Alpine.$data(form).localMessageHtml;
+                            const initialContent = codeEditorTextarea ? codeEditorTextarea.value : Alpine.$data(form).localMessageHtml;
                             if (initialContent) {
                                 editor.on('init', () => {
                                     this.setContent(initialContent);
                                     this.updatePreview(initialContent);
+                                    if (codeEditorTextarea) {
+                                        codeEditorTextarea.value = initialContent;
+                                        codeEditorTextarea.dispatchEvent(new Event('input'));
+                                    }
                                 });
                             }
                         }

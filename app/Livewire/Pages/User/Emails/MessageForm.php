@@ -25,6 +25,7 @@ class MessageForm extends Component
     public $reply_to_email = '';
     public $sending_status = 'PAUSE';
     public $showPreview = false;
+    public $activeEditor = 'advanced'; // 'advanced' for TinyMCE, 'code' for Code Editor
 
     public function rules(): array
     {
