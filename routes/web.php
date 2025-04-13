@@ -24,6 +24,11 @@ Route::get('/payment/close', function () {
 // Route::fallback(function () {
 //     return response()->view('errors.404', [], 404);
 // });
+// Secure chat image route
+Route::get('/chat/images/{userId}/{filename}', [\App\Http\Controllers\ChatImageController::class, 'show'])
+    ->middleware(['auth'])
+    ->name('chat.image');
+
 require __DIR__.'/auth.php';
 require __DIR__.'/admin.php';
 require __DIR__.'/user.php';

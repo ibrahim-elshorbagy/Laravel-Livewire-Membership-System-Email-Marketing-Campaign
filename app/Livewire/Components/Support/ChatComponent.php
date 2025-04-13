@@ -123,11 +123,13 @@ class ChatComponent extends Component
             $userId = $this->ticket->user_id;
             // Store in the same folder structure as logo
             $path = "admin/support/{$userId}/{$fileName}";
-            Storage::disk('public')->put($path, $fileContent);
+            Storage::disk('local')->put($path, $fileContent);
+
+            $secureUrl = route('chat.image', ['userId' => $userId, 'filename' => $fileName]);
 
             return [
                 'success' => true,
-                'url' => Storage::url($path),
+                'url' => $secureUrl,
                 'path' => $path
             ];
         } catch (\Exception $e) {

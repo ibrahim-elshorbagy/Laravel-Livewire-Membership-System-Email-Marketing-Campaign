@@ -70,12 +70,14 @@ class Support extends Component
             $fileName = 'support_' . now()->timestamp . '_' . uniqid() . '.' . $imageType;
             $userId = auth()->user()->id;
             // Store in the same folder structure as logo
-            $path = "users/{$userId}/support/{$fileName}";
-            Storage::disk('public')->put($path, $fileContent);
+            $path = "admin/support/{$userId}/{$fileName}";
+            Storage::disk('local')->put($path, $fileContent);
+
+            $secureUrl = route('chat.image', ['userId' => $userId, 'filename' => $fileName]);
 
             return [
                 'success' => true,
-                'url' => Storage::url($path),
+                'url' => $secureUrl,
                 'path' => $path
             ];
         } catch (\Exception $e) {
