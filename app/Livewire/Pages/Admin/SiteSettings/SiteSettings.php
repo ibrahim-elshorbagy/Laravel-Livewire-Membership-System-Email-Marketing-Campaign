@@ -11,10 +11,18 @@ use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Session;
+use App\Models\Admin\Site\SystemSetting\BouncePattern;
+use Livewire\WithPagination;
 
 class SiteSettings extends Component
 {
-    use WithFileUploads, LivewireAlert;
+    use WithFileUploads, LivewireAlert, WithPagination;
+
+    // Bounce Pattern properties
+    public $newPatternType = '';
+    public $newPattern = '';
+    public $filterType = '';
+    public $perPage = 10;
 
 
     public $site_name;
@@ -86,6 +94,7 @@ class SiteSettings extends Component
 
     public function mount()
     {
+        // Load bounce patterns with pagination and filtering
         $this->site_name = config('app.name');
 
         // Load mail settings
@@ -358,9 +367,92 @@ class SiteSettings extends Component
         Artisan::call('config:clear');
     }
 
+    public $selectedPatternId = '';
+    public $editPatternType = '';
+    public $editPattern = '';
+
+    public function addBouncePattern()
+    {
+        $this->validate([
+            'newPatternType' => 'required|in:subject,hard,soft',
+            'newPattern' => 'required|string'
+        ]);
+
+        $patterns = Str::of($this->newPattern)
+            ->explode("\n")
+            ->map(fn($pattern) => trim($pattern))
+            ->filter()
+            ->unique()
+            ->values()
+            ->toArray();
+
+        foreach ($patterns as $pattern) {
+            BouncePattern::create([
+                'type' => $this->newPatternType,
+                'pattern' => $pattern,
+            ]);
+        }
+
+        $this->bouncePatterns = BouncePattern::all();
+        $this->newPatternType = '';
+        $this->newPattern = '';
+        $this->alert('success', count($patterns) . ' bounce pattern(s) added successfully.', ['position' => 'bottom-end']);
+    }
+
+    public function updatePattern()
+    {
+        $this->validate([
+            'editPatternType' => 'required|in:subject,hard,soft',
+            'editPattern' => 'required|string|max:255'
+        ]);
+
+        $pattern = BouncePattern::find($this->selectedPatternId);
+        if ($pattern) {
+            $pattern->update([
+                'type' => $this->editPatternType,
+                'pattern' => $this->editPattern
+            ]);
+
+            $this->bouncePatterns = BouncePattern::all();
+            $this->selectedPatternId = '';
+            $this->editPatternType = '';
+            $this->editPattern = '';
+            $this->alert('success', 'Pattern updated successfully.', ['position' => 'bottom-end']);
+            $this->dispatch('close-modal', 'edit-pattern-modal');
+        }
+    }
+
+    public function deletePattern($id)
+    {
+        $pattern = BouncePattern::find($id);
+        if ($pattern) {
+            $pattern->delete();
+            $this->bouncePatterns = BouncePattern::all();
+            $this->alert('success', 'Pattern deleted successfully.', ['position' => 'bottom-end']);
+        }
+    }
+
+    public function loadBouncePatterns()
+    {
+        $query = BouncePattern::query();
+
+        if ($this->filterType) {
+            $query->where('type', $this->filterType);
+        }
+
+        return $query->paginate($this->perPage);
+    }
+
+    public function updatedFilterType()
+    {
+        $this->bouncePatterns = $this->loadBouncePatterns();
+    }
+
     public function render()
     {
-        return view('livewire.pages.admin.site-settings.site-settings')
-            ->layout('layouts.app',['title' => 'Site Settings']);
+        return view('livewire.pages.admin.site-settings.site-settings', [
+            'bouncePatterns' => $this->loadBouncePatterns()
+        ])->layout('layouts.app',['title' => 'Site Settings']);
     }
+
 }

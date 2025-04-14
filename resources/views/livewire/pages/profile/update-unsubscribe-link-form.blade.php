@@ -4,9 +4,12 @@ use App\Models\UserInfo;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Volt\Component;
 use Illuminate\Validation\Rule;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 new class extends Component
 {
+    use LivewireAlert;
+
     public string $unsubscribe_pre_text = '';
     public string $unsubscribe_text = '';
     public string $unsubscribe_link = '';
@@ -65,7 +68,11 @@ new class extends Component
 
         $userInfo->save();
 
-        $this->dispatch('unsubscribe-info-updated');
+        $this->alert('success', 'Saved successful!', [
+            'position' => 'bottom-end',
+            'timer' => 3000,
+            'toast' => true,
+        ]);
     }
 }; ?>
 
@@ -208,14 +215,11 @@ new class extends Component
         </div>
 
         <div class="flex gap-4 items-center">
-            <x-primary-button>Save</x-primary-button>
+            <x-primary-create-button>Save</x-primary-create-button>
             <x-primary-info-button type="button" wire:click="resetDefaults">
                 Reset Defaults
             </x-primary-info-button>
 
-            <x-action-message class="me-3" on="unsubscribe-info-updated">
-                Saved.
-            </x-action-message>
         </div>
     </form>
 </section>

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('mail_server')->nullable();
             $table->string('imap_port')->nullable();
             $table->boolean('bounce_status')->default(false);
+            $table->integer('max_soft_bounces')->default(4);
         });
     }
 

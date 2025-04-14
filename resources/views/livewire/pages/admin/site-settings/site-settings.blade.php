@@ -160,8 +160,8 @@
                 <div class="grid gap-6 md:grid-cols-1">
                     <div>
                         <x-input-label for="grace_days" :value="__('Grace Days')" />
-                        <x-text-input wire:model="grace_days" id="grace_days" type="number" min="0" class="block mt-1 w-full"
-                            required />
+                        <x-text-input wire:model="grace_days" id="grace_days" type="number" min="0"
+                            class="block mt-1 w-full" required />
                         <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
                             Number of days to extend subscription access after expiration
                         </p>
@@ -176,23 +176,33 @@
                 </h3>
                 <div class="flex flex-col gap-5 md:flex-row">
                     <div>
-                        <label for="maintenance" class="inline-flex gap-3 justify-between items-center px-4 py-1.5 rounded-lg min-w-52 bg-neutral-100 dark:bg-neutral-800">
+                        <label for="maintenance"
+                            class="inline-flex gap-3 justify-between items-center px-4 py-1.5 rounded-lg min-w-52 bg-neutral-100 dark:bg-neutral-800">
 
-                            <input id="maintenance" wire:model="maintenance" type="checkbox" class="sr-only peer" role="switch" />
-                            <span class="text-xs font-medium md:text-sm trancking-wide text-neutral-600 peer-checked:text-neutral-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-neutral-400 dark:peer-checked:text-neutral-100">Maintenance Mode</span>
+                            <input id="maintenance" wire:model="maintenance" type="checkbox" class="sr-only peer"
+                                role="switch" />
+                            <span
+                                class="text-xs font-medium md:text-sm trancking-wide text-neutral-600 peer-checked:text-neutral-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-neutral-400 dark:peer-checked:text-neutral-100">Maintenance
+                                Mode</span>
 
-                            <div class="relative h-6 w-11 after:h-5 after:w-5 peer-checked:after:translate-x-5 rounded-full bg-white after:absolute after:bottom-0 after:left-[0.0625rem] after:top-0 after:my-auto after:rounded-full after:bg-neutral-600 after:transition-all after:content-[''] peer-checked:bg-green-500 peer-checked:after:bg-neutral-100 peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-neutral-800 peer-focus:peer-checked:outline-black peer-active:outline-offset-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:border-neutral-700 dark:bg-neutral-950 dark:after:bg-neutral-400 dark:peer-checked:bg-orange-500 dark:peer-checked:after:bg-black dark:peer-focus:outline-neutral-300 dark:peer-focus:peer-checked:outline-orange-500" aria-hidden="true"></div>
+                            <div class="relative h-6 w-11 after:h-5 after:w-5 peer-checked:after:translate-x-5 rounded-full bg-white after:absolute after:bottom-0 after:left-[0.0625rem] after:top-0 after:my-auto after:rounded-full after:bg-neutral-600 after:transition-all after:content-[''] peer-checked:bg-green-500 peer-checked:after:bg-neutral-100 peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-neutral-800 peer-focus:peer-checked:outline-black peer-active:outline-offset-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:border-neutral-700 dark:bg-neutral-950 dark:after:bg-neutral-400 dark:peer-checked:bg-orange-500 dark:peer-checked:after:bg-black dark:peer-focus:outline-neutral-300 dark:peer-focus:peer-checked:outline-orange-500"
+                                aria-hidden="true"></div>
 
                         </label>
                         <x-input-error :messages="$errors->get('maintenance')" class="mt-2" />
                     </div>
                     <div>
-                        <label for="our_devices" class="inline-flex gap-3 justify-between items-center px-4 py-1.5 rounded-lg min-w-52 bg-neutral-100 dark:bg-neutral-800">
+                        <label for="our_devices"
+                            class="inline-flex gap-3 justify-between items-center px-4 py-1.5 rounded-lg min-w-52 bg-neutral-100 dark:bg-neutral-800">
 
-                            <input id="our_devices" wire:model="our_devices" type="checkbox" class="sr-only peer" role="switch" />
-                            <span class="text-xs font-medium md:text-sm trancking-wide text-neutral-600 peer-checked:text-neutral-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-neutral-400 dark:peer-checked:text-neutral-100">Only Our Devices</span>
+                            <input id="our_devices" wire:model="our_devices" type="checkbox" class="sr-only peer"
+                                role="switch" />
+                            <span
+                                class="text-xs font-medium md:text-sm trancking-wide text-neutral-600 peer-checked:text-neutral-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-neutral-400 dark:peer-checked:text-neutral-100">Only
+                                Our Devices</span>
 
-                                <div class="relative h-6 w-11 after:h-5 after:w-5 peer-checked:after:translate-x-5 rounded-full bg-white after:absolute after:bottom-0 after:left-[0.0625rem] after:top-0 after:my-auto after:rounded-full after:bg-neutral-600 after:transition-all after:content-[''] peer-checked:bg-green-500 peer-checked:after:bg-neutral-100 peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-neutral-800 peer-focus:peer-checked:outline-black peer-active:outline-offset-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:border-neutral-700 dark:bg-neutral-950 dark:after:bg-neutral-400 dark:peer-checked:bg-orange-500 dark:peer-checked:after:bg-black dark:peer-focus:outline-neutral-300 dark:peer-focus:peer-checked:outline-orange-500" aria-hidden="true"></div>
+                            <div class="relative h-6 w-11 after:h-5 after:w-5 peer-checked:after:translate-x-5 rounded-full bg-white after:absolute after:bottom-0 after:left-[0.0625rem] after:top-0 after:my-auto after:rounded-full after:bg-neutral-600 after:transition-all after:content-[''] peer-checked:bg-green-500 peer-checked:after:bg-neutral-100 peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-neutral-800 peer-focus:peer-checked:outline-black peer-active:outline-offset-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:border-neutral-700 dark:bg-neutral-950 dark:after:bg-neutral-400 dark:peer-checked:bg-orange-500 dark:peer-checked:after:bg-black dark:peer-focus:outline-neutral-300 dark:peer-focus:peer-checked:outline-orange-500"
+                                aria-hidden="true"></div>
 
                         </label>
                         <x-input-error :messages="$errors->get('our_devices')" class="mt-2" />
@@ -216,36 +226,42 @@
 
                     <div>
                         <x-input-label for="mail_host" :value="__('SMTP Host')" />
-                        <x-text-input wire:model="mail_host" id="mail_host" type="text" class="block mt-1 w-full" required />
+                        <x-text-input wire:model="mail_host" id="mail_host" type="text" class="block mt-1 w-full"
+                            required />
                         <x-input-error :messages="$errors->get('mail_host')" class="mt-2" />
                     </div>
 
                     <div>
                         <x-input-label for="mail_port" :value="__('SMTP Port')" />
-                        <x-text-input wire:model="mail_port" id="mail_port" type="number" class="block mt-1 w-full" required />
+                        <x-text-input wire:model="mail_port" id="mail_port" type="number" class="block mt-1 w-full"
+                            required />
                         <x-input-error :messages="$errors->get('mail_port')" class="mt-2" />
                     </div>
 
                     <div>
                         <x-input-label for="mail_username" :value="__('SMTP Username')" />
-                        <x-text-input wire:model="mail_username" id="mail_username" type="text" class="block mt-1 w-full" required />
+                        <x-text-input wire:model="mail_username" id="mail_username" type="text"
+                            class="block mt-1 w-full" required />
                         <x-input-error :messages="$errors->get('mail_username')" class="mt-2" />
                     </div>
 
                     <div>
                         <x-input-label for="mail_password" :value="__('SMTP Password')" />
-                        <x-text-input wire:model="mail_password" id="mail_password"  class="block mt-1 w-full" required />
+                        <x-text-input wire:model="mail_password" id="mail_password" class="block mt-1 w-full"
+                            required />
                         <x-input-error :messages="$errors->get('mail_password')" class="mt-2" />
                     </div>
 
                     <div>
                         <x-input-label for="mail_from_address" :value="__('From Support Email')" />
-                        <x-text-input wire:model="mail_from_address" id="mail_from_address" type="email" class="block mt-1 w-full" required />
+                        <x-text-input wire:model="mail_from_address" id="mail_from_address" type="email"
+                            class="block mt-1 w-full" required />
                         <x-input-error :messages="$errors->get('mail_from_address')" class="mt-2" />
                     </div>
                     <div>
                         <x-input-label for="mail_from_name" :value="__('From Name')" />
-                        <x-text-input wire:model="mail_from_name" id="mail_from_name" type="text" class="block mt-1 w-full" required />
+                        <x-text-input wire:model="mail_from_name" id="mail_from_name" type="text"
+                            class="block mt-1 w-full" required />
                         <x-input-error :messages="$errors->get('mail_from_name')" class="mt-2" />
                     </div>
                 </div>
@@ -279,5 +295,138 @@
                 </x-primary-create-button>
             </div>
         </form>
+
+        <div class="p-6 my-6 rounded-lg border border-neutral-200 dark:border-neutral-600">
+            <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
+                Bounce Pattern Settings
+            </h3>
+
+
+            <div class="grid gap-6 md:grid-cols-1">
+
+                <div class="mt-4 space-y-4">
+                    <h4 class="text-lg font-medium text-neutral-800 dark:text-neutral-200">Add New Pattern</h4>
+                    <div class="w-48">
+                        <x-input-label for="newPatternType" :value="__('Pattern Type')" />
+                        <x-primary-select-input wire:model="newPatternType" id="newPatternType"
+                            class="block mt-1 w-full">
+                            <option value="">Select Type</option>
+                            <option value="subject">Subject</option>
+                            <option value="hard">Hard Bounce</option>
+                            <option value="soft">Soft Bounce</option>
+                        </x-primary-select-input>
+                        <x-input-error :messages="$errors->get('newPatternType')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="newPattern" :value="__('Pattern Text')" />
+                        <x-textarea-input wire:model="newPattern" id="newPattern"
+                            placeholder="Enter patterns (one per line)" class="block mt-1 w-full" />
+                        <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                            Enter each pattern on a new line
+                        </div>
+                        <x-input-error :messages="$errors->get('newPattern')" class="mt-2" />
+                    </div>
+
+                    <div class="flex items-end">
+                        <x-primary-create-button wire:click="addBouncePattern" type="button" class="mb-1">
+                            Add Pattern
+                        </x-primary-create-button>
+                    </div>
+                </div>
+
+                <x-primary-accordion title="Patterns" :isExpandedByDefault="false">
+                    <div class="mb-4">
+                        <div class="block mt-1 w-48">
+                            <x-primary-select-input wire:model.live="filterType" id="filterType" >
+                                <option value="">All Types</option>
+                                <option value="subject">Subject</option>
+                                <option value="hard">Hard Bounce</option>
+                                <option value="soft">Soft Bounce</option>
+                            </x-primary-select-input>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto w-full rounded-lg">
+                        <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
+                            <thead
+                                class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
+                                <tr>
+                                    <th scope="col" class="p-4">Type</th>
+                                    <th scope="col" class="p-4">Pattern</th>
+                                    <th scope="col" class="p-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
+                                @forelse($bouncePatterns as $pattern)
+                                <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                                    wire:key="pattern-row-{{ $pattern->id }}">
+                                    <td class="p-4">{{ ucfirst($pattern->type) }}</td>
+                                    <td class="p-4">{{ $pattern->pattern }}</td>
+                                    <td class="p-4">
+                                        <div class="flex gap-2">
+                                            <button type="button"
+                                                class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300"
+                                                x-on:click="$dispatch('open-modal', 'edit-pattern-modal'); $wire.selectedPatternId = {{ $pattern->id }}; $wire.editPatternType = '{{ $pattern->type }}'; $wire.editPattern = '{{ $pattern->pattern }}'">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" wire:click="deletePattern({{ $pattern->id }})"
+                                                wire:confirm="Are you sure you want to delete this pattern?"
+                                                class="text-neutral-400 hover:text-red-600 dark:hover:text-red-500">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="3" class="p-4 text-center text-neutral-500 dark:text-neutral-400">
+                                        No bounce patterns found.
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                        <div class="mt-4">
+                            {{ $bouncePatterns->links() }}
+                        </div>
+                    </div>
+                </x-primary-accordion>
+
+                <!-- Edit Pattern Modal -->
+                <x-modal name="edit-pattern-modal" maxWidth="md">
+                    <div class="p-6">
+                        <h2 class="text-lg font-medium">Edit Pattern</h2>
+                        <form wire:submit.prevent="updatePattern" class="mt-4">
+                            <div class="space-y-4">
+                                <div>
+                                    <x-input-label for="patternType" value="Pattern Type" />
+                                    <x-primary-select-input wire:model="editPatternType" id="patternType"
+                                        class="block mt-1 w-full">
+                                        <option value="subject">Subject</option>
+                                        <option value="hard">Hard Bounce</option>
+                                        <option value="soft">Soft Bounce</option>
+                                    </x-primary-select-input>
+                                    <x-input-error :messages="$errors->get('editPatternType')" class="mt-2" />
+                                </div>
+                                <div>
+                                    <x-input-label for="pattern" value="Pattern" />
+                                    <x-text-input wire:model="editPattern" id="pattern" class="block mt-1 w-full" />
+                                    <x-input-error :messages="$errors->get('editPattern')" class="mt-2" />
+                                </div>
+                            </div>
+                            <div class="flex justify-end mt-6 space-x-3">
+                                <x-secondary-button x-on:click="$dispatch('close-modal', 'edit-pattern-modal')">
+                                    Cancel
+                                </x-secondary-button>
+                                <x-primary-create-button type="submit">
+                                    Update
+                                </x-primary-create-button>
+                            </div>
+                        </form>
+                    </div>
+                </x-modal>
+            </div>
+        </div>
+
     </div>
 </div>

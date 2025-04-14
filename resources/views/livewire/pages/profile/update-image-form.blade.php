@@ -4,10 +4,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 use Livewire\Volt\Component;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 new class extends Component
 {
     use WithFileUploads;
+    use LivewireAlert;
 
     public $image;
     public $currentImage;
@@ -40,6 +42,11 @@ new class extends Component
         $this->reset('image');
 
         $this->dispatch('image-updated');
+        $this->alert('success', 'Saved successful!', [
+                'position' => 'bottom-end',
+                'timer' => 3000,
+                'toast' => true,
+            ]);
         $this->dispatch('refresh-user-profile-display', [
         'image_url' => $user->image_url,
         'first_name' => $user->first_name,
@@ -87,7 +94,7 @@ new class extends Component
             <!-- Save Button - Only show when image is selected -->
             @if ($image)
                 <div class="flex gap-4 items-center">
-                    <x-primary-button>{{ __('Save') }}</x-primary-button>
+                    <x-primary-create-button>{{ __('Save') }}</x-primary-create-button>
 
                     <x-action-message class="me-3" on="profile-updated">
                         {{ __('Saved.') }}

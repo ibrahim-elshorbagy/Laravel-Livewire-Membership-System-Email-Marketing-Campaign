@@ -7,9 +7,13 @@ use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\EmailVerificationMail;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 new class extends Component
 {
+
+    use LivewireAlert;
+
     public string $email = '';
     public string $first_name = '';
     public string $last_name = '';
@@ -60,6 +64,11 @@ new class extends Component
         $user->save();
 
         $this->dispatch('profile-updated', name: $user->first_name);
+        $this->alert('success', 'Saved successful!', [
+                'position' => 'bottom-end',
+                'timer' => 3000,
+                'toast' => true,
+            ]);
         $this->dispatch('refresh-user-profile-display', [
         'image_url' => $user->image_url,
         'first_name' => $user->first_name,
@@ -192,7 +201,7 @@ new class extends Component
         </div>
 
         <div class="flex gap-4 items-center">
-            <x-primary-button>Save</x-primary-button>
+            <x-primary-create-button>Save</x-primary-create-button>
 
             <x-action-message class="me-3" on="profile-updated">
                 Saved.

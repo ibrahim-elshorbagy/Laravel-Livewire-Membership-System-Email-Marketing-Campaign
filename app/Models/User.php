@@ -116,4 +116,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Server::class, 'assigned_to_user_id');
     }
 
+    public function userBouncesInfo(){
+        return $this->hasOne(UserBouncesInfo::class, 'user_id');
+
+    }
+
 }
