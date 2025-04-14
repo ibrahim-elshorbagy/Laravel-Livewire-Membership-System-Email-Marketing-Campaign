@@ -72,7 +72,7 @@ new class extends Component
 
 <section x-data="{disableUnsubscribe:!$wire.unsubscribe_status}">
     <form wire:submit="updateUnsubscribeInfo">
-        <header class="flex justify-between items-center">
+        <header class="flex flex-col justify-between items-center mb-3 md:flex-row">
             <div class="flex gap-5 items-center mb-6">
                 <i class="fa-solid fa-envelope-open-text fa-2xl"></i>
                 <div>
@@ -80,7 +80,7 @@ new class extends Component
                         Unsubscribe Settings
                     </h2>
 
-                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    <p class="mt-1 text-xs text-gray-600 md:text-sm dark:text-gray-400">
                         Include unsubscribe text & email to your campaigns
                     </p>
                 </div>
@@ -90,7 +90,7 @@ new class extends Component
                 <input wire:model="unsubscribe_status" x-bind:click="disableUnsubscribe = !$wire.unsubscribe_status"
                     id="unsubscribe_status" type="checkbox" class="sr-only peer" role="switch" checked />
                 <span
-                    class="text-sm font-medium trancking-wide text-neutral-600 peer-checked:text-neutral-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-neutral-400 dark:peer-checked:text-neutral-100">Enable
+                    class="text-xs font-medium md:text-sm trancking-wide text-neutral-600 peer-checked:text-neutral-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-neutral-400 dark:peer-checked:text-neutral-100">Enable
                     Unsubscribe Header</span>
                 <div class="relative h-6 w-11 after:h-5 after:w-5 peer-checked:after:translate-x-5 rounded-full   bg-neutral-200 after:absolute after:bottom-0 after:left-[0.0625rem] after:top-0 after:my-auto after:rounded-full after:bg-neutral-600 after:transition-all after:content-[''] peer-checked:bg-green-600 peer-checked:after:bg-neutral-100 peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-neutral-800 peer-focus:peer-checked:outline-black peer-active:outline-offset-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:border-neutral-700 dark:bg-neutral-800 dark:after:bg-neutral-400 dark:peer-checked:bg-green-600 dark:peer-checked:after:bg-black dark:peer-focus:outline-neutral-300 dark:peer-focus:peer-checked:outline-green-600"
                     aria-hidden="true"></div>
@@ -108,7 +108,7 @@ new class extends Component
                 </div>
                 <x-text-input wire:model.live="unsubscribe_pre_text" id="unsubscribe_pre_text"
                     x-bind:disabled="disableUnsubscribe" class="block mt-1 w-full" />
-                <p class="mt-3 ml-1 text-sm text-gray-500 dark:text-gray-400">
+                <p class="mt-3 ml-1 text-xs text-gray-500 md:text-sm dark:text-gray-400">
                     <i class="fas fa-info-circle"></i>
                     This Will Be the Text before the Unsubscribe Link Button.
                 </p>
@@ -122,7 +122,7 @@ new class extends Component
                 </div>
                 <x-text-input wire:model.live="unsubscribe_text" id="unsubscribe_text"
                     x-bind:disabled="disableUnsubscribe" class="block mt-1 w-full" />
-                <p class="mt-3 ml-1 text-sm text-gray-500 dark:text-gray-400">
+                <p class="mt-3 ml-1 text-xs text-gray-500 md:text-sm dark:text-gray-400">
                     <i class="fas fa-info-circle"></i>
                     This Will Be the Text Of Unsubscribe Link Button.
                 </p>
@@ -137,7 +137,7 @@ new class extends Component
                 <x-text-input wire:model.live="unsubscribe_link" id="unsubscribe_link"
                     x-bind:disabled="disableUnsubscribe" class="block mt-1 w-full"
                     placeholder="Example: https://xxx.com/unsub.html OR unsub@xxx.com" />
-                <p class="mt-3 ml-1 text-sm text-gray-500 dark:text-gray-400">
+                <p class="mt-3 ml-1 text-xs text-gray-500 md:text-sm dark:text-gray-400">
                     <i class="fas fa-info-circle"></i>
                     Please enter the URL for unsubscribing from or provide the email address you wish to use for the
                     unsubscription request.
@@ -147,7 +147,7 @@ new class extends Component
 
             <!-- Preview -->
             <div class="mt-4">
-                <h4 class="mb-2 text-sm font-medium text-gray-900 dark:text-gray-100">Preview:</h4>
+                <h4 class="mb-2 text-xs font-medium text-gray-900 md:text-sm dark:text-gray-100">Preview:</h4>
                 <div
                     class="p-4 bg-white rounded-lg border border-gray-200 dark:bg-gray-800 dark:bg-neutral-900 dark:border-neutral-700">
                     <div class="unsubscribe-container">
@@ -188,7 +188,7 @@ new class extends Component
                     </h3>
                 </div>
 
-                <div class="text-sm text-gray-600 dark:text-gray-400">
+                <div class="text-xs text-gray-600 md:text-sm dark:text-gray-400">
 
                     <p class="mb-2">
                         • GeMailApp will automatically generate a clickable unsubscribe link and add to it to all your

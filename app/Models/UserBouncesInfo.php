@@ -4,16 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserInfo extends Model
+class UserBouncesInfo extends Model
 {
     public $timestamps = false;
     protected $primaryKey = 'user_id';
     public $incrementing = false;
 
 
-
     protected $casts = [
-        'unsubscribe_status' => 'boolean'
+        'bounce_status' => 'boolean'
     ];
 
     public function user()
