@@ -7,6 +7,7 @@ use Livewire\Volt\Component;
 use Illuminate\Validation\Rule;
 use App\Services\BounceMailService;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use App\Jobs\ProcessBounceEmails;
 
 new class extends Component
 {
@@ -40,28 +41,35 @@ new class extends Component
     public function startBounceCheck()
     {
         try {
-            $this->error_message = null;
-            $this->is_checking = true;
+            $user = Auth::user();
+            $bounceInfo = UserBouncesInfo::where('user_id', $user->id)->first();
 
-            $bounceInfo = new UserBouncesInfo([
-                'bounce_inbox' => $this->bounce_inbox,
-                'bounce_inbox_password' => $this->bounce_inbox_password,
-                'mail_server' => $this->mail_server,
-                'imap_port' => $this->imap_port
+            if (!$bounceInfo) {
+                $this->alert('error', 'Please save your bounce settings first!', [
+                    'position' => 'bottom-end',
+                    'timer' => 3000,
+                    'toast' => true,
+                ]);
+                return;
+            }
+
+            ProcessBounceEmails::dispatch($bounceInfo);
+
+            $this->alert('success', 'Bounce check job has been queued!', [
+                'position' => 'bottom-end',
+                'timer' => 3000,
+                'toast' => true,
             ]);
 
-            $this->bounceService = new BounceMailService($bounceInfo);
-            $this->bounceService->connect();
-
-            $messages = $this->bounceService->getUnreadMessages();
-            $this->bounce_messages = $messages;
-
         } catch (Exception $e) {
-            $this->error_message = $e->getMessage();
-            $this->is_checking = false;
-            $this->bounceService = null;
+            $this->alert('error', 'Failed to queue bounce check job: ' . $e->getMessage(), [
+                'position' => 'bottom-end',
+                'timer' => 3000,
+                'toast' => true,
+            ]);
         }
     }
+
 
     public function stopBounceCheck()
     {
@@ -268,30 +276,6 @@ new class extends Component
         </div>
         @endif
 
-        @if(count($bounce_messages) > 0)
-        <div class="mt-4">
-            <h4 class="mb-2 font-medium text-gray-900 text-md dark:text-gray-100">
-                Bounce Messages
-            </h4>
-            <div class="space-y-2">
-                @foreach($bounce_messages as $message)
-                <div class="flex justify-between items-start p-3 bg-gray-50 rounded dark:bg-gray-700">
-                    <p class="text-sm text-gray-600 dark:text-gray-300">
-                        <strong>From:</strong> {{ $message['from'] }}<br>
-                        <strong>affected_email:</strong> {{ $message['affected_email'] }}<br>
-                        <strong>Subject:</strong> {{ $message['subject'] }}<br>
-                        <strong>Date:</strong> {{ $message['date'] }}<br>
-                        <strong>Bounce Type:</strong> {{ $message['bounce_type'] ?? 'Unknown' }}<br>
-                    </p>
-                    <div class="text-sm text-green-600 dark:text-green-400">
-                        @if($message['is_read'])
-                        <i class="fas fa-check-circle"></i> Read
-                        @endif
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </div>
-        @endif
+
     </div>
 </section>
