@@ -25,7 +25,13 @@ class EmailListName extends Model
     {
         return $this->hasMany(EmailList::class, 'list_id');
     }
-        public function campaigns()
+
+    public function hardBounceEmails()
+    {
+        return $this->hasMany(EmailList::class, 'list_id')->where('is_hard_bounce', true);
+    }
+
+    public function campaigns()
     {
         return $this->hasManyThrough(
             Campaign::class,

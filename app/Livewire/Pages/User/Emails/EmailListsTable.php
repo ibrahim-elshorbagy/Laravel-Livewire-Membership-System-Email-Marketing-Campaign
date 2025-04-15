@@ -13,6 +13,7 @@ use App\Models\JobProgress;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Url;
@@ -32,9 +33,12 @@ class EmailListsTable extends Component
     private $user;
     public $subscriberBalance;
     public $emailLimit;
+
     public $selectedEmailId = null;
     public $editEmail = '';
     public $editName = '';
+    public $editSoftBounceCounter = '';
+    public $editIsHardBounce = '';
 
     #[Url]
     public $selectedList = '';
@@ -235,7 +239,7 @@ class EmailListsTable extends Component
 
         // Start with base query with necessary columns only
         $query = EmailList::query()
-            ->select(['id', 'email','name'])
+            ->select(['id', 'email','name','soft_bounce_counter','is_hard_bounce'])
             ->with(['history' => function($query) {
                 $query->with(['campaign:id,message_id', 'campaign.message:id,email_subject'])
                     ->orderBy('sent_time', 'desc');
@@ -264,23 +268,59 @@ class EmailListsTable extends Component
     }
 
 
+    public function getHardBounceCount()
+    {
+        if (!$this->selectedList) {
+            return 0;
+        }
+
+        // Get the list ID from the name
+        $list = $this->lists->firstWhere('name', $this->selectedList);
+        if (!$list) {
+            return 0;
+        }
+
+        // Count hard bounce emails in this list
+        return EmailList::where('user_id', Auth::id())
+            ->where('is_hard_bounce', true)
+            ->where('list_id', $list->id)
+            ->count();
+    }
 
 
     public function deleteEmails($type = 'selected', $emailId = null)
     {
+        // Validate method parameters using Laravel's validator
+        $validator = Validator::make(
+            [
+                'type' => $type,
+                'emailId' => $emailId
+            ],
+            [
+                'type' => ['required', 'string', Rule::in(['selected', 'single', 'all', 'hard_bounce'])],
+                'emailId' => ['nullable', 'integer', Rule::exists('email_lists', 'id')->where(function ($query) {
+                    return $query->where('user_id', Auth::id());
+                })],
+            ]
+        );
+
+        if ($validator->fails()) {
+            $this->alert('error', $validator->errors()->first(), ['position' => 'bottom-end']);
+            return;
+        }
 
         $this->user = auth()->user();
 
-        // Handle single email deletion
-        if (is_numeric($type)) {
+        try {
+            // Handle single email deletion
+            if (is_numeric($type)) {
                 $emailId = $type;
                 $type = 'single';
             }
 
-        try {
             DB::transaction(function () use ($type, $emailId) {
                 // Build the query based on deletion type
-                $query = EmailList::where('user_id',Auth::id());
+                $query = EmailList::where('user_id', Auth::id());
 
                 switch ($type) {
                     case 'single':
@@ -301,7 +341,20 @@ class EmailListsTable extends Component
                             $this->alert('error', 'Please select a list first!', ['position' => 'bottom-end']);
                             return;
                         }
-                        $query->where('list_id', $this->selectedList);
+                        $query->whereHas('emailListName', function($query) {
+                                    $query->where('name', $this->selectedList);
+                                });
+                        break;
+
+                    case 'hard_bounce':
+                        if (!$this->selectedList) {
+                            $this->alert('error', 'Please select a list first!', ['position' => 'bottom-end']);
+                            return;
+                        }
+                        $query->where('is_hard_bounce', true)
+                                ->whereHas('emailListName', function($query) {
+                                    $query->where('name', $this->selectedList);
+                                });
                         break;
                 }
 
@@ -334,6 +387,7 @@ class EmailListsTable extends Component
                         'single' => 'Email deleted successfully!',
                         'selected' => "{$count} selected emails deleted successfully!",
                         'all' => "All emails in list deleted successfully!",
+                        'hard_bounce' => "{$count} hard bounce emails deleted successfully!",
                     };
 
                     $this->alert('success', $message, ['position' => 'bottom-end']);
@@ -488,7 +542,9 @@ class EmailListsTable extends Component
                     ->where('list_id', $this->selectedList)
                     ->ignore($this->selectedEmailId)
             ],
-            'editName' => 'nullable|string'
+            'editName' => 'nullable|string',
+            'editSoftBounceCounter' => 'nullable|integer|min:0|max:255',
+            'editIsHardBounce' => 'nullable|boolean'
         ]);
 
         try {
@@ -497,7 +553,9 @@ class EmailListsTable extends Component
 
             $email->update([
                 'email' => $this->editEmail,
-                'name' => $this->editName
+                'name' => $this->editName,
+                'soft_bounce_counter' => $this->editSoftBounceCounter,
+                'is_hard_bounce' => $this->editIsHardBounce
             ]);
 
             $this->dispatch('close-modal', 'edit-email-modal');
@@ -506,6 +564,10 @@ class EmailListsTable extends Component
             // Reset form
             $this->editEmail = '';
             $this->editName = '';
+            $this->editSoftBounceCounter = '';
+            $this->editIsHardBounce = '';
+
+
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to update email.', ['position' => 'bottom-end']);
         }

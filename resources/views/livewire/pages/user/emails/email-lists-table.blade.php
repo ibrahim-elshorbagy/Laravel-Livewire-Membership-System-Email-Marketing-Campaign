@@ -117,6 +117,8 @@
             <div>
                 @if(!$hasActiveJobsFlag)
                 <div class="flex flex-col gap-2 mt-2 sm:flex-row">
+
+
                     <!-- Delete Button  -->
                     <div class="relative">
                         <x-primary-danger-button x-data="{
@@ -165,19 +167,22 @@
                                     </p>
                                 </div>
                             </div>
-                            @elseif($selectedList && $this->lists->firstWhere('name', $selectedList)?->emails_count != 0)
+                            @elseif($selectedList && $this->lists->firstWhere('name', $selectedList)?->emails_count !=
+                            0)
                             <div class="flex gap-1.5 items-start text-red-600 sm:gap-2 dark:text-red-500">
                                 <i class="mt-0.5 text-xs sm:text-sm fas fa-exclamation-triangle"></i>
                                 <div>
                                     <p class="font-medium">Warning</p>
                                     <p class="mt-0.5 text-xs text-neutral-600 dark:text-neutral-400">
-                                        Delete all {{ $this->lists->firstWhere('name', $selectedList)?->emails_count ?? 0
+                                        Delete all {{ $this->lists->firstWhere('name', $selectedList)?->emails_count ??
+                                        0
                                         }} emails
-                                        from "{{ $this->lists->firstWhere('id', $selectedList)?->name }}"
+                                        from "{{ $this->lists->firstWhere('name', $selectedList)?->name }}"
                                     </p>
                                 </div>
                             </div>
-                            @elseif($selectedList && $this->lists->firstWhere('name', $selectedList)?->emails_count == 0)
+                            @elseif($selectedList && $this->lists->firstWhere('name', $selectedList)?->emails_count ==
+                            0)
                             <div class="flex gap-1.5 items-start text-yellow-600 sm:gap-2 dark:text-yellow-500">
                                 <i class="mt-0.5 text-xs sm:text-sm fas fa-exclamation-circle"></i>
                                 <div>
@@ -194,6 +199,66 @@
                                     <p class="font-medium">Select List</p>
                                     <p class="mt-0.5 text-xs text-neutral-600 dark:text-neutral-400">
                                         Please select a list first
+                                    </p>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Hard Bounce Delete Button  -->
+                    <div class="relative">
+                        <x-primary-danger-button x-data="{}" :disabled="!$selectedList || $this->getHardBounceCount() == 0"
+                            x-bind:class="$el.disabled ? 'opacity-50 cursor-not-allowed' : ''"
+                            wire:click="deleteEmails('hard_bounce')"
+                            wire:confirm="WARNING: This will delete ALL hard bounce emails in the current list. This action cannot be undone. Are you sure?"
+                            class="w-full text-sm sm:text-base" @mouseenter="$refs.hardBounceNoteBox.classList.remove('opacity-0')"
+                            @mouseleave="$refs.hardBounceNoteBox.classList.add('opacity-0')">
+
+                            <div class="flex gap-1 items-center sm:gap-2">
+                                <i class="text-xs sm:text-sm fas fa-trash"></i>
+                                <span class="text-xs sm:text-sm">Delete Hard Bounces</span>
+
+                                @if($selectedList)
+                                <span class="px-1.5 py-0.5 text-xs bg-red-700 rounded-full sm:px-2">
+                                    {{ $this->getHardBounceCount() }}
+                                </span>
+                                @endif
+                            </div>
+                        </x-primary-danger-button>
+
+
+                        <!-- Tooltip -->
+                        <div x-ref="hardBounceNoteBox"
+                            class="absolute left-0 z-50 p-2 mt-2 w-60 text-xs bg-white rounded-lg border shadow-lg opacity-0 transition-opacity duration-200 ease-in-out transform sm:w-72 sm:p-3 sm:text-sm dark:bg-neutral-800 dark:border-neutral-700">
+                            @if(!$selectedList)
+                            <div class="flex gap-1.5 items-start text-blue-600 sm:gap-2 dark:text-blue-500">
+                                <i class="mt-0.5 text-xs sm:text-sm fas fa-info-circle"></i>
+                                <div>
+                                    <p class="font-medium">Select List</p>
+                                    <p class="mt-0.5 text-xs text-neutral-600 dark:text-neutral-400">
+                                        Please select a list first
+                                    </p>
+                                </div>
+                            </div>
+                            @elseif($this->getHardBounceCount() == 0)
+                            <div class="flex gap-1.5 items-start text-yellow-600 sm:gap-2 dark:text-yellow-500">
+                                <i class="mt-0.5 text-xs sm:text-sm fas fa-exclamation-circle"></i>
+                                <div>
+                                    <p class="font-medium">No Hard Bounces</p>
+                                    <p class="mt-0.5 text-xs text-neutral-600 dark:text-neutral-400">
+                                        No hard bounce emails to delete
+                                    </p>
+                                </div>
+                            </div>
+                            @else
+                            <div class="flex gap-1.5 items-start text-red-600 sm:gap-2 dark:text-red-500">
+                                <i class="mt-0.5 text-xs sm:text-sm fas fa-exclamation-triangle"></i>
+                                <div>
+                                    <p class="font-medium">Warning</p>
+                                    <p class="mt-0.5 text-xs text-neutral-600 dark:text-neutral-400">
+                                        Delete all {{ $this->getHardBounceCount() }} hard bounce emails
+                                        from "{{ $this->lists->firstWhere('name', $selectedList)?->name }}"
                                     </p>
                                 </div>
                             </div>
@@ -342,6 +407,8 @@
                                     <div class="flex justify-between items-center">
                                         <span class="w-[350px]">Email</span>
                                         <span class="w-[350px]">Name</span>
+                                        <span class="w-[350px]">Soft Bounce</span>
+                                        <span class="w-[350px]">Hard Bounce</span>
                                         <span class="w-[130px]"></span> {{-- Spacer For History --}}
                                     </div>
                                 </th>
@@ -365,6 +432,22 @@
 
                                         <span class="w-[350px]">{{ $email->email }}</span>
                                         <span class="w-[350px]">{{ $email->name }}</span>
+                                        <span class="w-[350px]">
+                                            @if($email->soft_bounce_counter > 0)
+                                            <span
+                                                class="px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded-full dark:bg-yellow-900 dark:text-yellow-300">
+                                                {{ $email->soft_bounce_counter }}
+                                            </span>
+                                            @endif
+                                        </span>
+                                        <span class="w-[350px]">
+                                            @if($email->is_hard_bounce)
+                                            <span
+                                                class="px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full dark:bg-red-900 dark:text-red-300">
+                                                Hard Bounce
+                                            </span>
+                                            @endif
+                                        </span>
 
                                         <div class="flex self-end gap-2 items-center w-[130px] justify-end">
                                             @if($email->history->count() > 0)
@@ -467,7 +550,7 @@
                                         </button>
                                         <button type="button"
                                             class="ml-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300"
-                                            x-on:click="$dispatch('open-modal', 'edit-email-modal'); $wire.selectedEmailId = {{ $email->id }}; $wire.editEmail = '{{ $email->email }}'; $wire.editName = '{{ $email->name }}'">
+                                            x-on:click="$dispatch('open-modal', 'edit-email-modal'); $wire.selectedEmailId = {{ $email->id }}; $wire.editEmail = '{{ $email->email }}'; $wire.editName = '{{ $email->name }}'; $wire.editSoftBounceCounter = '{{ $email->soft_bounce_counter }}'; $wire.editIsHardBounce = '{{ $email->is_hard_bounce }}'">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                     </div>
@@ -616,6 +699,21 @@
                             <x-input-label for="emailName" value="Name" />
                             <x-text-input wire:model="editName" id="emailName" type="text" class="block mt-1 w-full" />
                             <x-input-error :messages="$errors->get('editName')" class="mt-2" />
+                        </div>
+                        <div>
+                            <x-input-label for="softBounceCounter" value="Soft Bounce Counter" />
+                            <x-text-input wire:model="editSoftBounceCounter" id="softBounceCounter" type="number"
+                                class="block mt-1 w-full" />
+                            <x-input-error :messages="$errors->get('editSoftBounceCounter')" class="mt-2" />
+                        </div>
+                        <div>
+                            <x-input-label for="isHardBounce" value="Hard Bounce Status" />
+                            <x-primary-select-input wire:model="editIsHardBounce" id="isHardBounce"
+                                class="block mt-1 w-full">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </x-primary-select-input>
+                            <x-input-error :messages="$errors->get('editIsHardBounce')" class="mt-2" />
                         </div>
                     </div>
                     <div class="flex justify-end mt-6 space-x-3">

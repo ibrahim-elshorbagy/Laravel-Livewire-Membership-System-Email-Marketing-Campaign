@@ -12,6 +12,10 @@ class EmailList extends Model
     use HasFactory;
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'is_hard_bounce' => 'boolean'
+    ];
+
 
     public function user()
     {
