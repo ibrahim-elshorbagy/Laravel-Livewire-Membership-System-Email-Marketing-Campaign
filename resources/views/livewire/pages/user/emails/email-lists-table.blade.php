@@ -62,6 +62,8 @@
                 <x-primary-select-input wire:model.live="orderBy" class="w-full sm:w-32">
                     <option value="email">Email</option>
                     <option value="name">Name</option>
+                    <option value="soft_bounce_counter">Soft Bounce</option>
+                    <option value="is_hard_bounce">Hard Bounce</option>
                 </x-primary-select-input>
                 <x-primary-select-input wire:model.live="sortDirection" class="w-full sm:w-32">
                     <option value="asc">Ascending</option>

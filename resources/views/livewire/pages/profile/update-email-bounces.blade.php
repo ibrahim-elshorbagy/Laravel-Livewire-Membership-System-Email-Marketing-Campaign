@@ -1,13 +1,14 @@
 <?php
-phpinfo();
 use App\Models\User;
 use App\Models\UserBouncesInfo;
+use App\Models\JobProgress;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Volt\Component;
 use Illuminate\Validation\Rule;
 use App\Services\BounceMailService;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use App\Jobs\ProcessBounceEmails;
+use Livewire\Attributes\On;
 
 new class extends Component
 {
@@ -19,10 +20,16 @@ new class extends Component
     public int $max_soft_bounces = 0;
 
     public bool $bounce_status = false;
-    public bool $is_checking = false;
     public array $bounce_messages = [];
     public ?string $error_message = null;
     private ?BounceMailService $bounceService = null;
+    public bool $has_active_job = false;
+
+    #[On('jobStatusUpdated')]
+    public function handleJobStatusUpdate($status): void
+    {
+        $this->has_active_job = $status;
+    }
 
     public function mount(): void
     {
@@ -35,6 +42,31 @@ new class extends Component
         $this->imap_port = $userBounces->imap_port ?? '993';
         $this->bounce_status = $userBounces->bounce_status ?? false;
         $this->max_soft_bounces = $userBounces->max_soft_bounces ?? 0;
+
+        // Check for active bounce check job
+        $this->checkActiveJob();
+    }
+
+    protected function checkActiveJob(): void
+    {
+        $user_id = Auth::id();
+
+        // Check JobProgress table
+        $activeJob = JobProgress::where('user_id', $user_id)
+            ->where('job_type', 'process_bounce_emails')
+            ->whereIn('status', ['processing', 'queued', 'pending'])
+            ->exists();
+
+        // Check jobs table
+        $activeQueueJob = DB::table('jobs')
+            ->where(function ($query) use ($user_id) {
+                $query->whereRaw("payload LIKE '%\"userId\":{$user_id}%'")
+                    ->orWhereRaw("payload LIKE '%\"user_id\":{$user_id}%'")
+                    ->orWhereRaw("payload LIKE '%i:{$user_id};%'");
+            })
+            ->exists();
+
+        $this->has_active_job = $activeJob || $activeQueueJob;
     }
 
 
@@ -42,6 +74,19 @@ new class extends Component
     {
         try {
             $user = Auth::user();
+
+            // Check for active jobs
+            $this->checkActiveJob();
+
+            if ($this->has_active_job) {
+                $this->alert('warning', 'A bounce check job is already in progress.', [
+                    'position' => 'bottom-end',
+                    'timer' => 3000,
+                    'toast' => true,
+                ]);
+                return;
+            }
+
             $bounceInfo = UserBouncesInfo::where('user_id', $user->id)->first();
 
             if (!$bounceInfo) {
@@ -53,7 +98,39 @@ new class extends Component
                 return;
             }
 
+
+
+            try {
+
+                $bounceService = new BounceMailService($bounceInfo);
+
+                $connected = $bounceService->testConnection();
+
+                if ($connected) {
+                    $this->error_message = null;
+                    $this->alert('success', 'Connection test successful! Your IMAP settings are correct.', [
+                        'position' => 'bottom-end',
+                        'timer' => 3000,
+                        'toast' => true,
+                    ]);
+                }
+                $this->error_message =null;
+
+            } catch (Exception $e) {
+                // Store the error message for display
+                $this->error_message = 'Connection failed: ' . $e->getMessage();
+
+                $this->alert('error', $this->error_message, [
+                    'position' => 'bottom-end',
+                    'timer' => 3000,
+                    'toast' => true,
+                ]);
+                return;
+
+            }
+
             ProcessBounceEmails::dispatch($bounceInfo);
+            $this->has_active_job = true;
 
             $this->alert('success', 'Bounce check job has been queued!', [
                 'position' => 'bottom-end',
@@ -76,7 +153,6 @@ new class extends Component
         if ($this->bounceService) {
             $this->bounceService->disconnect();
         }
-        $this->is_checking = false;
         $this->bounceService = null;
     }
 
@@ -118,23 +194,28 @@ new class extends Component
             ]);
 
             $bounceService = new BounceMailService($bounceInfo);
-            $bounceService->connect();
-            $bounceService->disconnect();
 
-            $this->error_message = null;
-            $this->alert('success', 'Connection test successful! Your IMAP settings are correct.', [
-                'position' => 'bottom-end',
-                'timer' => 3000,
-                'toast' => true,
-            ]);
+            $connected = $bounceService->testConnection();
+
+            if ($connected) {
+                $this->error_message = null;
+                $this->alert('success', 'Connection test successful! Your IMAP settings are correct.', [
+                    'position' => 'bottom-end',
+                    'timer' => 3000,
+                    'toast' => true,
+                ]);
+            }
+            $this->error_message =null;
+
         } catch (Exception $e) {
+            // Store the error message for display
+            $this->error_message = 'Connection test failed: ' . $e->getMessage();
 
-            $this->alert('error', 'Connection test failed: ' . $e->getMessage(), [
+            $this->alert('error', $this->error_message, [
                 'position' => 'bottom-end',
                 'timer' => 3000,
                 'toast' => true,
             ]);
-
         }
     }
 }; ?>
@@ -236,46 +317,28 @@ new class extends Component
                 </span>
             </x-primary-info-button>
 
-            @if (session('test-success'))
-            <div class="text-sm text-green-600 dark:text-green-400">
-                {{ session('test-success') }}
-            </div>
-            @endif
-
-        </div>
-    </form>
-
-    <!-- Bounce Check Controls -->
-    <div class="p-4 mt-6 bg-white rounded-lg shadow dark:bg-gray-800">
-        <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
-            Bounce Check Controls
-        </h3>
-
-        <div class="flex gap-4 mb-4">
-            @if(!$is_checking)
-            <x-primary-create-button type="button" wire:click="startBounceCheck">
+            <x-primary-create-button type="button" wire:click="startBounceCheck" :disabled="$has_active_job" >
                 <div class="flex gap-2">
-                    <span wire:loading.remove wire:target="startBounceCheck">Start Bounce Check</span>
+                    <span wire:loading.remove wire:target="startBounceCheck">Start Bounce</span>
                     <span wire:loading wire:target="startBounceCheck" class="flex items-center">
                         <i class="fa-duotone fa-solid fa-spinner fa-spin"></i>
                         <span class="ml-2">Checking...</span>
                     </span>
                 </div>
-
             </x-primary-create-button>
-            @else
-            <x-danger-button type="button" wire:click="stopBounceCheck">
-                Stop Bounce Check
-            </x-danger-button>
-            @endif
-        </div>
 
-        @if($error_message)
-        <div class="p-4 mb-4 text-sm text-red-800 bg-red-50 rounded-lg dark:bg-gray-800 dark:text-red-400">
+        </div>
+    </form>
+
+    <!-- error_message -->
+    @if($error_message)
+        <div class="p-4 text-sm text-red-800 bg-red-50 rounded-lg dark:bg-neutral-600 dark:text-red-400">
             {{ $error_message }}
         </div>
-        @endif
+    @endif
 
-
-    </div>
+    <!-- Progress Bar Component -->
+    @if($has_active_job)
+    <livewire:pages.profile.components.email-bounces-progress-bar />
+    @endif
 </section>

@@ -68,7 +68,6 @@ class CreateEmailList extends Component
     public function hasActiveJobs()
     {
         return DB::table('jobs')
-            ->where('queue', 'high')
             ->where(function($query) {
                 $query->where('payload', 'like', '%"userId":' . $this->userId . '%')
                     ->orWhere('payload', 'like', '%"user_id":' . $this->userId . '%')

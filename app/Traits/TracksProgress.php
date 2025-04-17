@@ -11,8 +11,10 @@ trait TracksProgress
 
     protected function initializeProgress($jobType, $userId, $totalItems)
     {
+        $jobId = property_exists($this, 'job') ? $this->job->getJobId() : $this->jobId;
+
         $this->jobProgress = JobProgress::create([
-            'job_id' => $this->job->getJobId(),
+            'job_id' => $jobId,
             'job_type' => $jobType,
             'user_id' => $userId,
             'total_items' => $totalItems,
@@ -22,6 +24,7 @@ trait TracksProgress
         ]);
     }
 
+
     protected function updateProgress($processedItems)
     {
         if ($this->jobProgress) {
@@ -29,7 +32,14 @@ trait TracksProgress
         }
     }
 
-    protected function completeProgress()
+    protected function updateProgressTotal($totalItems)
+    {
+        if ($this->jobProgress) {
+            $this->jobProgress->updateProgress($this->jobProgress->processed_items, $totalItems);
+        }
+    }
+
+    public function completeProgress()
     {
         if ($this->jobProgress) {
             $this->jobProgress->update([
@@ -39,7 +49,7 @@ trait TracksProgress
         }
     }
 
-    protected function failProgress($error)
+    public function failProgress($error)
     {
         if ($this->jobProgress) {
             $this->jobProgress->update([

@@ -66,6 +66,7 @@ class EmailListsTable extends Component
             'search' => 'nullable|string|max:255',
             'perPage' => 'required|integer|in:10,25,50,100',
             'sortDirection' => ['required', 'string', Rule::in(['asc', 'desc'])],
+            'orderBy' => ['required', 'string', Rule::in(['email', 'name','soft_bounce_counter','is_hard_bounce'])],
             'selectedEmails' => 'array',
             'selectedList' => 'nullable|string|max:255',
             'selectedEmails.*' => [
@@ -131,7 +132,6 @@ class EmailListsTable extends Component
         session(['cached_user' => $this->user]);
 
         $countProcessing = DB::table('jobs')
-            ->where('queue', 'high')
             ->where(function ($query) {
                 $query->whereRaw("payload LIKE '%\"userId\":{$this->user->id}%'")
                     ->orWhereRaw("payload LIKE '%\"user_id\":{$this->user->id}%'")

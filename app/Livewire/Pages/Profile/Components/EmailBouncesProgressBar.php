@@ -1,37 +1,24 @@
 <?php
 
-namespace App\Livewire\Pages\User\Emails\Partials;
+namespace App\Livewire\Pages\Profile\Components;
 
 use Livewire\Component;
 use App\Models\JobProgress;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Auth;
-class JobProgressComponent extends Component
+use Illuminate\Support\Facades\DB;
+
+class EmailBouncesProgressBar extends Component
 {
     public $userId;
-    private $user;
-
-    // default in ms
     public $pollInterval = 1000;
 
     public function mount()
     {
-        $this->user = auth()->user();
-        $this->userId = $this->user->id;
-
+        $this->userId = Auth::id();
     }
 
-    /**
-     * Called via wire:poll
-     * We only dispatch an event if something actually changed,
-     * to avoid re-rendering the parent for no reason.
-     */
     public function refreshProgress()
     {
-        // $start = microtime(true);
-
         $activeJobsExist = $this->checkActiveJobs();
         // If there's no change in job status, no need to dispatch anything
         if ($activeJobsExist !== session('active_jobs_flag')) {
@@ -39,12 +26,9 @@ class JobProgressComponent extends Component
             // Tell the parent if anything changed
             $this->dispatch('jobStatusUpdated', $activeJobsExist);
         }
-
-        // If active jobs remain true, keep poll at 1s; otherwise slow it to 10s
         $this->pollInterval = $activeJobsExist ? 1000 : 10000;
-
-        // Log::info('refreshProgress took '.(microtime(true) - $start).' seconds to complete.');
     }
+
 
     protected function checkActiveJobs()
     {
@@ -59,21 +43,8 @@ class JobProgressComponent extends Component
         return ($countProcessing > 0 || $queuePosition > 0);
     }
 
-    #[Computed]
-    public function progressData()
-    {
-        return [
-            'progress' => JobProgress::where('user_id', $this->userId)
-                ->whereIn('status', ['processing', 'pending'])
-                ->orderBy('created_at', 'desc')
-                ->get(),
-            'queueStatus' => $this->queueStatus(),
-        ];
-    }
-
     public function queueStatus()
     {
-        // Get the earliest job's created_at for this user
         $userEarliestJob = DB::table('jobs')
             ->where(function ($query) {
                 $query->whereRaw("payload LIKE '%\"userId\":{$this->userId}%'")
@@ -86,20 +57,28 @@ class JobProgressComponent extends Component
             return 0;
         }
 
-        // Count how many jobs are ahead of the user's earliest job
-        $position = DB::table('jobs')
+        return DB::table('jobs')
             ->where('created_at', '<', $userEarliestJob)
-            ->count();
-
-        return $position + 1; // Add 1 to account for zero-based position
+            ->count() + 1;
     }
 
+    public function getProgressDataProperty()
+    {
+        return [
+            'progress' => JobProgress::where('user_id', $this->userId)
+                ->where('job_type', 'process_bounce_emails')
+                ->whereIn('status', ['processing', 'pending', 'failed'])
+                ->orderBy('created_at', 'desc')
+                ->get(),
+            'queueStatus' => $this->queueStatus(),
+        ];
+    }
 
     public function render()
     {
-        return view('livewire.pages.user.emails.partials.job-progress-component', [
-            'progressData'  => $this->progressData,
-            'pollInterval'  => $this->pollInterval,
+        return view('livewire.pages.profile.components.email-bounces-progress-bar', [
+            'progressData' => $this->progressData,
+            'pollInterval' => $this->pollInterval,
         ]);
     }
 }
