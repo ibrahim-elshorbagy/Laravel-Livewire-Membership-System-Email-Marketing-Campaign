@@ -387,7 +387,7 @@
                             </tbody>
                         </table>
                         <div class="mt-4">
-                            {{ $bouncePatterns->links() }}
+                            {{ $bouncePatterns->links(data: ['scrollTo' => false]) }}
                         </div>
                     </div>
                 </x-primary-accordion>
