@@ -18,7 +18,7 @@ class PlanManagement extends Component
 
     public function getMonthlyPlansProperty()
     {
-        return Plan::where('periodicity_type', PeriodicityType::Month)
+        return Plan::whereIn('periodicity_type', [PeriodicityType::Month,PeriodicityType::Week])
             ->with('features')
             ->get();
     }
