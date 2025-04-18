@@ -72,19 +72,20 @@
                             @else
                             @php
                             $features = $subscription->getFeatureData();
-                            $subscribers = $features['Subscribers Limit'] ?? ['used' => 0, 'limit' => 0];
-                            $emails = $features['Email Sending'] ?? ['used' => 0, 'limit' => 0];
+                            $subscribers = $features[0] ?? ['used' => 0, 'limit' => 0];
+                            $emails = $features[1] ?? ['used' => 0, 'limit' => 0];
                             @endphp
+
                             <div class="flex flex-col items-center">
                                 <span class="text-xs text-gray-600 dark:text-gray-400">Subscribers:</span>
                                 <span class="text-xs font-medium text-gray-900 dark:text-gray-200">
-                                    {{ $subscribers['used'] }}/{{ $subscribers['limit'] }}
+                                    {{ (int)$subscribers['used'] }}/{{ (int)$subscribers['limit'] }}
                                 </span>
                             </div>
                             <div class="flex flex-col items-center">
                                 <span class="text-xs text-gray-600 dark:text-gray-400">Emails:</span>
                                 <span class="text-xs font-medium text-gray-900 dark:text-gray-200">
-                                    {{ $emails['used'] }}/{{ $emails['limit'] }}
+                                    {{ (int)$emails['used'] }}/{{ (int)$emails['limit'] }}
                                 </span>
                             </div>
                             @endif

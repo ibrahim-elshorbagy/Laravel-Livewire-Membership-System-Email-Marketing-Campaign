@@ -24,18 +24,15 @@ class Subscription extends BaseSubscription
             return collect();
         }
 
-
-        return $this->plan->features->mapWithKeys(function ($feature) {
+        return $this->plan->features->map(function ($feature) {
             $consumption = optional($this->subscriber)->featureConsumptions
                 ?->first(function ($consumption) use ($feature) {
                     return optional($consumption->feature)->name === $feature->name;
                 });
 
             return [
-                $feature->name => [
-                    'limit' => $feature->pivot->charges,
-                    'used' => $consumption ? $consumption->consumption : 0
-                ]
+                'limit' => $feature->pivot->charges,
+                'used' => $consumption ? $consumption->consumption : 0
             ];
         });
     }
