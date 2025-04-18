@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use LucasDotVin\Soulbscription\Models\Feature;
 use Exception;
 
 class EmailGatewayController extends Controller
@@ -26,8 +27,12 @@ class EmailGatewayController extends Controller
     protected $allowedUserAgents = [
         'Google-Apps-Script',
     ];
+    protected $emailSendingFeatureName;
 
-
+    public function __construct()
+    {
+        $this->emailSendingFeatureName = Feature::find(2)?->name;
+    }
     // Check user agent ----------------------------------------------------------------------------
     protected function checkUserAgent(Request $request)
     {
@@ -389,7 +394,7 @@ class EmailGatewayController extends Controller
 
 
             // Check if can consume batch size ----------------------------------------------------------------------------
-            if (!$user->canConsume('Email Sending', $this->batchSize)) {
+            if (!$user->canConsume($this->emailSendingFeatureName, $this->batchSize)) {
 
                 try{
 
@@ -410,7 +415,7 @@ class EmailGatewayController extends Controller
                                 'id' => $user->id,
                                 'name' => $user->first_name . ' ' . $user->last_name,
                                 'email' => $user->email,
-                                'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
+                                'EmailSendingRemainingQouta' => $user->balance($this->emailSendingFeatureName),
                             ],
                             'server' => [
                                 'id' => $request->serverid
@@ -466,7 +471,7 @@ class EmailGatewayController extends Controller
                                 'id' => $user->id,
                                 'name' => $user->first_name . ' ' . $user->last_name,
                                 'email' => $user->email,
-                                'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
+                                'EmailSendingRemainingQouta' => $user->balance($this->emailSendingFeatureName),
                             ],
                             'server' => [
                                 'id' => $server->id,
@@ -560,7 +565,7 @@ class EmailGatewayController extends Controller
                             'id' => $user->id,
                             'name' => $user->first_name . ' ' . $user->last_name,
                             'email' => $user->email,
-                            'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
+                            'EmailSendingRemainingQouta' => $user->balance($this->emailSendingFeatureName),
                         ],
                         'server' => [
                             'id' => $server->id,
@@ -589,7 +594,7 @@ class EmailGatewayController extends Controller
                     'id' => $user->id,
                     'name' => $user->first_name . ' ' . $user->last_name,
                     'email' => $user->email,
-                    'EmailSendingRemainingQouta' => $user->balance('Email Sending'),
+                    'EmailSendingRemainingQouta' => $user->balance($this->emailSendingFeatureName),
                 ],
                 'server' => [
                     'id' => $server->id,
@@ -642,7 +647,7 @@ class EmailGatewayController extends Controller
         $totalCampaignEmails = EmailList::whereIn('list_id', $campaign->emailLists->pluck('id'))
             ->where('is_hard_bounce', false)
             ->count();
-            
+
         $totalHardBounces = EmailList::whereIn('list_id', $campaign->emailLists->pluck('id'))
             ->where('is_hard_bounce', true)
             ->count();
@@ -713,7 +718,10 @@ class EmailGatewayController extends Controller
 
         // Update summary with new batch - with safeguards
         if (count($emailsToSend) > 0) {
-            $user->consume('Email Sending', (float) count($emailsToSend));
+            // Update the user's Email Sending quota directly instead of recording each consumption
+            $currentQuota = $user->balance($this->emailSendingFeatureName);
+            $newQuota = $currentQuota - count($emailsToSend);
+            $user->forceSetConsumption($this->emailSendingFeatureName, $newQuota);
 
             $newProcessedEmails = $processingSummary['processed_emails'] + count($emailsToSend);
             $processingSummary['processed_emails'] = min($newProcessedEmails, $totalCampaignEmails);

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Traits\TracksProgress;
+use LucasDotVin\Soulbscription\Models\Feature;
 
 class ProcessEmailFile implements ShouldQueue
 {
@@ -244,7 +245,8 @@ class ProcessEmailFile implements ShouldQueue
     {
         try {
             $user = \App\Models\User::find($this->userId);
-            $user->setConsumedQuota('Subscribers Limit', (float) $totalCount);
+            $subscribersLimitName = Feature::find(1)?->name;
+            $user->setConsumedQuota($subscribersLimitName, (float) $totalCount);
         } catch (\Exception $e) {
             Log::warning('Failed to update quota', [
                 'error' => $e->getMessage(),

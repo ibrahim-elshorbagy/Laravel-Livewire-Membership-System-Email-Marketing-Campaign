@@ -74,13 +74,7 @@
                                 <div class="space-y-1">
                                     <div class="flex justify-between items-center">
                                         <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                                            @if($feature->name == 'Subscribers Limit')
-                                            Number of contacts
-                                            @elseif($feature->name == 'Email Sending')
-                                            Emails per month
-                                            @else
                                             {{ $feature->name }}
-                                            @endif
                                         </span>
                                         <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
                                             {{ (int)$balance }} / {{ (int)$charges }}

@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use LucasDotVin\Soulbscription\Models\Feature;
 
 class DeleteEmails implements ShouldQueue
 {
@@ -106,7 +107,8 @@ class DeleteEmails implements ShouldQueue
                 // Update quota
                 $totalEmailCount = EmailList::where('user_id', $this->userId)->count();
                 $user = \App\Models\User::find($this->userId);
-                $user->forceSetConsumption('Subscribers Limit', (float) $totalEmailCount);
+                $subscribersLimitName = Feature::find(1)?->name;
+                $user->forceSetConsumption($subscribersLimitName, (float) $totalEmailCount);
 
                 // Complete the progress
                 $this->completeProgress("Successfully deleted {$processedCount} emails from list {$this->listId}");

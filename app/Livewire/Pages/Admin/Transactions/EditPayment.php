@@ -13,8 +13,10 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use App\Traits\SubscriptionManagementTrait;
 use App\Traits\PlanPriceCalculator;
+use LucasDotVin\Soulbscription\Models\Feature;
 use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
 use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
+use App\Models\EmailList;
 
 class EditPayment extends Component
 {
@@ -142,6 +144,12 @@ class EditPayment extends Component
             }
 
             $subscription = $this->handleSubscriptionChange($this->payment);
+            // Reset user consumption metrics
+            $subscribersLimitName = Feature::find(1)?->name;
+            $emailSendingName = Feature::find(2)?->name;
+            $this->payment->user->forceSetConsumption($subscribersLimitName, EmailList::where('user_id', $this->payment->user->id)->count());
+            $this->payment->user->forceSetConsumption($emailSendingName, 0);
+
 
             $this->payment->update([
                 'status' => 'approved',

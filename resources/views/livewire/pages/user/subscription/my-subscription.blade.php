@@ -87,15 +87,8 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M5 13l4 4L19 7" />
                                     </svg>
-                                    {{-- Bad I know --}}
                                     <span>
-                                        @if($feature->name == 'Subscribers Limit')
-                                        Number of contacts
-                                        @elseif($feature->name == 'Email Sending')
-                                        Emails per month
-                                        @else
                                         {{ $feature->name }}
-                                        @endif
                                     </span>
                                 </div>
                                 <div class="flex items-center space-x-2">

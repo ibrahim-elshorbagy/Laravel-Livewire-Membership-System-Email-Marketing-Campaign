@@ -10,8 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Spatie\WebhookClient\Jobs\ProcessWebhookJob;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 use App\Traits\SubscriptionManagementTrait;
-
-
+use LucasDotVin\Soulbscription\Models\Feature;
 
 class PayPalWebhookJob extends ProcessWebhookJob
 {
@@ -181,8 +180,10 @@ class PayPalWebhookJob extends ProcessWebhookJob
                     $subscription = $this->handleSubscriptionChange($payment);
 
                     // Reset user consumption metrics
-                    $payment->user->forceSetConsumption('Subscribers Limit', EmailList::where('user_id', $payment->user->id)->count());
-                    $payment->user->forceSetConsumption('Email Sending', 0);
+                    $subscribersLimitName = Feature::find(1)?->name;
+                    $emailSendingName = Feature::find(2)?->name;
+                    $payment->user->forceSetConsumption($subscribersLimitName, EmailList::where('user_id', $payment->user->id)->count());
+                    $payment->user->forceSetConsumption($emailSendingName, 0);
 
 
                     $payment->update([

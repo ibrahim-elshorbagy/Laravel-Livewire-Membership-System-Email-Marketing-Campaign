@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Support\Facades\Session;
+use LucasDotVin\Soulbscription\Models\Feature;
 
 class CreateEmailList extends Component
 {
@@ -45,7 +46,9 @@ class CreateEmailList extends Component
     {
         $this->user = auth()->user();
         $this->userId = $this->user->id;
-        $this->remainingQuota = $this->user->balance('Subscribers Limit');
+
+        $subscribersLimitName = Feature::find(1)?->name;
+        $this->remainingQuota = $this->user->balance($subscribersLimitName);
 
         $this->emailLists = EmailListName::where('user_id', $this->user->id)->get();
 
@@ -122,12 +125,14 @@ class CreateEmailList extends Component
                 return;
             }
 
-            if (!$this->user->canConsume('Subscribers Limit', $emailsCount)) {
+            $subscribersLimitName = Feature::find(1)?->name;
+
+            if (!$this->user->canConsume($subscribersLimitName, $emailsCount)) {
                 $this->alert('error', 'Not enough quota remaining', ['position' => 'bottom-end']);
                 return;
             }
 
-            DB::transaction(function() use ($emails) {
+            DB::transaction(function() use ($emails,$subscribersLimitName) {
                 $batch = collect($emails)->map(fn($email) => [
                     'user_id' => $this->user->id,
                     'list_id' => $this->list_id,
@@ -137,7 +142,7 @@ class CreateEmailList extends Component
                 DB::table('email_lists')->insertOrIgnore($batch);
 
                 $totalEmailCount = EmailList::where('user_id', $this->user->id)->count();
-                $this->user->setConsumedQuota('Subscribers Limit', (float) $totalEmailCount);
+                $this->user->setConsumedQuota($subscribersLimitName, (float) $totalEmailCount);
             });
 
             Session::flash('success', 'Emails saved successfully.');

@@ -88,6 +88,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(EmailListName::class, 'list_id');
     }
 
+    // most work with quota feature
     public function forceSetConsumption($featureName, $amount)
     {
         $feature = \LucasDotVin\Soulbscription\Models\Feature::where('name', $featureName)->first();

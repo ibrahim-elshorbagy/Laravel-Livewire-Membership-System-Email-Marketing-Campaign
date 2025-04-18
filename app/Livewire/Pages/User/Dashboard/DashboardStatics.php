@@ -10,6 +10,7 @@ use App\Models\Email\EmailMessage;
 use App\Models\EmailList;
 use App\Models\EmailListName;
 use Carbon\Carbon;
+use LucasDotVin\Soulbscription\Models\Feature;
 
 class DashboardStatics extends Component
 {
@@ -47,10 +48,14 @@ class DashboardStatics extends Component
     public function render()
     {
         $userId = auth()->user()->id;
-        $subscribers_limit = auth()->user()->lastSubscription()?->plan->features->where('name', 'Subscribers Limit')->first()->pivot->charges;
-        $subscribers = $subscribers_limit - auth()->user()->balance('Subscribers Limit');
-        $email_sending_limit = auth()->user()->lastSubscription()?->plan->features->where('name', 'Email Sending')->first()->pivot->charges;
-        $email_sending = $email_sending_limit -auth()->user()->balance('Email Sending');
+
+        $subscribersLimitName = Feature::find(1)?->name;
+        $subscribers_limit = auth()->user()->lastSubscription()?->plan->features->where('name', $subscribersLimitName)->first()->pivot->charges;
+        $subscribers = $subscribers_limit - auth()->user()->balance($subscribersLimitName);
+
+        $emailSendingName = Feature::find(2)?->name;
+        $email_sending_limit = auth()->user()->lastSubscription()?->plan->features->where('name', $emailSendingName)->first()->pivot->charges;
+        $email_sending = $email_sending_limit -auth()->user()->balance($emailSendingName);
 
         // Get user-specific statistics
         $paymentCount = Payment::where('user_id', $userId)->where('status', 'approved')->count();

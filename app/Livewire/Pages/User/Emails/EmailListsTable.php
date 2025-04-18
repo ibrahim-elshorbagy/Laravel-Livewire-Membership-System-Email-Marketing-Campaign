@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Validator;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Url;
-
+use LucasDotVin\Soulbscription\Models\Feature;
 
 class EmailListsTable extends Component
 {
@@ -117,7 +117,8 @@ class EmailListsTable extends Component
     public function mount()
     {
         $this->user = auth()->user();
-        $this->subscriberBalance = $this->user->balance('Subscribers Limit');
+        $subscribersLimitName = Feature::find(1)?->name;
+        $this->subscriberBalance = $this->user->balance($subscribersLimitName);
         if (!$this->user) {
             return redirect()->route('login');
         }
@@ -377,8 +378,9 @@ class EmailListsTable extends Component
                     $query->delete();
 
                     // Update user's quota
+                    $subscribersLimitName = Feature::find(1)?->name;
                     $this->user->forceSetConsumption(
-                        'Subscribers Limit',
+                        $subscribersLimitName,
                         EmailList::where('user_id', Auth::id())->count()
                     );
 
@@ -635,8 +637,10 @@ class EmailListsTable extends Component
                 return ['show' => false];
             }
 
+            $subscribersLimitName = Feature::find(1)?->name;
+
             $emailFeature = $subscription->plan->features()
-                ->where('name', 'Subscribers Limit')
+                ->where('name', $subscribersLimitName)
                 ->first();
 
             if (!$emailFeature) {
