@@ -638,8 +638,14 @@ class EmailGatewayController extends Controller
     {
         $emailsToSend = [];
 
-        // Get campaign totals - More accurate counting
-        $totalCampaignEmails = EmailList::whereIn('list_id', $campaign->emailLists->pluck('id'))->count();
+        // Get campaign totals excluding hard bounces
+        $totalCampaignEmails = EmailList::whereIn('list_id', $campaign->emailLists->pluck('id'))
+            ->where('is_hard_bounce', false)
+            ->count();
+            
+        $totalHardBounces = EmailList::whereIn('list_id', $campaign->emailLists->pluck('id'))
+            ->where('is_hard_bounce', true)
+            ->count();
 
         // Only count valid email histories
         $totalProcessedEmails = EmailHistory::where('campaign_id', $campaign->id)->count();
@@ -663,6 +669,7 @@ class EmailGatewayController extends Controller
             $remainingInBatch = $this->batchSize - count($emailsToSend);
 
             $unsentEmails = EmailList::where('list_id', $list->id)
+                ->where('is_hard_bounce', false)
                 ->whereNotExists(function($query) use ($campaign) {
                     $query->select(DB::raw(1))
                         ->from('email_histories')
@@ -715,7 +722,7 @@ class EmailGatewayController extends Controller
                 round(($processingSummary['processed_emails'] / $totalCampaignEmails) * 100, 2)
             );
 
-            if ($processingSummary['remaining_emails'] === 0) {
+            if ($processingSummary['remaining_emails'] === 0 || $processingSummary['remaining_emails'] === $totalHardBounces) {
                 DB::transaction(function() use ($campaign) {
                     // Update campaign status
                     $campaign->update(['status' => 'Completed']);

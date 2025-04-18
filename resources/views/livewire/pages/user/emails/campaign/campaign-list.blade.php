@@ -123,7 +123,7 @@
                     <td class="p-4 text-nowrap">
                         @php
                         $totalEmails = $campaign->emailLists->flatMap(function($list) {
-                        return $list->emails;
+                        return $list->emails->where('is_hard_bounce', false);
                         })->count();
                         $sentEmails = $campaign->emailHistories()->where('status', 'sent')->count();
                         $percentage = $totalEmails > 0 ? round(($sentEmails / $totalEmails) * 100, 1) : 0;
