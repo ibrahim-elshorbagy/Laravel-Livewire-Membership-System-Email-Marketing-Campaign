@@ -11,7 +11,7 @@ use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Attributes\Computed;
 use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
-use LucasDotVin\Soulbscription\Models\Subscription;
+use App\Models\Subscription\Subscription;
 use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
 
 class Subscripers extends Component
@@ -28,6 +28,8 @@ class Subscripers extends Component
     public $searchExpired = '';
     public $perPage = 10;
     public $selectedTab = 'all';
+    public $selectedSubscriptionId = null;
+    public $noteContent = '';
 
     protected $queryString = [
         'searchAll' => ['except' => ''],
@@ -128,10 +130,21 @@ class Subscripers extends Component
 
     protected function baseQuery(string $status = 'all')
     {
-        $query = Subscription::with(['plan', 'subscriber' => function ($query) {
-            $query->withTrashed();
-        }])
-        ->withoutGlobalScopes([SuppressingScope::class, StartingScope::class]);
+        $query =  Subscription::with([
+                'plan.features' => function($query) {
+                    $query->withPivot('charges');
+                },
+                'subscriber' => function($query) {
+                    $query->withTrashed()
+                        ->with(['featureConsumptions' => function($q) {
+                            $q->with(['feature']);
+                        }]);
+                },
+                'payments' => function($query) {
+                    $query->latest();
+                },
+                'note'
+            ])->withoutGlobalScopes([SuppressingScope::class, StartingScope::class]);
 
         // Only show subscriptions with non-deleted users unless in 'all' or 'deleted' tabs
         if (!in_array($status, ['all', 'deleted'])) {
@@ -155,8 +168,6 @@ class Subscripers extends Component
                             }),
             default => $query
         };
-
-        return $query;
     }
 
     protected function searchCallback()
@@ -171,27 +182,23 @@ class Subscripers extends Component
                 default => 'searchAll',
             }};
 
-            $query->whereHas('subscriber', function ($q) use ($searchTerm) {
-                $q->withTrashed()
-                    ->where(function ($subQuery) use ($searchTerm) {
-                    $subQuery->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$searchTerm%")
-                        ->orWhere('username', 'like', "%$searchTerm%");
+            $query->where(function($q) use ($searchTerm) {
+                $q->whereHas('subscriber', function ($userQuery) use ($searchTerm) {
+                    $userQuery->withTrashed()
+                        ->where(function ($subQuery) use ($searchTerm) {
+                            $subQuery->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$searchTerm%")
+                                ->orWhere('email', 'like', "%$searchTerm%")
+                                ->orWhere('username', 'like', "%$searchTerm%");
+                        });
+                })
+                ->orWhereHas('plan', function($planQuery) use ($searchTerm) {
+                    $planQuery->where('name', 'like', "%$searchTerm%");
                 });
             });
         };
     }
-    public function getSubscriptionPayment($subscriptionId)
-    {
-        return Payment::where('subscription_id', $subscriptionId)
-            ->latest()
-            ->first();
-    }
 
-    public function getSubscriptionNote($subscriptionId)
-    {
-        return Note::where('subscription_id', $subscriptionId)
-            ->first();
-    }
+
     public function impersonateUser($userId)
     {
         $user = User::find($userId);
@@ -202,21 +209,20 @@ class Subscripers extends Component
         }
     }
 
-    protected function getFeatureDetails($subscription, $featureName)
+
+    public function updateNote()
     {
-        // Get feature from plan
-        $feature = $subscription->plan->features->where('name', $featureName)->first();
+        $note = Note::firstOrCreate(
+            ['subscription_id' => $this->selectedSubscriptionId],
+            ['content' => '']
+        );
 
-        // Get remaining balance
-        $remaining = $subscription->subscriber->balance($featureName) ?? 0;
+        $note->update([
+            'content' => $this->noteContent
+        ]);
 
-        // Get total quota
-        $total = $feature?->pivot->charges;
-
-        return [
-            'remaining' => $remaining,
-            'total' => $total,
-        ];
+        $this->alert('success', 'Note updated successfully', ['position' => 'bottom-end']);
+        $this->dispatch('close-modal','subscription-note-modal');
     }
 
     public function render()

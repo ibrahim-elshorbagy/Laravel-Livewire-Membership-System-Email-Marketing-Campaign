@@ -14,7 +14,7 @@
                 <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </div>
-                @if($$search)
+                @if($search)
                 <div class="flex absolute inset-y-0 right-0 items-center pr-3">
                     <button wire:click="$set('{{ $search }}', '')" class="text-gray-400 hover:text-gray-600">
                         <i class="fas fa-times-circle"></i>
@@ -24,7 +24,6 @@
             </div>
         </div>
     </div>
-    <div x-text="selectedTab" class="mb-4"></div>
     <!-- Table -->
     <div class="overflow-hidden overflow-x-auto w-full rounded-lg">
         <table class="w-full text-xs text-left text-neutral-600 dark:text-neutral-400">
@@ -32,7 +31,7 @@
                 <tr>
                     <th class="p-4">Subscriber</th>
                     <th class="p-4">Plan</th>
-                    <th class="p-4">Limits</th>
+                    <th class="p-4 text-center">Limits</th>
                     <th class="p-4">Start Date</th>
                     <th class="p-4">Expiration</th>
                     <th class="p-4 text-nowrap">Payment Status</th>
@@ -44,7 +43,6 @@
                 @foreach($items as $subscription)
                 @php
                 $subscriber = $subscription->subscriber;
-                $payment = $this->getSubscriptionPayment($subscription->id);
                 @endphp
                 <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800">
                     <td class="p-4">
@@ -62,66 +60,55 @@
                         </div>
                     </td>
                     <td class="p-4">
-                        <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full text-nowrap">
+                        <span
+                            class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full text-nowrap">
                             {{ $subscription->plan->name }}
                         </span>
                     </td>
                     <td class="p-4 text-nowrap">
-                        <div class="flex flex-col gap-2">
-
-
-                            <!-- Subscribers Limit -->
+                        <div class="flex flex-col gap-2 text-center">
+                            @if($subscription->suppressed_at)
+                            <span class="text-xs text-yellow-600 dark:text-yellow-400">Suppressed</span>
+                            @else
                             @php
-                            $subscribersLimit = $this->getFeatureDetails($subscription, 'Subscribers Limit');
+                            $features = $subscription->getFeatureData();
+                            $subscribers = $features['Subscribers Limit'] ?? ['used' => 0, 'limit' => 0];
+                            $emails = $features['Email Sending'] ?? ['used' => 0, 'limit' => 0];
                             @endphp
-                                <div class="flex flex-col gap-2 justify-between items-center mb-1">
-                                    <span class="text-xs text-gray-600 dark:text-gray-400">Subscribers</span>
-                                    @if($subscription->suppressed_at)
-                                    <span class="text-xs text-yellow-600 dark:text-yellow-400">
-                                        Suppressed
-                                    </span>
-                                    @else
-                                    <span class="text-xs font-medium text-gray-900 dark:text-gray-200">
-                                        {{ $subscribersLimit['remaining'] }} / {{ $subscribersLimit['total'] }}
-                                    </span>
-                                    @endif
-                                </div>
-
-                            <!-- Email Sending Limit -->
-                            @php
-                            $emailLimit = $this->getFeatureDetails($subscription, 'Email Sending');
-                            @endphp
-                            <div class="flex flex-col gap-2 justify-between items-center mb-1">
-                                <span class="text-xs text-gray-600 dark:text-gray-400">Email Sending</span>
-                                @if($subscription->suppressed_at)
-                                <span class="text-xs text-yellow-600 dark:text-yellow-400">
-                                    Suppressed
-                                </span>
-                                @else
+                            <div class="flex flex-col items-center">
+                                <span class="text-xs text-gray-600 dark:text-gray-400">Subscribers:</span>
                                 <span class="text-xs font-medium text-gray-900 dark:text-gray-200">
-                                    {{ $emailLimit['remaining'] }} / {{ $emailLimit['total'] }}
+                                    {{ $subscribers['used'] }}/{{ $subscribers['limit'] }}
                                 </span>
-                                @endif
                             </div>
-
+                            <div class="flex flex-col items-center">
+                                <span class="text-xs text-gray-600 dark:text-gray-400">Emails:</span>
+                                <span class="text-xs font-medium text-gray-900 dark:text-gray-200">
+                                    {{ $emails['used'] }}/{{ $emails['limit'] }}
+                                </span>
+                            </div>
+                            @endif
                         </div>
                     </td>
                     <td class="p-4">{{ $subscription->started_at->format('d/m/Y h:i:s A') }}</td>
                     <td class="p-4">{{ $subscription->expired_at?->format('d/m/Y h:i:s A') }}</td>
                     <td class="p-4">
-                        @if($payment)
+                        @if($subscription->payments->isNotEmpty())
+                        @php
+                        $payment = $subscription->payments->first();
+                        @endphp
                         <span class="px-2 py-1 text-xs font-semibold rounded-full text-nowrap
-                            @switch($payment->status)
-                                @case('approved') text-green-800 bg-green-100 @break
-                                @case('pending') text-yellow-800 bg-yellow-100 @break
-                                @case('failed') text-red-800 bg-red-100 @break
-                                @default text-gray-800 bg-gray-100
-                            @endswitch">
+                                @switch($payment->status)
+                                    @case('approved') text-green-800 bg-green-100 @break
+                                    @case('pending') text-yellow-800 bg-yellow-100 @break
+                                    @case('failed') text-red-800 bg-red-100 @break
+                                    @default text-gray-800 bg-gray-100
+                                @endswitch">
                             <span class="text-nowrap">{{ ucfirst($payment->status) }}</span>
-
                         </span>
                         @else
-                        <span class="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full text-nowrap">
+                        <span
+                            class="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full text-nowrap">
                             No Payment
                         </span>
                         @endif
@@ -144,7 +131,8 @@
                                 wire:navigate>
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </x-primary-info-button>
-                            <x-primary-info-button href="{{ route('admin.users.transactions', $subscriber) }}" wire:navigate>
+                            <x-primary-info-button href="{{ route('admin.users.transactions', $subscriber) }}"
+                                wire:navigate>
                                 Transactions
                             </x-primary-info-button>
                             @if(!$subscriber->deleted_at)
@@ -154,7 +142,9 @@
                                 Login
                             </x-primary-info-button>
                             @endif
-                            <x-primary-info-button x-on:click="$dispatch('open-modal', 'subscription-note-{{ $subscription->id }}')">
+                            <x-primary-info-button
+                                x-on:click="$dispatch('open-modal', 'subscription-note-modal'); $wire.selectedSubscriptionId = {{ $subscription->id }}; $wire.noteContent = '{{ $subscription->note?->content }}'"
+                                class="ml-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
                                 <i class="fa-solid fa-note-sticky"></i>
                             </x-primary-info-button>
 
@@ -162,11 +152,6 @@
                         </div>
                     </td>
                 </tr>
-                <!-- Note Modal -->
-                    <x-modal name="subscription-note-{{ $subscription->id }}" :show="false" :maxWidth="'2xl'">
-                        <livewire:pages.admin.subscription.subscription-note :subscription="$subscription"
-                            :wire:key="'note-'.$subscription->id.$subscription->updated_at" />
-                    </x-modal>
                 @endforeach
             </tbody>
         </table>
@@ -176,5 +161,28 @@
     <div class="mt-4">
         {{ $items->links() }}
     </div>
+
+    <!-- Note Modal -->
+    <x-modal name="subscription-note-modal" :maxWidth="'2xl'">
+        <div class="p-6">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">Subscription Note</h2>
+            <form wire:submit.prevent="updateNote">
+                <div class="mt-6">
+                    <x-primary-textarea wire:model="noteContent" placeholder="Enter note for this subscription..."
+                        class="w-full h-64">
+                    </x-primary-textarea>
+                </div>
+                <div class="flex justify-end mt-6 space-x-3">
+                    <x-secondary-button x-on:click="$dispatch('close')">
+                        Cancel
+                    </x-secondary-button>
+                    <x-primary-create-button type="submit">
+                        Save
+                    </x-primary-create-button>
+                </div>
+            </form>
+        </div>
+    </x-modal>
+
 
 </div>

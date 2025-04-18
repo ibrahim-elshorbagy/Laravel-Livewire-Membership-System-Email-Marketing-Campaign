@@ -122,4 +122,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
     }
 
+    public function featureConsumptions()
+    {
+        return $this->morphMany(\LucasDotVin\Soulbscription\Models\FeatureConsumption::class, 'subscriber');
+    }
+
 }
