@@ -34,7 +34,7 @@
                 </td>
                 <td class="p-4">
                     <div class="space-y-1 text-nowrap">
-                        {{-- @foreach($plan->features as $feature)
+                        @foreach($plan->features as $feature)
                         <div class="flex gap-2 items-center">
                             <span class="text-green-500">
                                 <i class="fas fa-check"></i>
@@ -46,30 +46,8 @@
                                 @endif
                             </span>
                         </div>
-                        @endforeach --}}
+                        @endforeach
 
-                        <div class="flex gap-2 items-center">
-                            <span class="text-green-500">
-                                <i class="fas fa-check"></i>
-                            </span>
-                            <span class="">
-                                Number of contacts
-                                @if($plan->features[0]->pivot->charges)
-                                ( {{ (int)$plan->features[0]->pivot->charges }} Limit)
-                                @endif
-                            </span>
-                        </div>
-                        <div class="flex gap-2 items-center">
-                            <span class="text-green-500">
-                                <i class="fas fa-check"></i>
-                            </span>
-                            <span class="">
-                                Emails per month
-                                @if($plan->features[1]->pivot->charges)
-                                ( {{ (int)$plan->features[1]->pivot->charges }} Limit)
-                                @endif
-                            </span>
-                        </div>
                     </div>
                 </td>
                 <td class="p-4">

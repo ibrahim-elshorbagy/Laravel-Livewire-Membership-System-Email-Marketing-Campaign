@@ -64,11 +64,9 @@
                 <h4 class="mt-12 font-medium text-neutral-900 dark:text-neutral-100">Features</h4>
                 <ul
                     class="mt-4 space-y-2 text-sm font-medium list-disc list-inside marker:text-lg marker:text-black dark:marker:text-orange-500">
-                    {{-- @foreach($plan->features as $feature)
+                    @foreach($plan->features as $feature)
                     <li>{{ $feature->name }} ({{ $feature->pivot->charges }})</li>
-                    @endforeach --}}
-                    <li>Number of contacts ({{ (int)$plan->features[0]->pivot->charges }})</li>
-                    <li>Emails per month ({{ (int)$plan->features[0]->pivot->charges }})</li>
+                    @endforeach
                 </ul>
 
                 @auth
@@ -122,11 +120,9 @@
                 <h4 class="mt-12 font-medium text-neutral-900 dark:text-neutral-100">Features</h4>
                 <ul
                     class="mt-4 space-y-2 text-sm font-medium list-disc list-inside marker:text-lg marker:text-black dark:marker:text-orange-500">
-                    {{-- @foreach($plan->features as $feature)
+                    @foreach($plan->features as $feature)
                     <li>{{ $feature->name }} ({{ $feature->pivot->charges }})</li>
-                    @endforeach --}}
-                    <li>Number of contacts ({{ (int)$plan->features[0]->pivot->charges }})</li>
-                    <li>Emails per month ({{ (int)$plan->features[0]->pivot->charges }})</li>
+                    @endforeach
                 </ul>
 
                 @auth
