@@ -545,7 +545,7 @@
                                 <td class="p-4">
                                     <div class="flex space-x-2">
 
-                                        <button wire:click="deleteEmails({{ $email->id }})"
+                                        <button wire:click="deleteEmails('single',{{ $email->id }})"
                                             wire:confirm="Are you sure you want to delete this email?"
                                             class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
                                             Delete

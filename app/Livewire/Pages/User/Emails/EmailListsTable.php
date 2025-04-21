@@ -313,11 +313,6 @@ class EmailListsTable extends Component
         $this->user = auth()->user();
 
         try {
-            // Handle single email deletion
-            if (is_numeric($type)) {
-                $emailId = $type;
-                $type = 'single';
-            }
 
             DB::transaction(function () use ($type, $emailId) {
                 // Build the query based on deletion type
