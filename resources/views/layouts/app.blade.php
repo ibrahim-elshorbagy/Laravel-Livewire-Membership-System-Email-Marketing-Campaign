@@ -43,11 +43,11 @@
             class="flex fixed left-0 z-30 flex-col p-4 w-60 border-r transition-transform duration-300 h-svh shrink-0 border-neutral-300 bg-neutral-50 md:hidden md:w-64 md:translate-x-0 dark:border-neutral-700 dark:bg-neutral-900"
             x-bind:class="sidebarIsOpen ? 'translate-x-0' : '-translate-x-60'">
             <a href="{{ route('main-site') }}"
-                class="mb-4 ml-2 w-12 text-2xl font-bold text-neutral-900 dark:text-white">
+                class="mb-4 ml-2 w-24 text-2xl font-bold text-neutral-900 dark:text-white">
                 <x-application-logo />
             </a>
 
-            <div class="flex overflow-y-auto flex-col gap-2 pb-3">
+            <div class="flex flex-col gap-2 pb-3">
                 @auth
                 <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}" wire:navigate>
                     <span>Dashboard</span>
@@ -82,16 +82,30 @@
                     href="{{ route('user.campaigns.list') }}" wire:navigate>
                     <span>Campaigns</span>
                 </x-nav-link>
-                <x-primary-dropdown label="Support">
-                    <x-nav-link :active="request()->routeIs('user.support.tickets')"
-                        href="{{ route('user.support.tickets') }}" wire:navigate>
-                        <span>My Tickets</span>
-                    </x-nav-link>
-                    <x-nav-link :active="request()->routeIs('user.support.create')"
-                        href="{{ route('user.support.create') }}" wire:navigate>
-                        <span>Create Ticket</span>
-                    </x-nav-link>
-                </x-primary-dropdown>
+                @persist('sidebar')
+                <div x-data="{ isSupportExpanded: false}" class="flex flex-col space-y-2">
+                    <button type="button" x-on:click="isSupportExpanded = ! isSupportExpanded"
+                        class="flex gap-2 justify-between items-center px-2 py-1.5 text-sm font-medium rounded-md underline-offset-2 focus:outline-none focus-visible:underline"
+                        x-bind:class="isSupportExpanded ? 'text-neutral-900 bg-black/10 dark:text-white dark:bg-white/10' :  'text-neutral-600 hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/5'">
+                        <span class="mr-auto text-left">Support</span>
+                        <i class="transition-transform fa-solid fa-angle-up" x-bind:class="isSupportExpanded ? 'rotate-0' : 'rotate-180'"
+                            aria-hidden="true"></i>
+                    </button>
+
+                    <ul x-cloak x-collapse x-show="isSupportExpanded">
+                        <li class="px-1 py-0.5 first:mt-2">
+                            <x-nav-link :active="request()->routeIs('user.support.tickets')" href="{{ route('user.support.tickets') }}"
+                                wire:navigate>
+                                <span>My Tickets</span>
+                            </x-nav-link>
+                            <x-nav-link :active="request()->routeIs('user.support.create')"
+                                href="{{ route('user.support.create') }}" wire:navigate>
+                                <span>Create Ticket</span>
+                            </x-nav-link>
+                        </li>
+                    </ul>
+                </div>
+                @endpersist('sidebar')
                 @endrole
 
 
@@ -283,6 +297,7 @@
                                 <span>Create Ticket</span>
                             </x-nav-link>
                         </x-primary-dropdown>
+
                         @endrole
 
 
