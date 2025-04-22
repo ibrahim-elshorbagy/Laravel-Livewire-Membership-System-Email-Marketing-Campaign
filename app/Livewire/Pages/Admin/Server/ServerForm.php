@@ -23,6 +23,7 @@ class ServerForm extends Component
     public $servers = '';
     public $assigned_to_user_id = null;
     public $current_quota = 0;
+    public $emails_count = 4;
     public $admin_notes = '';
     public $userSearch = '';
     public $last_access_time = null;
@@ -40,6 +41,7 @@ class ServerForm extends Component
                         return $query->where('assigned_to_user_id', $this->assigned_to_user_id);
                     })->ignore($this->server_id),
                 ],
+                'emails_count' => 'required|integer|min:1|max:255',
                 'assigned_to_user_id' => 'nullable|exists:users,id',
                 'admin_notes' => 'nullable|string',
             ];

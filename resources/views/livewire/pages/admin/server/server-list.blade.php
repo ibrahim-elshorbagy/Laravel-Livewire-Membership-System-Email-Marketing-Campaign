@@ -68,10 +68,11 @@
                         <input type="checkbox" wire:model.live="selectPage" class="rounded">
                     </th>
                     <th scope="col" class="p-4">Name</th>
-                    <th scope="col" class="p-4">Assigned To</th>
-                    <th scope="col" class="p-4">Last Access</th>
+                    <th scope="col" class="p-4 w-[300px]">Note</th>
+                    <th scope="col" class="p-4 w-[200px]">Assigned To</th>
                     <th scope="col" class="p-4">Quota</th>
-                    <th scope="col" class="p-4">Added At</th>
+                    <th scope="col" class="p-4">Emails Count</th>
+                    <th scope="col" class="p-4">Dates </th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
             </thead>
@@ -82,7 +83,48 @@
                         <input type="checkbox" wire:model.live="selectedServers" value="{{ $server->id }}"
                             class="rounded">
                     </td>
-                    <td class="p-4">{{ $server->name }}</td>
+                    <td class="p-4 text-sm">{{ $server->name }}</td>
+                    <td class="p-4" x-data="{
+                                            isEditing: false,
+                                            tempNote: '{{ $server->admin_notes }}',
+                                            originalNote: '{{ $server->admin_notes }}',
+                                            startEdit() {
+                                                this.isEditing = true;
+                                                this.tempNote = this.originalNote;
+                                            },
+                                            saveEdit() {
+                                                $wire.edit_admin_notes = this.tempNote;
+                                                $wire.selectedServerId = {{ $server->id }};
+                                                $wire.saveNote();
+                                                this.isEditing = false;
+                                                this.originalNote = this.tempNote;
+                                            },
+                                            cancelEdit() {
+                                                this.isEditing = false;
+                                                this.tempNote = this.originalNote;
+                                            }
+                                        }">
+                        <template x-if="isEditing">
+                            <div class="flex items-center space-x-2">
+                                <x-textarea-input class="w-full text-sm" x-model="tempNote" @keydown.enter.prevent="saveEdit()"
+                                    @keydown.escape="cancelEdit()" />
+                                <button @click="saveEdit()" class="text-green-500 hover:text-green-600">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button @click="cancelEdit()" class="text-red-500 hover:text-red-600">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </template>
+                        <template x-if="!isEditing">
+                            <div class="flex items-center space-x-2">
+                                <span>{{ $server->admin_notes }}</span>
+                                <button @click="startEdit()" class="text-blue-500 hover:text-blue-600">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </template>
+                    </td>
                     <td class="p-4">
                         <div x-data="{ open: false }" class="relative">
                             <button type="button" @click="open = !open"
@@ -174,9 +216,56 @@
                             </div>
                         </div>
                     </td>
-                    <td class="p-4">{{ $server->last_access_time?->format('d/m/Y h:i:s A')?? '' }}</td>
-                    <td class="p-4">{{ $server->current_quota }}</td>
-                    <td class="p-4">{{ $server->created_at?->format('d/m/Y h:i:s A') }}</td>
+                    <td class="p-4 text-xs">{{ $server->current_quota }}</td>
+                    <td class="p-4 text-xs" x-data="{
+                        isEditing: false,
+                        tempCount: {{ $server->emails_count }},
+                        originalCount: {{ $server->emails_count }},
+                        startEdit() {
+                            this.isEditing = true;
+                            this.tempCount = this.originalCount;
+                        },
+                        saveEdit() {
+                            if (this.tempCount >= 1 && this.tempCount <= 255) {
+                                $wire.tempEmailsCount = this.tempCount;
+                                $wire.saveEmailsCount({{ $server->id }});
+                                this.isEditing = false;
+                                this.originalCount = this.tempCount;
+                            }
+                        },
+                        cancelEdit() {
+                            this.isEditing = false;
+                            this.tempCount = this.originalCount;
+                        }
+                    }">
+                        <template x-if="isEditing">
+                            <div class="flex items-center space-x-2">
+                                <x-text-input type="number" min="1" max="255" class="w-20 text-sm" x-model="tempCount"
+                                    @keydown.enter="saveEdit()" @keydown.escape="cancelEdit()" />
+                                <button @click="saveEdit()" class="text-green-500 hover:text-green-600">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button @click="cancelEdit()" class="text-red-500 hover:text-red-600">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </template>
+                        <template x-if="!isEditing">
+                            <div class="flex items-center space-x-2">
+                                <span x-text="originalCount"></span>
+                                <button @click="startEdit()" class="text-blue-500 hover:text-blue-600">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </template>
+                    </td>
+                    <td class="flex flex-col p-4 text-xs">
+                        <span>Added At</span>
+
+                        <span>{{ $server->created_at?->format('d/m/Y h:i:s A') }}</span>
+                        <span>Last Access</span>
+                        <span>{{ $server->last_access_time?->format('d/m/Y h:i:s A') }}</span>
+                    </td>
                     <td class="p-4">
                         <div class="flex space-x-2">
                             <div class="flex gap-2 items-center">

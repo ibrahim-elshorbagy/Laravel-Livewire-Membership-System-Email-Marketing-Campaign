@@ -24,7 +24,9 @@
             <!-- Multiple Server Names (Create Mode) -->
             <div class="lg:col-span-2">
                 <x-input-label for="servers" required>Server Names</x-input-label>
-                <x-textarea-input wire:model="servers" id="servers" placeholder="Enter server names separated by commas or new lines" class="block mt-1 w-full" required />
+                <x-textarea-input wire:model="servers" id="servers"
+                    placeholder="Enter server names separated by commas or new lines" class="block mt-1 w-full"
+                    required />
                 <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                     Enter server names using only English letters, dots, and hyphens (server-one.com, server-two)
                 </div>
@@ -32,6 +34,17 @@
                 <x-input-error :messages="$errors->get('servers')" class="mt-2" />
             </div>
             @endif
+
+            <!-- Emails Count Field (Both Modes) -->
+            <div class="@if(!$server_id) lg:col-span-2 @endif">
+                <x-input-label for="emails_count" required>Emails Count</x-input-label>
+                <x-text-input wire:model="emails_count" id="emails_count" type="number" min="1"
+                    class="block mt-1 w-full" required />
+                <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    Number of emails allowed for this server (default: 4)
+                </div>
+                <x-input-error :messages="$errors->get('emails_count')" class="mt-2" />
+            </div>
 
             @if($server_id)
             <!-- Assigned User (Edit Mode Only) -->
@@ -41,10 +54,10 @@
                     <button type="button" @click="open = !open"
                         class="px-4 py-2 w-full text-left rounded-md border shadow-sm dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
                         @if($assigned_to_user_id && $users->firstWhere('id', $assigned_to_user_id))
-                            {{ $users->firstWhere('id', $assigned_to_user_id)->first_name }}
-                            {{ $users->firstWhere('id', $assigned_to_user_id)->last_name }}
+                        {{ $users->firstWhere('id', $assigned_to_user_id)->first_name }}
+                        {{ $users->firstWhere('id', $assigned_to_user_id)->last_name }}
                         @else
-                            Select User
+                        Select User
                         @endif
                     </button>
 
@@ -65,7 +78,8 @@
                                     {{ $assigned_to_user_id == $user->id ? 'bg-sky-50 dark:bg-sky-900' : '' }}"
                                     wire:click="$set('assigned_to_user_id', {{ $user->id }}); open = false">
                                     <div class="flex gap-2 items-center w-max">
-                                        <img class="object-cover rounded-full size-10" src="{{ $user->image_url ?? asset('default-avatar.png') }}"
+                                        <img class="object-cover rounded-full size-10"
+                                            src="{{ $user->image_url ?? asset('default-avatar.png') }}"
                                             alt="{{ $user->first_name }} {{ $user->last_name }}" />
                                         <div class="flex flex-col">
                                             <span class="text-neutral-900 dark:text-neutral-100">

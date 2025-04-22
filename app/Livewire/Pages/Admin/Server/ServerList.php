@@ -31,6 +31,7 @@ class ServerList extends Component
     public $admin_notes = '';
     public $selectedServerId = null;
     public $edit_admin_notes = '';
+    public $tempEmailsCount = null;
 
 
     protected $queryString = [
@@ -73,6 +74,21 @@ class ServerList extends Component
 
         $this->alert('success', 'Notes saved successfully!', ['position' => 'bottom-end']);
         $this->dispatch('close-modal', 'edit-note-modal');
+    }
+
+    public function saveEmailsCount($serverId)
+    {
+        $this->validate([
+            'tempEmailsCount' => 'required|integer|min:1|max:255'
+        ]);
+
+        $server = Server::findOrFail($serverId);
+        $server->update([
+            'emails_count' => $this->tempEmailsCount
+        ]);
+
+        $this->tempEmailsCount = null;
+        $this->alert('success', 'Emails count updated successfully!', ['position' => 'bottom-end']);
     }
 
     public function deleteServer($serverId)

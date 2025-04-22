@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Validator;
 use LucasDotVin\Soulbscription\Models\Feature;
 use Exception;
 
+
 class EmailGatewayController extends Controller
 {
     protected $apiPassword = '6Sb8E3cGG2bS1a';
@@ -28,10 +29,12 @@ class EmailGatewayController extends Controller
         'Google-Apps-Script',
     ];
     protected $emailSendingFeatureName;
+    protected $emailSendingFeatureTotalQouta;
 
     public function __construct()
     {
-        $this->emailSendingFeatureName = Feature::find(2)?->name;
+        $feature = Feature::find(2);
+        $this->emailSendingFeatureName = $feature->name;
     }
     // Check user agent ----------------------------------------------------------------------------
     protected function checkUserAgent(Request $request)
@@ -273,7 +276,7 @@ class EmailGatewayController extends Controller
 
             // Validate server assignment
             $server = Server::where('name', $request->serverid)->first();
-
+            $this->batchSize = $server->emails_count; //Update batchSize
 
             $user = User::where('id', $server->assigned_to_user_id)->first();
 
@@ -718,10 +721,25 @@ class EmailGatewayController extends Controller
 
         // Update summary with new batch - with safeguards
         if (count($emailsToSend) > 0) {
-            // Update the user's Email Sending quota directly instead of recording each consumption
-            $currentQuota = $user->balance($this->emailSendingFeatureName);
-            $newQuota = $currentQuota - count($emailsToSend);
-            $user->forceSetConsumption($this->emailSendingFeatureName, $newQuota);
+
+        $emailSendingFeature = $user->subscription->plan->features->firstWhere('name', $this->emailSendingFeatureName);
+
+
+        // Retrieve the total quota (limit) from the feature's pivot table
+        $emailSendingFeatureTotalQuota = $emailSendingFeature->pivot->charges;
+
+        // Retrieve the User's feature Remaining balance
+        $emailSendingUserBalance = $user->balance($this->emailSendingFeatureName);
+
+        // Calculate the amount the user has consumed (total quota - remaining balance)
+        $oldConsumed = $emailSendingFeatureTotalQuota - $emailSendingUserBalance;
+
+        // Add the amount the user is about to consume (count of emails to send)
+        $newTotalConsumed = $oldConsumed + count($emailsToSend);
+
+        // Set the new consumed quota
+        $user->setConsumedQuota($this->emailSendingFeatureName, $newTotalConsumed);
+
 
             $newProcessedEmails = $processingSummary['processed_emails'] + count($emailsToSend);
             $processingSummary['processed_emails'] = min($newProcessedEmails, $totalCampaignEmails);
