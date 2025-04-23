@@ -19,7 +19,7 @@ trait PlanPriceCalculator
         if($newPlan && $user)
         {
 
-            if ($currentSubscription) { //If there is Subscription
+            if ($currentSubscription && $currentSubscription->plan->id !=1) { //If there is Subscription // DON"T MAKE THE CALC IF THE MAIN PLAN IS THE FREE ONE
 
                 return $this->calculateUpgradePrice($newPlan, $currentSubscription);
 
