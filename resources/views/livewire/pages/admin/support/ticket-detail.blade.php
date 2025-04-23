@@ -60,16 +60,14 @@
 
                         @if($user_subscription->plan->features->isNotEmpty())
                         <div class="mt-4">
-                            <h4 class="mb-2 text-sm font-medium text-neutral-900 dark:text-neutral-100">Features Usage
-                            </h4>
+                            <h4 class="mb-2 text-sm font-medium text-neutral-900 dark:text-neutral-100">Features Usage</h4>
                             <div class="space-y-3">
                                 @foreach($user_subscription->plan->features as $feature)
                                 @php
-                                $balance = $ticket->user->balance($feature->name);
-                                $charges = $feature->pivot->charges;
-                                $percentage = $charges > 0 ? ($balance / $charges) * 100 : 0;
-                                $colorClass = $percentage > 75 ? 'bg-green-500' : ($percentage > 25 ? 'bg-yellow-500' :
-                                'bg-red-500');
+                                $charges = $feature->pivot->charges; // Total allowed
+                                $balance = $ticket->user->balance($feature->name); // Currently remaining
+                                $used = $charges - $balance; // Calculate how much has been used
+                                $percentage = $charges > 0 ? ($used / $charges) * 100 : 0; // Percentage used
                                 @endphp
                                 <div class="space-y-1">
                                     <div class="flex justify-between items-center">
@@ -77,12 +75,11 @@
                                             {{ $feature->name }}
                                         </span>
                                         <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                                            {{ (int)$balance }} / {{ (int)$charges }}
+                                            {{ (int)$used }} / {{ (int)$charges }}
                                         </span>
                                     </div>
                                     <div class="w-full h-2 bg-gray-200 rounded-full dark:bg-neutral-700">
-                                        <div class="h-2 rounded-full transition-all {{ $colorClass }}"
-                                            style="width: {{ $percentage }}%"></div>
+                                        <div class="h-2 bg-green-500 rounded-full transition-all" style="width: {{ $percentage }}%"></div>
                                     </div>
                                 </div>
                                 @endforeach

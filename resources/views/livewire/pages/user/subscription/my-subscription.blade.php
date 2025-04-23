@@ -82,19 +82,22 @@
                         <li class="space-y-2">
                             <div class="flex justify-between items-center">
                                 <div class="flex items-center text-sm text-neutral-600 dark:text-neutral-400">
-                                    <svg class="flex-shrink-0 mr-2 w-4 h-4 text-green-500" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 13l4 4L19 7" />
+                                    <svg class="flex-shrink-0 mr-2 w-4 h-4 text-green-500" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                     <span>
                                         {{ $feature->name }}
                                     </span>
                                 </div>
                                 <div class="flex items-center space-x-2">
+                                    @php
+                                    $charges = $feature->pivot->charges; // Total allowed
+                                    $balance = auth()->user()->balance($feature->name); // Currently remaining
+                                    $used = $charges - $balance; // Calculate how much has been used
+                                    @endphp
                                     <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-                                        {{ (int)auth()->user()->balance($feature->name) }} / {{
-                                        (int)$feature->pivot->charges }}
+                                        {{ (int)$used }} / {{ (int)$charges }}
                                     </span>
                                 </div>
                             </div>
@@ -102,29 +105,26 @@
                             <!-- Progress Bar -->
                             <div class="w-full h-2 bg-gray-200 rounded-full dark:bg-neutral-700">
                                 @php
-                                $percentage = ($feature->pivot->charges > 0)
-                                ? (auth()->user()->balance($feature->name) / $feature->pivot->charges) * 100
-                                : 0;
-                                $colorClass = $percentage > 75
-                                ? 'bg-green-500'
-                                : ($percentage > 25
-                                ? 'bg-yellow-500'
-                                : 'bg-red-500');
+                                $percentage = ($charges > 0) ? ($used / $charges) * 100 : 0;
+                                // Make sure percentage doesn't exceed 100% for display purposes
+                                $displayPercentage = min(100, $percentage);
                                 @endphp
-                                <div class="h-2 rounded-full transition-all {{ $colorClass }}"
-                                    style="width: {{ $percentage }}%">
+                                <div class="h-2 bg-green-500 rounded-full transition-all" style="width: {{ $displayPercentage }}%">
                                 </div>
                             </div>
 
                             <!-- Usage Info -->
                             <div class="flex justify-between text-xs">
                                 <span class="text-neutral-500 dark:text-neutral-400">
-                                    @if($percentage <= 0) Limit reached @elseif($percentage <=25) Running low
-                                        @elseif($percentage <=75) Good usage @else Plenty available @endif </span>
-                                        <span
-                                            class="font-medium {{ $colorClass === 'bg-green-500' ? 'text-green-600 dark:text-green-400' : ($colorClass === 'bg-yellow-500' ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400') }}">
-                                            {{ number_format($percentage, 0) }}%
-                                        </span>
+                                    @if($percentage >= 95) High usage
+                                    @elseif($percentage >= 50) Moderate usage
+                                    @elseif($percentage > 0) Low usage
+                                    @else No usage
+                                    @endif
+                                </span>
+                                <span class="font-medium text-green-600 dark:text-green-400">
+                                    {{ number_format($percentage, 2) }}%
+                                </span>
                             </div>
                         </li>
                         @endforeach
