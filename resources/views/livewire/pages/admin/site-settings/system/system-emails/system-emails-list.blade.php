@@ -12,110 +12,164 @@
         </div>
     </header>
 
-    <!-- Search and Filters -->
-    <div class="mb-6">
-        <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
-            <div class="relative flex-1">
-                <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search Templates..."
-                    class="pl-10 w-full" />
-                <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-                    <i class="text-gray-400 fas fa-search"></i>
+    <!-- Email Lists Tabs -->
+    <x-tabs selected-tab="{{ $selectedList }}">
+        <x-slot name="tabs">
+            <!-- All Emails Tab -->
+            <x-tab name="all" :active="$selectedList === 'all'">
+                All Emails
+            </x-tab>
+
+            <!-- List Tabs -->
+            @foreach($lists as $list)
+            <x-tab name="{{ $list->name }}" :active="$selectedList === $list->name">
+                {{ $list->name }}
+                <span class="px-2 py-1 text-xs rounded-full bg-neutral-200 dark:bg-neutral-700">
+                    {{ $list->emails_count }}
+                </span>
+                <x-slot name="actions">
+                    <div class="flex items-center ml-2 opacity-0 transition-opacity text-nowrap group-hover:opacity-100">
+
+                        <button type="button" class="ml-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300"
+                            x-on:click="$dispatch('open-modal', 'edit-list-modal');$wire.editingListId = {{ $list->id }};$wire.listName = '{{ $list->name }}'; ">
+                            <i class="fas fa-edit"></i>
+                        </button>
+
+                        <button type="button" wire:click="deleteList({{ $list->id }})"
+                            wire:confirm="Are you sure you want to delete this list?"
+                            class="ml-2 text-neutral-400 hover:text-red-600 dark:hover:text-red-500">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </x-slot>
+
+            </x-tab>
+            @endforeach
+
+            <!-- Create List Button -->
+            <div class="flex items-center">
+                <button type="button" x-data @click="$dispatch('open-modal', 'create-list')"
+                    class="flex items-center px-3 py-2 text-sm font-medium text-sky-600 rounded-lg dark:text-sky-400 hover:bg-neutral-100 dark:hover:bg-neutral-800">
+                    <i class="mr-1 fas fa-plus"></i> New List
+                </button>
+            </div>
+        </x-slot>
+
+        <x-slot name="content">
+            <!-- Search and Filters -->
+            <div class="mb-6">
+                <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
+                    <div class="relative flex-1">
+                        <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search Templates..."
+                            class="pl-10 w-full" />
+                        <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                            <i class="text-gray-400 fas fa-search"></i>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <x-primary-select-input wire:model.live="sortField" class="w-full sm:w-40">
+                            <option value="updated_at">Sort by Date</option>
+                            <option value="slug">Sort by Title</option>
+                        </x-primary-select-input>
+
+                        <x-primary-select-input wire:model.live="sortDirection" class="w-full sm:w-32">
+                            <option value="asc">Ascending</option>
+                            <option value="desc">Descending</option>
+                        </x-primary-select-input>
+
+                        <x-primary-select-input wire:model.live="perPage" class="w-full sm:w-32">
+                            <option value="10">10 per page</option>
+                            <option value="25">25 per page</option>
+                            <option value="50">50 per page</option>
+                        </x-primary-select-input>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex flex-wrap gap-2">
-                <x-primary-select-input wire:model.live="sortField" class="w-full sm:w-40">
-                    <option value="updated_at">Sort by Date</option>
-                    <option value="slug">Sort by Title</option>
-                </x-primary-select-input>
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center space-x-4">
+                    @if(count($selectedTemplates) > 0)
+                    <span class="text-sm font-medium">{{ count($selectedTemplates) }} items selected</span>
+                    <button wire:click="bulkDelete" wire:confirm="Are you sure you want to delete the selected templates?"
+                        class="px-3 py-1 text-sm text-white bg-red-500 rounded-md hover:bg-red-600">
+                        Delete Selected
+                    </button>
+                    <button wire:click="openAssignListModal"
+                        class="px-3 py-1 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600">
+                        Assign to List
+                    </button>
+                    @if($selectedList !== 'all')
+                    <button wire:click="removeFromList"
+                        wire:confirm="Are you sure you want to remove selected templates from this list?"
+                        class="px-3 py-1 text-sm text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                        Remove from List
+                    </button>
+                    @endif
+                    @endif
+                </div>
+            </div>
 
-                <x-primary-select-input wire:model.live="sortDirection" class="w-full sm:w-32">
-                    <option value="asc">Ascending</option>
-                    <option value="desc">Descending</option>
-                </x-primary-select-input>
+            <!-- Tab Content -->
+            <x-tab-panel name="all" :active="$selectedList === 'all'">
+                @include('livewire.pages.admin.site-settings.system.system-emails.partials.emails-table')
+            </x-tab-panel>
 
-                <x-primary-select-input wire:model.live="perPage" class="w-full sm:w-32">
-                    <option value="10">10 per page</option>
-                    <option value="25">25 per page</option>
-                    <option value="50">50 per page</option>
-                </x-primary-select-input>
+            @foreach($lists as $list)
+            <x-tab-panel name="{{ $list->name }}" :active="$selectedList === $list->name">
+                @include('livewire.pages.admin.site-settings.system.system-emails.partials.emails-table')
+            </x-tab-panel>
+            @endforeach
+        </x-slot>
+    </x-tabs>
+
+    <!-- Create List Modal -->
+    <x-modal name="create-list" :show="false" maxWidth="md">
+        <div class="p-6">
+            <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Create New Email List</h2>
+            <div class="mt-4">
+                <x-text-input wire:model="listName" id="list-name" class="w-full" placeholder="List name" />
+                <x-input-error :messages="$errors->get('listName')" :messages="$errors->get('listName')" for="listName" class="mt-2" />
+            </div>
+            <div class="flex justify-end mt-6 space-x-2">
+                <x-secondary-button x-on:click="$dispatch('close-modal', 'create-list')">Cancel</x-secondary-button>
+                <x-primary-create-button wire:click="createList">Create</x-primary-create-button>
             </div>
         </div>
-    </div>
+    </x-modal>
 
-    <div class="flex justify-between items-center mb-4">
-        <div class="flex items-center space-x-4">
-            @if(count($selectedTemplates) > 0)
-            <span class="text-sm font-medium">{{ count($selectedTemplates) }} items selected</span>
-            <button wire:click="bulkDelete" wire:confirm="Are you sure you want to delete the selected templates?"
-                class="px-3 py-1 text-sm text-white bg-red-500 rounded-md hover:bg-red-600">
-                Delete Selected
-            </button>
-            @endif
+    <!-- Edit List Modal -->
+    <x-modal name="edit-list-modal" :show="false" maxWidth="md">
+        <div class="p-6">
+            <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Edit List</h2>
+            <div class="mt-4">
+                <x-text-input wire:model="listName" id="edit-list-name" class="w-full" placeholder="List name" />
+                <x-input-error :messages="$errors->get('listName')" for="listName" class="mt-2" />
+            </div>
+            <div class="flex justify-end mt-6 space-x-2">
+                <x-secondary-button x-on:click="$dispatch('close-modal', 'edit-list-modal')">Cancel</x-secondary-button>
+                <x-primary-create-button wire:click="updateList">Update</x-primary-create-button>
+            </div>
         </div>
-    </div>
+    </x-modal>
 
-    <!-- Table -->
-    <div class="overflow-hidden overflow-x-auto w-full rounded-lg">
-        <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
-            <thead
-                class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
-                <tr>
-                    <th scope="col" class="p-4">
-                        <input type="checkbox" wire:model.live="selectPage" class="rounded">
-                    </th>
-                    <th scope="col" class="p-4">Name</th>
-                    <th scope="col" class="p-4">Subject</th>
-                    <th scope="col" class="p-4">Updated</th>
-                    <th scope="col" class="p-4">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
-                @foreach($systemEmails as $email)
-                <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                    <td class="p-4">
-                        <input type="checkbox" wire:model.live="selectedTemplates" value="{{ $email->id }}"
-                            class="rounded">
-                    </td>
-                    <td class="p-4">
-                        <div>
-                            <p >{{ $email->name }}</p>
-                            <p class="text-sm text-neutral-500">{{ $email->slug }}</p>
-                        </div>
-                    </td>
-                    <td class="p-4 text-nowrap">
-                        {{ $email->email_subject }}
-                    </td>
-                    <td class="p-4 text-nowrap">
-                        {{ $email->updated_at->format('d/m/Y H:i:s') }}
-                    </td>
-                    <td class="p-4">
-                        <div class="flex space-x-2">
-                            {{-- <a href="{{ route('admin.site-system-emails.show', $email->id) }}" wire:navigate
-                                class="inline-flex items-center px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-500/10 hover:bg-purple-500/20">
-                                View
-                            </a> --}}
-
-                            <a href="{{ route('admin.site-settings-emails.form', $email->id) }}"
-                                class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
-                                Edit
-                            </a>
-
-                            <button wire:click="deleteTemplate({{ $email->id }})"
-                                wire:confirm="Are you sure you want to delete this template?"
-                                class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
-                                Delete
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Pagination -->
-    <div class="mt-4">
-        {{ $systemEmails->links() }}
-    </div>
+    <!-- Assign List Modal -->
+    <x-modal name="assign-list-modal" :show="false" maxWidth="md">
+        <div class="p-6">
+            <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Assign Templates to List</h2>
+            <div class="mt-4">
+                <x-primary-select-input wire:model="assignListId" class="w-full">
+                    <option value="">Select a list</option>
+                    @foreach($lists as $list)
+                    <option value="{{ $list->id }}">{{ $list->name }}</option>
+                    @endforeach
+                </x-primary-select-input>
+                <x-input-error :messages="$errors->get('assignListId')" for="assignListId" class="mt-2" />
+            </div>
+            <div class="flex justify-end mt-6 space-x-2">
+                <x-secondary-button x-on:click="$dispatch('close-modal', 'assign-list-modal')">Cancel</x-secondary-button>
+                <x-primary-create-button wire:click="assignToList">Assign</x-primary-create-button>
+            </div>
+        </div>
+    </x-modal>
 </div>

@@ -7,6 +7,7 @@ use App\Models\Admin\Site\SystemSetting\SystemEmail;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Support\Facades\Session;
 use App\Rules\ProhibitedWords;
+use App\Models\Admin\Site\SystemSetting\SystemEmailList;
 
 class SystemEmailsForm extends Component
 {
@@ -18,6 +19,7 @@ class SystemEmailsForm extends Component
     public $email_subject = '';
     public $message_html = '';
     public $showPreview = false;
+    public $list_id = null;
 
     public function rules(): array
     {
@@ -27,6 +29,7 @@ class SystemEmailsForm extends Component
             'slug' => ['required', 'string','max:255','unique:system_emails,slug,'.$this->email_id],
             'email_subject' => ['nullable', 'string','max:255'],
             'message_html'  => ['nullable', 'string'],
+            'list_id' => ['nullable', 'exists:system_email_lists,id'],
         ];
     }
 
@@ -36,7 +39,13 @@ class SystemEmailsForm extends Component
             $this->email_id = $email;
             $emailModel = SystemEmail::findOrFail($email);
             $this->fill($emailModel->toArray());
+            $this->list_id = $emailModel->list_id;
         }
+    }
+
+    public function getListsProperty()
+    {
+        return SystemEmailList::all();
     }
 
     public function togglePreview()

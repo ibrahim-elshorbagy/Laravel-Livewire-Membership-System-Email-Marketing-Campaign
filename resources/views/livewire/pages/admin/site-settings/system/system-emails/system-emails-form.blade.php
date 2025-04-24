@@ -30,6 +30,16 @@
                     <x-text-input wire:model="email_subject" id="email_subject" type="text" class="block mt-1 w-full" />
                     <x-input-error :messages="$errors->get('email_subject')" class="mt-2" />
                 </div>
+                <div>
+                    <x-input-label for="list_id">Email List</x-input-label>
+                    <x-primary-select-input wire:model="list_id" id="list_id" class="block mt-1 w-full">
+                        <option value="">Select a list</option>
+                        @foreach($this->lists as $list)
+                        <option value="{{ $list->id }}">{{ $list->name }}</option>
+                        @endforeach
+                    </x-primary-select-input>
+                    <x-input-error :messages="$errors->get('list_id')" class="mt-2" />
+                </div>
                 <div wire:ignore>
                     <x-input-label for="message_html">HTML Template</x-input-label>
                     <div class="mt-1 space-y-2">
