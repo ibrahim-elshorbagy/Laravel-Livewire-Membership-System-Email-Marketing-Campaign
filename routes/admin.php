@@ -27,6 +27,7 @@ use App\Livewire\Pages\Admin\Transactions\User\UserTransactions;
 use App\Livewire\Pages\Admin\User\UserManagement;
 use App\Livewire\Pages\Admin\User\UserManagement\Create;
 use App\Livewire\Pages\Admin\User\UserManagement\Edit;
+use App\Livewire\Pages\Admin\User\UserManagement\SendEmail;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -40,6 +41,7 @@ use Livewire\Volt\Volt;
         Route::get('/users', UserManagement::class)->name('admin.users');
         Route::get('/users/create', Create::class)->name('admin.users.create');
         Route::get('/users/{user}/edit', Edit::class)->name('admin.users.edit');
+        Route::get('/user/{user}/sned/{email}', SendEmail::class)->name('admin.users.send-email');
 
         // Subscription Management
         Route::get('/subscriptions', Subscripers::class)->name('admin.subscriptions');

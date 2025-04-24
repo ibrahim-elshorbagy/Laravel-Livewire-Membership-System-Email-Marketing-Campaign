@@ -104,6 +104,11 @@
                             </x-primary-info-button>
 
                             <x-primary-info-button
+                                x-on:click="$dispatch('open-modal', 'send-email-modal');$wire.selectedIdUserToEMail= {{ $user->id }};">
+                                Send Email
+                            </x-primary-info-button>
+
+                            <x-primary-info-button
                                 onclick="confirm('Are you sure you want to impersonate this user?') || event.stopImmediatePropagation()"
                                 wire:click="impersonateUser({{ $user->id }})">
                                 Login
@@ -135,4 +140,50 @@
     <div class="mt-4">
         {{ $items->links() }}
     </div>
+
+    <!-- Send- Email Modal -->
+    <x-modal name="send-email-modal" maxWidth="md">
+        <div class="p-6">
+            <h2 class="text-lg font-medium">Select Email Template</h2>
+            <div class="mt-4">
+                <x-input-label for="email_id">Email Template</x-input-label>
+                <x-primary-select-input wire:model="selectedEmailId" id="email_id" class="block mt-1 w-full">
+                    <option value="">Select an email template</option>
+                    @foreach($system_emails as $email)
+                    <option value="{{ $email->id }}">{{ $email->name }} - ({{ $email->email_subject }})</option>
+                    @endforeach
+                </x-primary-select-input>
+                <x-input-error :messages="$errors->get('selectedEmailId')" class="mt-2" />
+            </div>
+            @if ($errors->any())
+                <div class="p-4 mt-4 bg-red-50 rounded-md border border-red-200 dark:bg-red-900/20 dark:border-red-800">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="w-5 h-5 text-red-400 fas fa-times-circle"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                                There were errors with your submission
+                            </h3>
+                            <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                                <ul class="pl-5 space-y-1 list-disc">
+                                    @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+            <div class="flex justify-end mt-6 space-x-3">
+                <x-secondary-button x-on:click="$dispatch('close')">
+                    Cancel
+                </x-secondary-button>
+                <x-primary-create-button wire:click="goToEmailEditor()" >
+                    Continue to Editor
+                </x-primary-create-button>
+            </div>
+        </div>
+    </x-modal>
 </div>

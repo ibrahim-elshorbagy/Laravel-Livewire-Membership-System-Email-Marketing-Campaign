@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages\Admin\User;
 
+use App\Models\Admin\Site\SystemSetting\SystemEmail;
 use App\Models\Payment\Payment;
 use App\Models\Subscription\Note;
 use App\Models\User;
@@ -26,6 +27,9 @@ class UserManagement extends Component
     public $trashedSearch = ''; // New search for trashed users
     public $perPage = 10;
     public $selectedTab = 'users';
+
+    public $selectedIdUserToEMail;
+    public $selectedEmailId;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -126,6 +130,22 @@ class UserManagement extends Component
         }
     }
 
+    // Send Enail
+    public function goToEmailEditor()
+    {
+        // Validate both required fields
+        $this->validate([
+            'selectedIdUserToEMail' => 'required|exists:users,id',
+            'selectedEmailId' => 'required|exists:system_emails,id'
+        ]);
+
+        // Only proceed if validation passes
+        return redirect()->route('admin.users.send-email', [
+            'user' => $this->selectedIdUserToEMail,
+            'email' => $this->selectedEmailId
+        ]);
+    }
+
     #[Computed]
     public function users()
     {
@@ -178,7 +198,10 @@ class UserManagement extends Component
 
     public function render()
     {
-        return view('livewire.pages.admin.user.user-management')
+        $system_emails =SystemEmail::select('id','name','email_subject')->get();
+        return view('livewire.pages.admin.user.user-management',[
+            'system_emails'=>$system_emails
+        ])
             ->layout('layouts.app',['title' => 'User Management']);
     }
 }
