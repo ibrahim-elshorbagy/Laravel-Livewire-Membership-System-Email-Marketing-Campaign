@@ -81,21 +81,15 @@ class EmailListsTable extends Component
                     return $query->where('user_id', Auth::id());
                 }),
             ],
-        ];
-    }
-
-    protected function listRules()
-    {
-        return [
-            'listName' => [
+            'editingListId' => [
                 'required',
-                'string',
-                'max:255',
-                Rule::unique('email_list_names', 'name')
-                    ->where('user_id', Auth::id())
+                Rule::exists('editingListId', 'id')->where(function ($query) {
+                    return $query->where('user_id', Auth::id());
+                }),
             ],
         ];
     }
+
 
     protected $messages = [
         'selectedEmails.*.exists' => 'One or more selected emails are invalid.',
@@ -474,7 +468,15 @@ class EmailListsTable extends Component
 
     public function createList()
     {
-        $this->validate($this->listRules());
+        $this->validate([
+            'listName' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('email_list_names', 'name')
+                    ->where('user_id', Auth::id())
+            ],
+        ]);
 
 
         try {
@@ -491,8 +493,21 @@ class EmailListsTable extends Component
         }
     }
 
-    public function updateList($listId)
+    public function updateList()
     {
+        // First validate the ID
+        $this->validate([
+            'editingListId' => [
+                'required',
+                'int',
+                'exists:email_list_names,id'
+            ]
+        ]);
+
+        // Get the validated ID
+        $listId = $this->editingListId;
+
+        // Then validate the name with the obtained ID
         $this->validate([
             'listName' => [
                 'required',
@@ -510,7 +525,7 @@ class EmailListsTable extends Component
                 ->update(['name' => $this->listName]);
 
             $this->listName = '';
-            $this->dispatch('close-modal', 'edit-list-'.$listId);
+            $this->dispatch('close-modal', 'edit-list-modal');
             $this->alert('success', 'List updated successfully!', ['position' => 'bottom-end']);
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to update list.', ['position' => 'bottom-end']);
