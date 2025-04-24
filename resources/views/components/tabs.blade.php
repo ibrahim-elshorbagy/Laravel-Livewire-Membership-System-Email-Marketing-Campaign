@@ -42,7 +42,7 @@
     selectTab(tabName) {
         this.selectedTab = tabName;
         // Trigger Livewire action
-        $wire.selectedList(tabName);
+        {{-- $wire.selectedList(tabName); --}}
         // Dispatch a custom event that can be listened to
         this.$dispatch('tab-selected', tabName);
     }
