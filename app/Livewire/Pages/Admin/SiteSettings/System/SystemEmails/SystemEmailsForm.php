@@ -20,6 +20,7 @@ class SystemEmailsForm extends Component
     public $message_html = '';
     public $showPreview = false;
     public $list_id = null;
+    public $activeEditor = 'advanced'; // 'advanced' for TinyMCE, 'code' for Code Editor
 
     public function rules(): array
     {

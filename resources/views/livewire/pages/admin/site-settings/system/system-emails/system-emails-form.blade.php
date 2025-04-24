@@ -9,7 +9,7 @@
         </div>
     </header>
 
-    <form wire:submit.prevent="saveEmail" class="space-y-4">
+    <form wire:submit.prevent="saveEmail" id="messageForm" class="space-y-4">
         <div class="grid grid-cols-1 gap-6 h-full lg:grid-cols-2">
             <!-- Form Section -->
             <div class="overflow-y-auto space-y-4">
@@ -40,18 +40,39 @@
                     </x-primary-select-input>
                     <x-input-error :messages="$errors->get('list_id')" class="mt-2" />
                 </div>
-                <div wire:ignore>
-                    <x-input-label for="message_html">HTML Template</x-input-label>
-                    <div class="mt-1 space-y-2">
-                        <!-- Make container resizable -->
-                        <div id="editor-container" class="overflow-hidden rounded-md border dark:border-neutral-700"
-                            style="height: 800px; min-height: 200px; max-height: 800px; resize: vertical;"> </div>
-                        <!-- Hidden textarea bound to Livewire --> <textarea id="editor" wire:model.live="message_html"
-                            class="hidden"></textarea>
+                <div class="mb-4" x-data="{ activeEditor: @entangle('activeEditor').live }">
+                    <div class="flex justify-between items-center mb-4">
+                        <x-input-label>HTML Template</x-input-label>
+                        <div class="flex items-center space-x-4">
+                            <button type="button"
+                                @click="$wire.set('activeEditor', 'advanced'); $dispatch('editor-changed', { editor: 'advanced' })"
+                                :class="{'bg-blue-500 text-white': activeEditor === 'advanced', 'bg-gray-200 dark:bg-neutral-700': activeEditor !== 'advanced'}"
+                                class="px-4 py-2 rounded-md transition-colors">
+                                Advanced Editor
+                            </button>
+                            <button type="button"
+                                @click="$wire.set('activeEditor', 'code'); $dispatch('editor-changed', { editor: 'code' })"
+                                :class="{'bg-blue-500 text-white': activeEditor === 'code', 'bg-gray-200 dark:bg-neutral-700': activeEditor !== 'code'}"
+                                class="px-4 py-2 rounded-md transition-colors">
+                                Code Editor
+                            </button>
+                        </div>
                     </div>
-                    <x-input-error :messages="$errors->get('message_html')" class="mt-2" />
-                </div>
 
+                    <div wire:ignore x-show="activeEditor === 'advanced'">
+                        <div class="mt-1 space-y-2">
+                            <div id="text-editor" class="min-h-[350px]"></div>
+                        </div>
+                    </div>
+
+                    <div wire:ignore x-show="activeEditor === 'code'">
+                        <div class="mt-1 space-y-2">
+                            <div id="editor-container" class="overflow-hidden rounded-md border dark:border-neutral-700"
+                                style="height: 400px; min-height: 200px; max-height: 800px; resize: vertical;"> </div>
+                            <textarea id="editor" wire:model.live="message_html" class="hidden"></textarea>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="flex sticky bottom-0 justify-end py-4 space-x-3 bg-neutral-50 dark:bg-neutral-900">
                     <x-secondary-button type="button" wire:navigate href="{{ route('admin.site-system-emails') }}">
@@ -108,6 +129,34 @@
 
 
 </div>
+@push('scripts')
+@vite('resources/js/AdvanceTinyMCE.js')
+<script>
+    document.addEventListener('livewire:initialized', function() {
+        const form = document.getElementById('messageForm');
+        if (form && !window.advanceCodeEditor.initialized) {
+            window.advanceCodeEditor.init();
+
+            // Handle form submission
+            form.addEventListener('submit', function() {
+                @this.set('message_html', window.advanceCodeEditor.getContent());
+            });
+
+            // Handle Livewire updates
+            Livewire.on('message-updated', () => {
+                if (window.advanceCodeEditor) {
+                    window.advanceCodeEditor.destroyEditor();
+                    setTimeout(() => {
+                        window.advanceCodeEditor.init();
+                    }, 100);
+                }
+            });
+        }
+    });
+</script>
+@endpush
+
+
 @push('scripts')
 @vite('resources/js/codeEditor.js')
 @endpush
