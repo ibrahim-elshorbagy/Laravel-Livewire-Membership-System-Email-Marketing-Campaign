@@ -172,6 +172,33 @@
 
             <div class="p-6 rounded-lg border border-neutral-200 dark:border-neutral-600">
                 <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
+                    Content Size Limits
+                </h3>
+                <div class="grid gap-6 md:grid-cols-2">
+                    <div>
+                        <x-input-label for="base64_image_size_limit" :value="__('Base64 Image Size Limit (KB)')" />
+                        <x-text-input wire:model="base64_image_size_limit" id="base64_image_size_limit" type="number"
+                            min="1" max="16000" class="block mt-1 w-full" required />
+                        <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+                            Maximum size allowed for encoded images in content (in kilobytes)
+                        </p>
+                        <x-input-error :messages="$errors->get('base64_image_size_limit')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="html_size_limit" :value="__('HTML Content Size Limit (KB)')" />
+                        <x-text-input wire:model="html_size_limit" id="html_size_limit" type="number" min="1"
+                            max="16000" class="block mt-1 w-full" required />
+                        <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+                            Maximum size allowed for HTML content (in kilobytes) - Max Is 16000 KB
+                        </p>
+                        <x-input-error :messages="$errors->get('html_size_limit')" class="mt-2" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 rounded-lg border border-neutral-200 dark:border-neutral-600">
+                <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
                     Site Access
                 </h3>
                 <div class="flex flex-col gap-5 md:flex-row">
@@ -338,7 +365,7 @@
                 <x-primary-accordion title="Patterns" :isExpandedByDefault="false">
                     <div class="mb-4">
                         <div class="block mt-1 w-48">
-                            <x-primary-select-input wire:model.live="filterType" id="filterType" >
+                            <x-primary-select-input wire:model.live="filterType" id="filterType">
                                 <option value="">All Types</option>
                                 <option value="subject">Subject</option>
                                 <option value="hard">Hard Bounce</option>

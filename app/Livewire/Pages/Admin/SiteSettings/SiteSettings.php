@@ -48,6 +48,10 @@ class SiteSettings extends Component
     public $our_devices;
     public $grace_days;
 
+    // Size limit properties
+    public $base64_image_size_limit;
+    public $html_size_limit;
+
     // New properties for image previews
     public $logo_preview;
     public $favicon_preview;
@@ -89,6 +93,8 @@ class SiteSettings extends Component
         'mail_from_address' => 'required|email',
         'mail_from_name' => 'required|string',
         'grace_days' => 'required|integer|min:0',
+        'base64_image_size_limit' => 'required|integer|min:1|max:16000',
+        'html_size_limit' => 'required|integer|min:1|max:16000',
     ];
 
 
@@ -119,6 +125,8 @@ class SiteSettings extends Component
         $this->maintenance = SiteSetting::getValue('maintenance');
         $this->our_devices = SiteSetting::getValue('our_devices');
         $this->grace_days = SiteSetting::getValue('grace_days') ?? 0;
+        $this->base64_image_size_limit = SiteSetting::getValue('base64_image_size_limit') ?? 150;
+        $this->html_size_limit = SiteSetting::getValue('html_size_limit') ?? 1500;
     }
 
     // Preview auth image
@@ -298,6 +306,10 @@ class SiteSettings extends Component
             // Update grace days setting
             SiteSetting::setValue('grace_days', $this->grace_days);
 
+            // Update size limits
+            SiteSetting::setValue('base64_image_size_limit', $this->base64_image_size_limit);
+            SiteSetting::setValue('html_size_limit', $this->html_size_limit);
+
             // Clear the global settings cache
             GlobalSettingsMiddleware::clearCache();
 
@@ -443,10 +455,6 @@ class SiteSettings extends Component
         return $query->paginate($this->perPage);
     }
 
-    public function updatedFilterType()
-    {
-        $this->bouncePatterns = $this->loadBouncePatterns();
-    }
 
     public function render()
     {

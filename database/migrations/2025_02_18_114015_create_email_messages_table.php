@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('message_title');
             $table->string('email_subject');
-            $table->text('message_html');
+            $table->mediumText('message_html');
             $table->text('message_plain_text');
             $table->string('sender_name')->nullable();
             $table->string('reply_to_email')->nullable();

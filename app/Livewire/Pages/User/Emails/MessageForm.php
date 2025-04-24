@@ -11,6 +11,8 @@ use App\Rules\ProhibitedWords;
 use Mews\Purifier\Facades\Purifier;
 use App\Services\HtmlPurifierService;
 use HTMLPurifier;
+use App\Rules\Base64ImageSize;
+use App\Rules\HtmlSize;
 
 class MessageForm extends Component
 {
@@ -29,8 +31,7 @@ class MessageForm extends Component
 
     public function rules(): array
     {
-        $messageHtmlRules = ['nullable', 'string'];
-        $messagePlainTextRules = ['nullable', 'string'];
+
 
         if (!(auth()->user()->hasRole('admin') || auth()->user()->can('allow-prohibited-words'))) {
             $messageHtmlRules[] = new ProhibitedWords();
@@ -43,8 +44,8 @@ class MessageForm extends Component
             'sender_name' => ['nullable', 'string','max:255'],
             'reply_to_email' => ['nullable', 'email','max:255'],
             'sending_status' => ['in:RUN,PAUSE'],
-            'message_html'  => $messageHtmlRules,
-            'message_plain_text' => $messagePlainTextRules,
+            'message_html'  => ['nullable', 'string',new Base64ImageSize(),new HtmlSize()],
+            'message_plain_text' => ['nullable', 'string'],
         ];
     }
 
