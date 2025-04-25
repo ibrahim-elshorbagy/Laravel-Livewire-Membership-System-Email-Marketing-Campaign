@@ -153,18 +153,30 @@
                 </div>
             </div>
 
+            <!-- PLAN SETTINGS BOX -->
             <div class="p-6 rounded-lg border border-neutral-200 dark:border-neutral-600">
                 <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
                     Plans Settings
                 </h3>
+
                 <div class="grid gap-6 md:grid-cols-1">
                     <div>
+                        <!-- Label for the Grace Days input -->
                         <x-input-label for="grace_days" :value="__('Grace Days')" />
-                        <x-text-input wire:model="grace_days" id="grace_days" type="number" min="0"
-                            class="block mt-1 w-full" required />
+
+                        <!-- Input for setting grace period after plan expiration -->
+                        <x-text-input wire:model="grace_days" id="grace_days" type="number" min="0" class="block mt-1 w-full"
+                            required />
+
+                        <!-- Description of what Grace Days means -->
                         <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-                            Number of days to extend subscription access after expiration
+                            Number of extra days a user can keep using his plan add emails or sending it
+                            <br>
+                            After That his Subscription will be Suppress and API won't retive his emails
+                            <br>
                         </p>
+
+                        <!-- Display validation errors for grace_days -->
                         <x-input-error :messages="$errors->get('grace_days')" class="mt-2" />
                     </div>
                 </div>
@@ -197,11 +209,16 @@
                 </div>
             </div>
 
+            <!-- SITE ACCESS BOX -->
             <div class="p-6 rounded-lg border border-neutral-200 dark:border-neutral-600">
                 <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
                     Site Access
                 </h3>
+
+                <!-- Two toggle switches in a row (or column on mobile) -->
                 <div class="flex flex-col gap-5 md:flex-row">
+
+                    <!-- Maintenance Mode Toggle -->
                     <div>
                         <label for="maintenance"
                             class="inline-flex gap-3 justify-between items-center px-4 py-1.5 rounded-lg min-w-52 bg-neutral-100 dark:bg-neutral-800">
@@ -212,12 +229,23 @@
                                 class="text-xs font-medium md:text-sm trancking-wide text-neutral-600 peer-checked:text-neutral-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-neutral-400 dark:peer-checked:text-neutral-100">Maintenance
                                 Mode</span>
 
+                            <!-- Visual part of the switch -->
                             <div class="relative h-6 w-11 after:h-5 after:w-5 peer-checked:after:translate-x-5 rounded-full bg-white after:absolute after:bottom-0 after:left-[0.0625rem] after:top-0 after:my-auto after:rounded-full after:bg-neutral-600 after:transition-all after:content-[''] peer-checked:bg-green-500 peer-checked:after:bg-neutral-100 peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-neutral-800 peer-focus:peer-checked:outline-black peer-active:outline-offset-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:border-neutral-700 dark:bg-neutral-950 dark:after:bg-neutral-400 dark:peer-checked:bg-orange-500 dark:peer-checked:after:bg-black dark:peer-focus:outline-neutral-300 dark:peer-focus:peer-checked:outline-orange-500"
                                 aria-hidden="true"></div>
 
                         </label>
+
+                        <!-- Validation error if exists -->
                         <x-input-error :messages="$errors->get('maintenance')" class="mt-2" />
+
+                        <!-- Explanation for Maintenance Mode -->
+                        <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+                            If enabled, the <strong>Emails API</strong> will be shut down temporarily.And External Servers won't be able to
+                            retrieve emails during this period.
+                        </p>
                     </div>
+
+                    <!-- Only Our Devices Toggle -->
                     <div>
                         <label for="our_devices"
                             class="inline-flex gap-3 justify-between items-center px-4 py-1.5 rounded-lg min-w-52 bg-neutral-100 dark:bg-neutral-800">
@@ -228,14 +256,27 @@
                                 class="text-xs font-medium md:text-sm trancking-wide text-neutral-600 peer-checked:text-neutral-900 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-neutral-400 dark:peer-checked:text-neutral-100">Only
                                 Our Devices</span>
 
+                            <!-- Visual part of the switch -->
                             <div class="relative h-6 w-11 after:h-5 after:w-5 peer-checked:after:translate-x-5 rounded-full bg-white after:absolute after:bottom-0 after:left-[0.0625rem] after:top-0 after:my-auto after:rounded-full after:bg-neutral-600 after:transition-all after:content-[''] peer-checked:bg-green-500 peer-checked:after:bg-neutral-100 peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-neutral-800 peer-focus:peer-checked:outline-black peer-active:outline-offset-0 peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:border-neutral-700 dark:bg-neutral-950 dark:after:bg-neutral-400 dark:peer-checked:bg-orange-500 dark:peer-checked:after:bg-black dark:peer-focus:outline-neutral-300 dark:peer-focus:peer-checked:outline-orange-500"
                                 aria-hidden="true"></div>
 
                         </label>
+
+                        <!-- Validation error if exists -->
                         <x-input-error :messages="$errors->get('our_devices')" class="mt-2" />
+
+                        <!-- Explanation for Only Our Devices -->
+                        <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+                            If enabled, only requests from <strong>Our External Servers</strong> are allowed to access
+                            the Emails API.
+                            <br>
+                            If disabled, anyone who has the correct API Password can use a browser or any tool (like Postman) to
+                            access the API.
+                        </p>
                     </div>
                 </div>
             </div>
+
             <div class="p-6 rounded-lg border border-neutral-200 dark:border-neutral-600">
                 <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
                     Mail Settings
