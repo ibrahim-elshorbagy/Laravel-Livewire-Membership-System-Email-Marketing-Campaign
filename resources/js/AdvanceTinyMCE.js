@@ -97,6 +97,25 @@ class AdvanceTinyMCE {
                                 Alpine.$data(form).localMessageHtml = content;
                             }
                         });
+
+                        editor.on('input change keyup', () => {
+                            const content = this.getContent();
+                            this.updatePreview(content);
+
+                            // Update Livewire model
+                            const form = document.getElementById('messageForm');
+                            if (form && window.Alpine && Alpine.$data) {
+                                Alpine.$data(form).localMessageHtml = content;
+                            }
+
+                            // Dispatch custom event
+                            const event = new CustomEvent('editor-content-updated', {
+                                detail: { content }
+                            });
+                            window.dispatchEvent(event);
+                        });
+
+
                     },
                     init_instance_callback: (editor) => {
                         this.initialized = true;

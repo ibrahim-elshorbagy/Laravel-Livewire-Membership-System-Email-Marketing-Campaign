@@ -60,6 +60,40 @@
                             <textarea id="editor" wire:model.live="message_html" class="hidden"></textarea>
                         </div>
                     </div>
+
+
+                    <div x-data="htmlSizeChecker()" x-init="init($wire.html_size_limit, $wire.base64_image_size_limit, $wire.message_html)"
+                        @editor-content-updated.window="checkSizes($event.detail.content)"
+                        class="p-4 mt-4 space-y-3 text-sm text-gray-700 bg-gray-100 rounded-xl dark:bg-neutral-800 dark:text-gray-300">
+                        <!-- Current HTML Size -->
+                        <div x-show="currentSize > 0"
+                            class="flex justify-between items-center p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white/60 dark:bg-white/10">
+                            <span class="font-semibold">Current size:</span>
+                            <span class="px-2 py-1 ml-2 text-xs text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-200"
+                                x-text="`${formatKB(currentSize)} (${formatMB(currentSize)})`">
+                            </span>
+                        </div>
+
+                        <!-- HTML Size Limit Warning -->
+                        <div x-show="currentSize > maxHtmlSize" class="flex items-center text-red-600 dark:text-red-400">
+                            <i class="mr-2 fas fa-exclamation-triangle"></i>
+                            <span>
+                                Warning: HTML content exceeds maximum size of
+                                <span x-text="maxHtmlSizeKB" class="font-semibold"></span> KB!
+                            </span>
+                        </div>
+
+                        <!-- Large Image Warning -->
+                        <div x-show="hasLargeImages" class="flex items-center text-red-600 dark:text-red-400">
+                            <i class="mr-2 fas fa-exclamation-triangle"></i>
+                            <span>
+                                Warning: Contains images larger than
+                                <span x-text="maxImageSizeKB" class="font-semibold"></span> KB!
+                            </span>
+                        </div>
+                    </div>
+
+
                 </div>
 
 
@@ -208,6 +242,88 @@
             });
         }
     });
+
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('htmlSizeChecker', () => ({
+            currentSize: 0,
+            maxHtmlSize: 0,
+            maxHtmlSizeKB: 0,
+            maxImageSize: 0,
+            maxImageSizeKB: 0,
+            hasLargeImages: false,
+
+            init(htmlSizeLimitKB, imageSizeLimitKB, initialContent = '') {
+                this.maxHtmlSizeKB = htmlSizeLimitKB;
+                this.maxHtmlSize = htmlSizeLimitKB * 1024;
+                this.maxImageSizeKB = imageSizeLimitKB;
+                this.maxImageSize = imageSizeLimitKB * 1024;
+
+                // Check initial content immediately
+                this.checkSizes(initialContent);
+
+                // Listen for editor changes
+                Livewire.hook('message.processed', (component) => {
+                    if (component.fingerprint.name === 'pages.user.emails.message-form') {
+                        this.checkSizes(component.serverMemo.data.message_html);
+                    }
+                });
+
+                // Also check the editor content after it initializes
+                setTimeout(() => {
+                    const editorContent = this.getEditorContent();
+                    if (editorContent && editorContent !== initialContent) {
+                        this.checkSizes(editorContent);
+                    }
+                }, 500);
+            },
+
+            getEditorContent() {
+                // Try to get content from active editor
+                if (window.advanceCodeEditor?.editor) {
+                    return window.advanceCodeEditor.editor.getContent();
+                }
+
+                const codeEditor = document.querySelector('.cm-content');
+                if (codeEditor) {
+                    return codeEditor.textContent;
+                }
+
+                return '';
+            },
+
+            checkSizes(htmlContent) {
+                if (!htmlContent) {
+                    this.currentSize = 0;
+                    this.hasLargeImages = false;
+                    return;
+                }
+
+                this.currentSize = new Blob([htmlContent]).size;
+                this.hasLargeImages = this.checkImageSizes(htmlContent);
+            },
+
+            checkImageSizes(htmlContent) {
+                const imgRegex = /<img[^>]+src="data:image\/[^;]+;base64,([^"]+)"/gi;
+                const matches = [...htmlContent.matchAll(imgRegex)];
+
+                return matches.some(match => {
+                    const base64Data = match[1];
+                    const size = (base64Data.length * 0.75);
+                    return size > this.maxImageSize;
+                });
+            },
+
+            formatKB(bytes) {
+                return `${(bytes / 1024).toFixed(2)} KB`;
+            },
+
+            formatMB(bytes) {
+                return `${(bytes / (1024 * 1024)).toFixed(4)} MB`;
+            }
+        }));
+    });
+
+
 </script>
 @endpush
 

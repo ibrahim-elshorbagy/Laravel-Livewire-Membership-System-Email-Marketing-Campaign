@@ -62,6 +62,10 @@ function initializeEditor() {
                     if (tinyMCEEditor && tinyMCEEditor.setContent) {
                         tinyMCEEditor.setContent(content, { format: 'html' });
                     }
+                    
+                    window.dispatchEvent(new CustomEvent('editor-content-updated', {
+                        detail: { content }
+                    }));
 
                     // Update preview
                     updatePreview(content);

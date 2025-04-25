@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages\User\Emails;
 
+use App\Models\Admin\Site\SiteSetting;
 use Livewire\Component;
 use App\Models\Email\EmailMessage;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +29,8 @@ class MessageForm extends Component
     public $sending_status = 'PAUSE';
     public $showPreview = false;
     public $activeEditor = 'advanced'; // 'advanced' for TinyMCE, 'code' for Code Editor
+    public $html_size_limit ;
+    public $base64_image_size_limit ;
 
     public function rules(): array
     {
@@ -57,6 +60,8 @@ class MessageForm extends Component
             $messageModel = EmailMessage::findOrFail($message);
             $this->fill($messageModel->toArray());
         }
+        $this->html_size_limit = SiteSetting::getValue('html_size_limit')?? 1500 ;
+        $this->base64_image_size_limit = SiteSetting::getValue('base64_image_size_limit')?? 150 ;
     }
 
     public function togglePreview()
