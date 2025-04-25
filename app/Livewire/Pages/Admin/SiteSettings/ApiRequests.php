@@ -64,7 +64,9 @@ class ApiRequests extends Component
     {
         return ApiRequest::when($this->search, function ($query) {
                 $query->where(function($q) {
-                    $q->where('serverid', 'like', '%' . $this->search . '%');
+                    $q->where('serverid', 'like', '%' . $this->search . '%')
+                      ->orWhereRaw("JSON_EXTRACT(error_data, '$.error') LIKE ?", ['%' . $this->search . '%'])
+                      ->orWhereRaw("JSON_EXTRACT(error_data, '$.message') LIKE ?", ['%' . $this->search . '%']);
                 });
             })
             ->orderBy($this->sortField, $this->sortDirection)

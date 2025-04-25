@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin\Site\ApiError;
 use App\Models\Admin\Site\ApiRequest;
 use App\Models\Admin\Site\SiteSetting;
 use App\Models\User;
@@ -62,14 +61,32 @@ class EmailGatewayController extends Controller
                 'serverid.string' => 'Server ID must be a string',
             ]);
             if ($validator->fails()) {
-
+                try{
                     return response()->json([
                         'error' => 'Validation failed',
                         'message' => implode(', ', $validator->errors()->all()),
                         'error_number'=> 1,
+                        'server' => [
+                            'id' => $request->serverid
+                        ]
                     ], 422);
 
+                }finally {
+                    $executionTime = microtime(true) - $startTime;
+                    ApiRequest::create([
+                        'serverid' => $request->serverid,
+                        'execution_time' => $executionTime,
+                        'status' => 'failed',
+                        'error_data' => [
+                            'error' => 'Validation failed',
+                            'message' => implode(', ', $validator->errors()->all()),
+                            'error_number' => 1
+                        ]
+                    ]);
+                }
+
             }
+
 
 
             // Validate request data ----------------------------------------------------------------------------
@@ -92,15 +109,6 @@ class EmailGatewayController extends Controller
 
                 try{
 
-                    ApiError::create([
-                        'serverid' => $request->serverid,
-                        'error_data' => [
-                            'error' => 'Validation failed',
-                            'message' => implode(', ', $validator->errors()->all()),
-                            'error_number' => 1
-                        ]
-                    ]);
-
                     return response()->json([
                         'error' => 'Validation failed',
                         'message' => implode(', ', $validator->errors()->all()),
@@ -115,7 +123,12 @@ class EmailGatewayController extends Controller
                     ApiRequest::create([
                         'serverid' => $request->serverid,
                         'execution_time' => $executionTime,
-                        'status' => 'failed'
+                        'status' => 'failed',
+                        'error_data' => [
+                            'error' => 'Validation failed',
+                            'message' => implode(', ', $validator->errors()->all()),
+                            'error_number' => 1
+                        ]
                     ]);
                 }
 
@@ -138,14 +151,6 @@ class EmailGatewayController extends Controller
 
                     try{
 
-                        ApiError::create([
-                            'serverid' => $request->has('serverid') ? $request->serverid : null,
-                            'error_data' => [
-                                'error' => 'Access Denied',
-                                'message' => 'Invalid User-Agent',
-                                'error_number' => 2
-                            ]
-                        ]);
                         return response()->json([
                             'error' => 'Access Denied',
                             'message' => 'Invalid User-Agent',
@@ -161,7 +166,12 @@ class EmailGatewayController extends Controller
                         ApiRequest::create([
                             'serverid' => $serverid,
                             'execution_time' => $executionTime,
-                            'status' => 'failed'
+                            'status' => 'failed',
+                            'error_data' => [
+                                'error' => 'Access Denied',
+                                'message' => 'Invalid User-Agent',
+                                'error_number' => 2
+                            ]
                         ]);
                     }
 
@@ -180,14 +190,6 @@ class EmailGatewayController extends Controller
 
                 try{
 
-                    ApiError::create([
-                        'serverid' => $serverid,
-                        'error_data' => [
-                            'error' => 'Maintenance Mode',
-                            'message' => 'System is currently under maintenance',
-                            'error_number' => 3
-                        ]
-                    ]);
 
                     return response()->json([
                         'error' => 'Maintenance Mode',
@@ -203,7 +205,12 @@ class EmailGatewayController extends Controller
                         ApiRequest::create([
                             'serverid' => $serverid,
                             'execution_time' => $executionTime,
-                            'status' => 'failed'
+                            'status' => 'failed',
+                            'error_data' => [
+                            'error' => 'Maintenance Mode',
+                            'message' => 'System is currently under maintenance',
+                            'error_number' => 3
+                        ]
                         ]);
                 }
 
@@ -233,14 +240,6 @@ class EmailGatewayController extends Controller
             if ($request->pass !== $this->apiPassword) {
 
                 try{
-                        ApiError::create([
-                            'serverid' => $request->serverid,
-                            'error_data' => [
-                                'error' => 'Authentication failed',
-                                'message' => 'Invalid API credentials',
-                                'error_number' => 4
-                            ]
-                        ]);
 
                         return response()->json([
                             'error' => 'Authentication failed',
@@ -256,7 +255,12 @@ class EmailGatewayController extends Controller
                         ApiRequest::create([
                             'serverid' => $serverid,
                             'execution_time' => $executionTime,
-                            'status' => 'failed'
+                            'status' => 'failed',
+                            'error_data' => [
+                                'error' => 'Authentication failed',
+                                'message' => 'Invalid API credentials',
+                                'error_number' => 4
+                            ]
                         ]);
                 }
 
@@ -282,15 +286,6 @@ class EmailGatewayController extends Controller
 
             if (!$user) {
                 try {
-                    ApiError::create([
-                        'serverid' => $request->serverid,
-                        'error_data' => [
-                            'error' => 'Invalid user',
-                            'message' => 'No Assigned user found',
-                            'error_number' => 10
-                        ]
-                    ]);
-
                     return response()->json([
                         'error' => 'Invalid user',
                         'message' => 'No Assigned user found',
@@ -304,7 +299,12 @@ class EmailGatewayController extends Controller
                     ApiRequest::create([
                         'serverid' => $serverid,
                         'execution_time' => $executionTime,
-                        'status' => 'failed'
+                        'status' => 'failed',
+                        'error_data' => [
+                            'error' => 'Invalid user',
+                            'message' => 'No Assigned user found',
+                            'error_number' => 10
+                        ]
                     ]);
                 }
             }
@@ -312,15 +312,6 @@ class EmailGatewayController extends Controller
             if (!$user->active) {
 
                 try{
-
-                        ApiError::create([
-                                'serverid' => $request->serverid,
-                                'error_data' => [
-                                    'error' => 'Account inactive',
-                                    'message' => 'User account is currently inactive',
-                                    'error_number' => 5
-                                ]
-                            ]);
 
                             return response()->json([
                                 'error' => 'Account inactive',
@@ -336,7 +327,12 @@ class EmailGatewayController extends Controller
                         ApiRequest::create([
                             'serverid' => $serverid,
                             'execution_time' => $executionTime,
-                            'status' => 'failed'
+                            'status' => 'failed',
+                            'error_data' => [
+                                    'error' => 'Account inactive',
+                                    'message' => 'User account is currently inactive',
+                                    'error_number' => 5
+                                ]
                         ]);
                 }
 
@@ -358,15 +354,6 @@ class EmailGatewayController extends Controller
 
                 try{
 
-                        ApiError::create([
-                            'serverid' => $request->serverid,
-                            'error_data' => [
-                                'error' => 'No subscription',
-                                'message' => 'Active subscription required',
-                                'error_number' => 6
-                            ]
-                        ]);
-
                         return response()->json([
                             'error' => 'No subscription',
                             'message' => 'Active subscription required',
@@ -381,7 +368,12 @@ class EmailGatewayController extends Controller
                         ApiRequest::create([
                             'serverid' => $serverid,
                             'execution_time' => $executionTime,
-                            'status' => 'failed'
+                            'status' => 'failed',
+                            'error_data' => [
+                                'error' => 'No subscription',
+                                'message' => 'Active subscription required',
+                                'error_number' => 6
+                            ]
                         ]);
                 }
 
@@ -400,15 +392,6 @@ class EmailGatewayController extends Controller
             if (!$user->canConsume($this->emailSendingFeatureName, $this->batchSize)) {
 
                 try{
-
-                        ApiError::create([
-                                'serverid' => $request->serverid,
-                                'error_data' => [
-                                    'error' => 'Quota exceeded',
-                                    'message' => 'Email sending limit reached',
-                                    'error_number' => 7
-                                ]
-                        ]);
 
                         return response()->json([
                             'error' => 'Quota exceeded',
@@ -430,7 +413,12 @@ class EmailGatewayController extends Controller
                         ApiRequest::create([
                             'serverid' => $serverid,
                             'execution_time' => $executionTime,
-                            'status' => 'failed'
+                            'status' => 'failed',
+                            'error_data' => [
+                                    'error' => 'Quota exceeded',
+                                    'message' => 'Email sending limit reached',
+                                    'error_number' => 7
+                                ]
                         ]);
                 }
 
@@ -457,15 +445,6 @@ class EmailGatewayController extends Controller
 
                 try{
 
-                        ApiError::create([
-                            'serverid' => $request->serverid,
-                            'error_data' => [
-                                'error' => 'No active campaign',
-                                'message' => 'No active campaign found for this server',
-                                'error_number' => 8
-                            ]
-                        ]);
-
                         return response()->json([
                             'error' => 'No active campaign',
                             'message' => 'No active campaign found for this server',
@@ -490,7 +469,12 @@ class EmailGatewayController extends Controller
                         ApiRequest::create([
                             'serverid' => $serverid,
                             'execution_time' => $executionTime,
-                            'status' => 'failed'
+                            'status' => 'failed',
+                            'error_data' => [
+                                'error' => 'No active campaign',
+                                'message' => 'No active campaign found for this server',
+                                'error_number' => 8
+                            ]
                         ]);
                 }
 
@@ -550,14 +534,6 @@ class EmailGatewayController extends Controller
             if (empty($emailsToSend)) {
 
                 try{
-                    ApiError::create([
-                        'serverid' => $request->serverid,
-                        'error_data' => [
-                            'error' => 'No Emails avaiable',
-                            'message' =>  "No emails found for this server's campaign ",
-                            'error_number' => 9
-                        ]
-                    ]);
 
                     return response()->json([
                         'error' => 'No Emails avaiable',
@@ -582,7 +558,12 @@ class EmailGatewayController extends Controller
                         ApiRequest::create([
                             'serverid' => $serverid,
                             'execution_time' => $executionTime,
-                            'status' => 'failed'
+                            'status' => 'failed',
+                            'error_data' => [
+                            'error' => 'No Emails avaiable',
+                            'message' =>  "No emails found for this server's campaign ",
+                            'error_number' => 9
+                        ]
                         ]);
                     }
 

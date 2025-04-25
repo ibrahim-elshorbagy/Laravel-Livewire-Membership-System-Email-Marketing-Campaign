@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('api_requests', function (Blueprint $table) {
             $table->id();
             $table->string('serverid')->nullable()->index();
-            $table->decimal('execution_time', 10, 6)->default(0); 
+            $table->decimal('execution_time', 10, 6)->default(0);
             $table->enum('status', ['success', 'failed'])->default('success');
             $table->timestamp('request_time');
 

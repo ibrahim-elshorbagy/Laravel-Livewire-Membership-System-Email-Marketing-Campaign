@@ -17,7 +17,7 @@
     <div class="mb-6">
         <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
             <div class="relative flex-1">
-                <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search ServerId..."
+                <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search ServerId, Errors..."
                     class="pl-10 w-full" />
                 <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
@@ -70,6 +70,7 @@
                     </th>
                     <th scope="col" class="p-4">Server ID</th>
                     <th scope="col" class="p-4">Status</th>
+                    <th scope="col" class="p-4">Error Message</th>
                     <th scope="col" class="p-4">Duration</th>
                     <th scope="col" class="p-4">Date</th>
                 </tr>
@@ -87,6 +88,20 @@
                             class="px-2 py-1 text-xs font-medium rounded-full {{ $request->status === 'success' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100' }}">
                             {{ ucfirst($request->status) }}
                         </span>
+                    </td>
+                    <td class="p-4">
+                        @if($request->status === 'failed' && $request->error_data)
+                        <div class="space-y-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full">
+                                    Error #{{ $request->error_number }}: {{ $request->error }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-neutral-600 dark:text-neutral-400">{{ $request->message }}</p>
+                        </div>
+                        @else
+                        <span class="text-neutral-500">-</span>
+                        @endif
                     </td>
                     <td class="p-4">{{ number_format($request->execution_time, 3) }}s</td>
                     <td class="p-4">{{ $request->request_time->format('d/m/Y H:i:s') }}</td>
