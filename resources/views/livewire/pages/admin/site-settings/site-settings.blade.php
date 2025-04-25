@@ -165,8 +165,8 @@
                         <x-input-label for="grace_days" :value="__('Grace Days')" />
 
                         <!-- Input for setting grace period after plan expiration -->
-                        <x-text-input wire:model="grace_days" id="grace_days" type="number" min="0" class="block mt-1 w-full"
-                            required />
+                        <x-text-input wire:model="grace_days" id="grace_days" type="number" min="0"
+                            class="block mt-1 w-full" required />
 
                         <!-- Description of what Grace Days means -->
                         <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
@@ -240,7 +240,8 @@
 
                         <!-- Explanation for Maintenance Mode -->
                         <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-                            If enabled, the <strong>Emails API</strong> will be shut down temporarily.And External Servers won't be able to
+                            If enabled, the <strong>Emails API</strong> will be shut down temporarily.And External
+                            Servers won't be able to
                             retrieve emails during this period.
                         </p>
                     </div>
@@ -270,7 +271,8 @@
                             If enabled, only requests from <strong>Our External Servers</strong> are allowed to access
                             the Emails API.
                             <br>
-                            If disabled, anyone who has the correct API Password can use a browser or any tool (like Postman) to
+                            If disabled, anyone who has the correct API Password can use a browser or any tool (like
+                            Postman) to
                             access the API.
                         </p>
                     </div>
@@ -364,6 +366,8 @@
             </div>
         </form>
 
+
+
         <div class="p-6 my-6 rounded-lg border border-neutral-200 dark:border-neutral-600">
             <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
                 Bounce Pattern Settings
@@ -405,12 +409,32 @@
 
                 <x-primary-accordion title="Patterns" :isExpandedByDefault="false">
                     <div class="mb-4">
-                        <div class="block mt-1 w-48">
-                            <x-primary-select-input wire:model.live="filterType" id="filterType">
-                                <option value="">All Types</option>
-                                <option value="subject">Subject</option>
-                                <option value="hard">Hard Bounce</option>
-                                <option value="soft">Soft Bounce</option>
+                        <div class="flex flex-wrap gap-2">
+                            <x-text-input wire:model.live="searchPattern" type="search" placeholder="Search patterns..."
+                                class="w-full sm:w-48" />
+                            <x-primary-select-input wire:model.live="filterType" id="filterType" class="w-full sm:w-48">
+                                <option value="">All</option>
+                                <option value="subject">subject</option>
+                                <option value="hard">hard</option>
+                                <option value="soft">soft</option>
+                            </x-primary-select-input>
+
+                            <x-primary-select-input wire:model.live="sortField" class="w-full sm:w-48">
+                                <option value="pattern">pattern</option>
+                                <option value="type">type</option>
+                                <option value="created_at">Added Date</option>
+                            </x-primary-select-input>
+
+                            <x-primary-select-input wire:model.live="sortDirection" class="w-full sm:w-32">
+                                <option value="asc">asc</option>
+                                <option value="desc">desc</option>
+                            </x-primary-select-input>
+
+                            <x-primary-select-input wire:model.live="perPage" class="w-full sm:w-32">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
                             </x-primary-select-input>
                         </div>
                     </div>
@@ -421,6 +445,7 @@
                                 <tr>
                                     <th scope="col" class="p-4">Type</th>
                                     <th scope="col" class="p-4">Pattern</th>
+                                    <th scope="col" class="p-4">Added Date</th>
                                     <th scope="col" class="p-4">Actions</th>
                                 </tr>
                             </thead>
@@ -430,6 +455,7 @@
                                     wire:key="pattern-row-{{ $pattern->id }}">
                                     <td class="p-4">{{ ucfirst($pattern->type) }}</td>
                                     <td class="p-4">{{ $pattern->pattern }}</td>
+                                    <td class="p-4">{{ $pattern->created_at }}</td>
                                     <td class="p-4">
                                         <div class="flex gap-2">
                                             <button type="button"
@@ -495,6 +521,8 @@
                 </x-modal>
             </div>
         </div>
+
+
 
     </div>
 </div>

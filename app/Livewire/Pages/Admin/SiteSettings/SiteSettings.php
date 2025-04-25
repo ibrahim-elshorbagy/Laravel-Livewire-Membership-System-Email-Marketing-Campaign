@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Session;
 use App\Models\Admin\Site\SystemSetting\BouncePattern;
 use Livewire\WithPagination;
+use Illuminate\Validation\Rule;
 
 class SiteSettings extends Component
 {
@@ -23,6 +24,9 @@ class SiteSettings extends Component
     public $newPattern = '';
     public $filterType = '';
     public $perPage = 10;
+    public $sortField = 'pattern';
+    public $sortDirection = 'asc';
+    public $searchPattern = '';
 
 
     public $site_name;
@@ -127,6 +131,9 @@ class SiteSettings extends Component
         $this->grace_days = SiteSetting::getValue('grace_days') ?? 0;
         $this->base64_image_size_limit = SiteSetting::getValue('base64_image_size_limit') ?? 150;
         $this->html_size_limit = SiteSetting::getValue('html_size_limit') ?? 1500;
+
+        $this->bouncePatterns = BouncePattern::all();
+
     }
 
     // Preview auth image
@@ -398,24 +405,31 @@ class SiteSettings extends Component
             ->values()
             ->toArray();
 
+        $addedCount = 0;
         foreach ($patterns as $pattern) {
-            BouncePattern::create([
-                'type' => $this->newPatternType,
-                'pattern' => $pattern,
-            ]);
+            $exists = BouncePattern::where('pattern', $pattern)
+                ->where('type', $this->newPatternType)
+                ->exists();
+
+            if (!$exists) {
+                BouncePattern::create([
+                    'type' => $this->newPatternType,
+                    'pattern' => $pattern,
+                ]);
+                $addedCount++;
+            }
         }
 
-        $this->bouncePatterns = BouncePattern::all();
         $this->newPatternType = '';
         $this->newPattern = '';
-        $this->alert('success', count($patterns) . ' bounce pattern(s) added successfully.', ['position' => 'bottom-end']);
+        $this->alert('success', $addedCount . ' bounce pattern(s) added successfully.', ['position' => 'bottom-end']);
     }
 
     public function updatePattern()
     {
         $this->validate([
             'editPatternType' => 'required|in:subject,hard,soft',
-            'editPattern' => 'required|string|max:255'
+            'editPattern' => [Rule::unique('bounce_patterns','pattern')->ignore($this->selectedPatternId),'required','string','max:255']
         ]);
 
         $pattern = BouncePattern::find($this->selectedPatternId);
@@ -425,7 +439,6 @@ class SiteSettings extends Component
                 'pattern' => $this->editPattern
             ]);
 
-            $this->bouncePatterns = BouncePattern::all();
             $this->selectedPatternId = '';
             $this->editPatternType = '';
             $this->editPattern = '';
@@ -439,10 +452,10 @@ class SiteSettings extends Component
         $pattern = BouncePattern::find($id);
         if ($pattern) {
             $pattern->delete();
-            $this->bouncePatterns = BouncePattern::all();
             $this->alert('success', 'Pattern deleted successfully.', ['position' => 'bottom-end']);
         }
     }
+
 
     public function loadBouncePatterns()
     {
@@ -452,7 +465,12 @@ class SiteSettings extends Component
             $query->where('type', $this->filterType);
         }
 
-        return $query->paginate($this->perPage);
+        if ($this->searchPattern) {
+            $query->where('pattern', 'like', '%' . $this->searchPattern . '%');
+        }
+
+        return $query->orderBy($this->sortField, $this->sortDirection)
+                     ->paginate($this->perPage);
     }
 
 
