@@ -23,6 +23,13 @@
                     <i class="text-gray-400 fas fa-search"></i>
                 </div>
             </div>
+            <div class="relative flex-1">
+                <x-text-input wire:model.live.debounce.300ms="userSearch" placeholder="Search User Username, Name"
+                    class="pl-10 w-full" />
+                <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                    <i class="text-gray-400 fas fa-search"></i>
+                </div>
+            </div>
 
             <div class="flex flex-wrap gap-2">
                 <x-primary-select-input wire:model.live="sortField" class="w-full sm:w-48">
@@ -65,14 +72,14 @@
             <thead
                 class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                 <tr>
-                    <th scope="col" class="p-4">
+                    <th scope="col" class="p-4 w-12">
                         <input type="checkbox" wire:model.live="selectPage" class="rounded">
                     </th>
-                    <th scope="col" class="p-4">Server ID</th>
-                    <th scope="col" class="p-4">Status</th>
-                    <th scope="col" class="p-4">Error Message</th>
-                    <th scope="col" class="p-4">Duration</th>
-                    <th scope="col" class="p-4">Date</th>
+                    <th scope="col" class="p-4 min-w-96">Server ID</th>
+                    <th scope="col" class="p-4 w-3 text-center">Status</th>
+                    <th scope="col" class="p-4 min-w-96">Error Message</th>
+                    <th scope="col" class="p-4 w-3">Duration</th>
+                    <th scope="col" class="p-4 w-3">Date</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
@@ -82,29 +89,89 @@
                         <input type="checkbox" wire:model.live="selectedRequests" value="{{ $request->id }}"
                             class="rounded">
                     </td>
-                    <td class="p-4">{{ $request->serverid }}</td>
                     <td class="p-4">
+                        <div class="space-y-2">
+                            <!-- Redesigned Server ID section -->
+                            <div class="flex items-center">
+                                <span
+                                    class="px-2 py-1 font-medium text-blue-700 bg-blue-50 rounded dark:bg-blue-900 dark:text-blue-100">
+                                    {{ $request->serverid }}
+                                </span>
+                            </div>
+
+                            @if($request->server)
+                            <div class="flex flex-col text-xs">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-neutral-500">Last Access:</span>
+                                    <span>{{ $request->server->last_access_time ?
+                                        $request->server->last_access_time->format('d/m/Y H:i:s') : 'Never' }}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-neutral-500">Quota:</span>
+                                    <span>{{ $request->server->current_quota ?? 'N/A' }}</span>
+                                </div>
+                                @if($request->server->admin_notes)
+                                <div class="flex justify-between items-center">
+                                    <span class="font-medium text-neutral-500">Note:</span>
+                                    <button type="button"
+                                        x-on:click="$dispatch('open-modal', 'note-modal'); $wire.admin_notes = `{{ $request->server->admin_notes ?? '' }}`"
+                                        class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
+                                        <i class="fa-solid fa-note-sticky"></i>
+                                    </button>
+                                </div>
+                                @endif
+
+
+                                @if($request->server->assignedUser)
+                                <div
+                                    class="p-2 mt-2 rounded border bg-neutral-100 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
+                                    <div class="flex justify-between items-center">
+                                        <div class="pr-2 truncate">
+                                            <div class="text-xs font-medium">{{
+                                                $request->server->assignedUser->first_name }} {{
+                                                $request->server->assignedUser->last_name }}</div>
+                                            <div class="text-xs truncate text-neutral-500">{{
+                                                $request->server->assignedUser->username }}</div>
+                                        </div>
+                                        <x-primary-info-button
+                                            onclick="confirm('Are you sure you want to impersonate this user?') || event.stopImmediatePropagation()"
+                                            wire:click="impersonateUser({{ $request->server->assignedUser->id }})"
+                                            class="px-2 py-1 text-xs">
+                                            Login
+                                        </x-primary-info-button>
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+                            @endif
+                        </div>
+                    </td>
+                    <td class="p-4 text-center">
                         <span
                             class="px-2 py-1 text-xs font-medium rounded-full {{ $request->status === 'success' ? 'text-green-800 bg-green-100' : 'text-red-800 bg-red-100' }}">
                             {{ ucfirst($request->status) }}
                         </span>
                     </td>
-                    <td class="p-4">
+                    <td class="overflow-hidden p-4">
                         @if($request->status === 'failed' && $request->error_data)
                         <div class="space-y-2">
-                            <div class="flex items-center space-x-2">
-                                <span class="px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full">
+                            <div class="flex items-center">
+                                <span
+                                    class="px-2 py-1 text-xs font-medium text-red-800 truncate bg-red-100 rounded-full">
                                     Error #{{ $request->error_number }}: {{ $request->error }}
                                 </span>
                             </div>
-                            <p class="text-sm text-neutral-600 dark:text-neutral-400">{{ $request->message }}</p>
+                            <p class="text-sm truncate text-neutral-600 dark:text-neutral-400"
+                                title="{{ $request->message }}">
+                                {{ $request->message }}
+                            </p>
                         </div>
                         @else
                         <span class="text-neutral-500">-</span>
                         @endif
                     </td>
                     <td class="p-4">{{ number_format($request->execution_time, 3) }}s</td>
-                    <td class="p-4">{{ $request->request_time->format('d/m/Y H:i:s') }}</td>
+                    <td class="p-4">{{ $request->request_time->format('d/m/Y H:i:s A') }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -123,4 +190,21 @@
     <div class="mt-4">
         {{ $requests->links() }}
     </div>
+
+    <!-- Single Reusable Edit Email Modal -->
+    <x-modal name="note-modal" maxWidth="md">
+        <div class="p-6">
+            <h2 class="text-lg font-medium">Admin Note</h2>
+            <form wire:submit.prevent="saveNote" class="mt-4">
+                <div class="space-y-4">
+                   <p x-text="$wire.admin_notes"></p>
+                </div>
+                <div class="flex justify-end mt-6 space-x-3">
+                    <x-secondary-button x-on:click="$dispatch('close-modal', 'note-modal')">
+                        Close
+                    </x-secondary-button>
+                </div>
+            </form>
+        </div>
+    </x-modal>
 </div>

@@ -2,6 +2,7 @@
 
 namespace App\Models\Admin\Site;
 
+use App\Models\Server;
 use Illuminate\Database\Eloquent\Model;
 
 class ApiRequest extends Model
@@ -37,5 +38,10 @@ class ApiRequest extends Model
     public function getErrorNumberAttribute()
     {
         return $this->error_data['error_number'] ?? null;
+    }
+
+    public function server()
+    {
+        return $this->belongsTo(Server::class, 'serverid', 'name');
     }
 }

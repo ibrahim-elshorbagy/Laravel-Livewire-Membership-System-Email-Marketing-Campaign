@@ -3,6 +3,8 @@
 namespace App\Livewire\Pages\Admin\SiteSettings;
 
 use App\Models\Admin\Site\ApiRequest;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -14,17 +16,21 @@ class ApiRequests extends Component
 
     #[Url]
     public $search = '';
-    
+    #[Url]
+    public $userSearch = '';
+
     public $sortField = 'request_time';
     public $sortDirection = 'desc';
     public $perPage = 10;
     public $selectedRequests = [];
     public $selectPage = false;
 
+    public $admin_notes;
     protected function rules()
     {
         return [
             'search' => 'nullable|string',
+            'userSearch' => 'nullable|string',
             'sortField' => 'required|in:serverid,request_time,execution_time,status',
             'sortDirection' => 'required|in:asc,desc',
             'perPage' => 'required|integer|in:10,25,50',
@@ -60,13 +66,35 @@ class ApiRequests extends Component
         }
     }
 
+    public function impersonateUser($userId)
+    {
+        $user = User::find($userId);
+        if ($user) {
+            session()->put('impersonated_by', auth()->id());
+            auth()->login($user);
+            return redirect()->route('dashboard');
+        }
+    }
     public function getRequestsProperty()
     {
-        return ApiRequest::when($this->search, function ($query) {
+        return ApiRequest::with(['server' => function($query) {
+                $query->with(['assignedUser' => function($q) {
+                    $q->select('id', 'first_name', 'last_name', 'username');
+                }]);
+            }])
+            ->when($this->search, function ($query) {
                 $query->where(function($q) {
                     $q->where('serverid', 'like', '%' . $this->search . '%')
                       ->orWhereRaw("JSON_EXTRACT(error_data, '$.error') LIKE ?", ['%' . $this->search . '%'])
                       ->orWhereRaw("JSON_EXTRACT(error_data, '$.message') LIKE ?", ['%' . $this->search . '%']);
+                });
+            })
+            ->when($this->userSearch, function ($query) {
+                $query->whereHas('server.assignedUser', function($userQuery) {
+                    $userQuery->where(function($q) {
+                        $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', '%' . $this->userSearch . '%')
+                          ->orWhere('username', 'like', '%' . $this->userSearch . '%');
+                    });
                 });
             })
             ->orderBy($this->sortField, $this->sortDirection)
