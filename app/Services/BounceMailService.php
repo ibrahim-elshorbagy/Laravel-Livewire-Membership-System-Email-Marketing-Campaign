@@ -144,7 +144,7 @@ class BounceMailService
         }
     }
 
-    
+
     public function getAllUnreadMessages(): array
     {
         // Initialize tracking with an estimate - we'll update the actual count later
@@ -270,7 +270,7 @@ class BounceMailService
 
             // More robust matching that handles word boundaries
             if (preg_match('/\b' . preg_quote($pattern, '/') . '\b/i', $text)) {
-                Log::channel('emailBounces')->info("Matched pattern: '{$pattern}' in {$text}");
+                Log::channel('emailBounces')->info("Matched pattern: '{$pattern}' in "); //{$text}
                 return true;
             }
         }
@@ -286,8 +286,7 @@ class BounceMailService
 
     protected function extractAffectedEmail(string $body): ?string
     {
-        // Match any non-space characters before @, followed by domain and TLD
-        if (preg_match('/([^\s]+)@([^\s.]+)\.([^\s.]+)/', $body, $matches)) {
+        if (preg_match('/\b([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/', $body, $matches)) {
             return $matches[0];
         }
 
