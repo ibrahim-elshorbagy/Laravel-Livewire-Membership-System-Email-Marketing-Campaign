@@ -6,14 +6,12 @@
         </h2>
 
         <div class="flex gap-5">
-
             <x-primary-info-link href="{{ route('admin.servers') }}" wire:navigate>
                 Back To Servers
             </x-primary-info-link>
             <x-primary-create-link href="{{ route('admin.servers.form') }}">
                 Add New Server
             </x-primary-create-link>
-
         </div>
     </header>
 
@@ -61,9 +59,15 @@
             </button>
             @endif
         </div>
+        <div>
+            <x-primary-danger-button wire:click="deleteAllOrphanServers"
+                wire:confirm="Are you sure you want to delete ALL orphan servers? This action cannot be undone!">
+                Delete All Orphan Servers
+            </x-primary-danger-button>
+        </div>
     </div>
 
-    <!-- Table Container with Relative Positioning -->
+<!-- Table Container with Relative Positioning -->
     <div class="overflow-hidden overflow-x-auto relative w-full rounded-lg">
         <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
             <thead
@@ -85,30 +89,29 @@
                 @foreach($servers as $server)
                 <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800">
                     <td class="p-4">
-                        <input type="checkbox" wire:model.live="selectedServers" value="{{ $server->id }}"
-                            class="rounded">
+                        <input type="checkbox" wire:model.live="selectedServers" value="{{ $server->id }}" class="rounded">
                     </td>
                     <td class="p-4 text-sm">{{ $server->name }}</td>
                     <td class="p-4" x-data="{
-                                            isEditing: false,
-                                            tempNote: '{{ $server->admin_notes }}',
-                                            originalNote: '{{ $server->admin_notes }}',
-                                            startEdit() {
-                                                this.isEditing = true;
-                                                this.tempNote = this.originalNote;
-                                            },
-                                            saveEdit() {
-                                                $wire.edit_admin_notes = this.tempNote;
-                                                $wire.selectedServerId = {{ $server->id }};
-                                                $wire.saveNote();
-                                                this.isEditing = false;
-                                                this.originalNote = this.tempNote;
-                                            },
-                                            cancelEdit() {
-                                                this.isEditing = false;
-                                                this.tempNote = this.originalNote;
-                                            }
-                                        }">
+                                                isEditing: false,
+                                                tempNote: '{{ $server->admin_notes }}',
+                                                originalNote: '{{ $server->admin_notes }}',
+                                                startEdit() {
+                                                    this.isEditing = true;
+                                                    this.tempNote = this.originalNote;
+                                                },
+                                                saveEdit() {
+                                                    $wire.edit_admin_notes = this.tempNote;
+                                                    $wire.selectedServerId = {{ $server->id }};
+                                                    $wire.saveNote();
+                                                    this.isEditing = false;
+                                                    this.originalNote = this.tempNote;
+                                                },
+                                                cancelEdit() {
+                                                    this.isEditing = false;
+                                                    this.tempNote = this.originalNote;
+                                                }
+                                            }">
                         <template x-if="isEditing">
                             <div class="flex items-center space-x-2">
                                 <x-textarea-input class="w-full text-sm" x-model="tempNote"
@@ -164,27 +167,27 @@
                                 x-transition:leave-start="transform opacity-100 scale-100"
                                 x-transition:leave-end="transform opacity-0 scale-95"
                                 class="fixed z-[9999] w-96 bg-white rounded-md shadow-lg dark:bg-neutral-800" x-init="$watch('open', value => {
-                                    if (value) {
-                                        $nextTick(() => {
-                                            const button = $el.previousElementSibling;
-                                            const rect = button.getBoundingClientRect();
-                                            const dropdown = $el;
-                                            const dropdownHeight = dropdown.offsetHeight;
-                                            const viewportHeight = window.innerHeight;
+                                        if (value) {
+                                            $nextTick(() => {
+                                                const button = $el.previousElementSibling;
+                                                const rect = button.getBoundingClientRect();
+                                                const dropdown = $el;
+                                                const dropdownHeight = dropdown.offsetHeight;
+                                                const viewportHeight = window.innerHeight;
 
-                                            // Position dropdown below or above the button based on available space
-                                            if (rect.bottom + dropdownHeight > viewportHeight && rect.top > dropdownHeight) {
-                                                dropdown.style.bottom = `${viewportHeight - rect.top}px`;
-                                                dropdown.style.top = 'auto';
-                                            } else {
-                                                dropdown.style.top = `${rect.bottom}px`;
-                                                dropdown.style.bottom = 'auto';
-                                            }
+                                                // Position dropdown below or above the button based on available space
+                                                if (rect.bottom + dropdownHeight > viewportHeight && rect.top > dropdownHeight) {
+                                                    dropdown.style.bottom = `${viewportHeight - rect.top}px`;
+                                                    dropdown.style.top = 'auto';
+                                                } else {
+                                                    dropdown.style.top = `${rect.bottom}px`;
+                                                    dropdown.style.bottom = 'auto';
+                                                }
 
-                                            dropdown.style.left = `${rect.left}px`;
-                                        });
-                                    }
-                                })">
+                                                dropdown.style.left = `${rect.left}px`;
+                                            });
+                                        }
+                                    })">
                                 <div class="p-2">
                                     <input type="text" wire:model.live.debounce.300ms="userSearch"
                                         class="px-3 py-2 w-full rounded-md border dark:bg-neutral-700 dark:border-neutral-600"
@@ -197,7 +200,7 @@
                                         </div>
                                         @foreach($users as $user)
                                         <div class="px-3 py-2 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700
-                                            {{ $server->assigned_to_user_id == $user->id ? 'bg-sky-50 dark:bg-sky-900' : '' }}"
+                                                {{ $server->assigned_to_user_id == $user->id ? 'bg-sky-50 dark:bg-sky-900' : '' }}"
                                             wire:click="assignUser({{ $server->id }}, {{ $user->id }}); open = false">
                                             <div class="flex gap-2 items-center w-max">
                                                 <img class="object-cover rounded-full size-10"
@@ -208,8 +211,7 @@
                                                         {{ $user->first_name }} {{ $user->last_name }}
                                                         - ({{ $user->username }})
                                                     </span>
-                                                    <span
-                                                        class="text-sm text-neutral-600 opacity-85 dark:text-neutral-400">
+                                                    <span class="text-sm text-neutral-600 opacity-85 dark:text-neutral-400">
                                                         {{ $user->email }}
                                                     </span>
                                                 </div>
@@ -223,26 +225,26 @@
                     </td>
                     <td class="p-4 text-xs">{{ $server->current_quota }}</td>
                     <td class="p-4 text-xs" x-data="{
-                        isEditing: false,
-                        tempCount: {{ $server->emails_count }},
-                        originalCount: {{ $server->emails_count }},
-                        startEdit() {
-                            this.isEditing = true;
-                            this.tempCount = this.originalCount;
-                        },
-                        saveEdit() {
-                            if (this.tempCount >= 1 && this.tempCount <= 255) {
-                                $wire.tempEmailsCount = this.tempCount;
-                                $wire.saveEmailsCount({{ $server->id }});
+                            isEditing: false,
+                            tempCount: {{ $server->emails_count }},
+                            originalCount: {{ $server->emails_count }},
+                            startEdit() {
+                                this.isEditing = true;
+                                this.tempCount = this.originalCount;
+                            },
+                            saveEdit() {
+                                if (this.tempCount >= 1 && this.tempCount <= 255) {
+                                    $wire.tempEmailsCount = this.tempCount;
+                                    $wire.saveEmailsCount({{ $server->id }});
+                                    this.isEditing = false;
+                                    this.originalCount = this.tempCount;
+                                }
+                            },
+                            cancelEdit() {
                                 this.isEditing = false;
-                                this.originalCount = this.tempCount;
+                                this.tempCount = this.originalCount;
                             }
-                        },
-                        cancelEdit() {
-                            this.isEditing = false;
-                            this.tempCount = this.originalCount;
-                        }
-                    }">
+                        }">
                         <template x-if="isEditing">
                             <div class="flex items-center space-x-2">
                                 <x-text-input type="number" min="1" max="255" class="w-20 text-sm" x-model="tempCount"

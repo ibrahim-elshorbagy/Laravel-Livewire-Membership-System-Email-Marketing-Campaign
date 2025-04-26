@@ -126,9 +126,30 @@ class OrphanServerList extends Component
         }
     }
 
-    public function getServersProperty()
+    public function deleteAllOrphanServers()
+    {
+        try {
+            // Get all orphan servers
+            $orphanServers = $this->getOrphanServersQuery()->get();
+
+            foreach($orphanServers as $server) {
+                $server->delete();
+            }
+
+            $this->alert('success', 'All orphan servers deleted successfully!', ['position' => 'bottom-end']);
+        } catch (\Exception $e) {
+            $this->alert('error', 'Failed to delete orphan servers: ' . $e->getMessage(), ['position' => 'bottom-end']);
+        }
+    }
+
+    protected function getOrphanServersQuery()
     {
         return Server::with('assignedUser')
+            ->whereNotExists(function($query) {
+                $query->select(DB::raw(1))
+                    ->from('api_requests')
+                    ->whereColumn('api_requests.serverid', 'servers.name');
+            })
             ->when($this->search, function ($query) {
                 $query->where(function($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
@@ -139,7 +160,12 @@ class OrphanServerList extends Component
                                 ->orWhere('email', 'like', '%' . $this->search . '%');
                     });
                 });
-            })
+            });
+    }
+
+    public function getServersProperty()
+    {
+        return $this->getOrphanServersQuery()
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
     }
