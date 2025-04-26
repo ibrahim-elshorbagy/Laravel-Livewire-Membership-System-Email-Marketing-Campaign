@@ -307,7 +307,7 @@ new class extends Component
             </div>
         </div>
 
-        <div class="flex gap-4 items-center mb-6">
+        <div class="flex flex-row flex-wrap gap-4 items-center mb-6">
             <x-primary-create-button>Save Settings</x-primary-create-button>
             <x-primary-info-button type="button" wire:click="testConnection">
                 <span wire:loading.remove wire:target="testConnection">Test Connection</span>

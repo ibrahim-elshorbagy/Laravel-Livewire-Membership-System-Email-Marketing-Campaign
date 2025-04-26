@@ -54,10 +54,6 @@
                 </x-nav-link>
                 @endauth
                 @role('user')
-                {{-- <x-nav-link :active="request()->routeIs('our.plans')" href="{{ route('our.plans') }}"
-                    wire:navigate>
-                    <span>Plans</span>
-                </x-nav-link> --}}
                 <x-nav-link :active="request()->routeIs('user.my-subscription')"
                     href="{{ route('user.my-subscription') }}">
                     <span>Subscription</span>
@@ -66,46 +62,13 @@
                     href="{{ route('user.my-transactions') }}" wire:navigate>
                     <span>Transactions</span>
                 </x-nav-link>
-                <x-nav-link :active="request()->routeIs('user.emails.index')" href="{{ route('user.emails.index') }}"
-                    wire:navigate>
-                    <span>Mailing list</span>
-                </x-nav-link>
-                <x-nav-link :active="request()->routeIs('user.email-messages')"
-                    href="{{ route('user.email-messages') }}" wire:navigate>
-                    <span>Messages</span>
-                </x-nav-link>
                 <x-nav-link :active="request()->routeIs('user.servers')" href="{{ route('user.servers') }}"
                     wire:navigate>
                     <span>Servers</span>
                 </x-nav-link>
-                <x-nav-link :active="request()->routeIs('user.campaigns.list')"
-                    href="{{ route('user.campaigns.list') }}" wire:navigate>
-                    <span>Campaigns</span>
+                <x-nav-link :active="request()->routeIs('user-settings')" href="{{ route('user-settings') }}" wire:navigate>
+                    <span>Settings</span>
                 </x-nav-link>
-                @persist('sidebar')
-                <div x-data="{ isSupportExpanded: false}" class="flex flex-col space-y-2">
-                    <button type="button" x-on:click="isSupportExpanded = ! isSupportExpanded"
-                        class="flex gap-2 justify-between items-center px-2 py-1.5 text-sm font-medium rounded-md underline-offset-2 focus:outline-none focus-visible:underline"
-                        x-bind:class="isSupportExpanded ? 'text-neutral-900 bg-black/10 dark:text-white dark:bg-white/10' :  'text-neutral-600 hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/5'">
-                        <span class="mr-auto text-left">Support</span>
-                        <i class="transition-transform fa-solid fa-angle-up" x-bind:class="isSupportExpanded ? 'rotate-0' : 'rotate-180'"
-                            aria-hidden="true"></i>
-                    </button>
-
-                    <ul x-cloak x-collapse x-show="isSupportExpanded">
-                        <li class="px-1 py-0.5 first:mt-2">
-                            <x-nav-link :active="request()->routeIs('user.support.tickets')" href="{{ route('user.support.tickets') }}"
-                                wire:navigate>
-                                <span>My Tickets</span>
-                            </x-nav-link>
-                            <x-nav-link :active="request()->routeIs('user.support.create')"
-                                href="{{ route('user.support.create') }}" wire:navigate>
-                                <span>Create Ticket</span>
-                            </x-nav-link>
-                        </li>
-                    </ul>
-                </div>
-                @endpersist('sidebar')
                 @endrole
 
 
@@ -138,6 +101,55 @@
 
             </div>
 
+            @role('user')
+            @persist('sidebar')
+            <div x-data="{ isCampaignExpanded: false}" class="flex flex-col space-y-2">
+                <button type="button" x-on:click="isCampaignExpanded = ! isCampaignExpanded"
+                    class="flex gap-2 justify-between items-center px-2 py-1.5 text-sm font-medium rounded-md underline-offset-2 focus:outline-none focus-visible:underline"
+                    x-bind:class="isCampaignExpanded ? 'text-neutral-900 bg-black/10 dark:text-white dark:bg-white/10' :  'text-neutral-600 hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/5'">
+                    <span class="mr-auto text-left">Campaigns</span>
+                    <i class="transition-transform fa-solid fa-angle-up"
+                        x-bind:class="isCampaignExpanded ? 'rotate-0' : 'rotate-180'" aria-hidden="true"></i>
+                </button>
+
+                <ul x-cloak x-collapse x-show="isCampaignExpanded">
+                    <li class="px-1 py-0.5 ">
+                        <x-nav-link :active="request()->routeIs('user.campaigns.list')" href="{{ route('user.campaigns.list') }}" wire:navigate>
+                            <span>Campaigns</span>
+                        </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.emails.index')" href="{{ route('user.emails.index') }}" wire:navigate>
+                            <span>Mailing list</span>
+                        </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.email-messages')" href="{{ route('user.email-messages') }}" wire:navigate>
+                            <span>Messages</span>
+                        </x-nav-link>
+                    </li>
+                </ul>
+            </div>
+            <div x-data="{ isSupportExpanded: false}" class="flex flex-col space-y-2">
+                <button type="button" x-on:click="isSupportExpanded = ! isSupportExpanded"
+                    class="flex gap-2 justify-between items-center px-2 py-1.5 text-sm font-medium rounded-md underline-offset-2 focus:outline-none focus-visible:underline"
+                    x-bind:class="isSupportExpanded ? 'text-neutral-900 bg-black/10 dark:text-white dark:bg-white/10' :  'text-neutral-600 hover:bg-black/5 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-white/5'">
+                    <span class="mr-auto text-left">Support</span>
+                    <i class="transition-transform fa-solid fa-angle-up"
+                        x-bind:class="isSupportExpanded ? 'rotate-0' : 'rotate-180'" aria-hidden="true"></i>
+                </button>
+
+                <ul x-cloak x-collapse x-show="isSupportExpanded">
+                    <li class="px-1 py-0.5 ">
+                        <x-nav-link :active="request()->routeIs('user.support.tickets')" href="{{ route('user.support.tickets') }}"
+                            wire:navigate>
+                            <span>My Tickets</span>
+                        </x-nav-link>
+                        <x-nav-link :active="request()->routeIs('user.support.create')" href="{{ route('user.support.create') }}"
+                            wire:navigate>
+                            <span>Create Ticket</span>
+                        </x-nav-link>
+                    </li>
+                </ul>
+            </div>
+            @endpersist('sidebar')
+            @endrole
 
             @role('admin')
             @persist('sidebar')
@@ -153,7 +165,7 @@
                 </button>
 
                 <ul x-cloak x-collapse x-show="isEmailExpanded">
-                    <li class="px-1 py-0.5 first:mt-2">
+                    <li class="px-1 py-0.5 ">
                         <x-nav-link :active="request()->routeIs('admin.support.tickets')"
                             href="{{ route('admin.support.tickets') }}" wire:navigate>
                             <span>Support Tickets</span>
@@ -174,7 +186,7 @@
                 </button>
 
                 <ul x-cloak x-collapse x-show="isPaymentExpanded">
-                    <li class="px-1 py-0.5 first:mt-2">
+                    <li class="px-1 py-0.5 ">
                         <x-nav-link :active="request()->routeIs('admin.payment.paypal')"
                             href="{{ route('admin.payment.paypal') }}" wire:navigate>
                             <span>PayPal settings</span>
@@ -204,7 +216,7 @@
                 </button>
 
                 <ul x-cloak x-collapse x-show="isSettingsExpanded">
-                    <li class="px-1 py-0.5 first:mt-2">
+                    <li class="px-1 py-0.5 ">
                         <x-nav-link :active="request()->routeIs('admin.site-settings')"
                             href="{{ route('admin.site-settings') }}" wire:navigate>
                             <span>Site Settings</span>
@@ -219,7 +231,7 @@
                     <li class="px-1 py-0.5">
                         <x-nav-link :active="request()->routeIs('admin.site-api-requests')"
                             href="{{ route('admin.site-api-requests') }}" wire:navigate>
-                            <span>Api Requests</span>
+                            <span>API requests and fails</span>
                         </x-nav-link>
                     </li>
                 </ul>
@@ -265,22 +277,34 @@
                             href="{{ route('user.my-transactions') }}" wire:navigate>
                             <span class="text-nowrap">Transactions</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.emails.index')"
-                            href="{{ route('user.emails.index') }}" wire:navigate>
-                            <span class="text-nowrap">Mailing list</span>
-                        </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.email-messages')"
-                            href="{{ route('user.email-messages') }}" wire:navigate>
-                            <span class="text-nowrap">Messages</span>
-                        </x-nav-link>
+
+
                         <x-nav-link :active="request()->routeIs('user.servers')" href="{{ route('user.servers') }}"
                             wire:navigate>
                             <span>Servers</span>
                         </x-nav-link>
-                        <x-nav-link :active="request()->routeIs('user.campaigns.list')"
-                            href="{{ route('user.campaigns.list') }}" wire:navigate>
-                            <span>Campaigns</span>
+                        <x-nav-link :active="request()->routeIs('user-settings')" href="{{ route('user-settings') }}"
+                            wire:navigate>
+                            <span>Settings</span>
                         </x-nav-link>
+                        <x-primary-dropdown label="Campaigns">
+
+                            <x-nav-link :active="request()->routeIs('user.campaigns.list')"
+                                href="{{ route('user.campaigns.list') }}" wire:navigate>
+                                <span>Campaigns</span>
+                            </x-nav-link>
+
+                            <x-nav-link :active="request()->routeIs('user.emails.index')"
+                                href="{{ route('user.emails.index') }}" wire:navigate>
+                                <span class="text-nowrap">Mailing list</span>
+                            </x-nav-link>
+
+                            <x-nav-link :active="request()->routeIs('user.email-messages')"
+                                href="{{ route('user.email-messages') }}" wire:navigate>
+                                <span class="text-nowrap">Messages</span>
+                            </x-nav-link>
+
+                        </x-primary-dropdown>
                         <x-primary-dropdown label="Support">
                             <x-nav-link :active="request()->routeIs('user.support.tickets')"
                                 href="{{ route('user.support.tickets') }}" wire:navigate>
@@ -361,7 +385,7 @@
                             </x-nav-link>
                             <x-nav-link :active="request()->routeIs('admin.site-api-requests')"
                                 href="{{ route('admin.site-api-requests') }}" wire:navigate>
-                                <span>Api Requests</span>
+                                <span>API requests and fails</span>
                             </x-nav-link>
                         </x-primary-dropdown>
 

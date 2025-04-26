@@ -13,7 +13,9 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
-
+Route::view('profile/settings', 'livewire.pages.user.dashboard.settings')
+    ->middleware(['auth','role:user'])
+    ->name('user-settings');
 
 
 
