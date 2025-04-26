@@ -98,89 +98,6 @@ class BounceMailService
 
 
 
-
-    public function getAllUnreadMessages(): array
-    {
-        // Initialize tracking with an estimate - we'll update the actual count later
-        // Don't call initializeProgress here - let markUnreadMessages handle it
-
-        $messages = [];
-        $processedCount = 0;
-        $matchingCount = 0;
-
-        // Get all subject patterns
-        $subjectPatterns = array_map('trim', $this->patterns['subject']);
-
-        // Process each subject pattern separately for more efficient searching
-        foreach ($subjectPatterns as $pattern) {
-            // Use IMAP's built-in SUBJECT search criteria
-            $searchCriteria = 'UNSEEN SUBJECT "' . $pattern . '"';
-            $matchingEmails = imap_search($this->connection, $searchCriteria);
-
-            //If no email search with next pattern
-            if (!$matchingEmails) {
-                continue;
-            }
-
-            Log::channel('emailBounces')->info("Found " . count($matchingEmails) . " unread messages with subject pattern: '$pattern'");
-
-            // Update progress total if needed (first batch found)
-            if ($processedCount == 0 && $this->jobProgress) {
-                $this->updateProgressTotal(count($matchingEmails));
-            }
-
-            // Process the matching emails
-            $headers = imap_fetch_overview($this->connection, implode(',', $matchingEmails), 0);
-
-            foreach ($headers as $header) {
-                $emailNumber = $header->msgno;
-                $subject = isset($header->subject) ? imap_utf8($header->subject) : '';
-
-                try {
-                    $bounceHeaders = imap_fetchheader($this->connection, $emailNumber);
-                    $bodyPreview = substr(imap_body($this->connection, $emailNumber), 0, 2000);
-                    $bounceData = $bounceHeaders . "\n" . $bodyPreview;
-
-                    $bounceType = $this->analyzeBounceMessage($bounceData);
-                    $affectedEmail = $this->extractAffectedEmail($bodyPreview);
-
-                    if (!empty($affectedEmail) && $bounceType) {
-                        $messages[] = [
-                            'number' => $emailNumber,
-                            'subject' => $subject,
-                            'bounce_type' => $bounceType,
-                            'affected_email' => $affectedEmail,
-                        ];
-                        $matchingCount++;
-                    }
-
-                    imap_setflag_full($this->connection, $emailNumber, '\\Seen');
-                    $processedCount++;
-
-                    // Update progress after each item is processed
-                    if ($this->jobProgress) {
-                        $this->updateProgress($processedCount);
-                    }
-
-                } catch (\Exception $e) {
-                    Log::channel('emailBounces')->error("Error processing email {$emailNumber}: " . $e->getMessage());
-                    imap_setflag_full($this->connection, $emailNumber, '\\Seen');
-                    $processedCount++;
-
-                    // Update progress even when errors occur
-                    if ($this->jobProgress) {
-                        $this->updateProgress($processedCount);
-                    }
-                }
-            }
-        }
-
-        Log::channel('emailBounces')->info("Total processed: $processedCount, matching: $matchingCount");
-
-        return $messages;
-    }
-
-
     public function markUnreadMessages(): void
     {
         // Initialize progress tracking with initial estimate of 10
@@ -227,6 +144,144 @@ class BounceMailService
         }
     }
 
+    
+    public function getAllUnreadMessages(): array
+    {
+        // Initialize tracking with an estimate - we'll update the actual count later
+        // Don't call initializeProgress here - let markUnreadMessages handle it
+
+        $messages = [];
+        $processedCount = 0;
+        $matchingCount = 0;
+
+        // Get all subject patterns
+        $subjectPatterns = array_map('trim', $this->patterns['subject']);
+
+        // Process each subject pattern separately for more efficient searching
+        foreach ($subjectPatterns as $pattern) {
+            // Use IMAP's built-in SUBJECT search criteria
+            $searchCriteria = 'UNSEEN SUBJECT "' . $pattern . '"';
+            $matchingEmails = imap_search($this->connection, $searchCriteria);
+
+            //If no email search with next pattern
+            if (!$matchingEmails) {
+                continue;
+            }
+
+            Log::channel('emailBounces')->info("Found " . count($matchingEmails) . " unread messages with subject pattern: '$pattern'");
+
+            // Update progress total if needed (first batch found)
+            if ($processedCount == 0 && $this->jobProgress) {
+                $this->updateProgressTotal(count($matchingEmails));
+            }
+
+            // Process the matching emails
+            $headers = imap_fetch_overview($this->connection, implode(',', $matchingEmails), 0);
+
+            foreach ($headers as $header) {
+                $emailNumber = $header->msgno;
+                $subject = isset($header->subject) ? imap_utf8($header->subject) : '';
+
+                try {
+                    // Get the properly decoded message body
+                    $bodyPreview = $this->getDecodedMessageBody($emailNumber);
+
+                    $bounceType = $this->analyzeBounceMessage($bodyPreview);
+                    $affectedEmail = $this->extractAffectedEmail($bodyPreview);
+
+                    if (!empty($affectedEmail) && $bounceType) {
+                        $messages[] = [
+                            'number' => $emailNumber,
+                            'subject' => $subject,
+                            'bounce_type' => $bounceType,
+                            'affected_email' => $affectedEmail,
+                        ];
+                        $matchingCount++;
+                    }
+
+                    imap_setflag_full($this->connection, $emailNumber, '\\Seen');
+                    $processedCount++;
+
+                    // Update progress after each item is processed
+                    if ($this->jobProgress) {
+                        $this->updateProgress($processedCount);
+                    }
+
+                } catch (\Exception $e) {
+                    Log::channel('emailBounces')->error("Error processing email {$emailNumber}: " . $e->getMessage());
+                    imap_setflag_full($this->connection, $emailNumber, '\\Seen');
+                    $processedCount++;
+
+                    // Update progress even when errors occur
+                    if ($this->jobProgress) {
+                        $this->updateProgress($processedCount);
+                    }
+                }
+            }
+        }
+
+        Log::channel('emailBounces')->info("Total processed: $processedCount, matching: $matchingCount");
+        return $messages;
+    }
+
+    protected function getDecodedMessageBody(int $messageNumber): string
+    {
+        $structure = imap_fetchstructure($this->connection, $messageNumber);
+
+        // Handle multipart messages
+        if (isset($structure->parts)) {
+            foreach ($structure->parts as $partNumber => $part) {
+                // Prefer plain text parts
+                if (isset($part->subtype) && strtoupper($part->subtype) == 'PLAIN') {
+                    $body = imap_fetchbody($this->connection, $messageNumber, $partNumber + 1);
+                    return $this->decodeImapContent($body, $part->encoding);
+                }
+            }
+        }
+
+        // Fallback for single part messages
+        $body = imap_body($this->connection, $messageNumber);
+        return $this->decodeImapContent($body, $structure->encoding);
+    }
+
+    protected function decodeImapContent(string $content, int $encoding): string
+    {
+        switch ($encoding) {
+            case ENCBASE64:
+                return imap_base64($content) ?: $content;
+            case ENCQUOTEDPRINTABLE:
+                return imap_qprint($content) ?: $content;
+            default:
+                return $content;
+        }
+    }
+
+    protected function patternMatch(string $text, array $patterns): bool
+    {
+        $text = trim(strtolower($text));
+
+        foreach ($patterns as $pattern) {
+            $pattern = trim(strtolower($pattern));
+
+            // Skip empty patterns
+            if (empty($pattern)) {
+                continue;
+            }
+
+            // More robust matching that handles word boundaries
+            if (preg_match('/\b' . preg_quote($pattern, '/') . '\b/i', $text)) {
+                Log::channel('emailBounces')->info("Matched pattern: '{$pattern}' in {$text}");
+                return true;
+            }
+        }
+
+        Log::channel('emailBounces')->debug("No pattern matches found in text");
+        return false;
+    }
+
+
+
+
 
 
     protected function extractAffectedEmail(string $body): ?string
@@ -253,23 +308,7 @@ class BounceMailService
         return null;
     }
 
-    
-    protected function patternMatch(string $text, array $patterns): bool
-    {
-        $text = trim(strtolower($text));
 
-        foreach ($patterns as $pattern) {
-            $pattern = trim(strtolower($pattern));
-
-            if ($text === $pattern || stripos($text, $pattern) !== false) {
-                Log::channel('emailBounces')->info("Subject matched pattern: '{$pattern}' in text:");// '{$text}'
-                return true;
-            }
-        }
-
-        Log::channel('emailBounces')->debug("No match for subject text: "); // '{$text}'
-        return false;
-    }
 
 
 
