@@ -2,9 +2,9 @@
         <!-- Header -->
         <div class=" flex justify-between items-center mb-6">
     <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Edit Payment #{{ $payment->id }}</h2>
-    <x-primary-info-button href="{{ route('admin.payment.transactions') }}" wire:navigate>
+    <x-primary-info-link href="{{ route('admin.payment.transactions') }}" wire:navigate>
         Back to Payments
-    </x-primary-info-button>
+    </x-primary-info-link>
 </div>
 
 <!-- Customer Info -->

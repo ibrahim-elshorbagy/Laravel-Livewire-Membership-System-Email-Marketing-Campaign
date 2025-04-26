@@ -5,9 +5,9 @@
             {{ $campaign_id ? 'Edit Campaign' : 'New Campaign' }}
         </h2>
         <div class="mt-4 md:mt-0">
-            <x-primary-info-button href="{{ route('user.campaigns.list') }}" wire:navigate>
+            <x-primary-info-link href="{{ route('user.campaigns.list') }}" wire:navigate>
                 Back to Campaigns
-            </x-primary-info-button>
+            </x-primary-info-link>
         </div>
     </header>
 

@@ -8,9 +8,9 @@
             </h2>
         </div>
         <div class="flex mt-2 sm:mt-4 md:mt-0 md:ml-4">
-            <x-primary-info-button href="{{ route('admin.subscriptions') }}" wire:navigate>
+            <x-primary-info-link href="{{ route('admin.subscriptions') }}" wire:navigate>
                 Back to Subscriptions
-            </x-primary-info-button>
+            </x-primary-info-link>
         </div>
     </div>
 

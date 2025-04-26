@@ -108,9 +108,9 @@
                         </button>
                     </div>
                     <div class="flex gap-4 items-center self-center mb-2 md:self-end">
-                        <x-primary-info-button href="{{ route('admin.support.tickets') }}" wire:navigate>
+                        <x-primary-info-link href="{{ route('admin.support.tickets') }}" wire:navigate>
                             Back To Tickets
-                        </x-primary-info-button>
+                        </x-primary-info-link>
                     </div>
                 </div>
         </div>

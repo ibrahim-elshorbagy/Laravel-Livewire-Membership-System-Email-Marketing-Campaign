@@ -72,9 +72,9 @@
             </h2>
         </div>
         <div class="flex mt-4 md:mt-0 md:ml-4">
-            <x-primary-info-button href="{{ route('user.emails.index') }}" wire:navigate>
+            <x-primary-info-link href="{{ route('user.emails.index') }}" wire:navigate>
                 Back to Mailing list
-            </x-primary-info-button>
+            </x-primary-info-link>
         </div>
     </div>
 

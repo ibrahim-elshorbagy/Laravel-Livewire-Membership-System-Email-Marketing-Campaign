@@ -5,9 +5,9 @@
             {{ $server_id ? 'Edit Server' : 'New Server' }}
         </h2>
         <div class="mt-4 md:mt-0">
-            <x-primary-info-button href="{{ route('admin.servers') }}" wire:navigate>
+            <x-primary-info-link href="{{ route('admin.servers') }}" wire:navigate>
                 Back To Servers
-            </x-primary-info-button>
+            </x-primary-info-link>
         </div>
     </header>
 

@@ -11,9 +11,9 @@
                     Preview: {{ $message->email_subject }}
                 </h3>
                 <div class="flex gap-5 items-center">
-                    <x-primary-info-button href="{{ route('user.email-messages') }}" wire:navigate>
+                    <x-primary-info-link href="{{ route('user.email-messages') }}" wire:navigate>
                         Back To Messages
-                    </x-primary-info-button>
+                    </x-primary-info-link>
 
                     <a href="{{ route('user.emails.message.form', $message->id) }}"
                         class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">

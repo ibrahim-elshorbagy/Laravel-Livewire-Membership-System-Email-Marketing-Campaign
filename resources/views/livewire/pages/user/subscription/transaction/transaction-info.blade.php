@@ -3,9 +3,9 @@
     <!-- Header -->
     <div class="flex flex-col justify-between items-center mb-6 md:flex-row">
         <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Transaction </h2>
-        <x-primary-info-button href="{{ route('user.my-transactions') }}" wire:navigate>
+        <x-primary-info-link href="{{ route('user.my-transactions') }}" wire:navigate>
             Back to Transactions
-        </x-primary-info-button>
+        </x-primary-info-link>
     </div>
 
     <!-- Plan Info -->

@@ -2,12 +2,13 @@
     class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <header class="flex flex-col justify-between items-center mb-6 md:flex-row">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
-            Servers Management
+            Orphan Servers
         </h2>
+
         <div class="flex gap-5">
 
-            <x-primary-info-link href="{{ route('admin.orphan-servers') }}" wire:navigate>
-                Orphan Servers Report
+            <x-primary-info-link href="{{ route('admin.servers') }}" wire:navigate>
+                Back To Servers
             </x-primary-info-link>
             <x-primary-create-link href="{{ route('admin.servers.form') }}">
                 Add New Server
@@ -110,8 +111,8 @@
                                         }">
                         <template x-if="isEditing">
                             <div class="flex items-center space-x-2">
-                                <x-textarea-input class="w-full text-sm" x-model="tempNote" @keydown.enter.prevent="saveEdit()"
-                                    @keydown.escape="cancelEdit()" />
+                                <x-textarea-input class="w-full text-sm" x-model="tempNote"
+                                    @keydown.enter.prevent="saveEdit()" @keydown.escape="cancelEdit()" />
                                 <button @click="saveEdit()" class="text-green-500 hover:text-green-600">
                                     <i class="fas fa-check"></i>
                                 </button>

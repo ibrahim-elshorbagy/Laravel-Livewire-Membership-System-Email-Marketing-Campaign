@@ -16,9 +16,9 @@
                 </div>
             </div>
         </div>
-        <x-primary-info-button href="{{ route('admin.payment.transactions') }}" wire:navigate>
+        <x-primary-info-link href="{{ route('admin.payment.transactions') }}" wire:navigate>
             Back to Transactions
-        </x-primary-info-button>
+        </x-primary-info-link>
     </div>
 
     <!-- Tabs -->

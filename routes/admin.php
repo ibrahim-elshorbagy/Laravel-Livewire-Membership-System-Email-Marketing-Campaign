@@ -9,6 +9,7 @@ use App\Livewire\Pages\Admin\Payment\Paypal\PaypalResponses;
 use App\Livewire\Pages\Admin\Payment\PaypalConfig;
 use App\Livewire\Pages\Admin\Plans\PlanManagement;
 use App\Livewire\Pages\Admin\Plans\PlanManagement\Edit as PlanManagementEdit;
+use App\Livewire\Pages\Admin\Server\Report\OrphanServerList;
 use App\Livewire\Pages\Admin\Server\ServerForm;
 use App\Livewire\Pages\Admin\Server\ServerList;
 
@@ -84,6 +85,7 @@ use Livewire\Volt\Volt;
 
         // Servers
         Route::get('/servers', ServerList::class)->name('admin.servers');
+        Route::get('/orphan-servers', OrphanServerList::class)->name('admin.orphan-servers');
         Route::get('/servers/form/{server?}', ServerForm::class)->name('admin.servers.form');
 
         // Support Ticket Management

@@ -4,8 +4,8 @@
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate"> {{
             $message_id ? 'Edit Message' : 'New Message' }} </h2>
         <div class="mt-4 md:mt-0">
-            <x-primary-info-button href="{{ route('user.email-messages') }}" wire:navigate> Back To Messages
-            </x-primary-info-button>
+            <x-primary-info-link href="{{ route('user.email-messages') }}" wire:navigate> Back To Messages
+            </x-primary-info-link>
         </div>
     </header>
 

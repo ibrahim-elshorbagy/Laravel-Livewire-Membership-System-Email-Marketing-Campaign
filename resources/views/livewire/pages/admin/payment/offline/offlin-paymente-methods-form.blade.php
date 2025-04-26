@@ -5,9 +5,9 @@
             {{ $method_id ? 'Edit Payment Method' : 'New Payment Method' }}
         </h2>
         <div class="mt-4 md:mt-0">
-            <x-primary-info-button href="{{ route('admin.offline-payment-methods') }}" wire:navigate>
+            <x-primary-info-link href="{{ route('admin.offline-payment-methods') }}" wire:navigate>
                 Back To Payment Methods
-            </x-primary-info-button>
+            </x-primary-info-link>
         </div>
     </header>
 

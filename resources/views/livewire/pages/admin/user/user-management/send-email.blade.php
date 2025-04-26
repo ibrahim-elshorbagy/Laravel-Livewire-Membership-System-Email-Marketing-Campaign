@@ -3,8 +3,8 @@
     <header class="flex flex-col justify-between items-center mb-6 md:flex-row">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">Send Email</h2>
         <div class="mt-4 md:mt-0">
-            <x-primary-info-button href="{{ route('admin.users') }}" wire:navigate> Back To System Users
-            </x-primary-info-button>
+            <x-primary-info-link href="{{ route('admin.users') }}" wire:navigate> Back To System Users
+            </x-primary-info-link>
         </div>
     </header>
 
