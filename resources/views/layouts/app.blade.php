@@ -35,12 +35,12 @@
     <div x-data="{ sidebarIsOpen: false }">
 
         <!-- Mobile sidebar overlay -->
-        <div x-cloak x-show="sidebarIsOpen" class="fixed inset-0 z-20 backdrop-blur-sm bg-neutral-950/10 md:hidden"
+        <div x-cloak x-show="sidebarIsOpen" class="fixed inset-0 z-20 backdrop-blur-sm bg-neutral-950/10 lg:hidden"
             aria-hidden="true" x-on:click="sidebarIsOpen = false" x-transition.opacity></div>
 
         <!-- Mobile sidebar -->
         <nav x-cloak
-            class="flex fixed left-0 z-30 flex-col p-4 w-60 border-r transition-transform duration-300 h-svh shrink-0 border-neutral-300 bg-neutral-50 md:hidden md:w-64 md:translate-x-0 dark:border-neutral-700 dark:bg-neutral-900"
+            class="flex fixed left-0 z-30 flex-col p-4 w-60 border-r transition-transform duration-300 h-svh shrink-0 border-neutral-300 bg-neutral-50 lg:hidden lg:w-64 lg:translate-x-0 dark:border-neutral-700 dark:bg-neutral-900"
             x-bind:class="sidebarIsOpen ? 'translate-x-0' : '-translate-x-60'">
             <a href="{{ route('main-site') }}"
                 class="mb-4 ml-2 w-24 text-2xl font-bold text-neutral-900 dark:text-white">
@@ -256,7 +256,7 @@
                     </div>
 
                     <!-- Desktop navigation -->
-                    <div class="hidden gap-2 items-center md:flex">
+                    <div class="hidden gap-2 items-center lg:flex">
                         @auth
                         <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
                             wire:navigate>
@@ -458,7 +458,7 @@
                     </div>
 
                     <!-- Mobile menu button  -->
-                    <button x-on:click="sidebarIsOpen = true" class="md:hidden text-neutral-600 dark:text-neutral-300">
+                    <button x-on:click="sidebarIsOpen = true" class="lg:hidden text-neutral-600 dark:text-neutral-300">
                         <i class="fas fa-bars"></i>
                         <span class="sr-only">Open sidebar</span>
                     </button>
