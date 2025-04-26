@@ -8,6 +8,7 @@ use App\Livewire\Pages\User\Emails\MessageList;
 use App\Livewire\Pages\User\Emails\CreateEmailList;
 use App\Livewire\Pages\User\Emails\EmailListsTable;
 use App\Livewire\Pages\User\Emails\Partials\ShowMessage;
+use App\Livewire\Pages\User\Report\Email\EmailBounceReport;
 use App\Livewire\Pages\User\Server\ServerList;
 use App\Livewire\Pages\User\Subscription\MySubscription;
 use App\Livewire\Pages\User\Subscription\Subscribe;
@@ -38,6 +39,9 @@ Route::webhooks('/paypal/webhook', 'paypal');
 
 
 Route::middleware(['auth','role:user'])->group(function () {
+
+    // Reports
+    Route::get('/report/email-bounce', EmailBounceReport::class)->name('user.report.email-bounce');
 
 
     //Subscription

@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Livewire\Pages\User\Report\Email;
+
+use App\Models\User\Reports\EmailBounce;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
+use Livewire\WithPagination;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
+
+class EmailBounceReport extends Component
+{
+    use WithPagination, LivewireAlert;
+
+    public $search = '';
+    public $type = '';
+    public $sortField = 'created_at';
+    public $sortDirection = 'desc';
+    public $perPage = 10;
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'type' => ['except' => ''],
+        'sortField' => ['except' => 'created_at'],
+        'sortDirection' => ['except' => 'desc'],
+    ];
+
+    protected function rules()
+    {
+        return [
+            'search' => 'nullable|string|max:255',
+            'type' => 'nullable|in:soft,hard',
+            'sortField' => 'required|in:email,type,created_at',
+            'sortDirection' => 'required|in:asc,desc',
+            'perPage' => 'required|integer|in:10,25,50',
+        ];
+    }
+
+    public function getBouncesProperty()
+    {
+        return EmailBounce::where('user_id', Auth::id())
+            ->when($this->search, function ($query) {
+                $query->where('email', 'like', '%' . $this->search . '%');
+            })
+            ->when($this->type, function ($query) {
+                $query->where('type', $this->type);
+            })
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->paginate($this->perPage);
+    }
+
+    public function render()
+    {
+        return view('livewire.pages.user.report.email.email-bounce-report', [
+            'bounces' => $this->bounces
+        ])->layout('layouts.app', ['title' => 'Email Bounce Report']);
+    }
+}

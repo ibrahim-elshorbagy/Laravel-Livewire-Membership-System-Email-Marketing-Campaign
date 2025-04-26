@@ -326,6 +326,9 @@ new class extends Component
                     </span>
                 </div>
             </x-primary-create-button>
+            <x-primary-info-button href="{{ route('user.report.email-bounce') }}" wire:navigate>
+                            Email Bounce Report
+            </x-primary-info-button>
 
         </div>
     </form>
