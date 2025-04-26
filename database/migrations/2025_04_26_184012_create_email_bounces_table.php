@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('email_bounces', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->unique()->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('email');
             $table->enum('type', ['soft', 'hard'])->nullable();
             $table->timestamp('created_at')->nullable();

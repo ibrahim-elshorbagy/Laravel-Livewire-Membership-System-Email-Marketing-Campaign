@@ -3,6 +3,8 @@
 namespace App\Livewire\Pages\User\Report\Email;
 
 use App\Models\User\Reports\EmailBounce;
+use App\Models\UserBouncesInfo;
+use App\Services\BounceMailService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -17,6 +19,7 @@ class EmailBounceReport extends Component
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
     public $perPage = 10;
+
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -47,6 +50,51 @@ class EmailBounceReport extends Component
             })
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
+    }
+
+    public function applyToEmailList()
+    {
+        try {
+
+            // Get user bounce info
+            $bounceService = new BounceMailService();
+
+            $stats = $bounceService->applyBouncesToEmailList(Auth::id());
+
+            $this->alert('success', 'Bounces applied to your email list successfully: ' ."<br>".
+                $stats['hard_bounces'] . ' hard bounces and ' ."<br>".
+                $stats['soft_bounces'] . ' soft bounces processed. ' ."<br>".
+                $stats['converted_to_hard'] . ' soft bounces converted to hard bounces.', [
+                'position' => 'center',
+                'timer' => 8000,
+                'toast' => true,
+            ]);
+        } catch (\Exception $e) {
+            $this->alert('error', 'An error occurred: ' . $e->getMessage(), [
+                'position' => 'center',
+                'timer' => 5000,
+                'toast' => true,
+            ]);
+        }
+    }
+
+    public function DeleteAllEmails()
+    {
+        try {
+            $count = EmailBounce::where('user_id', Auth::id())->delete();
+
+            $this->alert('success', "$count bounced emails deleted successfully!", [
+                'position' => 'bottom-end',
+                'timer' => 4000,
+                'toast' => true,
+            ]);
+        } catch (\Exception $e) {
+            $this->alert('error', 'Error deleting emails: ' . $e->getMessage(), [
+                'position' => 'bottom-end',
+                'timer' => 5000,
+                'toast' => true,
+            ]);
+        }
     }
 
     public function render()

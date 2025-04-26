@@ -4,6 +4,26 @@
         <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Email Bounce Report
         </h2>
+
+        <div class="flex space-x-2">
+
+        <!--Apply to Email List Button -->
+            <x-primary-info-button type="button" wire:click="applyToEmailList">
+                <span wire:loading.remove wire:target="applyToEmailList">Affect Main Email List</span>
+                <span wire:loading wire:target="applyToEmailList" class="flex items-center">
+                    <i class="fa-duotone fa-solid fa-spinner fa-spin"></i>
+                    <span class="ml-2">Processing...</span>
+            </x-primary-info-button>
+
+        <!--Delete All Report Emails -->
+            <x-primary-danger-button type="button" wire:confirm="Are you sure you want to delete All Report Emails?" wire:click="DeleteAllEmails">
+                <span wire:loading.remove wire:target="DeleteAllEmails">Delete All Report Emails</span>
+                <span wire:loading wire:target="DeleteAllEmails" class="flex items-center">
+                    <i class="fa-duotone fa-solid fa-spinner fa-spin"></i>
+                    <span class="ml-2">Deleting...</span>
+            </x-primary-danger-button>
+
+        </div>
     </header>
 
     <!-- Search and Filters -->
@@ -57,7 +77,8 @@
                 <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800">
                     <td class="p-4">{{ $bounce->email }}</td>
                     <td class="p-4 capitalize">{{ $bounce->type ?? '-' }}</td>
-                    <td class="p-4">{{ $bounce->created_at?->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i:s A') ?? '' }}</td>
+                    <td class="p-4">{{ $bounce->created_at?->timezone(auth()->user()->timezone ??
+                        $globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i:s A') ?? '' }}</td>
                 </tr>
                 @empty
                 <tr>

@@ -6,6 +6,7 @@ use App\Models\UserBouncesInfo;
 use App\Models\Admin\Site\SystemSetting\BouncePattern;
 use App\Models\EmailList;
 use App\Models\JobProgress;
+use App\Models\User\Reports\EmailBounce;
 use App\Traits\TracksProgress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -25,12 +26,16 @@ class BounceMailService
         'soft' => []
     ];
 
-    public function __construct(UserBouncesInfo $bounceInfo, $jobId = null)
+    public function __construct( $bounceInfo = null, $jobId = null)
     {
         $this->user = $bounceInfo;
         $this->jobId = $jobId;
-        $this->loadBouncePatterns();
+
+        if ($this->user) {
+            $this->loadBouncePatterns();
+        }
     }
+
 
     // Connection
 
@@ -77,6 +82,9 @@ class BounceMailService
 
 
 
+
+
+
     // Main Code
 
     // Load All Bounce Patterns
@@ -86,6 +94,10 @@ class BounceMailService
             $this->patterns[$type] = BouncePattern::getPatterns($type);
         }
     }
+
+
+
+
 
     public function getAllUnreadMessages(): array
     {
@@ -168,6 +180,7 @@ class BounceMailService
         return $messages;
     }
 
+
     public function markUnreadMessages(): void
     {
         // Initialize progress tracking with initial estimate of 10
@@ -182,26 +195,28 @@ class BounceMailService
             $this->updateProgressTotal($totalProcessed > 0 ? $totalProcessed : 1);
 
             if ($totalProcessed > 0) {
-                $updates = [
-                    'hard' => [],
-                    'soft' => []
-                ];
+                $bounceRecords = [];
 
                 foreach ($messages as $index => $message) {
                     if (!empty($message['affected_email'])) {
-                        if ($message['bounce_type'] === 'hard') {
-                            $updates['hard'][] = $message['affected_email'];
-                        } elseif ($message['bounce_type'] === 'soft') {
-                            $updates['soft'][] = $message['affected_email'];
-                        }
+                        // Prepare data for email_bounces table
+                        $bounceRecords[] = [
+                            'user_id' => $this->user->user_id,
+                            'email' => $message['affected_email'],
+                            'type' => $message['bounce_type'],
+                            'created_at' => now()
+                        ];
                     }
 
                     // Update progress for each categorized message
                     $this->updateProgress($index + 1);
                 }
 
-                $this->processHardBounces($updates['hard']);
-                $this->processSoftBounces($updates['soft']);
+                // Bulk insert into email_bounces table
+                if (!empty($bounceRecords)) {
+                    EmailBounce::insert($bounceRecords);
+                    Log::channel('emailBounces')->info('Added ' . count($bounceRecords) . ' email bounce records');
+                }
             }
 
             $this->completeProgress();
@@ -214,62 +229,6 @@ class BounceMailService
 
 
 
-    protected function processHardBounces(array $emails): void
-    {
-        if (empty($emails)) {
-            return;
-        }
-
-        EmailList::where('user_id', $this->user->user_id)
-            ->whereIn('email', $emails)
-            ->update(['is_hard_bounce' => true]);
-
-        Log::channel('emailBounces')->info('Updated ' . count($emails) . ' hard bounces');
-    }
-
-
-
-    protected function processSoftBounces(array $emails): void
-    {
-        if (empty($emails)) {
-            return;
-        }
-
-        DB::beginTransaction();
-        try {
-            $emailsToCheck = EmailList::where('user_id', $this->user->user_id)
-                ->whereIn('email', $emails)
-                ->select('email', 'soft_bounce_counter')
-                ->get()
-                ->keyBy('email');
-
-            EmailList::where('user_id', $this->user->user_id)
-                ->whereIn('email', $emails)
-                ->increment('soft_bounce_counter');
-
-            $hardBounceEmails = [];
-            foreach ($emails as $email) {
-                if (isset($emailsToCheck[$email]) &&
-                    ($emailsToCheck[$email]->soft_bounce_counter + 1) >= $this->user->max_soft_bounces) {
-                    $hardBounceEmails[] = $email;
-                }
-            }
-
-            if (!empty($hardBounceEmails)) {
-                $this->processHardBounces($hardBounceEmails);
-                Log::channel('emailBounces')->info('Converted ' . count($hardBounceEmails) . ' soft bounces to hard bounces');
-            }
-
-            DB::commit();
-
-            Log::channel('emailBounces')->info('Updated ' . count($emails) . ' soft bounces');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
-    }
-
     protected function extractAffectedEmail(string $body): ?string
     {
         // Match any non-space characters before @, followed by domain and TLD
@@ -279,6 +238,7 @@ class BounceMailService
 
         return null;
     }
+
 
     public function analyzeBounceMessage(string $data): ?string
     {
@@ -293,6 +253,7 @@ class BounceMailService
         return null;
     }
 
+    
     protected function patternMatch(string $text, array $patterns): bool
     {
         $text = trim(strtolower($text));
@@ -309,4 +270,119 @@ class BounceMailService
         Log::channel('emailBounces')->debug("No match for subject text: "); // '{$text}'
         return false;
     }
+
+
+
+
+
+
+
+    /**
+     * Apply bounce records to the main email list table
+     *
+     * @param int $userId Optional user ID to limit which records to process
+     * @return array Stats about processed records
+     */
+    public function applyBouncesToEmailList($userId): array
+    {
+        $stats = [
+            'hard_bounces' => 0,
+            'soft_bounces' => 0,
+            'converted_to_hard' => 0
+        ];
+
+        try {
+            DB::beginTransaction();
+
+            // Get all hard bounces
+            $hardBounceEmails = EmailBounce::where('type', 'hard')
+                ->when($userId, function($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })
+                ->pluck('email')
+                ->toArray();
+
+
+            // Get all soft bounces
+            $softBounceEmails = EmailBounce::where('type', 'soft')
+                ->when($userId, function($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })
+                ->pluck('email')
+                ->toArray();
+
+
+            // Process hard bounces
+            if (!empty($hardBounceEmails)) {
+                $affected = EmailList::when($userId, function($query) use ($userId) {
+                        $query->where('user_id', $userId);
+                    })
+                    ->whereIn('email', $hardBounceEmails)
+                    ->update(['is_hard_bounce' => true]);
+
+                $stats['hard_bounces'] = $affected;
+                Log::channel('emailBounces')->info("Applied $affected hard bounces to email list");
+            }
+
+
+            // Process soft bounces
+            if (!empty($softBounceEmails)) {
+                // Count how many times each soft bounce email occurred
+                $emailCounts = array_count_values($softBounceEmails);
+
+                // Get current email list records for these emails
+                $emailsToCheck = EmailList::when($userId, function($query) use ($userId) {
+                        $query->where('user_id', $userId);
+                    })
+                    ->whereIn('email', array_keys($emailCounts))
+                    ->select('id', 'email', 'user_id', 'soft_bounce_counter')
+                    ->get();
+
+                $affectedSoft = 0;
+                $hardBounceIds = [];
+
+                foreach ($emailsToCheck as $email) {
+                    $incrementBy = $emailCounts[$email->email] ?? 0;
+
+                    if ($incrementBy > 0) {
+                        // Increment the counter
+                        EmailList::where('id', $email->id)->increment('soft_bounce_counter', $incrementBy);
+                        $affectedSoft++;
+
+                        // Get max allowed soft bounces
+                        $userBounceInfo = UserBouncesInfo::where('user_id', $email->user_id)->first();
+                        $maxSoftBounces = $userBounceInfo ? $userBounceInfo->max_soft_bounces : 5;
+
+                        // Check if it should now be marked as a hard bounce
+                        if (($email->soft_bounce_counter + $incrementBy) >= $maxSoftBounces) {
+                            $hardBounceIds[] = $email->id;
+                        }
+                    }
+                }
+
+                $stats['soft_bounces'] = $affectedSoft;
+
+                // Convert to hard bounces if necessary
+                if (!empty($hardBounceIds)) {
+                    $convertedCount = EmailList::whereIn('id', $hardBounceIds)
+                        ->update(['is_hard_bounce' => true]);
+
+                    $stats['converted_to_hard'] = $convertedCount;
+                    Log::channel('emailBounces')->info("Converted $convertedCount soft bounces to hard bounces");
+                }
+            }
+
+
+            DB::commit();
+            return $stats;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::channel('emailBounces')->error("Error applying bounces to email list: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+
+
 }
