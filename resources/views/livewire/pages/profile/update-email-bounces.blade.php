@@ -17,7 +17,7 @@ new class extends Component
     public string $bounce_inbox_password = '';
     public string $mail_server = '';
     public string $imap_port = '';
-    public int $max_soft_bounces = 0;
+    public $max_soft_bounces = 0;
 
     public bool $bounce_status = false;
     public array $bounce_messages = [];
@@ -243,7 +243,7 @@ new class extends Component
                 <div class="flex gap-1">
                     <x-input-label for="bounce_inbox" :value="__('Bounce Inbox')" /><span class="text-red-500">*</span>
                 </div>
-                <x-text-input wire:model.live="bounce_inbox" id="bounce_inbox" class="block mt-1 w-full"
+                <x-text-input wire:model="bounce_inbox" id="bounce_inbox" class="block mt-1 w-full"
                     placeholder="bounce@localhost" />
                 <p class="mt-3 ml-1 text-xs text-gray-500 md:text-sm dark:text-gray-400">
                     <i class="fas fa-info-circle"></i>
@@ -258,7 +258,7 @@ new class extends Component
                     <x-input-label for="bounce_inbox_password" :value="__('Bounce Inbox Password')" /><span
                         class="text-red-500">*</span>
                 </div>
-                <x-text-input wire:model.live="bounce_inbox_password" id="bounce_inbox_password" type="password"
+                <x-text-input wire:model="bounce_inbox_password" id="bounce_inbox_password" type="password"
                     class="block mt-1 w-full" />
                 <p class="mt-3 ml-1 text-xs text-gray-500 md:text-sm dark:text-gray-400">
                     <i class="fas fa-info-circle"></i>
@@ -272,7 +272,7 @@ new class extends Component
                 <div class="flex gap-1">
                     <x-input-label for="mail_server" :value="__('Mail Server')" /><span class="text-red-500">*</span>
                 </div>
-                <x-text-input wire:model.live="mail_server" id="mail_server" class="block mt-1 w-full"
+                <x-text-input wire:model="mail_server" id="mail_server" class="block mt-1 w-full"
                     placeholder="mail.localhost" />
                 <p class="mt-3 ml-1 text-xs text-gray-500 md:text-sm dark:text-gray-400">
                     <i class="fas fa-info-circle"></i>
@@ -284,9 +284,9 @@ new class extends Component
             <!-- IMAP Port -->
             <div>
                 <div class="flex gap-1">
-                    <x-input-label for="imap_port" :value="__('IMAP Port')" /><span class="text-red-500">*</span>
+                    <x-input-label  for="imap_port" :value="__('IMAP Port')" /><span class="text-red-500">*</span>
                 </div>
-                <x-text-input wire:model.live="imap_port" id="imap_port" class="block mt-1 w-full" placeholder="993" />
+                <x-text-input type="number" wire:model="imap_port" id="imap_port" class="block mt-1 w-full" placeholder="993" />
                 <p class="mt-3 ml-1 text-xs text-gray-500 md:text-sm dark:text-gray-400">
                     <i class="fas fa-info-circle"></i>
                     The bounce checker requires an IMAP connection. Most IMAP ports are 993.
@@ -298,7 +298,7 @@ new class extends Component
                 <div class="flex gap-1">
                     <x-input-label for="max_soft_bounces" :value="__('Max Soft Bounces')" /><span class="text-red-500">*</span>
                 </div>
-                <x-text-input wire:model.live="max_soft_bounces" id="max_soft_bounces" class="block mt-1 w-full" placeholder="993" />
+                <x-text-input type="number" wire:model="max_soft_bounces" id="max_soft_bounces" class="block mt-1 w-full" placeholder="993" />
                 <p class="mt-3 ml-1 text-xs text-gray-500 md:text-sm dark:text-gray-400">
                     <i class="fas fa-info-circle"></i>
                     Max Soft Bounces to convert to Hard Bounces
