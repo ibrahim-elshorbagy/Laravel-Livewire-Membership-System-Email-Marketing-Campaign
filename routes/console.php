@@ -7,23 +7,23 @@ use Illuminate\Support\Facades\Config;
 
 
 Schedule::call(function () {
-    Log::channel('worker')->info('Cron Works at test_8');
+    Log::channel('worker')->info('Cron Works at');
 });
 
 Schedule::command('queue:work --queue=default,high --tries=5 --stop-when-empty', [])
     ->everyTenSeconds()
     ->withoutOverlapping()
     ->before(function () {
-        Log::channel('worker')->info('Starting queue:work...');
+        // Log::channel('worker')->info('Starting queue:work...');
     })
     ->after(function () {
-        Log::channel('worker')->info('Queue worker completed successfully.');
+        // Log::channel('worker')->info('Queue worker completed successfully.');
     })
     ->onFailure(function () {
-        Log::channel('worker')->error('Queue worker failed.');
+        // Log::channel('worker')->error('Queue worker failed.');
     })
     ->then(function () {
-        Log::channel('worker')->info('Closed queue worker.');
+        // Log::channel('worker')->info('Closed queue worker.');
     });
 
 
