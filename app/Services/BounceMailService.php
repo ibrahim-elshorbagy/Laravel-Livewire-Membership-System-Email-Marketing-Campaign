@@ -254,11 +254,16 @@ class BounceMailService
                 if (isset($part->subtype)) {
                     $subtype = strtoupper($part->subtype);
 
+                    // Decode delivery status (skip or process accordingly)
                     if ($subtype === 'DELIVERY-STATUS') {
                         return $this->decodeImapContent($partData, $part->encoding);
                     }
 
-                    if (empty($body) && $subtype === 'PLAIN') {
+                    // Check if HTML or plain text
+                    if ($subtype === 'HTML') {
+                        $body = $this->decodeImapContent($partData, $part->encoding);
+                    } elseif (empty($body) && $subtype === 'PLAIN') {
+                        // If HTML is not found, take plain text
                         $body = $this->decodeImapContent($partData, $part->encoding);
                     }
                 }
@@ -270,6 +275,7 @@ class BounceMailService
 
         return $body;
     }
+
 
 
 
@@ -340,6 +346,42 @@ class BounceMailService
         }
 
         return null;
+    }
+
+
+
+    public function getFirstUnreadMessageForTest(): void
+    {
+        // Search for all unread (UNSEEN) emails
+        $unreadEmails = imap_search($this->connection, 'UNSEEN');
+
+        if (!$unreadEmails) {
+            Log::channel('emailBounces')->info("No unread emails found.");
+            return;
+        }
+
+        // Get the first unread email only
+        $firstEmailNumber = $unreadEmails[0];
+
+        try {
+            // Fetch subject (for debug/logging)
+            $overview = imap_fetch_overview($this->connection, $firstEmailNumber, 0);
+            $subject = isset($overview[0]->subject) ? imap_utf8($overview[0]->subject) : '(No subject)';
+            Log::channel('emailBounces')->info("First unread email subject: $subject");
+
+            // 🔥 Fetch and decode the body using your existing method
+            $text = $this->getDecodedMessageBody($firstEmailNumber);
+
+            // Print body
+            Log::channel('emailBounces')->info("text sss: $text");
+
+
+            // Optionally mark as seen (so it doesn't show again)
+            imap_setflag_full($this->connection, $firstEmailNumber, '\\Seen');
+
+        } catch (\Exception $e) {
+            Log::channel('emailBounces')->error("Error fetching first unread email: " . $e->getMessage());
+        }
     }
 
 

@@ -147,6 +147,15 @@ new class extends Component
         }
     }
 
+    // public function startBounceCheckTestEmail()
+    //     {
+    //     $user = Auth::user();
+    //     $bounceInfo = UserBouncesInfo::where('user_id', $user->id)->first();
+    //     $bounceService = new BounceMailService($bounceInfo);
+    //     $bounceService->connect();
+    //     $connected = $bounceService->getFirstUnreadMessageForTest();
+    //     $bounceService->disconnect();
+    // }
 
     public function stopBounceCheck()
     {
