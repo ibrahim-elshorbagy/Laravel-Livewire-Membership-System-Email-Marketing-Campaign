@@ -145,35 +145,46 @@ class BounceMailService
     }
 
 
-    public function getAllUnreadMessages(): array
-    {
-        // Initialize tracking with an estimate - we'll update the actual count later
-        // Don't call initializeProgress here - let markUnreadMessages handle it
-
+    public function getAllUnreadMessages(): array {
+        // Initialize tracking with an estimate
         $messages = [];
         $processedCount = 0;
         $matchingCount = 0;
+        $totalEmailsToProcess = 0;
 
         // Get all subject patterns
         $subjectPatterns = array_map('trim', $this->patterns['subject']);
 
-        // Process each subject pattern separately for more efficient searching
+        // Keep track of which message numbers we've already seen
+        $processedMessageNumbers = [];
+
+        // Process each subject pattern separately
         foreach ($subjectPatterns as $pattern) {
             // Use IMAP's built-in SUBJECT search criteria
             $searchCriteria = 'UNSEEN SUBJECT "' . $pattern . '"';
             $matchingEmails = imap_search($this->connection, $searchCriteria);
 
-            //If no email search with next pattern
+            // If no emails match this pattern, continue to the next pattern
             if (!$matchingEmails) {
                 continue;
             }
 
-            Log::channel('emailBounces')->info("Found " . count($matchingEmails) . " unread messages with subject pattern: '$pattern'");
+            // Count only new emails we haven't seen before
+            $newEmails = array_diff($matchingEmails, $processedMessageNumbers);
+            $newEmailCount = count($newEmails);
 
-            // Update progress total if needed (first batch found)
-            if ($processedCount == 0 && $this->jobProgress) {
-                $this->updateProgressTotal(count($matchingEmails));
+            // Add these message numbers to our processed list
+            $processedMessageNumbers = array_merge($processedMessageNumbers, $matchingEmails);
+
+            // Add to total count
+            $totalEmailsToProcess += $newEmailCount;
+
+            // Update progress total with the additional emails
+            if ($this->jobProgress && $newEmailCount > 0) {
+                $this->updateProgressTotal($totalEmailsToProcess);
             }
+
+            Log::channel('emailBounces')->info("Found " . count($matchingEmails) . " unread messages with subject pattern: '$pattern'");
 
             // Process the matching emails
             $headers = imap_fetch_overview($this->connection, implode(',', $matchingEmails), 0);
