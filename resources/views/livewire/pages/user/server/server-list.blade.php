@@ -2,7 +2,7 @@
     class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <header class="flex flex-col justify-between items-center mb-6 md:flex-row">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
-            My Servers
+            My Sending bots
         </h2>
     </header>
 

@@ -179,6 +179,6 @@ class ServerForm extends Component
     {
         return view('livewire.pages.admin.server.server-form', [
             'users' => $this->users,
-        ])->layout('layouts.app', ['title' => $this->server_id ? 'Edit Server' : 'New Server']);
+        ])->layout('layouts.app', ['title' => $this->server_id ? 'Edit Sending bot' : 'New Sending bot']);
     }
 }

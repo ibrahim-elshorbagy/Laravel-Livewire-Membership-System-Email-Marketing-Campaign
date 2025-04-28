@@ -2,11 +2,11 @@
     class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <header class="flex flex-col justify-between items-center mb-6 md:flex-row">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
-            {{ $server_id ? 'Edit Server' : 'New Server' }}
+            {{ $server_id ? 'Edit Sending bot' : 'New Sending bot' }}
         </h2>
         <div class="mt-4 md:mt-0">
             <x-primary-info-link href="{{ route('admin.servers') }}" wire:navigate>
-                Back To Servers
+                Back To Sending bots
             </x-primary-info-link>
         </div>
     </header>
@@ -16,19 +16,19 @@
             @if($server_id)
             <!-- Single Server Name (Edit Mode) -->
             <div>
-                <x-input-label for="name" required>Server Name</x-input-label>
+                <x-input-label for="name" required>Sending bot Name</x-input-label>
                 <x-text-input wire:model="name" id="name" type="text" class="block mt-1 w-full" required />
                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
             </div>
             @else
             <!-- Multiple Server Names (Create Mode) -->
             <div class="lg:col-span-2">
-                <x-input-label for="servers" required>Server Names</x-input-label>
+                <x-input-label for="servers" required>Sending bots Names</x-input-label>
                 <x-textarea-input wire:model="servers" id="servers"
                     placeholder="Enter server names separated by commas or new lines" class="block mt-1 w-full"
                     required />
                 <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    Enter server names using only English letters, dots, and hyphens (server-one.com, server-two)
+                    Enter Sending bots names using only English letters, dots, and hyphens (server-one.com, server-two)
                 </div>
                 <x-input-error :messages="$errors->get('servers.*')" class="mt-2" />
                 <x-input-error :messages="$errors->get('servers')" class="mt-2" />
@@ -41,7 +41,7 @@
                 <x-text-input wire:model="emails_count" id="emails_count" type="number" min="1"
                     class="block mt-1 w-full" required />
                 <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    Number of emails allowed for this server (default: 4)
+                    Number of emails allowed for this Sending bots (default: 4)
                 </div>
                 <x-input-error :messages="$errors->get('emails_count')" class="mt-2" />
             </div>

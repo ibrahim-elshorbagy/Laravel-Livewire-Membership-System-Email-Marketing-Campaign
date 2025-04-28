@@ -50,11 +50,11 @@
                     <div class="flex justify-between items-center">
                         <i class="text-purple-500 md:text-3xl dark:text-purple-400 fas fa-server"></i>
                         <span
-                            class="px-3 py-1.5 text-xs font-medium text-purple-500 bg-purple-50 rounded-full md:text-sm dark:text-purple-400 dark:bg-purple-500/10">Server
+                            class="px-3 py-1.5 text-xs font-medium text-purple-500 bg-purple-50 rounded-full md:text-sm dark:text-purple-400 dark:bg-purple-500/10">Sending bots
                             Management</span>
                     </div>
                     <div class="mt-4">
-                        <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400"> Servers</p>
+                        <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Sending bots</p>
                         <p class="font-bold text-purple-600 md:text-2xl dark:text-purple-400">{{$serverCount}}</p>
                     </div>
                 </div>

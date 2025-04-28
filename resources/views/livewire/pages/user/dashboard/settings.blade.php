@@ -11,7 +11,7 @@
                 </h2>
 
                 <x-primary-info-button href="{{ route('user.servers') }}" wire:navigate>
-                    My Servers
+                    My Sending bots
                 </x-primary-info-button>
             </div>
             <div

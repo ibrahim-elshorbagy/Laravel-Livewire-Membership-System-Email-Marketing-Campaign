@@ -66,7 +66,7 @@
                 <tr>
                     <th scope="col" class="p-4 w-8">#</th>
                     <th scope="col" class="p-4 w-48">Message</th>
-                    <th scope="col" class="p-4 w-64">Servers</th>
+                    <th scope="col" class="p-4 w-64">Sending bots</th>
                     <th scope="col" class="p-4 w-64">Email Lists</th>
                     <th scope="col" class="p-4 w-48">Progress</th>
                     <th scope="col" class="p-4 w-48">Created At</th>

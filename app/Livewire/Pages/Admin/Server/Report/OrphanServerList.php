@@ -230,6 +230,6 @@ class OrphanServerList extends Component
         return view('livewire.pages.admin.server.report.orphan-server-list', [
             'servers' => $this->servers,
             'users' => $this->users,
-        ])->layout('layouts.app', ['title' => 'Orphan Servers']);
+        ])->layout('layouts.app', ['title' => 'Orphan Sending bots']);
     }
 }

@@ -50,6 +50,6 @@ class ServerList extends Component
     {
         return view('livewire.pages.user.server.server-list', [
             'servers' => $this->servers
-        ])->layout('layouts.app', ['title' => 'My Servers']);
+        ])->layout('layouts.app', ['title' => 'My Sending bots']);
     }
 }

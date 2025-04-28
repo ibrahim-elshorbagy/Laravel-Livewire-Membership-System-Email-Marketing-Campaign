@@ -2,15 +2,15 @@
     class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <header class="flex flex-col justify-between items-center mb-6 md:flex-row">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
-            Servers Management
+            Sending bots Management
         </h2>
         <div class="flex gap-5">
 
             <x-primary-info-link href="{{ route('admin.orphan-servers') }}" wire:navigate>
-                Orphan Servers Report
+                Orphan Sending bots Report
             </x-primary-info-link>
             <x-primary-create-link href="{{ route('admin.servers.form') }}">
-                Add New Server
+                Add Sending bots
             </x-primary-create-link>
 
         </div>
@@ -20,7 +20,7 @@
     <div class="mb-6">
         <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
             <div class="relative flex-1">
-                <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search servers, Users with any info"
+                <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search Sending bots, Users with any info"
                     class="pl-10 w-full" />
                 <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>

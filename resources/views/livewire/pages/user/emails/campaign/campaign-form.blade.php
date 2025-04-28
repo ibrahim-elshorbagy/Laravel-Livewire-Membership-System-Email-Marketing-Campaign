@@ -59,11 +59,11 @@
 
         <!-- Servers Selection -->
         <div x-data="{ open: false }" class="relative">
-            <x-input-label for="servers" required>Select Servers</x-input-label>
+            <x-input-label for="servers" required>Select Sending bots</x-input-label>
             <div class="mt-1">
                 <button type="button" @click="open = !open"
                     class="px-4 py-2 w-full text-left rounded-md border shadow-sm dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                    {{ count($selectedServers) }} server(s) selected
+                    {{ count($selectedServers) }} Sending bot(s) selected
                 </button>
 
                 <!-- Selected servers tags -->
@@ -89,14 +89,14 @@
                     <div class="p-2">
                         <input type="text" wire:model.live="serverSearch"
                             class="px-3 py-2 w-full rounded-md border dark:bg-neutral-700 dark:border-neutral-600"
-                            placeholder="Search servers...">
+                            placeholder="Search Sending bots...">
 
                         <div class="overflow-y-auto mt-2 max-h-48">
                             <label
                                 class="flex items-center px-3 py-2 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700 border-b border-neutral-200 dark:border-neutral-700">
                                 <input type="checkbox" wire:model.live="selectAllServers"
                                     class="rounded border-neutral-300 dark:border-neutral-700">
-                                <span class="ml-2 font-medium">Select All Available Servers</span>
+                                <span class="ml-2 font-medium">Select All Available Sending bots</span>
                             </label>
                             @foreach($availableServers as $server)
                             <label

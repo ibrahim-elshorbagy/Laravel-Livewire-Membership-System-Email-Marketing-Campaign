@@ -105,7 +105,7 @@
     <!-- Start The list  -->
     <div class="flex flex-col p-3 rounded-md border md:p-6">
         <!-- List Management -->
-        <div class="mb-6 md:flex md:items-center md:justify-between">
+        <div class="mb-6 md:flex md:items-center md:justify-between gap-5 flex-wrap">
 
             <!-- Header -->
             <div class="flex-1 min-w-0">
@@ -119,7 +119,7 @@
             <!-- Action Buttons -->
             <div>
                 @if(!$hasActiveJobsFlag)
-                <div class="flex flex-col gap-2 mt-2 sm:flex-row">
+                <div class="flex flex-col gap-2 mt-2 sm:flex-row flex-wrap">
 
 
                     <!-- Delete Button  -->
@@ -345,16 +345,16 @@
                                     <!-- Combined Email/Name column -->
                                     <th scope="col" class="p-4">
                                         <div class="flex justify-between items-center">
-                                            <span class="w-[350px]">Email</span>
-                                            <span class="w-[350px]">Name</span>
-                                            <span class="w-[350px]">Soft Bounce</span>
-                                            <span class="w-[350px]">Hard Bounce</span>
+                                            <span class="w-48">Email</span>
+                                            <span class="w-32">Name</span>
+                                            <span class="w-24 text-nowrap text-center">Soft Bounce</span>
+                                            <span class="w-24 text-nowrap text-center">Hard Bounce</span>
                                             <span class="w-[130px]"></span> {{-- Spacer For History --}}
                                         </div>
                                     </th>
 
                                     <!-- Actions column -->
-                                    <th scope="col" class="p-4">Actions</th>
+                                    <th scope="col" class="p-4 w-24">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
@@ -370,9 +370,9 @@
                                     <td x-data="{ isExpanded: false }" class="p-4 w-full">
                                         <div class="flex justify-between items-center">
 
-                                            <span class="w-[350px]">{{ $email->email }}</span>
-                                            <span class="w-[350px]">{{ $email->name }}</span>
-                                            <span class="w-[350px]">
+                                            <span class="w-48">{{ $email->email }}</span>
+                                            <span class="w-32">{{ $email->name }}</span>
+                                            <span class="w-24 text-center">
                                                 @if($email->soft_bounce_counter > 0)
                                                 <span
                                                     class="px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded-full dark:bg-yellow-900 dark:text-yellow-300">
@@ -380,7 +380,7 @@
                                                 </span>
                                                 @endif
                                             </span>
-                                            <span class="w-[350px]">
+                                            <span class="w-24 text-center">
                                                 @if($email->is_hard_bounce)
                                                 <span
                                                     class="px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full dark:bg-red-900 dark:text-red-300">

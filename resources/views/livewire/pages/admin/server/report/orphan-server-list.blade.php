@@ -2,15 +2,15 @@
     class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <header class="flex flex-col justify-between items-center mb-6 md:flex-row">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
-            Orphan Servers
+            Orphan Sending bots
         </h2>
 
         <div class="flex gap-5">
             <x-primary-info-link href="{{ route('admin.servers') }}" wire:navigate>
-                Back To Servers
+                Back To Sending bots
             </x-primary-info-link>
             <x-primary-create-link href="{{ route('admin.servers.form') }}">
-                Add New Server
+                Add New Sending bots
             </x-primary-create-link>
         </div>
     </header>
@@ -19,7 +19,7 @@
     <div class="mb-6">
         <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
             <div class="relative flex-1">
-                <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search servers, Users with any info"
+                <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search Orphan Sending bots, Users with any info"
                     class="pl-10 w-full" />
                 <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
@@ -61,8 +61,8 @@
         </div>
         <div>
             <x-primary-danger-button wire:click="deleteAllOrphanServers"
-                wire:confirm="Are you sure you want to delete ALL orphan servers? This action cannot be undone!">
-                Delete All Orphan Servers
+                wire:confirm="Are you sure you want to delete ALL orphan Sending bots? This action cannot be undone!">
+                Delete All Orphan Sending bots
             </x-primary-danger-button>
         </div>
     </div>

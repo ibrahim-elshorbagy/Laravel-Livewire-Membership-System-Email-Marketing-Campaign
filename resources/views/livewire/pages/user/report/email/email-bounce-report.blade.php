@@ -1,5 +1,18 @@
 <div
     class="flex flex-col p-4 md:p-6 rounded-md border border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+    <div
+        class="p-4 mb-4 text-yellow-800 bg-yellow-50 rounded-lg border border-yellow-200 dark:bg-yellow-900/10 dark:border-yellow-300/10 dark:text-yellow-300">
+        <div class="flex gap-2 items-center">
+            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd"
+                    d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
+                    clip-rule="evenodd" />
+            </svg>
+            <span class="font-medium">Important Note!</span>
+        </div>
+        <p class="mt-2 text-sm">Email lists will not be affected by bounces until you click "Affect Email List"
+            button.</p>
+    </div>
     <header class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
             Email Bounce Report
@@ -9,7 +22,7 @@
 
         <!--Apply to Email List Button -->
             <x-primary-info-button type="button" wire:click="applyToEmailList">
-                <span wire:loading.remove wire:target="applyToEmailList">Affect Main Email List</span>
+                <span wire:loading.remove wire:target="applyToEmailList">Affect Email List</span>
                 <span wire:loading wire:target="applyToEmailList" class="flex items-center">
                     <i class="fa-duotone fa-solid fa-spinner fa-spin"></i>
                     <span class="ml-2">Processing...</span>

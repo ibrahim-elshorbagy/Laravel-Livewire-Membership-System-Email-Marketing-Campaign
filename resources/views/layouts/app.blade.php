@@ -62,10 +62,6 @@
                     href="{{ route('user.my-transactions') }}" wire:navigate>
                     <span>Transactions</span>
                 </x-nav-link>
-                <x-nav-link :active="request()->routeIs('user.servers')" href="{{ route('user.servers') }}"
-                    wire:navigate>
-                    <span>Servers</span>
-                </x-nav-link>
                 <x-nav-link :active="request()->routeIs('user-settings')" href="{{ route('user-settings') }}" wire:navigate>
                     <span>Settings</span>
                 </x-nav-link>
@@ -93,10 +89,6 @@
                     <span>Plans</span>
                 </x-nav-link>
 
-                <x-nav-link :active="request()->routeIs('admin.servers')" href="{{ route('admin.servers') }}"
-                    wire:navigate>
-                    <span>Servers</span>
-                </x-nav-link>
                 @endrole
 
             </div>
@@ -279,10 +271,7 @@
                         </x-nav-link>
 
 
-                        <x-nav-link :active="request()->routeIs('user.servers')" href="{{ route('user.servers') }}"
-                            wire:navigate>
-                            <span>Servers</span>
-                        </x-nav-link>
+
                         <x-nav-link :active="request()->routeIs('user-settings')" href="{{ route('user-settings') }}"
                             wire:navigate>
                             <span>Settings</span>
@@ -342,11 +331,6 @@
                             <span>Plans</span>
                         </x-nav-link>
 
-                        <x-nav-link :active="request()->routeIs('admin.servers')" href="{{ route('admin.servers') }}"
-                            wire:navigate>
-                            <span>Servers</span>
-                        </x-nav-link>
-
                         <x-primary-dropdown label="Emails">
                             <x-nav-link :active="request()->routeIs('admin.support.tickets')"
                                 href="{{ route('admin.support.tickets') }}" wire:navigate>
@@ -386,6 +370,9 @@
                             <x-nav-link :active="request()->routeIs('admin.site-api-requests')"
                                 href="{{ route('admin.site-api-requests') }}" wire:navigate>
                                 <span>API requests and fails</span>
+                            </x-nav-link>
+                            <x-nav-link :active="request()->routeIs('admin.servers')" href="{{ route('admin.servers') }}" wire:navigate>
+                                <span>Sending bots</span>
                             </x-nav-link>
                         </x-primary-dropdown>
 
