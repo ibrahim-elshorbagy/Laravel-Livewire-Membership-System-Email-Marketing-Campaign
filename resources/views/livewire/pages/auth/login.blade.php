@@ -20,7 +20,8 @@ new #[Layout('layouts.app', ['title' => 'Login | Bulk Email Marketing App'])] cl
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        $this->redirect(route('dashboard'));
+        // $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
 }; ?>
 

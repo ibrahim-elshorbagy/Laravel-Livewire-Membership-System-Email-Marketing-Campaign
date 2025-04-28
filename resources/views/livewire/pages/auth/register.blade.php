@@ -48,7 +48,8 @@ new #[Layout('layouts.app', ['title' => 'Register | Bulk Email Marketing App'])]
             Mail::to($user->email)->queue(new EmailVerificationMail($user));
 
             Session::flash('welcome-flash', 'Please check your email for verification instructions.');
-            $this->redirect(route('dashboard', absolute: false), navigate: true);
+            // $this->redirect(route('dashboard', absolute: false), navigate: true);
+            $this->redirect(route('dashboard'));
         }
 }; ?>
 @push('seo')
