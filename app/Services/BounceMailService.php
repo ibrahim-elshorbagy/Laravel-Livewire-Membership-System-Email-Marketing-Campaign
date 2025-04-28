@@ -160,6 +160,8 @@ class BounceMailService
 
         // Process each subject pattern separately
         foreach ($subjectPatterns as $pattern) {
+
+            Log::channel('emailBounces')->info("Searching for subject pattern: '$pattern'");
             // Use IMAP's built-in SUBJECT search criteria
             $searchCriteria = 'UNSEEN SUBJECT "' . $pattern . '"';
             $matchingEmails = imap_search($this->connection, $searchCriteria);
@@ -238,34 +240,56 @@ class BounceMailService
     protected function getDecodedMessageBody(int $messageNumber): string
     {
         $structure = imap_fetchstructure($this->connection, $messageNumber);
+        $body = '';
 
-        // Handle multipart messages
         if (isset($structure->parts)) {
             foreach ($structure->parts as $partNumber => $part) {
-                // Prefer plain text parts
-                if (isset($part->subtype) && strtoupper($part->subtype) == 'PLAIN') {
-                    $body = imap_fetchbody($this->connection, $messageNumber, $partNumber + 1);
-                    return $this->decodeImapContent($body, $part->encoding);
+                $partData = imap_fetchbody($this->connection, $messageNumber, $partNumber + 1);
+
+                // Check if the part is a multipart message
+                if ($part->type == 1 && isset($part->parts)) { // 1 means multipart
+                    continue; // Skip multipart container parts (like attachments)
+                }
+
+                if (isset($part->subtype)) {
+                    $subtype = strtoupper($part->subtype);
+
+                    if ($subtype === 'DELIVERY-STATUS') {
+                        return $this->decodeImapContent($partData, $part->encoding);
+                    }
+
+                    if (empty($body) && $subtype === 'PLAIN') {
+                        $body = $this->decodeImapContent($partData, $part->encoding);
+                    }
                 }
             }
+        } else {
+            $rawBody = imap_body($this->connection, $messageNumber);
+            $body = $this->decodeImapContent($rawBody, $structure->encoding ?? 0);
         }
 
-        // Fallback for single part messages
-        $body = imap_body($this->connection, $messageNumber);
-        return $this->decodeImapContent($body, $structure->encoding);
+        return $body;
     }
+
+
 
     protected function decodeImapContent(string $content, int $encoding): string
     {
         switch ($encoding) {
+            case ENC7BIT:
+            case ENC8BIT:
+            case ENCBINARY:
+                return quoted_printable_decode($content); // fallback to this
             case ENCBASE64:
-                return imap_base64($content) ?: $content;
+                return base64_decode($content) ?: $content;
             case ENCQUOTEDPRINTABLE:
-                return imap_qprint($content) ?: $content;
+                return quoted_printable_decode($content) ?: $content;
+            case ENCOTHER:
             default:
                 return $content;
         }
     }
+
 
     protected function patternMatch(string $text, array $patterns): bool
     {
@@ -281,12 +305,12 @@ class BounceMailService
 
             // More robust matching that handles word boundaries
             if (preg_match('/\b' . preg_quote($pattern, '/') . '\b/i', $text)) {
-                Log::channel('emailBounces')->info("Matched pattern: '{$pattern}' in "); //{$text}
+                Log::channel('emailBounces')->info("Matched pattern: '{$pattern}' in {$text}"); //{$text}
                 return true;
             }
         }
 
-        Log::channel('emailBounces')->debug("No pattern matches found in text");
+        Log::channel('emailBounces')->debug("No pattern matches found in text {$text}");
         return false;
     }
 
