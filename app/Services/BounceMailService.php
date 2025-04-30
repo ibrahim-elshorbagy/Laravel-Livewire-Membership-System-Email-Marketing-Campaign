@@ -197,10 +197,15 @@ class BounceMailService
 
                 try {
                     // Get the properly decoded message body
-                    $bodyPreview = $this->getDecodedMessageBody($emailNumber);
+                    $rawBody = imap_body($this->connection, $emailNumber, FT_PEEK);
 
-                    $bounceType = $this->analyzeBounceMessage($bodyPreview);
-                    $affectedEmail = $this->extractAffectedEmail($bodyPreview);
+
+                    $bounceType = $this->analyzeBounceMessage($rawBody);
+                    $affectedEmail = $this->extractAffectedEmail($rawBody);
+
+                    Log::channel('emailBounces')->info("---------------------------------------------------------------------");
+                    Log::channel('emailBounces')->debug("bounceType {$bounceType}  affectedEmail {$affectedEmail}");
+                    Log::channel('emailBounces')->info("---------------------------------------------------------------------");
 
                     if (!empty($affectedEmail) && $bounceType) {
                         $messages[] = [
@@ -210,9 +215,10 @@ class BounceMailService
                             'affected_email' => $affectedEmail,
                         ];
                         $matchingCount++;
+                        // Only mark as read if processing was successful
+                        imap_setflag_full($this->connection, $emailNumber, '\\Seen');
                     }
 
-                    imap_setflag_full($this->connection, $emailNumber, '\\Seen');
                     $processedCount++;
 
                     // Update progress after each item is processed
@@ -222,7 +228,6 @@ class BounceMailService
 
                 } catch (\Exception $e) {
                     Log::channel('emailBounces')->error("Error processing email {$emailNumber}: " . $e->getMessage());
-                    imap_setflag_full($this->connection, $emailNumber, '\\Seen');
                     $processedCount++;
 
                     // Update progress even when errors occur
@@ -237,64 +242,6 @@ class BounceMailService
         return $messages;
     }
 
-    protected function getDecodedMessageBody(int $messageNumber): string
-    {
-        $structure = imap_fetchstructure($this->connection, $messageNumber);
-        $body = '';
-
-        if (isset($structure->parts)) {
-            foreach ($structure->parts as $partNumber => $part) {
-                $partData = imap_fetchbody($this->connection, $messageNumber, $partNumber + 1);
-
-                // Check if the part is a multipart message
-                if ($part->type == 1 && isset($part->parts)) { // 1 means multipart
-                    continue; // Skip multipart container parts (like attachments)
-                }
-
-                if (isset($part->subtype)) {
-                    $subtype = strtoupper($part->subtype);
-
-                    // Decode delivery status (skip or process accordingly)
-                    if ($subtype === 'DELIVERY-STATUS') {
-                        return $this->decodeImapContent($partData, $part->encoding);
-                    }
-
-                    // Check if HTML or plain text
-                    if ($subtype === 'HTML') {
-                        $body = $this->decodeImapContent($partData, $part->encoding);
-                    } elseif (empty($body) && $subtype === 'PLAIN') {
-                        // If HTML is not found, take plain text
-                        $body = $this->decodeImapContent($partData, $part->encoding);
-                    }
-                }
-            }
-        } else {
-            $rawBody = imap_body($this->connection, $messageNumber);
-            $body = $this->decodeImapContent($rawBody, $structure->encoding ?? 0);
-        }
-
-        return $body;
-    }
-
-
-
-
-    protected function decodeImapContent(string $content, int $encoding): string
-    {
-        switch ($encoding) {
-            case ENC7BIT:
-            case ENC8BIT:
-            case ENCBINARY:
-                return quoted_printable_decode($content); // fallback to this
-            case ENCBASE64:
-                return base64_decode($content) ?: $content;
-            case ENCQUOTEDPRINTABLE:
-                return quoted_printable_decode($content) ?: $content;
-            case ENCOTHER:
-            default:
-                return $content;
-        }
-    }
 
 
     protected function patternMatch(string $text, array $patterns): bool
@@ -311,12 +258,17 @@ class BounceMailService
 
             // More robust matching that handles word boundaries
             if (preg_match('/\b' . preg_quote($pattern, '/') . '\b/i', $text)) {
-                Log::channel('emailBounces')->info("Matched pattern: '{$pattern}' in {$text}"); //{$text}
+                Log::channel('emailBounces')->info("---------------------------------------------------------------------");
+                Log::channel('emailBounces')->info("Matched pattern: '{$pattern}' in {$text}");
+                Log::channel('emailBounces')->info("---------------------------------------------------------------------");
                 return true;
             }
         }
 
+        Log::channel('emailBounces')->info("---------------------------------------------------------------------");
         Log::channel('emailBounces')->debug("No pattern matches found in text {$text}");
+        Log::channel('emailBounces')->info("---------------------------------------------------------------------");
+
         return false;
     }
 
@@ -327,7 +279,16 @@ class BounceMailService
 
     protected function extractAffectedEmail(string $body): ?string
     {
-        if (preg_match('/\b([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/', $body, $matches)) {
+        // First try to find email in final-recipient field
+        if (preg_match('/final-recipient:\s*rfc822;\s*([^\s\n]+@[^\s\n]+)/i', $body, $matches)) {
+            return trim($matches[1]);
+        }
+        // If not found, try original-recipient field
+        elseif (preg_match('/original-recipient:\s*rfc822;\s*([^\s\n]+@[^\s\n]+)/i', $body, $matches)) {
+            return trim($matches[1]);
+        }
+        // Finally, try to find any email address in the body
+        elseif (preg_match('/\b([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/', $body, $matches)) {
             return $matches[0];
         }
 
@@ -369,8 +330,9 @@ class BounceMailService
             $subject = isset($overview[0]->subject) ? imap_utf8($overview[0]->subject) : '(No subject)';
             Log::channel('emailBounces')->info("First unread email subject: $subject");
 
-            // 🔥 Fetch and decode the body using your existing method
-            $text = $this->getDecodedMessageBody($firstEmailNumber);
+            // Fetch and decode the body using your existing method
+            $text = imap_body($this->connection, $firstEmailNumber);
+
 
             // Print body
             Log::channel('emailBounces')->info("text sss: $text");
