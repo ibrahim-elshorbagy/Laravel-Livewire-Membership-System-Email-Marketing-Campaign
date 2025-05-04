@@ -108,8 +108,7 @@
                                                 this.tempNote = this.originalNote;
                                             }
                                         }">
-                        <template x-if="isEditing">
-                            <div class="flex items-center space-x-2">
+                            <div x-show="isEditing" class="flex items-center space-x-2">
                                 <x-textarea-input class="w-full text-sm" x-model="tempNote" @keydown.enter.prevent="saveEdit()"
                                     @keydown.escape="cancelEdit()" />
                                 <button @click="saveEdit()" class="text-green-500 hover:text-green-600">
@@ -119,15 +118,14 @@
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
-                        </template>
-                        <template x-if="!isEditing">
+                        <div x-show="!isEditing">
                             <div class="flex items-center space-x-2">
                                 <span>{{ $server->admin_notes }}</span>
                                 <button @click="startEdit()" class="text-blue-500 hover:text-blue-600">
                                     <i class="fas fa-edit"></i>
                                 </button>
                             </div>
-                        </template>
+                        </d>
                     </td>
                     <td class="p-4">
                         <div x-data="{ open: false }" class="relative">
@@ -155,7 +153,7 @@
                             </button>
 
                             <!-- Dropdown positioned with fixed strategy -->
-                            <div x-show="open" @click.outside="open = false"
+                            <div  x-show="open" @click.outside="open = false"
                                 x-transition:enter="transition ease-out duration-200"
                                 x-transition:enter-start="transform opacity-0 scale-95"
                                 x-transition:enter-end="transform opacity-100 scale-100"
@@ -242,26 +240,23 @@
                             this.tempCount = this.originalCount;
                         }
                     }">
-                        <template x-if="isEditing">
-                            <div class="flex items-center space-x-2">
-                                <x-text-input type="number" min="1" max="255" class="w-20 text-sm" x-model="tempCount"
-                                    @keydown.enter="saveEdit()" @keydown.escape="cancelEdit()" />
-                                <button @click="saveEdit()" class="text-green-500 hover:text-green-600">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                                <button @click="cancelEdit()" class="text-red-500 hover:text-red-600">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </template>
-                        <template x-if="!isEditing">
-                            <div class="flex items-center space-x-2">
-                                <span x-text="originalCount"></span>
-                                <button @click="startEdit()" class="text-blue-500 hover:text-blue-600">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </div>
-                        </template>
+
+                        <div x-show="isEditing" class="flex items-center space-x-2">
+                            <x-text-input type="number" min="1" max="255" class="w-20 text-sm" x-model="tempCount"
+                                @keydown.enter="saveEdit()" @keydown.escape="cancelEdit()" />
+                            <button @click="saveEdit()" class="text-green-500 hover:text-green-600">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button @click="cancelEdit()" class="text-red-500 hover:text-red-600">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div x-show="!isEditing"class="flex items-center space-x-2">
+                            <span x-text="originalCount"></span>
+                            <button @click="startEdit()" class="text-blue-500 hover:text-blue-600">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
                     </td>
                     <td class="flex flex-col p-4 text-xs">
                         <span>Added At</span>
