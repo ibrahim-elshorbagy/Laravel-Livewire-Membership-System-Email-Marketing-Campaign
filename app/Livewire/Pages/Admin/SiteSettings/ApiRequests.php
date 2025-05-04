@@ -21,6 +21,7 @@ class ApiRequests extends Component
 
     public $sortField = 'request_time';
     public $sortDirection = 'desc';
+    public $status = 'all';
     public $perPage = 10;
     public $selectedRequests = [];
     public $selectPage = false;
@@ -31,7 +32,8 @@ class ApiRequests extends Component
         return [
             'search' => 'nullable|string',
             'userSearch' => 'nullable|string',
-            'sortField' => 'required|in:serverid,request_time,execution_time,status',
+            'sortField' => 'required|in:serverid,request_time,execution_time,status,error_number',
+            'status' => 'required|in:failed,success,all',
             'sortDirection' => 'required|in:asc,desc',
             'perPage' => 'required|integer|in:10,25,50',
             'selectedRequests' => 'array',
@@ -96,8 +98,16 @@ class ApiRequests extends Component
                           ->orWhere('username', 'like', '%' . $this->userSearch . '%');
                     });
                 });
+            })->when($this->status !== 'all', function ($query) {
+                $query->where('status', $this->status);
             })
-            ->orderBy($this->sortField, $this->sortDirection)
+            ->when($this->sortField === 'error_number', function ($query) {
+                $query->orderByRaw("CAST(JSON_EXTRACT(error_data, '$.error_number') AS SIGNED) {$this->sortDirection}");
+            })
+
+            ->when($this->sortField !== 'error_number', function ($query) {
+                $query->orderBy($this->sortField, $this->sortDirection);
+            })
             ->paginate($this->perPage);
     }
 

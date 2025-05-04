@@ -37,13 +37,18 @@
                     <option value="request_time">Sort by Date</option>
                     <option value="execution_time">Sort by Duration</option>
                     <option value="status">Sort by Status</option>
+                    <option value="error_number">Sort by Error Message</option>
                 </x-primary-select-input>
 
                 <x-primary-select-input wire:model.live="sortDirection" class="w-full sm:w-32">
                     <option value="asc">Ascending</option>
                     <option value="desc">Descending</option>
                 </x-primary-select-input>
-
+                <x-primary-select-input wire:model.live="status" class="w-full sm:w-32">
+                    <option value="all">All</option>
+                    <option value="success">Success</option>
+                    <option value="failed">Failed</option>
+                </x-primary-select-input>
                 <x-primary-select-input wire:model.live="perPage" class="w-full sm:w-32">
                     <option value="10">10 per page</option>
                     <option value="25">25 per page</option>
@@ -188,7 +193,7 @@
 
     <!-- Pagination -->
     <div class="mt-4">
-        {{ $requests->links() }}
+        {{ $requests->links(data: ['scrollTo' => false]) }}
     </div>
 
     <!-- Single Reusable Edit Email Modal -->
