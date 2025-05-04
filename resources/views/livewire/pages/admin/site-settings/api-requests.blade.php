@@ -5,11 +5,13 @@
             API Requests
         </h2>
         <div class="mt-4 md:mt-0">
-            <button wire:click="deleteAll"
-                wire:confirm="Are you sure you want to delete all API requests? This action cannot be undone."
-                class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-md shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
+            <x-primary-danger-button wire:click="deleteAll"
+                wire:confirm="Are you sure you want to delete all API requests? This action cannot be undone.">
                 Delete All Requests
-            </button>
+            </x-primary-danger-button>
+            <x-primary-info-button type="button" x-on:click="$dispatch('open-modal', 'bulk-delete-modal');">
+                Bulk Delete Modal
+            </x-primary-info-button>
         </div>
     </header>
 
@@ -196,7 +198,7 @@
         {{ $requests->links(data: ['scrollTo' => false]) }}
     </div>
 
-    <!-- Single Reusable Edit Email Modal -->
+    <!-- Single note-modal -->
     <x-modal name="note-modal" maxWidth="md">
         <div class="p-6">
             <h2 class="text-lg font-medium">Admin Note</h2>
@@ -208,6 +210,67 @@
                     <x-secondary-button x-on:click="$dispatch('close-modal', 'note-modal')">
                         Close
                     </x-secondary-button>
+                </div>
+            </form>
+        </div>
+    </x-modal>
+
+    <!-- Bulk Delete Modal with Full Error Message Display -->
+
+    <x-modal name="bulk-delete-modal" maxWidth="lg">
+        <div class="p-6">
+            <h2 class="text-lg font-medium">Bulk Delete API Requests</h2>
+            <form wire:submit.prevent="bulkDeleteFiltered" class="mt-4">
+                <div class="space-y-4">
+                    <!-- Select Status -->
+                    <div>
+                        <x-input-label for="status" value="Status" />
+                        <x-primary-select-input wire:model="status" id="status" class="block mt-1 w-full">
+                            <option value="all">All</option>
+                            <option value="failed">Failed</option>
+                            <option value="success">Success</option>
+                        </x-primary-select-input>
+                        <x-input-error :messages="$errors->get('status')" class="mt-2" />
+                    </div>
+
+                    <!-- Select Error Number -->
+                    <div>
+                        <x-input-label for="error_number" value="Error Number" />
+                        <x-primary-select-input wire:model="selectedErrorNumber" id="error_number"
+                            class="block mt-1 w-full">
+                            <option value="">All</option>
+                            @foreach ($errorData as $errorNumber => $message)
+                            <option value="{{ $errorNumber }}">{{ 'Error #'. $errorNumber . " : ". $message }}</option>
+                            @endforeach
+                        </x-primary-select-input>
+                        <x-input-error :messages="$errors->get('selectedErrorNumber')" class="mt-2" />
+                    </div>
+
+                    <!-- Date Range -->
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div>
+                            <x-input-label for="dateFrom" value="From Date" />
+                            <x-text-input type="datetime-local" wire:model="dateFrom" id="dateFrom"
+                                class="block mt-1 w-full" />
+                            <x-input-error :messages="$errors->get('dateFrom')" class="mt-2" />
+                        </div>
+                        <div>
+                            <x-input-label for="dateTo" value="To Date" />
+                            <x-text-input type="datetime-local" wire:model="dateTo" id="dateTo"
+                                class="block mt-1 w-full" />
+                            <x-input-error :messages="$errors->get('dateTo')" class="mt-2" />
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="flex justify-end mt-6 space-x-3">
+                    <x-secondary-button x-on:click="$dispatch('close-modal', 'bulk-delete-modal')">
+                        Cancel
+                    </x-secondary-button>
+                    <x-primary-create-button type="submit">
+                        Delete Filtered
+                    </x-primary-create-button>
                 </div>
             </form>
         </div>

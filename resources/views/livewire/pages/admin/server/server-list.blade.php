@@ -88,7 +88,7 @@
                             class="rounded">
                     </td>
                     <td class="p-4 text-sm">{{ $server->name }}</td>
-                    <td class="p-4" x-data="{
+                    <td class="p-4" wire:key="note-{{ $server->id }}" x-data="{
                                             isEditing: false,
                                             tempNote: '{{ $server->admin_notes }}',
                                             originalNote: '{{ $server->admin_notes }}',
@@ -221,7 +221,7 @@
                         </div>
                     </td>
                     <td class="p-4 text-xs">{{ $server->current_quota }}</td>
-                    <td class="p-4 text-xs" x-data="{
+                    <td wire:key="emails_count-{{ $server->id }}" class="p-4 text-xs" x-data="{
                         isEditing: false,
                         tempCount: {{ $server->emails_count }},
                         originalCount: {{ $server->emails_count }},

@@ -39,6 +39,9 @@ class ApiRequests extends Component
             'selectedRequests' => 'array',
             'selectedRequests.*' => 'integer|exists:api_requests,id',
             'selectPage' => 'boolean',
+            'selectedErrorNumber' => 'nullable|integer|min:1|max:10',
+            'dateFrom' => 'nullable|date',
+            'dateTo' => 'nullable|date|after_or_equal:dateFrom',
         ];
     }
 
@@ -123,10 +126,62 @@ class ApiRequests extends Component
         }
     }
 
+    public $errorData = [
+        1 => 'Validation failed: Invalid data provided.',
+        2 => 'Access Denied: Invalid User-Agent.',
+        3 => 'Maintenance Mode: The system is under maintenance.',
+        4 => 'Authentication failed: Invalid API credentials.',
+        5 => 'Account inactive: User account is currently inactive.',
+        6 => 'No subscription: Active subscription required.',
+        7 => 'Quota exceeded: Email sending limit reached.',
+        8 => 'No active campaign: No active campaign found for this server.',
+        9 => 'No Emails available: No emails found for this server\'s campaign.',
+        10 => 'Invalid user: No Assigned user found.',
+    ];
+
+    public $selectedErrorNumber = null;
+    public $dateFrom = null;
+    public $dateTo = null;
+
+
+    public function bulkDeleteFiltered()
+    {
+        $query = ApiRequest::query();
+
+        if ($this->status !== 'all') {
+            $query->where('status', $this->status);
+        }
+
+        if ($this->selectedErrorNumber) {
+            $query->whereJsonContains('error_data->error_number', (int)$this->selectedErrorNumber);
+        }
+
+        if ($this->dateFrom) {
+            $query->where('request_time', '>=', $this->dateFrom);
+        }
+
+        if ($this->dateTo) {
+            $query->where('request_time', '<=', $this->dateTo);
+        }
+
+
+
+        try {
+            $deletedCount = $query->delete();
+            $this->selectedRequests = [];
+            $this->selectPage = false;
+            $this->alert('success', $deletedCount . ' API requests deleted successfully!', ['position' => 'bottom-end']);
+        } catch (\Exception $e) {
+            $this->alert('error', 'Failed to delete requests: ' . $e->getMessage(), ['position' => 'bottom-end']);
+        }
+    }
+
     public function render()
     {
         return view('livewire.pages.admin.site-settings.api-requests', [
-            'requests' => $this->requests
+            'requests' => $this->requests,
+            'errorData' => $this->errorData,
+
         ])->layout('layouts.app', ['title' => 'API Requests']);
     }
 }
