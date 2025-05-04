@@ -32,6 +32,7 @@ class ServerList extends Component
     public $selectedServerId = null;
     public $edit_admin_notes = '';
     public $tempEmailsCount = null;
+    public $selectedEmailsCountServerId = null;
 
 
     protected $queryString = [
@@ -52,6 +53,10 @@ class ServerList extends Component
             'selectPage' => 'boolean',
             'serverId' => 'nullable|integer|exists:servers,id',
             'selectedUserId' => 'nullable|exists:users,id',
+
+
+
+
         ];
     }
 
@@ -67,25 +72,38 @@ class ServerList extends Component
 
     public function saveNote()
     {
+        $this->validate([
+            'selectedServerId' => 'required|exists:servers,id',
+            'edit_admin_notes' => 'required|string',
+        ]);
+
         $server = Server::findOrFail($this->selectedServerId);
         $server->update([
             'admin_notes' => $this->edit_admin_notes
         ]);
 
+        $this->reset(['selectedServerId', 'edit_admin_notes']);
+
         $this->alert('success', 'Notes saved successfully!', ['position' => 'bottom-end']);
         $this->dispatch('close-modal', 'edit-note-modal');
     }
 
-    public function saveEmailsCount($serverId)
+
+    public function saveEmailsCount()
     {
         $this->validate([
-            'tempEmailsCount' => 'required|integer|min:1|max:255'
+            'tempEmailsCount' => 'required|integer|min:1|max:255',
+            'selectedEmailsCountServerId'=>'required|exists:servers,id'
         ]);
 
-        $server = Server::findOrFail($serverId);
+        $server = Server::findOrFail($this->selectedEmailsCountServerId);
+
         $server->update([
             'emails_count' => $this->tempEmailsCount
         ]);
+
+        $this->reset(['selectedEmailsCountServerId', 'tempEmailsCount']);
+
 
         $this->tempEmailsCount = null;
         $this->alert('success', 'Emails count updated successfully!', ['position' => 'bottom-end']);

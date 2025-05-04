@@ -88,26 +88,49 @@
                             class="rounded">
                     </td>
                     <td class="p-4 text-sm">{{ $server->name }}</td>
-                    <td class="p-4" wire:key="note-{{ $server->id }}" x-data="{
-                                            isEditing: false,
-                                            tempNote: '{{ $server->admin_notes }}',
-                                            originalNote: '{{ $server->admin_notes }}',
-                                            startEdit() {
-                                                this.isEditing = true;
-                                                this.tempNote = this.originalNote;
-                                            },
-                                            saveEdit() {
-                                                $wire.edit_admin_notes = this.tempNote;
-                                                $wire.selectedServerId = {{ $server->id }};
-                                                $wire.saveNote();
-                                                this.isEditing = false;
-                                                this.originalNote = this.tempNote;
-                                            },
-                                            cancelEdit() {
-                                                this.isEditing = false;
-                                                this.tempNote = this.originalNote;
-                                            }
-                                        }">
+                    <td class="p-4" wire:key="note-row-{{ $server->id }}-{{ $server->updated_at->timestamp }}">
+                        <div x-data="{
+                            isEditing: false,
+                            tempNote: @js($server->admin_notes),
+                            originalNote: @js($server->admin_notes),
+                            serverId: @js($server->id),
+                            init() {
+                                // Restore edit state if this server was being edited
+                                if (this.$wire.selectedServerId === this.serverId) {
+                                    this.isEditing = true;
+                                    this.tempNote = this.$wire.edit_admin_notes || this.originalNote;
+                                }
+                            },
+                            startEdit() {
+                                this.isEditing = true;
+                                this.tempNote = this.originalNote;
+                                this.$wire.set('selectedServerId', this.serverId, false);
+                                this.$wire.set('edit_admin_notes', this.tempNote, false);
+
+                                // Focus the textarea
+                                this.$nextTick(() => {
+                                    this.$el.querySelector('textarea')?.focus();
+                                });
+                            },
+                            async saveEdit() {
+                                // Update Livewire properties
+                                this.$wire.set('edit_admin_notes', this.tempNote, false);
+                                this.$wire.set('selectedServerId', this.serverId, false);
+
+                                // Call save and wait for completion
+                                await this.$wire.saveNote();
+
+                                // Update local state only after successful save
+                                this.originalNote = this.tempNote;
+                                this.isEditing = false;
+                            },
+                            cancelEdit() {
+                                this.isEditing = false;
+                                this.tempNote = this.originalNote;
+                                this.$wire.set('selectedServerId', null, false);
+                            }
+                        }">
+                            <!-- Edit Mode -->
                             <div x-show="isEditing" class="flex items-center space-x-2">
                                 <x-textarea-input class="w-full text-sm" x-model="tempNote" @keydown.enter.prevent="saveEdit()"
                                     @keydown.escape="cancelEdit()" />
@@ -118,14 +141,17 @@
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
-                        <div x-show="!isEditing">
-                            <div class="flex items-center space-x-2">
-                                <span>{{ $server->admin_notes }}</span>
-                                <button @click="startEdit()" class="text-blue-500 hover:text-blue-600">
-                                    <i class="fas fa-edit"></i>
-                                </button>
+
+                            <!-- View Mode -->
+                            <div x-show="!isEditing">
+                                <div class="flex items-center space-x-2">
+                                    <span x-text="originalNote"></span>
+                                    <button @click="startEdit()" class="text-blue-500 hover:text-blue-600">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
                             </div>
-                        </d>
+                        </div>
                     </td>
                     <td class="p-4">
                         <div x-data="{ open: false }" class="relative">
@@ -219,31 +245,53 @@
                         </div>
                     </td>
                     <td class="p-4 text-xs">{{ $server->current_quota }}</td>
-                    <td wire:key="emails_count-{{ $server->id }}" class="p-4 text-xs" x-data="{
-                        isEditing: false,
-                        tempCount: {{ $server->emails_count }},
-                        originalCount: {{ $server->emails_count }},
-                        startEdit() {
-                            this.isEditing = true;
-                            this.tempCount = this.originalCount;
-                        },
-                        saveEdit() {
-                            if (this.tempCount >= 1 && this.tempCount <= 255) {
-                                $wire.tempEmailsCount = this.tempCount;
-                                $wire.saveEmailsCount({{ $server->id }});
-                                this.isEditing = false;
-                                this.originalCount = this.tempCount;
-                            }
-                        },
-                        cancelEdit() {
-                            this.isEditing = false;
-                            this.tempCount = this.originalCount;
-                        }
-                    }">
+                    <td wire:key="emails_count-{{ $server->id }}-{{ $server->updated_at->timestamp }}" class="p-4 text-xs" x-data="{
+                            isEditing: false,
+                            tempCount:  @js($server->emails_count) ,
+                            originalCount:  @js($server->emails_count) ,
+                            serverId:  @js($server->id) ,
+                            init() {
+                                // Restore edit state if this server was being edited
+                                if (this.$wire.selectedEmailsCountServerId === this.serverId) {
+                                    this.isEditing = true;
+                                    this.tempCount = this.$wire.tempEmailsCount || this.originalCount;
+                                }
+                            },
+                            startEdit() {
+                                this.isEditing = true;
+                                this.tempCount = this.originalCount;
+                                this.$wire.set('selectedEmailsCountServerId', this.serverId, false);
+                                this.$wire.set('tempEmailsCount', this.tempCount, false);
 
-                        <div x-show="isEditing" class="flex items-center space-x-2">
+                                // Focus the input after it appears
+                                this.$nextTick(() => {
+                                    this.$el.querySelector('input[type=number]')?.focus();
+                                });
+                            },
+                            async saveEdit() {
+                                if (this.tempCount >= 1 && this.tempCount <= 255) {
+                                    // Update Livewire properties without re-render
+                                    this.$wire.set('tempEmailsCount', this.tempCount, false);
+                                    this.$wire.set('selectedEmailsCountServerId', this.serverId, false);
+
+                                    // Call save and wait for completion
+                                    await this.$wire.saveEmailsCount();
+
+                                    // Update local state only after successful save
+                                    this.originalCount = this.tempCount;
+                                    this.isEditing = false;
+                                }
+                            },
+                            cancelEdit() {
+                                this.isEditing = false;
+                                this.tempCount = this.originalCount;
+                                this.$wire.set('selectedEmailsCountServerId', null, false);
+                            }
+                        }">
+                        <!-- Edit Mode -->
+                        <div x-show="isEditing"  class="flex items-center space-x-2">
                             <x-text-input type="number" min="1" max="255" class="w-20 text-sm" x-model="tempCount"
-                                @keydown.enter="saveEdit()" @keydown.escape="cancelEdit()" />
+                                @keydown.enter.prevent="saveEdit()" @keydown.escape="cancelEdit()" />
                             <button @click="saveEdit()" class="text-green-500 hover:text-green-600">
                                 <i class="fas fa-check"></i>
                             </button>
@@ -251,7 +299,9 @@
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
-                        <div x-show="!isEditing"class="flex items-center space-x-2">
+
+                        <!-- View Mode -->
+                        <div x-show="!isEditing"  class="flex items-center space-x-2">
                             <span x-text="originalCount"></span>
                             <button @click="startEdit()" class="text-blue-500 hover:text-blue-600">
                                 <i class="fas fa-edit"></i>
