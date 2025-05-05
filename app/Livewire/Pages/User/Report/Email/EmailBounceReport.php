@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Livewire\Attributes\On;
 
 class EmailBounceReport extends Component
 {
@@ -37,6 +38,12 @@ class EmailBounceReport extends Component
             'sortDirection' => 'required|in:asc,desc',
             'perPage' => 'required|integer|in:10,25,50',
         ];
+    }
+
+    #[On('refresh-bounce-list')]
+    public function refreshBounceList()
+    {
+        $this->resetPage();
     }
 
     public function getBouncesProperty()
@@ -96,6 +103,8 @@ class EmailBounceReport extends Component
             ]);
         }
     }
+
+
 
     public function render()
     {

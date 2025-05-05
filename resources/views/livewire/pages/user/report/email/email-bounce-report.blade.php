@@ -1,5 +1,5 @@
 <div
-    class="flex flex-col p-4 md:p-6 rounded-md border border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+    class="flex flex-col p-4 rounded-md border md:p-6 border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
     <div
         class="p-4 mb-4 text-yellow-800 bg-yellow-50 rounded-lg border border-yellow-200 dark:bg-yellow-900/10 dark:border-yellow-300/10 dark:text-yellow-300">
         <div class="flex gap-2 items-center">
@@ -20,6 +20,10 @@
 
         <div class="flex space-x-2">
 
+            <x-primary-create-button type="button" x-on:click="$dispatch('open-modal', 'add-emails-modal');">
+                Add Emails
+            </x-primary-create-button>
+
         <!--Apply to Email List Button -->
             <x-primary-info-button type="button" wire:click="applyToEmailList">
                 <span wire:loading.remove wire:target="applyToEmailList">Affect Email List</span>
@@ -39,14 +43,15 @@
         </div>
     </header>
 
+    <livewire:pages.user.report.email.email-bounce.email-bounce-modal>
     <!-- Search and Filters -->
     <div class="mb-6">
-        <div class="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0">
+        <div class="flex flex-col space-y-4 md:flex-row md:items-center md:space-x-4 md:space-y-0">
             <div class="relative w-full">
                 <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search emails..."
-                    class="w-full pl-10" />
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <i class="fas fa-search text-gray-400"></i>
+                    class="pl-10 w-full" />
+                <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                    <i class="text-gray-400 fas fa-search"></i>
                 </div>
             </div>
 
@@ -108,4 +113,7 @@
     <div class="mt-4">
         {{ $bounces->links() }}
     </div>
+
+
+
 </div>
