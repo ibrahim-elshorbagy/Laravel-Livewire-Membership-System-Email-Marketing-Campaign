@@ -119,7 +119,12 @@
                     <td class="p-4 capitalize">{{ $bounce->type ?? '-' }}</td>
                     <td class="p-4">{{ $bounce->created_at?->timezone(auth()->user()->timezone ??
                         $globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i:s A') ?? '' }}</td>
-                    <td class="p-4 text-center">
+                    <td class="flex gap-3 justify-center p-4">
+                        <button type="button"
+                            x-on:click="$dispatch('open-modal', 'edit-email-modal'); $wire.selectedEmailId = {{ $bounce->id }}; $wire.edit_email = `{{ $bounce->email ?? '' }}`"
+                            class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
+                            Edit
+                        </button>
                         <button wire:click="deleteEmail({{ $bounce->id }})" wire:confirm="Are you sure you want to delete this Email?"
                             class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
                             Delete
@@ -128,7 +133,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="3" class="p-4 text-center text-neutral-500 dark:text-neutral-400">
+                    <td colspan="5" class="p-4 text-center text-neutral-500 dark:text-neutral-400">
                         No bounces found.
                     </td>
                 </tr>
@@ -137,6 +142,30 @@
         </table>
     </div>
 
+    <!-- Single Reusable Edit Email Modal -->
+    <x-modal name="edit-email-modal" maxWidth="md">
+        <div class="p-6">
+            <h2 class="text-lg font-medium">Email</h2>
+            <form wire:submit.prevent="saveEmail" class="mt-4">
+                <div class="space-y-4">
+                    <div>
+                        <x-input-label for="edit_email" value="edit_email" />
+                        <x-text-input wire:model="edit_email" id="edit_email" type="text"
+                            class="block mt-1 w-full" />
+                        <x-input-error :messages="$errors->get('edit_email')" class="mt-2" />
+                    </div>
+                </div>
+                <div class="flex justify-end mt-6 space-x-3">
+                    <x-secondary-button x-on:click="$dispatch('close-modal', 'edit-email-modal')">
+                        Cancel
+                    </x-secondary-button>
+                    <x-primary-create-button type="submit">
+                        Update
+                    </x-primary-create-button>
+                </div>
+            </form>
+        </div>
+    </x-modal>
     <!-- Pagination -->
     <div class="mt-4">
         {{ $bounces->links() }}

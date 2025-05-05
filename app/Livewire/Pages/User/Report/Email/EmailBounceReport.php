@@ -26,6 +26,9 @@ class EmailBounceReport extends Component
     public $selectPage = false;
 
 
+    public $selectedEmailId = null;
+    public $edit_email= '';
+
     protected $queryString = [
         'search' => ['except' => ''],
         'type' => ['except' => ''],
@@ -106,6 +109,25 @@ class EmailBounceReport extends Component
             $this->alert('error', 'Failed to delete Emails: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
     }
+
+    public function saveEmail()
+    {
+        $this->validate([
+            'selectedEmailId' => 'required|exists:email_bounces,id',
+            'edit_email' => 'required|string|email',
+        ]);
+
+        $server = EmailBounce::Where('user_id',Auth::id())->findOrFail($this->selectedEmailId);
+        $server->update([
+            'email' => $this->edit_email
+        ]);
+
+        $this->reset(['selectedEmailId', 'edit_email']);
+
+        $this->alert('success', 'Email saved successfully!', ['position' => 'bottom-end']);
+        $this->dispatch('close-modal', 'edit-email-modal');
+    }
+    
     #[On('refresh-bounce-list')]
     public function refreshBounceList()
     {
