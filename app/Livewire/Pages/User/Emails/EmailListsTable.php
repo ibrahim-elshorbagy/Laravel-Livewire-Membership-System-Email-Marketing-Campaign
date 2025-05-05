@@ -413,7 +413,10 @@ class EmailListsTable extends Component
                 ],
             ]);
 
-            $history = EmailHistory::findOrFail($this->historyId);
+            $history = EmailHistory::whereHas('email', function($query) {
+                $query->where('user_id', auth()->id());
+            })->findOrFail($this->historyId);
+
             $history->delete();
 
             $this->alert('success', 'History record deleted successfully!', [
@@ -448,7 +451,9 @@ class EmailListsTable extends Component
                 return;
             }
 
-            EmailHistory::where('email_id', $this->emailId)->delete();
+            EmailHistory::whereHas('email', function($query) {
+                $query->where('user_id', auth()->id());
+            })->where('email_id', $this->emailId)->delete();
 
             $this->alert('success', "{$count} history records deleted successfully!", [
                 'position' => 'bottom-end',

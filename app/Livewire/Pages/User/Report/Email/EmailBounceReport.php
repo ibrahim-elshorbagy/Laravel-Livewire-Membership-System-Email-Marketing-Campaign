@@ -6,6 +6,7 @@ use App\Models\User\Reports\EmailBounce;
 use App\Models\UserBouncesInfo;
 use App\Services\BounceMailService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -20,6 +21,9 @@ class EmailBounceReport extends Component
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
     public $perPage = 10;
+
+    public $selectedBounces = [];
+    public $selectPage = false;
 
 
     protected $queryString = [
@@ -37,9 +41,71 @@ class EmailBounceReport extends Component
             'sortField' => 'required|in:email,type,created_at',
             'sortDirection' => 'required|in:asc,desc',
             'perPage' => 'required|integer|in:10,25,50',
+            'selectPage' => 'boolean',
+            'selectedBounces' => 'array',
+            'selectedBounces.*' => 'integer|exists:email_bounces,id',
+
         ];
     }
 
+
+    public function updatedSelectPage($value)
+    {
+
+        if ($value) {
+            $this->selectedBounces = $this->bounces->pluck('id')->map(fn($id) => (string) $id);
+        } else {
+            $this->selectedBounces = [];
+        }
+    }
+
+    public function deleteEmail($bouncesId)
+    {
+        $validator = Validator::make(
+            [
+                'bouncesId' => $bouncesId,
+            ],
+            [
+                'bouncesId' => ['required', 'integer'],
+            ]
+        );
+
+        if ($validator->fails()) {
+            $this->alert('error', $validator->errors()->first(), ['position' => 'bottom-end']);
+            return;
+        }
+
+        try {
+            EmailBounce::Where('user_id',Auth::id())->findOrFail($bouncesId)->delete();
+            $this->alert('success', 'Email deleted successfully!', ['position' => 'bottom-end']);
+        } catch (\Exception $e) {
+            $this->alert('error', 'Failed to delete Email: ' . $e->getMessage(), ['position' => 'bottom-end']);
+        }
+    }
+
+    public function bulkDelete()
+    {
+        $this->validate([
+            'selectedBounces' => 'required|array|min:1',
+            'selectedBounces.*' => 'integer|exists:email_bounces,id'
+        ]);
+
+        try {
+            // Get all selected emails
+            $emails = EmailBounce::Where('user_id',Auth::id())->whereIn('id', $this->selectedBounces)->get();
+
+            foreach($emails as $email) {
+                $email->delete();
+            }
+
+            $this->selectedBounces = [];
+            $this->selectPage = false;
+            $this->alert('success', 'Selected Emails deleted successfully!', ['position' => 'bottom-end']);
+
+        } catch (\Exception $e) {
+            $this->alert('error', 'Failed to delete Emails: ' . $e->getMessage(), ['position' => 'bottom-end']);
+        }
+    }
     #[On('refresh-bounce-list')]
     public function refreshBounceList()
     {

@@ -109,7 +109,7 @@ class ServerList extends Component
         $this->alert('success', 'Emails count updated successfully!', ['position' => 'bottom-end']);
     }
 
-    public function deleteServer($serverId)
+    public function deleteEmail($serverId)
     {
         try {
             Server::findOrFail($serverId)->delete();

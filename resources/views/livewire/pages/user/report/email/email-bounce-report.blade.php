@@ -40,6 +40,7 @@
                     <span class="ml-2">Deleting...</span>
             </x-primary-danger-button>
 
+
         </div>
     </header>
 
@@ -79,24 +80,51 @@
             </x-primary-select-input>
         </div>
     </div>
+    <!-- Bulk Actions -->
+    <div class="flex justify-between items-center mb-4">
+        <div class="flex items-center space-x-4">
+            @if(count($selectedBounces) > 0)
+            <span class="text-sm font-medium">{{ count($selectedBounces) }} items selected</span>
+            <x-primary-danger-button wire:click="bulkDelete"
+                wire:confirm="Are you sure you want to delete the selected servers?"
+                class="px-3 py-1 text-sm text-white bg-red-500 rounded-md hover:bg-red-600">
+                Delete Selected
+            </x-primary-danger-button>
+            @endif
+        </div>
+    </div>
 
     <!-- Table -->
     <div class="overflow-x-auto rounded-lg">
         <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
             <thead class="text-xs uppercase bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100">
                 <tr>
+                    <th class="p-4">
+                        <input type="checkbox" wire:model.live="selectPage" class="rounded">
+                    </th>
                     <th class="p-4">Email</th>
                     <th class="p-4">Type</th>
                     <th class="p-4">Date</th>
+                    <th class="p-4 text-center">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
                 @forelse($bounces as $bounce)
                 <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800">
+                    <td class="p-4">
+                        <input type="checkbox" wire:model.live="selectedBounces" value="{{ $bounce->id }}" class="rounded">
+                    </td>
+
                     <td class="p-4">{{ $bounce->email }}</td>
                     <td class="p-4 capitalize">{{ $bounce->type ?? '-' }}</td>
                     <td class="p-4">{{ $bounce->created_at?->timezone(auth()->user()->timezone ??
                         $globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i:s A') ?? '' }}</td>
+                    <td class="p-4 text-center">
+                        <button wire:click="deleteEmail({{ $bounce->id }})" wire:confirm="Are you sure you want to delete this Email?"
+                            class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
+                            Delete
+                        </button>
+                    </td>
                 </tr>
                 @empty
                 <tr>

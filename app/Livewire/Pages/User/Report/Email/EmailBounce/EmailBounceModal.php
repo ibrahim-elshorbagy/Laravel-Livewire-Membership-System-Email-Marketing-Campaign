@@ -19,12 +19,11 @@ class EmailBounceModal extends Component
                 ['emailData' => $emailData],
                 [
                     'emailData' => 'required|array|min:1',
-                    'emailData.*.email' => 'required|email',
+                    'emailData.*.email' => 'required|string',
                     'emailData.*.type' => 'required|in:soft,hard'
                 ],
                 [
                     'emailData.required' => 'At least one valid email is required',
-                    'emailData.*.email.email' => 'The email :input is invalid',
                     'emailData.*.type.in' => 'Bounce type must be either soft or hard'
                 ]
             );
