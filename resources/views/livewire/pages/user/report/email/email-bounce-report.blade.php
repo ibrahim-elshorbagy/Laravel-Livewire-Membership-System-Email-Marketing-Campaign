@@ -40,7 +40,11 @@
                     <span class="ml-2">Deleting...</span>
             </x-primary-danger-button>
 
-
+            <x-primary-info-link href="{{ route('user.report.email-filters') }}" wire:navigate>
+                <div class="flex gap-2 justify-center items-center">
+                    Emails Filters <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </x-primary-info-link>
         </div>
     </header>
 
@@ -149,7 +153,7 @@
             <form wire:submit.prevent="saveEmail" class="mt-4">
                 <div class="space-y-4">
                     <div>
-                        <x-input-label for="edit_email" value="edit_email" />
+                        <x-input-label for="edit_email" value="Edit Email" />
                         <x-text-input wire:model="edit_email" id="edit_email" type="text"
                             class="block mt-1 w-full" />
                         <x-input-error :messages="$errors->get('edit_email')" class="mt-2" />
