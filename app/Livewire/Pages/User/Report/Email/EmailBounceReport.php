@@ -28,6 +28,7 @@ class EmailBounceReport extends Component
 
     public $selectedEmailId = null;
     public $edit_email= '';
+    public $edit_type= '';
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -115,11 +116,15 @@ class EmailBounceReport extends Component
         $this->validate([
             'selectedEmailId' => 'required|exists:email_bounces,id',
             'edit_email' => 'required|string|email',
+            'edit_type' => 'required|string|in:soft,hard',
+
         ]);
 
         $server = EmailBounce::Where('user_id',Auth::id())->findOrFail($this->selectedEmailId);
         $server->update([
-            'email' => $this->edit_email
+            'email' => $this->edit_email,
+            'type' => $this->edit_type
+
         ]);
 
         $this->reset(['selectedEmailId', 'edit_email']);
@@ -127,7 +132,7 @@ class EmailBounceReport extends Component
         $this->alert('success', 'Email saved successfully!', ['position' => 'bottom-end']);
         $this->dispatch('close-modal', 'edit-email-modal');
     }
-    
+
     #[On('refresh-bounce-list')]
     public function refreshBounceList()
     {

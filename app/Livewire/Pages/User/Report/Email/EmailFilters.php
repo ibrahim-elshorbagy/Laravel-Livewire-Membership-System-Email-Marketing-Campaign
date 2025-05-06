@@ -27,6 +27,7 @@ class EmailFilters extends Component
 
     public $selectedEmailId = null;
     public $edit_email= '';
+    public $edit_type= '';
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -79,7 +80,7 @@ class EmailFilters extends Component
 
         try {
             EmailFilter::Where('user_id',Auth::id())->findOrFail($bouncesId)->delete();
-            $this->alert('success', 'Email deleted successfully!', ['position' => 'bottom-end']);
+            $this->alert('success', 'Email filter deleted successfully!', ['position' => 'bottom-end']);
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to delete Email: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
@@ -102,10 +103,10 @@ class EmailFilters extends Component
 
             $this->selectedEmails = [];
             $this->selectPage = false;
-            $this->alert('success', 'Selected Emails deleted successfully!', ['position' => 'bottom-end']);
+            $this->alert('success', 'Selected Email filters deleted successfully!', ['position' => 'bottom-end']);
 
         } catch (\Exception $e) {
-            $this->alert('error', 'Failed to delete Emails: ' . $e->getMessage(), ['position' => 'bottom-end']);
+            $this->alert('error', 'Failed to delete Email filters: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
     }
 
@@ -113,17 +114,19 @@ class EmailFilters extends Component
     {
         $this->validate([
             'selectedEmailId' => 'required|exists:email_filters,id',
-            'edit_email' => 'required|string|email',
+            'edit_email' => 'required|string',
+            'edit_type' => 'required|string|in:soft,hard',
         ]);
 
         $server = EmailFilter::Where('user_id',Auth::id())->findOrFail($this->selectedEmailId);
         $server->update([
-            'email' => $this->edit_email
+            'email' => $this->edit_email,
+            'type' => $this->edit_type
         ]);
 
         $this->reset(['selectedEmailId', 'edit_email']);
 
-        $this->alert('success', 'Email saved successfully!', ['position' => 'bottom-end']);
+        $this->alert('success', 'Email filter saved successfully!', ['position' => 'bottom-end']);
         $this->dispatch('close-modal', 'edit-email-modal');
     }
 
@@ -146,19 +149,18 @@ class EmailFilters extends Component
             ->paginate($this->perPage);
     }
 
-    public function applyToEmailList()
+    public function applyFilteredBouncesToEmailList()
     {
         try {
-
             // Get user bounce info
             $bounceService = new BounceMailService();
 
-            $stats = $bounceService->applyBouncesToEmailList(Auth::id());
+            $stats = $bounceService->applyEmailFiltersToList(Auth::id());
 
-            $this->alert('success', 'Bounces applied to your email list successfully: ' ."<br>".
-                $stats['hard_bounces'] . ' hard bounces and ' ."<br>".
-                $stats['soft_bounces'] . ' soft bounces processed. ' ."<br>".
-                $stats['converted_to_hard'] . ' soft bounces converted to hard bounces.', [
+            $this->alert('success', 'Email filters applied to your list successfully: ' ."<br>".
+                $stats['hard_bounce_patterns'] . ' hard bounce patterns and ' ."<br>".
+                $stats['soft_bounce_patterns'] . ' soft bounce patterns applied, affecting ' ."<br>".
+                $stats['emails_affected'] . ' emails in total.', [
                 'position' => 'center',
                 'timer' => 8000,
                 'toast' => true,
@@ -183,7 +185,7 @@ class EmailFilters extends Component
                 'toast' => true,
             ]);
         } catch (\Exception $e) {
-            $this->alert('error', 'Error deleting emails: ' . $e->getMessage(), [
+            $this->alert('error', 'Error deleting email filters: ' . $e->getMessage(), [
                 'position' => 'bottom-end',
                 'timer' => 5000,
                 'toast' => true,

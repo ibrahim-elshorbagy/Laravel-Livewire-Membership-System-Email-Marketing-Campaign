@@ -13,12 +13,12 @@
         <p class="mt-2 text-sm">Email lists will not be affected by bounces until you click "Affect Email List"
             button.</p>
     </div>
-    <header class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+    <header class="flex flex-col justify-between items-center mb-6 md:flex-row">
+        <h2 class="mb-2 text-2xl font-bold text-gray-900 dark:text-gray-100 md:mb-0">
             Email Bounce Report
         </h2>
 
-        <div class="flex space-x-2">
+        <div class="flex flex-wrap gap-2 justify-center items-start space-x-2">
 
             <x-primary-create-button type="button" x-on:click="$dispatch('open-modal', 'add-emails-modal');">
                 Add Emails
@@ -51,8 +51,8 @@
     <livewire:pages.user.report.email.email-bounce.email-bounce-modal>
     <!-- Search and Filters -->
     <div class="mb-6">
-        <div class="flex flex-col space-y-4 md:flex-row md:items-center md:space-x-4 md:space-y-0">
-            <div class="relative w-full">
+        <div class="flex flex-wrap gap-2 items-start space-x-2">
+            <div class="relative w-96">
                 <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search emails..."
                     class="pl-10 w-full" />
                 <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
@@ -121,11 +121,11 @@
 
                     <td class="p-4">{{ $bounce->email }}</td>
                     <td class="p-4 capitalize">{{ $bounce->type ?? '-' }}</td>
-                    <td class="p-4">{{ $bounce->created_at?->timezone(auth()->user()->timezone ??
+                    <td class="p-4 text-nowrap">{{ $bounce->created_at?->timezone(auth()->user()->timezone ??
                         $globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i:s A') ?? '' }}</td>
                     <td class="flex gap-3 justify-center p-4">
                         <button type="button"
-                            x-on:click="$dispatch('open-modal', 'edit-email-modal'); $wire.selectedEmailId = {{ $bounce->id }}; $wire.edit_email = `{{ $bounce->email ?? '' }}`"
+                            x-on:click="$dispatch('open-modal', 'edit-email-modal'); $wire.selectedEmailId = {{ $bounce->id }}; $wire.edit_email = `{{ $bounce->email ?? '' }}`; $wire.edit_type = `{{ $bounce->type ?? '' }}`"
                             class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
                             Edit
                         </button>
@@ -152,12 +152,16 @@
             <h2 class="text-lg font-medium">Email</h2>
             <form wire:submit.prevent="saveEmail" class="mt-4">
                 <div class="space-y-4">
-                    <div>
-                        <x-input-label for="edit_email" value="Edit Email" />
-                        <x-text-input wire:model="edit_email" id="edit_email" type="text"
-                            class="block mt-1 w-full" />
-                        <x-input-error :messages="$errors->get('edit_email')" class="mt-2" />
-                    </div>
+                    <x-input-label for="edit_email" value="Edit Email" />
+                    <x-text-input wire:model="edit_email" id="edit_email" type="text"
+                        class="block mt-1 w-full" />
+                    <x-input-error :messages="$errors->get('edit_email')" class="mt-2" />
+
+                    <x-input-label for="edit_type" value="Edit Type" />
+                    <x-primary-select-input wire:model="edit_type" id="edit_type" class="w-full">
+                        <option value="hard">hard</option>
+                        <option value="soft">soft</option>
+                    </x-primary-select-input>
                 </div>
                 <div class="flex justify-end mt-6 space-x-3">
                     <x-secondary-button x-on:click="$dispatch('close-modal', 'edit-email-modal')">

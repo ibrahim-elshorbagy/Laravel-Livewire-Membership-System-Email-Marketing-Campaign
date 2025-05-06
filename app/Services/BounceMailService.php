@@ -7,6 +7,7 @@ use App\Models\Admin\Site\SystemSetting\BouncePattern;
 use App\Models\EmailList;
 use App\Models\JobProgress;
 use App\Models\User\Reports\EmailBounce;
+use App\Models\User\Reports\EmailFilter;
 use App\Traits\TracksProgress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -461,5 +462,107 @@ class BounceMailService
     }
 
 
+    /**
+     * Apply email filters to the email list
+     *
+     * @param int $userId Optional user ID to limit which records to process
+     * @return array Stats about processed records
+     */
+    public function applyEmailFiltersToList($userId = null): array
+    {
+        $stats = [
+            'hard_bounce_patterns' => 0,
+            'soft_bounce_patterns' => 0,
+            'emails_affected' => 0
+        ];
+
+        try {
+            DB::beginTransaction();
+
+            // Get all email filters for this user
+            $emailFilters = EmailFilter::when($userId, function($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })
+                ->get();
+
+            if ($emailFilters->isEmpty()) {
+                DB::commit();
+                return $stats;
+            }
+
+            // Process each filter pattern
+            foreach ($emailFilters as $filter) {
+                $pattern = $filter->email;
+                $filterType = $filter->type;
+
+                // Create the SQL LIKE pattern
+                if (substr($pattern, 0, 1) === '@') {
+                    // Domain pattern like @example.com
+                    $likePattern = '%' . $pattern;
+                } elseif (substr($pattern, -1) === '@') {
+                    // Prefix pattern like support@
+                    $likePattern = $pattern . '%';
+                } else {
+                    // Pattern contains something in the middle or exact match
+                    $likePattern = '%' . $pattern . '%';
+                }
+
+                // Find emails matching this pattern
+                $matchingEmailsQuery = EmailList::when($userId, function($query) use ($userId) {
+                        $query->where('user_id', $userId);
+                    })
+                    ->where('email', 'LIKE', $likePattern);
+
+                // Get count before applying changes
+                $matchCount = $matchingEmailsQuery->count();
+
+                if ($matchCount > 0) {
+                    if ($filterType === 'hard') {
+                        // Apply hard bounce flag
+                        $matchingEmailsQuery->update(['is_hard_bounce' => true]);
+                        $stats['hard_bounce_patterns']++;
+                        $stats['emails_affected'] += $matchCount;
+
+                        // Log::channel('emailBounces')->info("Applied hard bounce filter '$pattern' affecting $matchCount emails");
+                    } elseif ($filterType === 'soft') {
+                        // For soft bounces, we need to increment counters
+                        $emailsToProcess = (clone $matchingEmailsQuery)->select('id', 'email', 'user_id', 'soft_bounce_counter')->get();
+                        $stats['soft_bounce_patterns']++;
+                        $convertedToHard = 0;
+
+                        foreach ($emailsToProcess as $email) {
+                            // Increment the counter
+                            EmailList::where('id', $email->id)->increment('soft_bounce_counter');
+                            $stats['emails_affected']++;
+
+                            // Get max allowed soft bounces
+                            $userBounceInfo = UserBouncesInfo::where('user_id', $email->user_id)->first();
+                            $maxSoftBounces = $userBounceInfo ? $userBounceInfo->max_soft_bounces : 5;
+
+                            // Check if it should now be marked as a hard bounce
+                            if (($email->soft_bounce_counter + 1) >= $maxSoftBounces) {
+                                EmailList::where('id', $email->id)->update(['is_hard_bounce' => true]);
+                                $convertedToHard++;
+                            }
+                        }
+
+                        if ($convertedToHard > 0) {
+                            // Log::channel('emailBounces')->info("Converted $convertedToHard soft bounces to hard bounces from pattern '$pattern'");
+                        }
+
+                        // Log::channel('emailBounces')->info("Applied soft bounce filter '$pattern' affecting $matchCount emails");
+                    }
+                }
+            }
+
+            DB::commit();
+            return $stats;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::channel('emailBounces')->error("Error applying email filters to list: " . $e->getMessage());
+            throw $e;
+        }
+    }
 
 }
