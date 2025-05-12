@@ -12,6 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use LucasDotVin\Soulbscription\Models\Concerns\HasSubscriptions;
 use App\Traits\GracePeriodTrait;
+use MBarlow\Megaphone\HasMegaphone;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -20,6 +21,8 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasRoles,SoftDeletes;
     use HasSubscriptions;
     use GracePeriodTrait;
+    use HasMegaphone;
+    
     /**
      * The attributes that are mass assignable.
      *

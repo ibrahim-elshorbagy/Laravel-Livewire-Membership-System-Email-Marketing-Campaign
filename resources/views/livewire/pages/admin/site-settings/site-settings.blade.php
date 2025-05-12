@@ -279,6 +279,42 @@
                 </div>
             </div>
 
+            <!-- Subscription Notification Settings -->
+            <div class="p-6 rounded-lg border border-neutral-200 dark:border-neutral-600">
+                <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
+                    Subscription Notification Settings
+                </h3>
+                <p class="my-2 text-md text-neutral-600 dark:text-neutral-400">
+                    Notification sent to users before their subscription expires.
+                </p>
+                <div class="grid gap-6 md:grid-cols-1">
+                    <div>
+                        <x-input-label for="subscription_notify_days" :value="__('Notification Days Before Expiry')" />
+                        <x-text-input wire:model="subscription_notify_days" id="subscription_notify_days" type="number"
+                            min="1" class="block mt-1 w-full" required />
+                        <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+                            Number of days before subscription expiry to send notification
+                        </p>
+                        <x-input-error :messages="$errors->get('subscription_notify_days')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="subscription_notify_title" :value="__('Notification Title')" />
+                        <x-text-input wire:model="subscription_notify_title" id="subscription_notify_title" type="text"
+                            class="block mt-1 w-full" required />
+                        <x-input-error :messages="$errors->get('subscription_notify_title')" class="mt-2" />
+                    </div>
+
+                    <div>
+                        <x-input-label for="subscription_notify_message" :value="__('Notification Message')" />
+                        <x-primary-textarea wire:model="subscription_notify_message" id="subscription_notify_message"
+                            class="block mt-1 w-full dark:bg-neutral-900/50 dark:text-white" rows="3"
+                            required></x-primary-textarea>
+                        <x-input-error :messages="$errors->get('subscription_notify_message')" class="mt-2" />
+                    </div>
+                </div>
+            </div>
+
             <div class="p-6 rounded-lg border border-neutral-200 dark:border-neutral-600">
                 <h3 class="mb-4 text-xl font-semibold text-neutral-800 dark:text-neutral-200">
                     Mail Settings

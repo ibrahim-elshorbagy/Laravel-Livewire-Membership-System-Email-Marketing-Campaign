@@ -7,6 +7,8 @@ use LucasDotVin\Soulbscription\Models\Subscription as BaseSubscription;
 
 class Subscription extends BaseSubscription
 {
+    protected $guarded = ['id'];
+
     public function payments()
     {
         return $this->hasMany(Payment::class);

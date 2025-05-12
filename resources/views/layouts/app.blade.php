@@ -32,8 +32,8 @@
 </head>
 
 <body class="font-sans antialiased">
-    <div x-data="{ sidebarIsOpen: false }">
 
+    <div x-data="{ sidebarIsOpen: false }">
         <!-- Mobile sidebar overlay -->
         <div x-cloak x-show="sidebarIsOpen" class="fixed inset-0 z-20 backdrop-blur-sm bg-neutral-950/10 lg:hidden"
             aria-hidden="true" x-on:click="sidebarIsOpen = false" x-transition.opacity></div>
@@ -46,6 +46,7 @@
                 class="mb-4 ml-2 w-24 text-2xl font-bold text-neutral-900 dark:text-white">
                 <x-application-logo />
             </a>
+
 
             <div class="flex flex-col gap-2 pb-3">
                 @auth
@@ -392,9 +393,8 @@
                     <!-- Right section -->
                     <div class="flex gap-2 items-center">
 
-
+                        <livewire:megaphone />
                         <x-theme-toggle />
-
                         <!-- Profile dropdown -->
                         <div x-data="{ userDropdownIsOpen: false }" class="relative">
                             @auth

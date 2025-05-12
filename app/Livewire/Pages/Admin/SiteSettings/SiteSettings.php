@@ -56,6 +56,11 @@ class SiteSettings extends Component
     public $base64_image_size_limit;
     public $html_size_limit;
 
+    // Subscription notification settings
+    public $subscription_notify_days;
+    public $subscription_notify_title;
+    public $subscription_notify_message;
+
     // New properties for image previews
     public $logo_preview;
     public $favicon_preview;
@@ -99,6 +104,9 @@ class SiteSettings extends Component
         'grace_days' => 'required|integer|min:0',
         'base64_image_size_limit' => 'required|integer|min:1|max:16000',
         'html_size_limit' => 'required|integer|min:1|max:16000',
+        'subscription_notify_days' => 'required|integer|min:1',
+        'subscription_notify_title' => 'required|string|max:255',
+        'subscription_notify_message' => 'required|string|max:500',
     ];
 
 
@@ -131,6 +139,9 @@ class SiteSettings extends Component
         $this->grace_days = SiteSetting::getValue('grace_days') ?? 0;
         $this->base64_image_size_limit = SiteSetting::getValue('base64_image_size_limit') ?? 150;
         $this->html_size_limit = SiteSetting::getValue('html_size_limit') ?? 1500;
+        $this->subscription_notify_days = SiteSetting::getValue('subscription_notify_days') ?? 3;
+        $this->subscription_notify_title = SiteSetting::getValue('subscription_notify_title') ?? 'Subscription Expiring Soon!';
+        $this->subscription_notify_message = SiteSetting::getValue('subscription_notify_message') ?? 'Your subscription will expire soon. Please renew to maintain access to all features.';
 
         $this->bouncePatterns = BouncePattern::all();
 
@@ -316,6 +327,11 @@ class SiteSettings extends Component
             // Update size limits
             SiteSetting::setValue('base64_image_size_limit', $this->base64_image_size_limit);
             SiteSetting::setValue('html_size_limit', $this->html_size_limit);
+
+            // Update subscription notification settings
+            SiteSetting::setValue('subscription_notify_days', $this->subscription_notify_days);
+            SiteSetting::setValue('subscription_notify_title', $this->subscription_notify_title);
+            SiteSetting::setValue('subscription_notify_message', $this->subscription_notify_message);
 
             // Clear the global settings cache
             GlobalSettingsMiddleware::clearCache();
