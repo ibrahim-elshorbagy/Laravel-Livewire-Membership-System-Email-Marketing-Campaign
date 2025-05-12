@@ -28,6 +28,8 @@ class ChatComponent extends Component
     public $isCurrentUserAdmin;
     public $isCurrentUserAllowed;
 
+    public $adminTemplate = "dear [customer_name],<br>  <br><br>Best Regards bulkemailapp<br>Support Team";
+
     protected $rules = [
         'message' => 'required|min:1'
     ];
@@ -38,6 +40,12 @@ class ChatComponent extends Component
         $this->time_zone = auth()->user()->timezone ?? config('app.timezone');
         $this->loadConversations();
         $this->determinePermissions();
+
+        // Set initial template for admin
+        if ($this->isCurrentUserAdmin) {
+            $customerName = $this->ticket->user->first_name . ' ' . $this->ticket->user->last_name;
+            $this->message = str_replace('[customer_name]', $customerName, $this->adminTemplate);
+        }
     }
 
     protected function determinePermissions()
@@ -224,8 +232,16 @@ class ChatComponent extends Component
         ]);
 
         $this->lastMessageId = $conversation->id;
-        $this->reset('message');
-        $this->dispatch('resetEditor');
+
+        // Reset with template for admin
+        if ($this->isCurrentUserAdmin) {
+            $customerName = $this->ticket->user->first_name . ' ' . $this->ticket->user->last_name;
+            $this->message = str_replace('[customer_name]', $customerName, $this->adminTemplate);
+        } else {
+            $this->reset('message');
+        }
+
+        $this->dispatch('resetEditor', message: $this->message);
         $this->alert('success', 'Message sent', ['position' => 'bottom-end']);
     }
 

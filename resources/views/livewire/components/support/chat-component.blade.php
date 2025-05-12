@@ -89,6 +89,14 @@
                                 fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', 'Helvetica', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana'],
                                 fontSizes: ['8', '9', '10', '11', '12', '14', '18', '24', '36'],
                                 callbacks: {
+                                    onInit: function() {
+                                        @if($isCurrentUserAdmin)
+                                            const initialMessage = @js($message);
+                                            if (initialMessage) {
+                                                $(this).summernote('code', initialMessage);
+                                            }
+                                        @endif
+                                    },
                                     // onChange: function(contents) {
                                     //     @this.set('message', contents, true);
                                     // },
@@ -160,8 +168,8 @@
     }
 
     document.addEventListener('livewire:initialized', function () {
-        Livewire.on('resetEditor', () => {
-            $('#message').summernote('reset');
+        Livewire.on('resetEditor', (event) => {
+            $('#message').summernote('code', event.message || '');
         });
 
         const form = document.getElementById('messageForm');
@@ -172,6 +180,14 @@
         Livewire.on('disconnected', () => {
             $('#message').summernote('destroy');
         });
+
+        // Initialize with template for admin
+        @if($isCurrentUserAdmin)
+            const initialMessage = @js($message);
+            if (initialMessage) {
+                $('#message').summernote('code', initialMessage);
+            }
+        @endif
     });
 </script>
 @endpush
