@@ -105,7 +105,7 @@
                 </button>
 
                 <ul x-cloak x-collapse x-show="isCampaignExpanded">
-                    <li class="px-1 py-0.5 ">
+                    <li class="px-1 py-0.5">
                         <x-nav-link :active="request()->routeIs('user.campaigns.list')" href="{{ route('user.campaigns.list') }}" wire:navigate>
                             <span>Campaigns</span>
                         </x-nav-link>
@@ -128,7 +128,7 @@
                 </button>
 
                 <ul x-cloak x-collapse x-show="isSupportExpanded">
-                    <li class="px-1 py-0.5 ">
+                    <li class="px-1 py-0.5">
                         <x-nav-link :active="request()->routeIs('user.support.tickets')" href="{{ route('user.support.tickets') }}"
                             wire:navigate>
                             <span>My Tickets</span>
@@ -157,7 +157,7 @@
                 </button>
 
                 <ul x-cloak x-collapse x-show="isEmailExpanded">
-                    <li class="px-1 py-0.5 ">
+                    <li class="px-1 py-0.5">
                         <x-nav-link :active="request()->routeIs('admin.support.tickets')"
                             href="{{ route('admin.support.tickets') }}" wire:navigate>
                             <span>Support Tickets</span>
@@ -178,7 +178,7 @@
                 </button>
 
                 <ul x-cloak x-collapse x-show="isPaymentExpanded">
-                    <li class="px-1 py-0.5 ">
+                    <li class="px-1 py-0.5">
                         <x-nav-link :active="request()->routeIs('admin.payment.paypal')"
                             href="{{ route('admin.payment.paypal') }}" wire:navigate>
                             <span>PayPal settings</span>
@@ -208,7 +208,7 @@
                 </button>
 
                 <ul x-cloak x-collapse x-show="isSettingsExpanded">
-                    <li class="px-1 py-0.5 ">
+                    <li class="px-1 py-0.5">
                         <x-nav-link :active="request()->routeIs('admin.site-settings')"
                             href="{{ route('admin.site-settings') }}" wire:navigate>
                             <span>Site Settings</span>
@@ -224,6 +224,12 @@
                         <x-nav-link :active="request()->routeIs('admin.site-api-requests')"
                             href="{{ route('admin.site-api-requests') }}" wire:navigate>
                             <span>API requests and fails</span>
+                        </x-nav-link>
+                    </li>
+                    <li class="px-1 py-0.5">
+                        <x-nav-link :active="request()->routeIs('admin.servers')" href="{{ route('admin.servers') }}"
+                            wire:navigate>
+                            <span>Sending bots</span>
                         </x-nav-link>
                     </li>
                 </ul>

@@ -5,7 +5,7 @@
             Orphan Sending bots
         </h2>
 
-        <div class="flex gap-5">
+        <div class="flex flex-wrap gap-2 justify-center mt-2 md:justify-normal">
             <x-primary-info-link href="{{ route('admin.servers') }}" wire:navigate>
                 Back To Sending bots
             </x-primary-info-link>
@@ -133,7 +133,7 @@
                             </div>
                         </template>
                     </td>
-                    <td class="p-4">
+                    <td class="p-4 w-[200px]">
                         <div x-data="{ open: false }" class="relative">
                             <button type="button" @click="open = !open"
                                 class="px-4 py-2 w-full text-left rounded-md border shadow-sm dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
@@ -266,7 +266,7 @@
                             </div>
                         </template>
                     </td>
-                    <td class="flex flex-col p-4 text-xs">
+                    <td class="flex flex-col p-4 text-xs text-nowrap">
                         <span>Added At</span>
 
                         <span>{{ $server->created_at?->format('d/m/Y h:i:s A') }}</span>
@@ -283,7 +283,7 @@
                                 </button>
                             </div>
                             <a href="{{ route('admin.site-api-requests') }}?search={{ $server->name }}" wire:navigate
-                                class="inline-flex gap-2 items-center px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-500/10 hover:bg-purple-500/20">
+                                class="inline-flex gap-2 items-center px-2 py-1 text-xs text-purple-500 rounded-md text-nowrap bg-purple-500/10 hover:bg-purple-500/20">
                                 API Requests
                             </a>
                             <a href="{{ route('admin.servers.form', $server->id) }}"
