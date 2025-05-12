@@ -102,6 +102,9 @@
                                 +{{ $campaign->servers->count() - 4 }} more
                             </span>
                             @endif
+                            @if($campaign->servers->count() == 0)
+                            No servers selected, edit to add servers
+                            @endif
                         </div>
                     </td>
                     <td class="p-4">
@@ -117,6 +120,9 @@
                             <span class="px-2 py-1 text-xs text-green-500 rounded-full bg-green-500/10">
                                 +{{ $campaign->emailLists->count() - 4 }} more
                             </span>
+                            @endif
+                            @if($campaign->emailLists->count() == 0)
+                            No email lists selected, edit to add lists
                             @endif
                         </div>
                     </td>
@@ -145,13 +151,11 @@
                     <td class="p-4 text-nowrap">{{ $campaign->created_at->format('d/m/Y h:i A') }}</td>
                     <td class="p-4">
                         <div class="flex space-x-2">
-
-
-
                             <div class="flex items-center space-x-2">
                                 <div class="relative" x-data="{ showTooltip: false }">
-                                    <button wire:click="toggleActive({{ $campaign->id }})"
-                                        @if(!$campaign->canBeModified()) disabled @endif
+                                    <button wire:click="toggleActive({{ $campaign->id }})" @if(!$campaign->canBeModified()) disabled @endif
+                                        @mouseenter="showTooltip = true"
+                                        @mouseleave="showTooltip = false"
                                         class="inline-flex items-center px-2 py-1 text-xs rounded-md
                                         {{ $campaign->status === 'Sending' ? 'bg-green-500/10 text-green-500' :
                                         ($campaign->status === 'Completed' ? 'bg-blue-500/10 text-blue-500' :
@@ -160,15 +164,15 @@
                                         cursor-not-allowed' :
                                         'hover:bg-opacity-20' }}">
                                         <i class="mr-1 fas {{
-                                                    $campaign->status === 'Sending' ? 'fa-play-circle' :
-                                                    ($campaign->status === 'Completed' ? 'fa-check-circle' : 'fa-pause-circle')
-                                                }}"></i>
+                                            $campaign->status === 'Sending' ? 'fa-play-circle' :
+                                            ($campaign->status === 'Completed' ? 'fa-check-circle' : 'fa-pause-circle')
+                                        }}"></i>
                                         {{ $campaign->status }}
                                     </button>
+
                                     @if(!$campaign->canBeActive())
-                                    <!-- Tooltip -->
-                                    <div x-show="showTooltip" x-cloak
-                                        x-transition:enter="transition ease-out duration-200"
+                                    <!-- Tooltip for when campaign cannot be started -->
+                                    <div x-show="showTooltip" x-cloak x-transition:enter="transition ease-out duration-200"
                                         x-transition:enter-start="opacity-0 translate-y-1"
                                         x-transition:enter-end="opacity-100 translate-y-0"
                                         x-transition:leave="transition ease-in duration-150"
@@ -194,13 +198,27 @@
                                             class="absolute top-full left-1/2 w-0 h-0 border-t-8 border-r-8 border-l-8 -translate-x-1/2 border-l-transparent border-r-transparent border-neutral-900">
                                         </div>
                                     </div>
+                                    @elseif($campaign->status !== 'Sending' && $campaign->status !== 'Completed')
+                                    <!-- Tooltip for when campaign can be started -->
+                                    <div x-show="showTooltip" x-cloak x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 translate-y-1"
+                                        x-transition:enter-end="opacity-100 translate-y-0"
+                                        x-transition:leave="transition ease-in duration-150"
+                                        x-transition:leave-start="opacity-100 translate-y-0"
+                                        x-transition:leave-end="opacity-0 translate-y-1"
+                                        class="absolute bottom-full left-1/2 z-10 px-3 py-2 mb-2 w-max text-sm text-white rounded-lg shadow-lg -translate-x-1/2 bg-neutral-900"
+                                        role="tooltip">
+                                        <div class="flex items-center space-x-1">
+                                            <i class="text-green-500 fas fa-play-circle"></i>
+                                            <span>Unpause to start sending</span>
+                                        </div>
+                                        <!-- Arrow -->
+                                        <div
+                                            class="absolute top-full left-1/2 w-0 h-0 border-t-8 border-r-8 border-l-8 -translate-x-1/2 border-l-transparent border-r-transparent border-neutral-900">
+                                        </div>
+                                    </div>
                                     @endif
                                 </div>
-
-                                {{-- <a href="{{ route('user.campaigns.progress', $campaign) }}" wire:navigate
-                                    class="inline-flex items-center px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-900/10 hover:bg-purple-500/20">
-                                    <i class="mr-1 fas fa-chart-line"></i> Progress
-                                </a> --}}
 
                                 @if($campaign->status != 'Completed')
                                 <a href="{{ route('user.campaigns.form', $campaign->id) }}" wire:navigate
@@ -215,6 +233,7 @@
                                     <i class="mr-1 fas fa-trash"></i>
                                 </button>
                             </div>
+                        </div>
                     </td>
                 </tr>
                 @endforeach
