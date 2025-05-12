@@ -131,7 +131,6 @@ class BaseMail extends Mailable
         // Render the template string directly with the data
         try {
             // Render the template string directly with the data
-            $templateHtml = str_replace('&nbsp;', ' ', $templateHtml);
             $renderedHtml = html_entity_decode(Blade::render($templateHtml, $data));
 
 
