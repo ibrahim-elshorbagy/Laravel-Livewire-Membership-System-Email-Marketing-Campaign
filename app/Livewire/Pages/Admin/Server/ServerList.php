@@ -183,6 +183,15 @@ class ServerList extends Component
     public function getUsersProperty()
     {
         return User::role('User')
+            ->whereHas('subscription', function($query) {
+                $query->where(function($q) {
+                    $q->where('expired_at', '>', now()) // active subscription
+                    ->orWhere('grace_days_ended_at', '>', now()); // or within grace period
+                })
+                ->whereHas('plan', function($q) {
+                    $q->where('id', '!=', 1); // exclude plan_id 1
+                });
+            })
             ->when($this->userSearch, function ($query) {
                 $query->where(function($q) {
                     $q->where('first_name', 'like', '%' . $this->userSearch . '%')
@@ -190,7 +199,9 @@ class ServerList extends Component
                         ->orWhere('username', 'like', '%' . $this->userSearch . '%')
                         ->orWhere('email', 'like', '%' . $this->userSearch . '%');
                 });
-            })->limit(30)->get();
+            })
+            ->limit(30)
+            ->get();
     }
 
     public function assignUser($serverId, $userId)
