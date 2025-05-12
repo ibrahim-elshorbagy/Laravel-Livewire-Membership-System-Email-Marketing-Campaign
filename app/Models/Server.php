@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Admin\Site\ApiRequest;
 use App\Models\Campaign\CampaignServer;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,5 +27,10 @@ class Server extends Model
     public function campaignServers()
     {
         return $this->hasMany(CampaignServer::class);
+    }
+
+    public function apiRequests()
+    {
+        return $this->hasMany(ApiRequest::class, 'serverid', 'name');
     }
 }

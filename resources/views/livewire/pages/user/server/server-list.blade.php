@@ -52,7 +52,13 @@
             <tbody class="divide-y divide-neutral-300 dark:divide-neutral-700">
                 @foreach($servers as $server)
                 <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                    <td class="p-4">{{ $server->name }}</td>
+                    <td class="p-4">{{ $server->name }}
+                        @if ($server->is_orphan)
+                        <span class="text-lg text-red-500">
+                            *
+                        </span>
+                        @endif
+                    </td>
                     <td class="p-4">{{ $server->last_access_time?->timezone(auth()->user()->timezone ??
                         $globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i:s A') ?? '' }}</td>
                     <td class="p-4">

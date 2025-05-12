@@ -148,7 +148,8 @@ class OrphanServerList extends Component
             ->whereNotExists(function($query) {
                 $query->select(DB::raw(1))
                     ->from('api_requests')
-                    ->whereColumn('api_requests.serverid', 'servers.name');
+                    ->whereColumn('api_requests.serverid', 'servers.name')
+                    ->where('request_time', '>=', now()->subDay());
             })
             ->when($this->search, function ($query) {
                 $query->where(function($q) {
