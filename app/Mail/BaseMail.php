@@ -100,9 +100,10 @@ class BaseMail extends Mailable
 
             // Subscription information
             'subscription_status' => $this->getSubscriptionStatus(),
-            'subscription_start_date' => $this->subscription ? Carbon::parse($this->subscription->started_at) : null,
-            'subscription_end_date' => $this->subscription ? Carbon::parse($this->subscription->expired_at) : null,
-            'subscription_grace_days_ended_date' => $this->subscription ? Carbon::parse($this->subscription->grace_days_ended_at) : null,
+            'subscription_start_date' => $this->subscription && $this->subscription->started_at ? Carbon::parse($this->subscription->started_at)->format('d/m/Y h:i:s A') : null,
+            'subscription_end_date' => $this->subscription && $this->subscription->expired_at? Carbon::parse($this->subscription->expired_at)->format('d/m/Y h:i:s A'): null,
+            'subscription_grace_days_ended_date' => $this->subscription && $this->subscription->grace_days_ended_at ? Carbon::parse($this->subscription->grace_days_ended_at)->format('d/m/Y h:i:s A') : null,
+            'current_datetime' => now()->format('d/m/Y h:i:s A'),
 
             // Plan information
             'plan_name' => $this->subscription?->plan?->name,
@@ -130,7 +131,9 @@ class BaseMail extends Mailable
         // Render the template string directly with the data
         try {
             // Render the template string directly with the data
+            $templateHtml = str_replace('&nbsp;', ' ', $templateHtml);
             $renderedHtml = html_entity_decode(Blade::render($templateHtml, $data));
+
 
             return $this->subject($subject)
                 ->html($renderedHtml);

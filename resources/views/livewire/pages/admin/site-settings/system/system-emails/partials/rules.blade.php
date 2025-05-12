@@ -261,31 +261,27 @@
                                 </td>
                             </tr>
                             <tr class="border-b border-neutral-200 dark:border-neutral-700">
-                                <td class="px-4 py-2 font-mono">@{{ $subscription_start_date?->format('d/m/Y h:i:sA') }}
+                                <td class="px-4 py-2 font-mono">@{{ $subscription_start_date }}
                                 </td>
                                 <td class="px-4 py-2">Subscription start date</td>
-                                <td class="px-4 py-2 italic">"Started: @{{ $subscription_start_date?->format('d/m/Y
-                                    h:i:sA') }}"</td>
+                                <td class="px-4 py-2 italic">"Started: @{{ $subscription_start_date}}"</td>
                             </tr>
                             <tr class="border-b border-neutral-200 dark:border-neutral-700">
-                                <td class="px-4 py-2 font-mono">@{{ $subscription_end_date?->format('d/m/Y h:i:s A') }}
+                                <td class="px-4 py-2 font-mono">@{{ $subscription_end_date}}
                                 </td>
                                 <td class="px-4 py-2">Subscription end date</td>
-                                <td class="px-4 py-2 italic">"Ends: @{{ $subscription_end_date?->format('d/m/Y h:i:s A')
-                                    }}"
+                                <td class="px-4 py-2 italic">"Ends: @{{ $subscription_end_date}}"
                                 </td>
                             </tr>
                             <tr class="border-b border-neutral-200 dark:border-neutral-700">
-                                <td class="px-4 py-2 font-mono">@{{ $subscription_grace_days_ended_date?->format('d/m/Y
-                                    h:i:s A') }}</td>
+                                <td class="px-4 py-2 font-mono">@{{ $subscription_grace_days_ended_date}}</td>
                                 <td class="px-4 py-2">Grace period end date</td>
-                                <td class="px-4 py-2 italic">"Grace period ends: @{{
-                                    $subscription_grace_days_ended_date?->format('d/m/Y h:i:s A') }}"</td>
+                                <td class="px-4 py-2 italic">"Grace period ends: @{{$subscription_grace_days_ended_date}}"</td>
                             </tr>
                             <tr class="border-b border-neutral-200 dark:border-neutral-700">
-                                <td class="px-4 py-2 font-mono">@{{ now()->format('d/m/Y h:i:s A') }}</td>
+                                <td class="px-4 py-2 font-mono">@{{ $current_datetime }}</td>
                                 <td class="px-4 py-2">Current date and time</td>
-                                <td class="px-4 py-2 italic">"Generated on: @{{ now()->format('d/m/Y h:i:s A') }}"</td>
+                                <td class="px-4 py-2 italic">"Generated on: @{{ $current_datetime}}"</td>
                             </tr>
 
                             <!-- Payment Information Section Header -->

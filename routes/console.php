@@ -15,7 +15,7 @@ Schedule::call(function () {
 Schedule::call(function () {
     (new SubscriptionNotifier())->SubscriptionAboutToEndNotify();
 })
-    ->daily()
+    // ->daily()
     ->before(function () {
         Log::channel('worker')->info('SubscriptionNotifier work...');
     })

@@ -4,6 +4,11 @@ namespace App\Services\Notification;
 use App\Models\User;
 use MBarlow\Megaphone\Types\Important;
 use App\Models\Admin\Site\SiteSetting;
+use App\Models\Admin\Site\SystemSetting\SystemEmail;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BaseMail;
+use Illuminate\Support\Facades\Log;
+
 class SubscriptionNotifier
 {
 
@@ -28,6 +33,9 @@ class SubscriptionNotifier
             ->with('subscriber')
             ->get();
 
+            $slug ='notification-subscription-about-to-end';
+            $emailTemplate = SystemEmail::where('slug', $slug)->select('id')->first();
+
         foreach ($subscriptions as $subscription) {
             $user = $subscription->subscriber;
 
@@ -39,6 +47,19 @@ class SubscriptionNotifier
 
             // Send notification
             $user->notify($notification);
+
+            // Send Email notification
+            if ($emailTemplate) {
+                $mailData = [
+                    'slug' => $slug,
+                    'user_id' => $user->id,
+                    'subscription_id' => $subscription->id,
+                ];
+                Log::info('Mail data sent', $mailData);
+
+                Mail::to($user->email)->queue(new BaseMail($mailData));
+
+            }
 
             // Mark notification as sent
             $subscription->update([
