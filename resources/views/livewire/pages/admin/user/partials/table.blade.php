@@ -46,6 +46,7 @@
                     <th scope="col" class="p-4">WhatsApp</th>
                     <th scope="col" class="p-4">Status</th>
                     <th scope="col" class="p-4">Email Verified</th>
+                    <th scope="col" class="p-4">Created</th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
             </thead>
@@ -85,6 +86,9 @@
                             class="inline-flex overflow-hidden rounded-lg px-1 py-0.5 text-xs font-medium {{ $user->email_verified_at ? 'text-blue-300 bg-blue-300/10' : 'text-yellow-500 bg-yellow-500/10' }}">
                             {{ $user->email_verified_at ? 'Verified' : 'Unverified' }}
                         </span>
+                    </td>
+                    <td class="p-4 text-xs">
+                            {{ $user->created_at->format('d/m/Y h:i:s A')  }} <br> {{ $user->created_at->diffForHumans() }}
                     </td>
                     <td class="p-4">
                         <div class="flex space-x-2">
