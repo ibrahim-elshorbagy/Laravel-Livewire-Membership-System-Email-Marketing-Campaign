@@ -67,7 +67,10 @@
                             <td class="px-4 py-2 font-mono">user-cancel-subscription</td>
                             <td class="px-4 py-2">Confirmation email when user cancels their subscription</td>
                         </tr>
-
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">notification-subscription-about-to-end</td>
+                            <td class="px-4 py-2">Notification to user subscription about to end</td>
+                        </tr>
                         <!-- System Emails -->
                         <tr class="bg-amber-50 border-b border-neutral-200 dark:border-neutral-700 dark:bg-amber-900">
                             <td colspan="3" class="px-6 py-4">
