@@ -19,6 +19,42 @@
         </div>
     </header>
 
+    @php
+    $unusedServers = $availableServers->filter(function($server) { return !$server->is_used; });
+    $displayServers = $unusedServers->take(20);
+    $remainingCount = $unusedServers->count() - 20;
+    @endphp
+    @if(!$unusedServers->isEmpty())
+        <div
+            class="p-4 mb-4 text-blue-800 bg-blue-50 rounded-lg border border-blue-200 dark:bg-blue-900/10 dark:border-blue-300/10 dark:text-blue-300">
+            <div class="flex gap-2 items-center">
+                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M12 1.5c-1.921 0-3.816.111-5.68.327-1.497.174-2.57 1.46-2.57 2.93V21.75a.75.75 0 001.029.696l3.471-1.388 3.472 1.388a.75.75 0 00.556 0l3.472-1.388 3.471 1.388a.75.75 0 001.029-.696V4.757c0-1.47-1.073-2.756-2.57-2.93A49.255 49.255 0 0012 1.5zm3.53 7.28a.75.75 0 00-1.06-1.06l-2.47 2.47-.97-.97a.75.75 0 00-1.06 1.06l1.5 1.5a.75.75 0 001.06 0l3-3z"
+                        clip-rule="evenodd" />
+                </svg>
+                <span class="font-medium">Available Bots</span>
+            </div>
+
+            <div class="mt-2 text-sm">
+                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
+
+                    @foreach($displayServers as $server)
+                    <div class="flex items-center p-2 space-x-2 rounded-lg bg-blue-100/50 dark:bg-blue-900/50">
+                        <i class="fas fa-robot"></i>
+                        <span>{{ $server->name }}</span>
+                    </div>
+                    @endforeach
+                    @if($remainingCount > 0)
+                    <div class="flex items-center p-2 space-x-2 rounded-lg bg-blue-100/50 dark:bg-blue-900/50">
+                        <i class="fas fa-ellipsis-h"></i>
+                        <span>+{{ $remainingCount }} more</span>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
     <!-- Search and Filters -->
     <div class="mb-6">
         <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
@@ -153,7 +189,8 @@
                         <div class="flex space-x-2">
                             <div class="flex items-center space-x-2">
                                 <div class="relative" x-data="{ showTooltip: false }">
-                                    <button wire:click="toggleActive({{ $campaign->id }})" @if(!$campaign->canBeModified()) disabled @endif
+                                    <button wire:click="toggleActive({{ $campaign->id }})"
+                                        @if(!$campaign->canBeModified()) disabled @endif
                                         @mouseenter="showTooltip = true"
                                         @mouseleave="showTooltip = false"
                                         class="inline-flex items-center px-2 py-1 text-xs rounded-md
@@ -172,7 +209,8 @@
 
                                     @if(!$campaign->canBeActive())
                                     <!-- Tooltip for when campaign cannot be started -->
-                                    <div x-show="showTooltip" x-cloak x-transition:enter="transition ease-out duration-200"
+                                    <div x-show="showTooltip" x-cloak
+                                        x-transition:enter="transition ease-out duration-200"
                                         x-transition:enter-start="opacity-0 translate-y-1"
                                         x-transition:enter-end="opacity-100 translate-y-0"
                                         x-transition:leave="transition ease-in duration-150"
@@ -200,7 +238,8 @@
                                     </div>
                                     @elseif($campaign->status !== 'Sending' && $campaign->status !== 'Completed')
                                     <!-- Tooltip for when campaign can be started -->
-                                    <div x-show="showTooltip" x-cloak x-transition:enter="transition ease-out duration-200"
+                                    <div x-show="showTooltip" x-cloak
+                                        x-transition:enter="transition ease-out duration-200"
                                         x-transition:enter-start="opacity-0 translate-y-1"
                                         x-transition:enter-end="opacity-100 translate-y-0"
                                         x-transition:leave="transition ease-in duration-150"

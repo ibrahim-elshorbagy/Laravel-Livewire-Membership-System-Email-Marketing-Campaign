@@ -107,10 +107,18 @@ class CampaignList extends Component
             ->paginate($this->perPage);
     }
 
+    public function getAvailableServersProperty()
+    {
+        return Server::where('assigned_to_user_id', Auth::id())
+            ->whereDoesntHave('campaignServers')
+            ->get();
+    }
+
     public function render()
     {
         return view('livewire.pages.user.emails.campaign.campaign-list', [
             'campaigns' => $this->campaigns,
+            'availableServers' => $this->availableServers,
         ])->layout('layouts.app', ['title' => 'Campaigns']);
     }
 }
