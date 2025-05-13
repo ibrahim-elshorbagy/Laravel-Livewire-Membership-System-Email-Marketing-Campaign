@@ -66,7 +66,7 @@ Route::middleware(['auth','role:user'])->group(function () {
     Route::get('/email-messages/{message}/show', ShowMessage::class)->name('user.emails.message.show');
 
     //Servers
-    Route::get('/my-servers', ServerList::class)->name('user.servers');
+    Route::get('/my-bots', ServerList::class)->name('user.servers');
 
     //Campaigns
     Route::get('/campaigns', CampaignList::class)->name('user.campaigns.list');

@@ -22,11 +22,11 @@
                         <i class="text-purple-500 md:text-3xl dark:text-purple-400 fas fa-server"></i>
                         <span
                             class="px-3 py-1.5 text-xs font-medium text-purple-500 bg-purple-50 rounded-full md:text-sm dark:text-purple-400 dark:bg-purple-500/10">My
-                            Servers</span>
+                            Bots</span>
                     </div>
                     <div class="flex items-center mt-4">
                         <div class="flex-1">
-                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Servers</p>
+                            <p class="text-sm font-medium md:text-xl text-neutral-600 dark:text-neutral-400">Bots</p>
                             <p class="font-bold text-purple-600 md:text-sm dark:text-purple-400">{{ $serverCount }}</p>
                         </div>
                     </div>

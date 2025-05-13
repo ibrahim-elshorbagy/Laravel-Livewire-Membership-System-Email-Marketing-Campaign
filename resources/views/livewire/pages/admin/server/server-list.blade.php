@@ -88,12 +88,12 @@
                             class="rounded">
                     </td>
                     <td class="p-4 text-sm">
-                        {{ $server->name }}
                         @if ($server->is_orphan)
                         <span class="text-lg text-red-500">
                             *
                         </span>
                         @endif
+                        {{ $server->name }}
                     </td>
                     <td class="p-4" wire:key="note-row-{{ $server->id }}-{{ $server->updated_at->timestamp }}">
                         <div x-data="{

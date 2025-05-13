@@ -39,7 +39,7 @@ class AdvanceTinyMCE {
                     // This blocks script tags and other potentially harmful elements
                     toolbar: "fullscreen code codesample accordion addcomment aidialog aishortcuts aligncenter alignjustify alignleft alignnone alignright | anchor | blockquote blocks | backcolor | bold | casechange checklist copy cut | fontfamily fontsize forecolor  | italic | language | lineheight | newdocument | outdent | paste pastetext | print exportpdf exportword importword | redo | remove removeformat | selectall | strikethrough | styles | subscript superscript underline | undo | visualaid | a11ycheck advtablerownumbering revisionhistory typopgraphy anchor restoredraft casechange charmap checklist  addcomment showcomments ltr rtl editimage fliph flipv imageoptions rotateleft rotateright emoticons export footnotes footnotesupdate formatpainter  help image insertdatetime link openlink unlink bullist numlist media mergetags mergetags_list nonbreaking pagebreak pageembed permanentpen preview quickimage quicklink quicktable cancel save searchreplace showcomments spellcheckdialog spellchecker |  template typography | insertfile inserttemplate addtemplate | visualblocks visualchars | wordcount",
                     content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-
+                    extended_valid_elements: 'a[href|target|rel|class|id|title|name]',
                     // Essential for full HTML editing
                     code_dialog_height: 600,
                     code_dialog_width: 800,

@@ -84,9 +84,9 @@ use Livewire\Volt\Volt;
 
 
         // Servers
-        Route::get('/servers', ServerList::class)->name('admin.servers');
-        Route::get('/orphan-servers', OrphanServerList::class)->name('admin.orphan-servers');
-        Route::get('/servers/form/{server?}', ServerForm::class)->name('admin.servers.form');
+        Route::get('/bots', ServerList::class)->name('admin.servers');
+        Route::get('/orphan-bots', OrphanServerList::class)->name('admin.orphan-servers');
+        Route::get('/bots/form/{server?}', ServerForm::class)->name('admin.servers.form');
 
         // Support Ticket Management
         Route::get('/support/tickets', TicketManagement::class)->name('admin.support.tickets');
