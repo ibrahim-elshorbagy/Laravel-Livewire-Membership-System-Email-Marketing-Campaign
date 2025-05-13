@@ -69,6 +69,11 @@ class ServerList extends Component
         }
     }
 
+    public function updatingSearch()
+    {
+        $this->validateOnly('search');
+        $this->resetPage();
+    }
 
     public function saveNote()
     {
