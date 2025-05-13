@@ -35,7 +35,10 @@ class ServerList extends Component
 
     public function getServersProperty()
     {
-        $servers = Server::where('assigned_to_user_id', Auth::id())
+        $servers = Server::with(['campaignServers.campaign', 'apiRequests' => function ($q) {
+                $q->where('request_time', '>=', now()->subDay())->limit(1);
+            }])
+            ->where('assigned_to_user_id', Auth::id())
             ->when($this->search, function ($query) {
                 $query->where(function($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
@@ -53,7 +56,13 @@ class ServerList extends Component
         // Add orphan status after retrieving the results
         $servers->getCollection()->transform(function ($server) {
             // Check if there are no requests within the last 24 hours
-            $server->is_orphan = $server->apiRequests->isEmpty(); // Check if no requests exist
+            $server->is_orphan = $server->apiRequests->isEmpty();
+            // Format campaign titles
+            $server->campaign = $server->campaignServers->map(function($cs) {
+                return $cs->campaign ? $cs->campaign->title : '';
+            })->filter()->implode(', ');
+            // Remove admin_notes
+            unset($server->admin_notes);
             return $server;
         });
 

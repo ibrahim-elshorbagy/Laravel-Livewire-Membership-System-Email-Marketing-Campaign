@@ -117,16 +117,7 @@
                                     <span class="font-medium text-neutral-500">Quota:</span>
                                     <span>{{ $request->server->current_quota ?? 'N/A' }}</span>
                                 </div>
-                                @if($request->server->admin_notes)
-                                <div class="flex justify-between items-center">
-                                    <span class="font-medium text-neutral-500">Note:</span>
-                                    <button type="button"
-                                        x-on:click="$dispatch('open-modal', 'note-modal'); $wire.admin_notes = `{{ $request->server->admin_notes ?? '' }}`"
-                                        class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
-                                        <i class="fa-solid fa-note-sticky"></i>
-                                    </button>
-                                </div>
-                                @endif
+
 
 
                                 @if($request->server->assignedUser)
@@ -198,22 +189,7 @@
         {{ $requests->links(data: ['scrollTo' => false]) }}
     </div>
 
-    <!-- Single note-modal -->
-    <x-modal name="note-modal" maxWidth="md">
-        <div class="p-6">
-            <h2 class="text-lg font-medium">Admin Note</h2>
-            <form wire:submit.prevent="saveNote" class="mt-4">
-                <div class="space-y-4">
-                   <p x-text="$wire.admin_notes"></p>
-                </div>
-                <div class="flex justify-end mt-6 space-x-3">
-                    <x-secondary-button x-on:click="$dispatch('close-modal', 'note-modal')">
-                        Close
-                    </x-secondary-button>
-                </div>
-            </form>
-        </div>
-    </x-modal>
+
 
     <!-- Bulk Delete Modal with Full Error Message Display -->
 

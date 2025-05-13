@@ -26,7 +26,7 @@ class ApiRequests extends Component
     public $selectedRequests = [];
     public $selectPage = false;
 
-    public $admin_notes;
+
     protected function rules()
     {
         return [

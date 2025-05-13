@@ -45,6 +45,7 @@
                 class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                 <tr>
                     <th scope="col" class="p-4">Name</th>
+                    <th scope="col" class="p-4">Campaign</th>
                     <th scope="col" class="p-4">Last Access</th>
                     <th scope="col" class="p-4">Quota</th>
                 </tr>
@@ -60,6 +61,7 @@
                         @endif
                         {{ $server->name }}
                     </td>
+                    <td class="p-4">{{ $server->campaign }}</td>
                     <td class="p-4">{{ $server->last_access_time?->timezone(auth()->user()->timezone ??
                         $globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i:s A') ?? '' }}</td>
                     <td class="p-4">
