@@ -73,6 +73,17 @@ class TicketManagement extends Component
             ->paginate($this->perPage);
     }
 
+    public function deleteTicket($ticketId)
+    {
+        $ticket = SupportTicket::find($ticketId);
+        if ($ticket) {
+            $ticket->delete();
+            $this->alert('success', 'Ticket deleted successfully.');
+        } else {
+            $this->alert('error', 'Ticket not found.');
+        }
+    }
+
     public function render()
     {
         return view('livewire.pages.admin.support.ticket-management', [

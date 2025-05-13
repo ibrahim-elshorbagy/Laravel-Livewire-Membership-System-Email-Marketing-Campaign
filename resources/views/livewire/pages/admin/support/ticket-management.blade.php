@@ -115,6 +115,11 @@
                                 class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
                                 <i class="fa-solid fa-eye"></i>
                             </a>
+                            <button wire:click="deleteTicket({{ $ticket->id }})"
+                                wire:confirm="Are you sure you want to delete this ticket?"
+                                class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
