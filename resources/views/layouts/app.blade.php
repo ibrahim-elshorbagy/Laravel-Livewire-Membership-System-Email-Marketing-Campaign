@@ -374,7 +374,9 @@
                     <!-- Right section -->
                     <div class="flex gap-2 items-center">
 
+                        @auth
                         <livewire:megaphone />
+                        @endauth
                         <x-theme-toggle />
                         <!-- Profile dropdown -->
                         <div x-data="{ userDropdownIsOpen: false }" class="relative">
