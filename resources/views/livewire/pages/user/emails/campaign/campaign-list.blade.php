@@ -25,35 +25,35 @@
     $remainingCount = $unusedServers->count() - 20;
     @endphp
     @if(!$unusedServers->isEmpty())
-        <div
-            class="p-4 mb-4 text-blue-800 bg-blue-50 rounded-lg border border-blue-200 dark:bg-blue-900/10 dark:border-blue-300/10 dark:text-blue-300">
-            <div class="flex gap-2 items-center">
-                <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fill-rule="evenodd"
-                        d="M12 1.5c-1.921 0-3.816.111-5.68.327-1.497.174-2.57 1.46-2.57 2.93V21.75a.75.75 0 001.029.696l3.471-1.388 3.472 1.388a.75.75 0 00.556 0l3.472-1.388 3.471 1.388a.75.75 0 001.029-.696V4.757c0-1.47-1.073-2.756-2.57-2.93A49.255 49.255 0 0012 1.5zm3.53 7.28a.75.75 0 00-1.06-1.06l-2.47 2.47-.97-.97a.75.75 0 00-1.06 1.06l1.5 1.5a.75.75 0 001.06 0l3-3z"
-                        clip-rule="evenodd" />
-                </svg>
-                <span class="font-medium">Available Bots</span>
-            </div>
+    <div
+        class="p-4 mb-4 text-blue-800 bg-blue-50 rounded-lg border border-blue-200 dark:bg-blue-900/10 dark:border-blue-300/10 dark:text-blue-300">
+        <div class="flex gap-2 items-center">
+            <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path fill-rule="evenodd"
+                    d="M12 1.5c-1.921 0-3.816.111-5.68.327-1.497.174-2.57 1.46-2.57 2.93V21.75a.75.75 0 001.029.696l3.471-1.388 3.472 1.388a.75.75 0 00.556 0l3.472-1.388 3.471 1.388a.75.75 0 001.029-.696V4.757c0-1.47-1.073-2.756-2.57-2.93A49.255 49.255 0 0012 1.5zm3.53 7.28a.75.75 0 00-1.06-1.06l-2.47 2.47-.97-.97a.75.75 0 00-1.06 1.06l1.5 1.5a.75.75 0 001.06 0l3-3z"
+                    clip-rule="evenodd" />
+            </svg>
+            <span class="font-medium">Available Bots</span>
+        </div>
 
-            <div class="mt-2 text-sm">
-                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
+        <div class="mt-2 text-sm">
+            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
 
-                    @foreach($displayServers as $server)
-                    <div class="flex items-center p-2 space-x-2 rounded-lg bg-blue-100/50 dark:bg-blue-900/50">
-                        <i class="fas fa-robot"></i>
-                        <span>{{ $server->name }}</span>
-                    </div>
-                    @endforeach
-                    @if($remainingCount > 0)
-                    <div class="flex items-center p-2 space-x-2 rounded-lg bg-blue-100/50 dark:bg-blue-900/50">
-                        <i class="fas fa-ellipsis-h"></i>
-                        <span>+{{ $remainingCount }} more</span>
-                    </div>
-                    @endif
+                @foreach($displayServers as $server)
+                <div class="flex items-center p-2 space-x-2 rounded-lg bg-blue-100/50 dark:bg-blue-900/50">
+                    <i class="fas fa-robot"></i>
+                    <span>{{ $server->name }}</span>
                 </div>
+                @endforeach
+                @if($remainingCount > 0)
+                <div class="flex items-center p-2 space-x-2 rounded-lg bg-blue-100/50 dark:bg-blue-900/50">
+                    <i class="fas fa-ellipsis-h"></i>
+                    <span>+{{ $remainingCount }} more</span>
+                </div>
+                @endif
             </div>
         </div>
+    </div>
     @endif
     <!-- Search and Filters -->
     <div class="mb-6">
@@ -139,7 +139,9 @@
                             </span>
                             @endif
                             @if($campaign->servers->count() == 0)
+                            @if($campaign->status !== 'Completed')
                             No servers selected, edit to add servers
+                            @endif
                             @endif
                         </div>
                     </td>
@@ -158,7 +160,9 @@
                             </span>
                             @endif
                             @if($campaign->emailLists->count() == 0)
+                            @if($campaign->status !== 'Completed')
                             No email lists selected, edit to add lists
+                            @endif
                             @endif
                         </div>
                     </td>
@@ -207,7 +211,27 @@
                                         {{ $campaign->status }}
                                     </button>
 
-                                    @if(!$campaign->canBeActive())
+                                    @if($campaign->status === 'Completed')
+                                    <!-- Tooltip for completed campaigns -->
+                                    <div x-show="showTooltip" x-cloak
+                                        x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 translate-y-1"
+                                        x-transition:enter-end="opacity-100 translate-y-0"
+                                        x-transition:leave="transition ease-in duration-150"
+                                        x-transition:leave-start="opacity-100 translate-y-0"
+                                        x-transition:leave-end="opacity-0 translate-y-1"
+                                        class="absolute bottom-full left-1/2 z-10 px-3 py-2 mb-2 w-max text-sm text-white rounded-lg shadow-lg -translate-x-1/2 bg-neutral-900"
+                                        role="tooltip">
+                                        <div class="flex items-center space-x-1">
+                                            <i class="text-blue-500 fas fa-check-circle"></i>
+                                            <span>Campaign has been completed</span>
+                                        </div>
+                                        <!-- Arrow -->
+                                        <div
+                                            class="absolute top-full left-1/2 w-0 h-0 border-t-8 border-r-8 border-l-8 -translate-x-1/2 border-l-transparent border-r-transparent border-neutral-900">
+                                        </div>
+                                    </div>
+                                    @elseif(!$campaign->canBeActive())
                                     <!-- Tooltip for when campaign cannot be started -->
                                     <div x-show="showTooltip" x-cloak
                                         x-transition:enter="transition ease-out duration-200"
