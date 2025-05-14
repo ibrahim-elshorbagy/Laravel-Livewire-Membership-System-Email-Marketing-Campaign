@@ -259,7 +259,7 @@
                                 <td colspan="3" class="px-6 py-4">
                                     <h4 class="text-lg font-semibold text-purple-800 dark:text-purple-200">Important
                                         Dates
-                                        (please use it with the '?' mark)
+                                        
                                     </h4>
                                 </td>
                             </tr>
