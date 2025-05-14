@@ -259,7 +259,7 @@
                                 <td colspan="3" class="px-6 py-4">
                                     <h4 class="text-lg font-semibold text-purple-800 dark:text-purple-200">Important
                                         Dates
-                                        
+
                                     </h4>
                                 </td>
                             </tr>
@@ -344,7 +344,7 @@ Welcome to our service! Your @{{ $plan_name }} subscription has been successfull
         - Plan: @{{ $plan_name }}
         - Duration: @{{ $plan_duration }}
         - Amount: $@{{ number_format($plan_price, 2) }}
-        - Start Date: @{{ $subscription_start_date->format('d/m/Y h:i:s A') }}
+        - Start Date: @{{ $subscription_start_date- }}
 
 Best regards,
 The Team</pre>
@@ -359,7 +359,6 @@ Your payment has been successfully processed:
         - Amount: @{{ $payment_amount }} @{{ $payment_currency }}
         - Gateway: @{{ $payment_gateway }}
         - Transaction ID: @{{ $payment_transaction_id }}
-        - Date: @{{ now()->format('d/m/Y h:i:s A') }}
 
 Thank you for your business!</pre>
                         </div>
