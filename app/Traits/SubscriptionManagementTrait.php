@@ -22,7 +22,9 @@ trait SubscriptionManagementTrait
                 $subscription = $payment->user->subscription;
 
                 // Check if it's an annual plan
-                if ($payment->plan->periodicity == 'Year') {
+
+
+                if ($payment->plan->periodicity_type == 'Year') {
                     $subscription->update([
                         'expired_at' => $subscription->expired_at->copy()->addYear()
                     ]);
