@@ -50,11 +50,11 @@ class DashboardStatics extends Component
         $userId = auth()->user()->id;
 
         $subscribersLimitName = Feature::find(1)?->name;
-        $subscribers_limit = auth()->user()->lastSubscription()?->plan->features->where('name', $subscribersLimitName)->first()->pivot->charges;
+        $subscribers_limit = auth()->user()->subscription?->plan->features->where('name', $subscribersLimitName)->first()->pivot->charges;
         $subscribers = $subscribers_limit - auth()->user()->balance($subscribersLimitName);
 
         $emailSendingName = Feature::find(2)?->name;
-        $email_sending_limit = auth()->user()->lastSubscription()?->plan->features->where('name', $emailSendingName)->first()->pivot->charges;
+        $email_sending_limit = auth()->user()->subscription?->plan->features->where('name', $emailSendingName)->first()->pivot->charges;
         $email_sending = $email_sending_limit -auth()->user()->balance($emailSendingName);
 
         // Get user-specific statistics

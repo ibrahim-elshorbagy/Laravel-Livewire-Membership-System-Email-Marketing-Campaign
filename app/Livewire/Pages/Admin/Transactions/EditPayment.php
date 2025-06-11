@@ -83,12 +83,12 @@ class EditPayment extends Component
 
     public function calculateDates()
     {
-        if ($this->user->lastSubscription()) {
-            $startDate = Carbon::parse($this->user->lastSubscription()->started_at);
-            $endDate = Carbon::parse($this->user->lastSubscription()->expired_at);
+        if ($this->user->subscription) {
+            $startDate = Carbon::parse($this->user->subscription->started_at);
+            $endDate = Carbon::parse($this->user->subscription->expired_at);
             $this->calculatedDates = $this->calculateSubscriptionDates(
                 $this->plan,
-                $this->user->lastSubscription()->plan,
+                $this->user->subscription->plan,
                 $startDate,
                 $endDate,
                 $this->amount

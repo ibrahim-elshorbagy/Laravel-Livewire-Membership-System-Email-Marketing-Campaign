@@ -16,10 +16,10 @@ trait SubscriptionManagementTrait
 {
     public function handleSubscriptionChange(Payment $payment)
     {
-        if ($payment->user->lastSubscription()) {
+        if ($payment->user->subscription) {
             // Case 1: User is renewing the same plan
-            if ($payment->user->lastSubscription()->plan->id == $payment->plan_id) {
-                $subscription = $payment->user->lastSubscription();
+            if ($payment->user->subscription->plan->id == $payment->plan_id) {
+                $subscription = $payment->user->subscription;
 
                 // Check if it's an annual plan
                 if ($payment->plan->periodicity == 'Year') {
@@ -38,7 +38,7 @@ trait SubscriptionManagementTrait
             // Case 2: User is changing to a different plan
             else {
                 // Get existing subscription info before suppressing it
-                $oldSubscription = $payment->user->lastSubscription();
+                $oldSubscription = $payment->user->subscription;
                 $oldPlan = $oldSubscription->plan;
                 $started_at = $oldSubscription->started_at;
                 $expired_at = $oldSubscription->expired_at;
@@ -51,7 +51,7 @@ trait SubscriptionManagementTrait
 
                 // Create new subscription
                 $subscription = $payment->user->graceSubscribeTo($payment->plan);
-                $newSubscription = $payment->user->lastSubscription();
+                $newSubscription = $payment->user->subscription;
                 $newSubscription->update(['started_at' => now()]);
 
                 // If coming from a trial plan, treat it as a new subscription

@@ -25,7 +25,7 @@ class TicketDetail extends Component
 
         // Add subscription data
         $user = $ticket->user;
-        $subscription = $user->lastSubscription();
+        $subscription = $user->subscription;
 
         if ($subscription) {
             $subscription->started_at = $subscription->started_at->toDateTimeString();

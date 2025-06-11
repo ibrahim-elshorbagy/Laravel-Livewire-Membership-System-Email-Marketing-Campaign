@@ -349,7 +349,7 @@ class EmailGatewayController extends Controller
 
 
             // Validate subscription ----------------------------------------------------------------------------
-            $subscription = $user->lastSubscription();
+            $subscription = $user->subscription;
             if (!$subscription) {
 
                 try{

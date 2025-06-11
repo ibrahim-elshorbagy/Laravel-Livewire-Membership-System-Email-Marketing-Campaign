@@ -15,7 +15,7 @@ class TicketDetail extends Component
 
     public function mount(SupportTicket $ticket)
     {
-        if ($ticket->user_id !== auth()->id()) {
+        if ((int)$ticket->user_id !== (int)auth()->id()) {
             abort(403);
         }
         $this->ticket = $ticket;

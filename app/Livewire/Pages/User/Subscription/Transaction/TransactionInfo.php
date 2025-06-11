@@ -213,12 +213,12 @@ class TransactionInfo extends Component
 
     public function calculateDates()
     {
-        if (auth()->user()->lastSubscription()) {
-            $startDate = Carbon::parse(auth()->user()->lastSubscription()->started_at);
-            $endDate = Carbon::parse(auth()->user()->lastSubscription()->expired_at);
+        if (auth()->user()->subscription) {
+            $startDate = Carbon::parse(auth()->user()->subscription->started_at);
+            $endDate = Carbon::parse(auth()->user()->subscription->expired_at);
             $this->calculatedDates = $this->calculateSubscriptionDates(
                 $this->plan,
-                auth()->user()->lastSubscription()->plan,
+                auth()->user()->subscription->plan,
                 $startDate,
                 $endDate,
                 $this->payment->amount

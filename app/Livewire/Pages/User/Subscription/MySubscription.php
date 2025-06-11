@@ -28,7 +28,7 @@ class MySubscription extends Component
     {
         $this->user = auth()->user();
         $time_zone = auth()->user()->timezone ?? SiteSetting::getValue('APP_TIMEZONE');
-        $this->subscription = $this->user->lastSubscription();
+        $this->subscription = $this->user->subscription;
 
         if ($this->subscription) {
             $this->subscription->started_at = $this->subscription->started_at->timezone($time_zone)->toDateTimeString();

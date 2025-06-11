@@ -38,7 +38,7 @@ class WelcomeSection extends Component
         $user = auth()->user();
         $time_zone = $user->timezone ?? SiteSetting::getValue('APP_TIMEZONE');
 
-        $subscription = $user->lastSubscription();
+        $subscription = $user->subscription;
 
         $showWarning = Payment::where('user_id', $user->id)
             ->where('status','pending')

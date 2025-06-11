@@ -81,7 +81,7 @@ class Subscribe extends Component
         $user = auth()->user();
 
         // Check if user has an active subscription
-        if ($user && $user->lastSubscription() && $user->lastSubscription()->plan->id != 1) {
+        if ($user && $user->subscription && $user->subscription->plan->id != 1) {
             // Log::info('Showing confirmation dialog');
 
             // Show confirmation dialog with correct event handling
@@ -173,8 +173,8 @@ class Subscribe extends Component
     public function getCurrentPlanId()
     {
         $user = auth()->user();
-        if ($user && $user->lastSubscription()) {
-            return $user->lastSubscription()->plan_id;
+        if ($user && $user->subscription) {
+            return $user->subscription->plan_id;
         }
         return null;
     }
@@ -182,8 +182,8 @@ class Subscribe extends Component
     public function getCurrentPlanPrice()
     {
         $user = auth()->user();
-        if ($user && $user->lastSubscription()) {
-            return $user->lastSubscription()->plan->price;
+        if ($user && $user->subscription) {
+            return $user->subscription->plan->price;
         }
         return null;
     }

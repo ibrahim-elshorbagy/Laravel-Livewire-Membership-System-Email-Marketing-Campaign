@@ -13,7 +13,7 @@ trait PlanPriceCalculator
     protected function calculateUpgradeCost($newPlan)
     {
         $user = auth()->user();
-        $currentSubscription = $user->lastSubscription();
+        $currentSubscription = $user->subscription;
         $newPlan = Plan::findOrFail($newPlan);
 
         if($newPlan && $user)

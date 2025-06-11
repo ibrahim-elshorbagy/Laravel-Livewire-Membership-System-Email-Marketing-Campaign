@@ -97,7 +97,7 @@ class Edit extends Component
             $this->user->syncRoles([$this->selectedRole]);
 
             // If changing to user role and user has no active subscription
-            if ($this->selectedRole === 'user' && !$this->user->lastSubscription()) {
+            if ($this->selectedRole === 'user' && !$this->user->subscription) {
                 $trialPlan = Plan::find(1);
                 if ($trialPlan) {
                     $this->user->graceSubscribeTo($trialPlan);

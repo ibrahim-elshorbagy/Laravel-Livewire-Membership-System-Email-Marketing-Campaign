@@ -325,7 +325,7 @@
             </div>
 
             <div class="flex justify-end mt-6 space-x-3">
-                <x-secondary-button x-on:click="$dispatch('close')">
+                <x-secondary-button x-on:click="$dispatch('close-modal', 'edit-subscription')">
                     Cancel
                 </x-secondary-button>
 
@@ -368,7 +368,7 @@
             </div>
 
             <div class="flex justify-end mt-6 space-x-3">
-                <x-secondary-button x-on:click="$dispatch('close')">
+                <x-secondary-button x-on:click="$dispatch('close-modal', 'edit-payment')">
                     Cancel
                 </x-secondary-button>
 
@@ -444,7 +444,7 @@
             </div>
 
             <div class="flex justify-end mt-6 space-x-3">
-                <x-secondary-button x-on:click="$dispatch('close')">
+                <x-secondary-button x-on:click="$dispatch('close-modal', 'edit-plan')">
                     Cancel
                 </x-secondary-button>
 

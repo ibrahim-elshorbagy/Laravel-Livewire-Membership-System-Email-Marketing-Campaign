@@ -98,7 +98,7 @@ class EditSubscription extends Component
             $subscriber->switchTo($newPlan);
 
             // Get the new subscription
-            $newSubscription = $subscriber->lastSubscription();
+            $newSubscription = $subscriber->subscription;
 
             // Update the payment record with the new subscription ID
             if ($this->payment) {

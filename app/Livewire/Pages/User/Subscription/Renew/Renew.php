@@ -33,7 +33,7 @@ class Renew extends Component
         $user = auth()->user();
 
         // Check if user has an active subscription
-        if ($user && $user->lastSubscription() && $user->lastSubscription()->plan->id != 1) {
+        if ($user && $user->subscription && $user->subscription->plan->id != 1) {
             // Log::info('Showing confirmation dialog');
 
             // Show confirmation dialog with correct event handling
@@ -68,7 +68,7 @@ class Renew extends Component
     // New method to handle confirmation
     public function handleConfirmed()
     {
-        $selectedPlan = auth()->user()->lastSubscription()->plan_id;
+        $selectedPlan = auth()->user()->subscription->plan_id;
         $this->dispatch('payment-method',$selectedPlan);
     }
 
@@ -89,7 +89,7 @@ class Renew extends Component
             DB::beginTransaction();
 
             $user = auth()->user();
-            $plan_id = $user->lastSubscription()->plan_id;
+            $plan_id = $user->subscription->plan_id;
 
             $plan = Plan::findOrFail($plan_id);
 
