@@ -1,13 +1,13 @@
 <div
-    class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+    class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
 
     <!-- Subscription Plans -->
     <div x-data="{ selectedTab: @entangle('selectedTab') }" class="w-full">
         <!-- Note about downgrading -->
         @auth
         <div
-            class="p-4 my-4 text-yellow-800 bg-yellow-50 rounded-lg border border-yellow-200 dark:bg-yellow-900/10 dark:border-yellow-300/10 dark:text-yellow-300">
-            <div class="flex gap-2 items-center">
+            class="p-4 my-4 text-yellow-800 border border-yellow-200 rounded-lg bg-yellow-50 dark:bg-yellow-900/10 dark:border-yellow-300/10 dark:text-yellow-300">
+            <div class="flex items-center gap-2">
                 <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                     <path fill-rule="evenodd"
                         d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
@@ -22,7 +22,7 @@
         @endauth
 
         <!-- Tab Navigation -->
-        <div class="flex overflow-x-auto gap-2 mb-6 border-b border-neutral-300 dark:border-neutral-700" role="tablist">
+        <div class="flex gap-2 mb-6 overflow-x-auto border-b border-neutral-300 dark:border-neutral-700" role="tablist">
             <button x-on:click="selectedTab = 'monthly'"
                 x-bind:class="selectedTab === 'monthly' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600 dark:text-neutral-400'"
                 class="px-4 py-2 text-sm h-min" role="tab">
@@ -39,7 +39,7 @@
         <div x-show="selectedTab === 'monthly'" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             @foreach($monthlyPlans as $plan)
             <article
-                class="flex overflow-hidden flex-col p-3 w-full rounded-lg md:p-6 group bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
+                class="flex flex-col w-full p-3 overflow-hidden rounded-lg md:p-6 group bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
                 {{-- @if($loop->first)
                 <span
                     class="px-2 py-1 ml-auto text-xs font-medium bg-black rounded-lg w-fit text-neutral-100 dark:bg-orange-500 dark:text-black">
@@ -72,9 +72,9 @@
                 @auth
                 <button type="button" @if($currentPlanId===$plan->id || ($currentPlanId && $plan->price <
                         $currentPlanPrice)) disabled
-                        class="px-4 py-2 mt-12 w-full text-xs font-medium tracking-wide text-center text-white whitespace-nowrap rounded-lg transition cursor-not-allowed md:text-sm bg-neutral-400"
+                        class="w-full px-4 py-2 mt-12 text-xs font-medium tracking-wide text-center text-white transition rounded-lg cursor-not-allowed whitespace-nowrap md:text-sm bg-neutral-400"
                         @else wire:click="$set('selectedPlan', {{ $plan->id }})" wire:loading.attr="disabled" @class([ 'mt-12 w-full whitespace-nowrap px-4 py-2 text-center text-sm font-medium tracking-wide transition
-                    rounded-lg' , 'bg-black text-neutral-100 dark:bg-orange-500 dark:text-black'=> $selectedPlan !==
+                    rounded-lg' , 'bg-black text-neutral-100 dark:bg-orange-500 dark:text-black'=> $selectedPlan !=
                         $plan->id,
                         'bg-green-500 text-white' => $selectedPlan === $plan->id,
                         ])
@@ -94,7 +94,7 @@
         <div x-cloak x-show="selectedTab === 'yearly'" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             @foreach($yearlyPlans as $plan)
             <article
-                class="flex overflow-hidden flex-col p-3 w-full rounded-lg md:p-6 group bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
+                class="flex flex-col w-full p-3 overflow-hidden rounded-lg md:p-6 group bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
                 {{-- @if($loop->first)
                 <span
                     class="px-2 py-1 ml-auto text-xs font-medium bg-black rounded-lg w-fit text-neutral-100 dark:bg-orange-500 dark:text-black">
@@ -128,9 +128,9 @@
                 @auth
                 <button type="button" @if($currentPlanId===$plan->id || ($currentPlanId && $plan->price <
                         $currentPlanPrice)) disabled
-                        class="px-4 py-2 mt-12 w-full text-xs font-medium tracking-wide text-center text-white whitespace-nowrap rounded-lg transition cursor-not-allowed md:text-sm bg-neutral-400"
+                        class="w-full px-4 py-2 mt-12 text-xs font-medium tracking-wide text-center text-white transition rounded-lg cursor-not-allowed whitespace-nowrap md:text-sm bg-neutral-400"
                         @else wire:click="$set('selectedPlan', {{ $plan->id }})" wire:loading.attr="disabled" @class([ 'mt-12 w-full whitespace-nowrap px-4 py-2 text-center text-sm font-medium tracking-wide transition
-                    rounded-lg' , 'bg-black text-neutral-100 dark:bg-orange-500 dark:text-black'=> $selectedPlan !==
+                    rounded-lg' , 'bg-black text-neutral-100 dark:bg-orange-500 dark:text-black'=> $selectedPlan !=
                         $plan->id,
                         'bg-green-500 text-white' => $selectedPlan === $plan->id,
                         ])
@@ -150,11 +150,11 @@
     <!-- Payment Button -->
     @auth
     @if($selectedPlan)
-    <div class="flex flex-col gap-4 items-center mt-8">
+    <div class="flex flex-col items-center gap-4 mt-8">
         @isset($upgradeCalculation)
-        @if($upgradeCalculation['title']=="Upgrade" && $currentPlanId !== 1)
+        @if($upgradeCalculation['title']=="Upgrade" && $currentPlanId != 1)
         <div
-            class="p-4 w-full max-w-md text-sm rounded-lg bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
+            class="w-full max-w-md p-4 text-sm rounded-lg bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
             <p class="mb-4 text-sm text-neutral-600 dark:text-neutral-400">
                 When upgrading to a higher plan, the cost is based on the difference between the new plan's price and
                 what you've
@@ -181,7 +181,7 @@
         <button wire:click="initiatePayment" wire:loading.attr="disabled"
             class="inline-flex justify-center items-center px-8 py-3 min-w-[200px] max-w-xs text-sm font-semibold text-white bg-black rounded-lg transition hover:bg-black/80 dark:bg-orange-500 dark:text-black dark:hover:bg-orange-600">
             <span wire:loading.remove>
-                @if($upgradeCalculation && $currentPlanId !== 1)
+                @if($upgradeCalculation && $currentPlanId != 1)
                 @if($upgradeCalculation['title'] === 'Upgrade')
                 Pay ${{ $upgradeCalculation['upgrade_cost'] }} to Upgrade Plan
                 @else

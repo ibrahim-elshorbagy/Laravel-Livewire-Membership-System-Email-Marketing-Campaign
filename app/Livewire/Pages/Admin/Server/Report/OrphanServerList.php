@@ -209,12 +209,12 @@ class OrphanServerList extends Component
             $server = Server::findOrFail($serverId);
             $previousUserId = $server->assigned_to_user_id;
 
-            if ($previousUserId !== $userId) {
+            if ($previousUserId != $userId) {
                 $query = Campaign::whereHas('servers', function($query) use ($serverId) {
                     $query->where('server_id', $serverId);
                 });
 
-                if ($userId !== null) {
+                if ($userId != null) {
                     $query->where('user_id', $previousUserId);
                 }
 

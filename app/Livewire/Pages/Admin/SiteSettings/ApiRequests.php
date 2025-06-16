@@ -101,14 +101,14 @@ class ApiRequests extends Component
                           ->orWhere('username', 'like', '%' . $this->userSearch . '%');
                     });
                 });
-            })->when($this->status !== 'all', function ($query) {
+            })->when($this->status != 'all', function ($query) {
                 $query->where('status', $this->status);
             })
             ->when($this->sortField === 'error_number', function ($query) {
                 $query->orderByRaw("CAST(JSON_EXTRACT(error_data, '$.error_number') AS SIGNED) {$this->sortDirection}");
             })
 
-            ->when($this->sortField !== 'error_number', function ($query) {
+            ->when($this->sortField != 'error_number', function ($query) {
                 $query->orderBy($this->sortField, $this->sortDirection);
             })
             ->paginate($this->perPage);
@@ -148,7 +148,7 @@ class ApiRequests extends Component
     {
         $query = ApiRequest::query();
 
-        if ($this->status !== 'all') {
+        if ($this->status != 'all') {
             $query->where('status', $this->status);
         }
 

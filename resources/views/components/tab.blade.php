@@ -6,7 +6,7 @@
     class="flex items-center px-4 py-2 rounded-lg transition-all text-md group text-nowrap hover:bg-neutral-100 dark:hover:bg-neutral-800"
     :class="{
         'bg-neutral-100 dark:bg-neutral-800 border-b-2 border-neutral-600 dark:border-orange-500': selectedTab === '{{ $name }}',
-        'bg-neutral-50 dark:bg-neutral-900': selectedTab !== '{{ $name }}'
+        'bg-neutral-50 dark:bg-neutral-900': selectedTab != '{{ $name }}'
     }">
     <button type="button" x-on:click="selectTab('{{ $name }}')" :aria-selected="selectedTab === '{{ $name }}'"
         :tabindex="selectedTab === '{{ $name }}' ? '0' : '-1'"

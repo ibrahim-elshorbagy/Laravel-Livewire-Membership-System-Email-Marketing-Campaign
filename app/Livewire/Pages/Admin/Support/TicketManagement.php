@@ -58,7 +58,7 @@ class TicketManagement extends Component
     public function getTicketsProperty()
     {
         return SupportTicket::with(['user'])
-            ->when($this->selectedTab !== 'all', fn($query) => $query->where('status', $this->selectedTab))
+            ->when($this->selectedTab != 'all', fn($query) => $query->where('status', $this->selectedTab))
             ->when($this->search, function ($query) {
                 $query->where(function($q) {
                     $q->where('subject', 'like', '%' . $this->search . '%')

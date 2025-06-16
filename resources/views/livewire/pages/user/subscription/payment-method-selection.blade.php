@@ -16,7 +16,7 @@
                 <label x-bind:class="{
                         'relative flex p-4 cursor-pointer rounded-lg border hover:border-black dark:hover:border-orange-500': true,
                         'border-black dark:border-orange-500': $wire.selectedMethod === 'paypal',
-                        'border-neutral-200 dark:border-neutral-700': $wire.selectedMethod !== 'paypal'
+                        'border-neutral-200 dark:border-neutral-700': $wire.selectedMethod != 'paypal'
                     }">
                     <div class="flex justify-between items-center w-full">
                         <div class="flex items-center">
@@ -35,7 +35,7 @@
                         <div class="ml-4">
                             <div x-bind:class="{
                                 'text-black dark:text-orange-500': $wire.selectedMethod === 'paypal',
-                                'text-neutral-400': $wire.selectedMethod !== 'paypal'
+                                'text-neutral-400': $wire.selectedMethod != 'paypal'
                             }">
                                 <i class="w-5 h-5 fa-solid fa-circle-check"></i>
                             </div>
@@ -48,7 +48,7 @@
                 <label x-bind:class="{
                         'relative flex p-4 cursor-pointer rounded-lg border hover:border-black dark:hover:border-orange-500': true,
                         'border-black dark:border-orange-500': $wire.selectedMethod === '{{ $method->slug }}',
-                        'border-neutral-200 dark:border-neutral-700': $wire.selectedMethod !== '{{ $method->slug }}'
+                        'border-neutral-200 dark:border-neutral-700': $wire.selectedMethod != '{{ $method->slug }}'
                     }">
                     <div class="flex justify-between items-center w-full">
                         <div class="flex items-center">
@@ -76,7 +76,7 @@
                         <div class="ml-4">
                             <div x-bind:class="{
                                 'text-black dark:text-orange-500': $wire.selectedMethod === '{{ $method->slug }}',
-                                'text-neutral-400': $wire.selectedMethod !== '{{ $method->slug }}'
+                                'text-neutral-400': $wire.selectedMethod != '{{ $method->slug }}'
                             }">
                                 <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd"

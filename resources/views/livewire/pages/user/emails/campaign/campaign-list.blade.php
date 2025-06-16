@@ -139,7 +139,7 @@
                             </span>
                             @endif
                             @if($campaign->servers->count() == 0)
-                            @if($campaign->status !== 'Completed')
+                            @if($campaign->status != 'Completed')
                             No servers selected, edit to add servers
                             @endif
                             @endif
@@ -160,7 +160,7 @@
                             </span>
                             @endif
                             @if($campaign->emailLists->count() == 0)
-                            @if($campaign->status !== 'Completed')
+                            @if($campaign->status != 'Completed')
                             No email lists selected, edit to add lists
                             @endif
                             @endif
@@ -260,7 +260,7 @@
                                             class="absolute top-full left-1/2 w-0 h-0 border-t-8 border-r-8 border-l-8 -translate-x-1/2 border-l-transparent border-r-transparent border-neutral-900">
                                         </div>
                                     </div>
-                                    @elseif($campaign->status !== 'Sending' && $campaign->status !== 'Completed')
+                                    @elseif($campaign->status != 'Sending' && $campaign->status != 'Completed')
                                     <!-- Tooltip for when campaign can be started -->
                                     <div x-show="showTooltip" x-cloak
                                         x-transition:enter="transition ease-out duration-200"

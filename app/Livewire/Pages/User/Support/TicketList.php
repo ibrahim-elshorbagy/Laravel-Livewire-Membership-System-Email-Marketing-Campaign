@@ -44,7 +44,7 @@ class TicketList extends Component
     public function getTicketsProperty()
     {
         return SupportTicket::where('user_id', Auth::id())
-            ->when($this->selectedTab !== 'all', fn($query) => $query->where('status', $this->selectedTab))
+            ->when($this->selectedTab != 'all', fn($query) => $query->where('status', $this->selectedTab))
             ->when($this->search, function ($query) {
                 $query->where(function($q) {
                     $q->where('subject', 'like', '%' . $this->search . '%');

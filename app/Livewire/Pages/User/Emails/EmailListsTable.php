@@ -539,7 +539,7 @@ class EmailListsTable extends Component
 
     public function selectList($listName)
     {
-        if ($this->selectedList !== $listName) {
+        if ($this->selectedList != $listName) {
             $this->selectedList = $listName;
             $this->resetPage();
             $this->resetSelections();

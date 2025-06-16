@@ -34,7 +34,7 @@ class JobProgressComponent extends Component
 
         $activeJobsExist = $this->checkActiveJobs();
         // If there's no change in job status, no need to dispatch anything
-        if ($activeJobsExist !== session('active_jobs_flag')) {
+        if ($activeJobsExist != session('active_jobs_flag')) {
             session(['active_jobs_flag' => $activeJobsExist]);
             // Tell the parent if anything changed
             $this->dispatch('jobStatusUpdated', $activeJobsExist);

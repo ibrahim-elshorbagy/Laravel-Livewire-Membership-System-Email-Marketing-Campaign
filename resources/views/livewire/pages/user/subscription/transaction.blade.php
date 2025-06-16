@@ -11,27 +11,27 @@
         <!-- Tab buttons -->
         <div class="flex overflow-x-auto gap-2 mb-5 border-b border-neutral-300 dark:border-neutral-700" role="tablist">
             <button wire:click="$set('selectedTab', 'all')"
-                :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'all', 'text-neutral-600 dark:text-neutral-400': selectedTab !== 'all'}"
+                :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'all', 'text-neutral-600 dark:text-neutral-400': selectedTab != 'all'}"
                 class="px-4 py-2 text-sm h-min" role="tab">All Transactions</button>
 
             <button wire:click="$set('selectedTab', 'approved')"
-                :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'approved', 'text-neutral-600 dark:text-neutral-400': selectedTab !== 'approved'}"
+                :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'approved', 'text-neutral-600 dark:text-neutral-400': selectedTab != 'approved'}"
                 class="px-4 py-2 text-sm h-min" role="tab">approved</button>
 
             <button wire:click="$set('selectedTab', 'pending')"
-                :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'pending', 'text-neutral-600 dark:text-neutral-400': selectedTab !== 'pending'}"
+                :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'pending', 'text-neutral-600 dark:text-neutral-400': selectedTab != 'pending'}"
                 class="px-4 py-2 text-sm h-min" role="tab">Pending</button>
 
             <button wire:click="$set('selectedTab', 'failed')"
-                :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'failed', 'text-neutral-600 dark:text-neutral-400': selectedTab !== 'failed'}"
+                :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'failed', 'text-neutral-600 dark:text-neutral-400': selectedTab != 'failed'}"
                 class="px-4 py-2 text-sm h-min" role="tab">Failed</button>
 
             <button wire:click="$set('selectedTab', 'cancelled')"
-                :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'cancelled', 'text-neutral-600 dark:text-neutral-400': selectedTab !== 'cancelled'}"
+                :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'cancelled', 'text-neutral-600 dark:text-neutral-400': selectedTab != 'cancelled'}"
                 class="px-4 py-2 text-sm h-min" role="tab">Cancelled</button>
-                
+
             <button wire:click="$set('selectedTab', 'refunded')"
-                :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'refunded', 'text-neutral-600 dark:text-neutral-400': selectedTab !== 'refunded'}"
+                :class="{'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500': selectedTab === 'refunded', 'text-neutral-600 dark:text-neutral-400': selectedTab != 'refunded'}"
                 class="px-4 py-2 text-sm h-min" role="tab">Refunded</button>
         </div>
 

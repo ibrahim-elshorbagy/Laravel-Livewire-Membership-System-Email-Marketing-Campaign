@@ -93,7 +93,7 @@ class Edit extends Component
         $this->user->update($data);
 
         // Update role if changed
-        if ($oldRole !== $this->selectedRole) {
+        if ($oldRole != $this->selectedRole) {
             $this->user->syncRoles([$this->selectedRole]);
 
             // If changing to user role and user has no active subscription

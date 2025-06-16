@@ -35,7 +35,7 @@ class AdminSubscriptionReactiveNotification extends Notification implements Shou
             ->line('Subscription Details:')
             ->line('Plan: ' . $this->subscription->plan->name)
             ->line('Reactivation Date: ' . now()->format('F j, Y'))
-            ->when($this->subscription->plan->id !== 1, function (MailMessage $mailMessage) {
+            ->when($this->subscription->plan->id != 1, function (MailMessage $mailMessage) {
                 return $mailMessage->line('Your access is now restored and will continue until: ' . $this->subscription->expired_at->format('F j, Y'));
             })
             ->line('Enjoy all the features of your plan!')

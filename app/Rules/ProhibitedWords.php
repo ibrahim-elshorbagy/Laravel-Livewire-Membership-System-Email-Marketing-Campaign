@@ -24,7 +24,7 @@ class ProhibitedWords implements ValidationRule
         $foundWords = [];
 
         foreach ($prohibitedWords as $word) {
-            if (stripos($value, $word) !== false) {
+            if (stripos($value, $word) != false) {
                 $foundWords[] = $word;
             }
         }

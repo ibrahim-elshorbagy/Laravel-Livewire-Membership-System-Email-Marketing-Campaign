@@ -46,13 +46,13 @@
                         <div class="flex items-center space-x-4">
                             <button type="button"
                                 @click="$wire.set('activeEditor', 'advanced'); $dispatch('editor-changed', { editor: 'advanced' })"
-                                :class="{'bg-blue-500 text-white': activeEditor === 'advanced', 'bg-gray-200 dark:bg-neutral-700': activeEditor !== 'advanced'}"
+                                :class="{'bg-blue-500 text-white': activeEditor === 'advanced', 'bg-gray-200 dark:bg-neutral-700': activeEditor != 'advanced'}"
                                 class="px-4 py-2 rounded-md transition-colors">
                                 Advanced Editor
                             </button>
                             <button type="button"
                                 @click="$wire.set('activeEditor', 'code'); $dispatch('editor-changed', { editor: 'code' })"
-                                :class="{'bg-blue-500 text-white': activeEditor === 'code', 'bg-gray-200 dark:bg-neutral-700': activeEditor !== 'code'}"
+                                :class="{'bg-blue-500 text-white': activeEditor === 'code', 'bg-gray-200 dark:bg-neutral-700': activeEditor != 'code'}"
                                 class="px-4 py-2 rounded-md transition-colors">
                                 Code Editor
                             </button>

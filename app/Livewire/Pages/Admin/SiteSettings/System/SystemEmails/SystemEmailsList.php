@@ -154,7 +154,7 @@ class SystemEmailsList extends Component
     {
         $query = SystemEmail::query();
 
-        if ($this->selectedList !== 'all') {
+        if ($this->selectedList != 'all') {
             $list = SystemEmailList::where('name', $this->selectedList)->first();
             if ($list) {
                 $query->where('list_id', $list->id);

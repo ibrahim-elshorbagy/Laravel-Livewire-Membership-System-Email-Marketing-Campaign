@@ -99,7 +99,7 @@
                         class="px-3 py-1 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600">
                         Assign to List
                     </button>
-                    @if($selectedList !== 'all')
+                    @if($selectedList != 'all')
                     <button wire:click="removeFromList"
                         wire:confirm="Are you sure you want to remove selected templates from this list?"
                         class="px-3 py-1 text-sm text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">

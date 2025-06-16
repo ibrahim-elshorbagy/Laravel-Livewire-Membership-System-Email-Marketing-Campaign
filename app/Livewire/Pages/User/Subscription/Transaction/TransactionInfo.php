@@ -55,7 +55,7 @@ class TransactionInfo extends Component
 
     public function mount(Payment $payment)
     {
-        if ($payment->user_id !== auth()->id()) {
+        if ((int)$payment->user_id != auth()->id()) {
             abort(403);
         }
 
@@ -84,7 +84,7 @@ class TransactionInfo extends Component
             ]);
         }
 
-        if ($payment->gateway !== 'paypal') {
+        if ($payment->gateway != 'paypal') {
             $offlineMethod = OfflinePaymentMethod::where('slug', $payment->gateway)->first();
             $this->showFileSection = $offlineMethod ? $offlineMethod->receipt_image : false;
         }

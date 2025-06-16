@@ -88,7 +88,7 @@ class ProcessEmailFile implements ShouldQueue
         $batch = [];
         $processedCount = 0;
 
-        while (($line = fgets($handle)) !== false) {
+        while (($line = fgets($handle)) != false) {
             $emails = $this->extractEmailsFromLine(trim($line));
 
             foreach ($emails as $email) {

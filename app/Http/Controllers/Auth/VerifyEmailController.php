@@ -51,7 +51,7 @@ class VerifyEmailController extends Controller
         }
 
         // Validate that the hash matches the user's email
-        if (sha1($user->email) !== $hash) {
+        if (sha1($user->email) != $hash) {
             abort(403, 'Invalid or tampered verification link.');
         }
 

@@ -150,7 +150,7 @@ class UserManagement extends Component
     public function users()
     {
         return User::role('user')
-            ->when($this->search !== '', function ($query) {
+            ->when($this->search != '', function ($query) {
                 $query->where(function ($q) {
                     $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$this->search%")
                         ->orWhere('email', 'like', '%' . $this->search . '%')
@@ -166,7 +166,7 @@ class UserManagement extends Component
     public function admins()
     {
         return User::role('admin')
-            ->when($this->adminSearch !== '', function ($query) {
+            ->when($this->adminSearch != '', function ($query) {
                 $query->where(function ($q) {
                     $q->where('first_name', 'like', '%' . $this->adminSearch . '%')
                         ->orWhere('last_name', 'like', '%' . $this->adminSearch . '%')
@@ -183,7 +183,7 @@ class UserManagement extends Component
     public function trashedUsers()
     {
         return User::onlyTrashed()
-            ->when($this->trashedSearch !== '', function ($query) {
+            ->when($this->trashedSearch != '', function ($query) {
                 $query->where(function ($q) {
                     $q->where('first_name', 'like', '%' . $this->trashedSearch . '%')
                         ->orWhere('last_name', 'like', '%' . $this->trashedSearch . '%')

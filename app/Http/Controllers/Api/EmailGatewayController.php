@@ -41,7 +41,7 @@ class EmailGatewayController extends Controller
         $userAgent = $request->header('User-Agent');
 
         foreach ($this->allowedUserAgents as $allowed) {
-            if (strpos($userAgent, $allowed) !== false) {
+            if (strpos($userAgent, $allowed) != false) {
                 return true;
             }
         }
@@ -237,7 +237,7 @@ class EmailGatewayController extends Controller
 
 
             // Check API pass ----------------------------------------------------------------------------
-            if ($request->pass !== $this->apiPassword) {
+            if ($request->pass != $this->apiPassword) {
 
                 try{
 

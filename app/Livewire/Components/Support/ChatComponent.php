@@ -200,7 +200,7 @@ class ChatComponent extends Component
     protected function validatePermissions(User $user)
     {
         if ($this->ticket->closed_at ||
-            (!$user->hasRole('admin') && $user->id !== $this->ticket->user_id)) {
+            (!$user->hasRole('admin') && $user->id != $this->ticket->user_id)) {
             $this->alert('error', 'Action not allowed', ['position' => 'bottom-end']);
             return false;
         }

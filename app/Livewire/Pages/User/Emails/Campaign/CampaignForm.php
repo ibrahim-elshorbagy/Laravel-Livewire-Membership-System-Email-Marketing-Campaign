@@ -47,7 +47,7 @@ class CampaignForm extends Component
             $this->campaign_id = $campaign;
             $campaignModel = Campaign::with(['servers', 'emailLists'])->findOrFail($campaign);
 
-            if ($campaignModel->user_id !== Auth::id() || $campaignModel->status === 'Completed') {
+            if ($campaignModel->user_id != Auth::id() || $campaignModel->status === 'Completed') {
                 return redirect()->route('user.campaigns.list');
             }
 

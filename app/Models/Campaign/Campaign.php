@@ -40,13 +40,13 @@ class Campaign extends Model
 
     public function canBeModified()
     {
-        return $this->status !== self::STATUS_COMPLETED;
+        return $this->status != self::STATUS_COMPLETED;
     }
 
     // Update canBeActive method
     public function canBeActive()
     {
-        return $this->status !== self::STATUS_COMPLETED &&
+        return $this->status != self::STATUS_COMPLETED &&
             $this->servers()->count() > 0 &&
             $this->emailLists()->count() > 0;
     }

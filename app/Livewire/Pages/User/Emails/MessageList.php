@@ -82,7 +82,7 @@ class MessageList extends Component
         try {
             $message = EmailMessage::findOrFail($this->templateId);
 
-            if ($message->user_id !== Auth::id()) {
+            if ($message->user_id != Auth::id()) {
                 throw new \Exception('Unauthorized access to template.');
             }
 
@@ -113,7 +113,7 @@ class MessageList extends Component
         try {
             $message = EmailMessage::findOrFail($this->templateId);
 
-            if ($message->user_id !== Auth::id()) {
+            if ($message->user_id != Auth::id()) {
                 throw new \Exception('Unauthorized access to template.');
             }
 

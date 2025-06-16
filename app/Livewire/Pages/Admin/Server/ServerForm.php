@@ -92,7 +92,7 @@ class ServerForm extends Component
                 $server = Server::findOrFail($this->server_id);
 
                 // If user assignment has changed
-                if ($this->previous_user_id !== $validatedData['assigned_to_user_id']) {
+                if ($this->previous_user_id != $validatedData['assigned_to_user_id']) {
                     // Base query to get campaigns using this server
                     $query = Campaign::whereHas('servers', function($query) {
                         $query->where('server_id', $this->server_id);
@@ -100,7 +100,7 @@ class ServerForm extends Component
 
                     // If setting to null, get all active campaigns
                     // If reassigning to another user, get only previous user's campaigns
-                    if ($validatedData['assigned_to_user_id'] !== null) {
+                    if ($validatedData['assigned_to_user_id'] != null) {
                         $query->where('user_id', $this->previous_user_id);
                     }
 
@@ -148,7 +148,7 @@ class ServerForm extends Component
     public function updatedAssignedToUserId($value)
     {
         // If this is an edit and the user is being changed
-        if ($this->server_id && $this->previous_user_id !== $value) {
+        if ($this->server_id && $this->previous_user_id != $value) {
             // Base query to get count of campaigns using this server
             $query = Campaign::whereHas('servers', function($query) {
                 $query->where('server_id', $this->server_id);
@@ -156,7 +156,7 @@ class ServerForm extends Component
 
             // If setting to null, count all active campaigns
             // If reassigning to another user, count only previous user's campaigns
-            if ($value !== null) {
+            if ($value != null) {
                 $query->where('user_id', $this->previous_user_id);
             }
 

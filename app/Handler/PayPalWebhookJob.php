@@ -124,7 +124,7 @@ class PayPalWebhookJob extends ProcessWebhookJob
                 return;
             }
 
-            if (!isset($captureResponse['status']) || $captureResponse['status'] !== 'COMPLETED') {
+            if (!isset($captureResponse['status']) || $captureResponse['status'] != 'COMPLETED') {
                 PayPalLogger::error('Unexpected capture response status', [
                     'response' => $captureResponse,
                     'order_id' => $orderId,

@@ -128,7 +128,7 @@
                     this.parsedEmails[index].type = type;
                     const emailValue = this.parsedEmails[index].value;
                     const allEmailIndex = this.allEmails.findIndex(e => e.value === emailValue);
-                    if (allEmailIndex !== -1) {
+                    if (allEmailIndex != -1) {
                         this.allEmails[allEmailIndex].type = type;
                     }
                 }
