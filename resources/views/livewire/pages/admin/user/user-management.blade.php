@@ -13,6 +13,9 @@
             <button x-on:click="selectedTab = 'verified'"
                 :class="selectedTab === 'verified' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">Verified Users</button>
+            <button x-on:click="selectedTab = 'unverified'"
+                :class="selectedTab === 'unverified' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
+                class="px-4 py-2 text-sm h-min" role="tab">Unverified Users</button>
             <button x-on:click="selectedTab = 'trashed'"
                 :class="selectedTab === 'trashed' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">Deleted Users</button>
@@ -57,6 +60,18 @@
             </div>
         </div>
 
+    <!-- Verified Users Tab Content -->
+        <div x-show="selectedTab === 'unverified'">
+            <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
+                @include('livewire.pages.admin.user.partials.table', [
+                'items' => $this->unverifiedUsers,
+                'search' => 'unverifiedSearch',
+                'searchPlaceholder' => 'Search unverifiedSearch users...',
+                'showCreateButton' => true,
+                'isTrashed' => false
+                ])
+            </div>
+        </div>
         <!-- Trashed Users Tab Content -->
         <div x-show="selectedTab === 'trashed'">
             <div class="w-full overflow-hidden overflow-x-auto rounded-lg">

@@ -26,6 +26,7 @@ class UserManagement extends Component
     public $adminSearch = '';
     public $trashedSearch = ''; // New search for trashed users
     public $verifiedSearch = '';
+    public $unverifiedSearch = ''; // New search for unverified users
     public $perPage = 10;
     public $selectedTab = 'users';
 
@@ -37,6 +38,7 @@ class UserManagement extends Component
         'adminSearch' => ['except' => ''],
         'trashedSearch' => ['except' => ''],
         'verifiedSearch' => ['except' => ''],
+        'unverifiedSearch' => ['except' => ''],
         'selectedTab' => ['except' => 'users'],
     ];
 
@@ -56,6 +58,11 @@ class UserManagement extends Component
     }
 
     public function updatingVerifiedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingUnverifiedSearch()
     {
         $this->resetPage();
     }
@@ -175,8 +182,7 @@ class UserManagement extends Component
         return User::role('admin')
             ->when($this->adminSearch != '', function ($query) {
                 $query->where(function ($q) {
-                    $q->where('first_name', 'like', '%' . $this->adminSearch . '%')
-                        ->orWhere('last_name', 'like', '%' . $this->adminSearch . '%')
+                    $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$this->adminSearch%")
                         ->orWhere('email', 'like', '%' . $this->adminSearch . '%')
                         ->orWhere('username', 'like', '%' . $this->adminSearch . '%')
                         ->orWhere('company', 'like', '%' . $this->adminSearch . '%');
@@ -192,8 +198,8 @@ class UserManagement extends Component
         return User::onlyTrashed()
             ->when($this->trashedSearch != '', function ($query) {
                 $query->where(function ($q) {
-                    $q->where('first_name', 'like', '%' . $this->trashedSearch . '%')
-                        ->orWhere('last_name', 'like', '%' . $this->trashedSearch . '%')
+                        $q
+                        ->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$this->trashedSearch%")
                         ->orWhere('email', 'like', '%' . $this->trashedSearch . '%')
                         ->orWhere('username', 'like', '%' . $this->trashedSearch . '%')
                         ->orWhere('company', 'like', '%' . $this->trashedSearch . '%');
@@ -213,6 +219,22 @@ class UserManagement extends Component
                         ->orWhere('email', 'like', '%' . $this->verifiedSearch . '%')
                         ->orWhere('username', 'like', '%' . $this->verifiedSearch . '%')
                         ->orWhere('company', 'like', '%' . $this->verifiedSearch . '%');
+                });
+            })
+            ->latest()
+            ->paginate($this->perPage);
+    }
+
+    #[Computed]
+    public function unverifiedUsers()
+    {
+        return User::whereNull('email_verified_at')
+            ->when($this->unverifiedSearch != '', function ($query) {
+                $query->where(function ($q) {
+                    $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$this->unverifiedSearch%")
+                        ->orWhere('email', 'like', '%' . $this->unverifiedSearch . '%')
+                        ->orWhere('username', 'like', '%' . $this->unverifiedSearch . '%')
+                        ->orWhere('company', 'like', '%' . $this->unverifiedSearch . '%');
                 });
             })
             ->latest()
