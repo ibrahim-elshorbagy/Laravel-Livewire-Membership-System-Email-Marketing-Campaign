@@ -154,8 +154,13 @@
             </svg>
             <span class="font-medium">Pending Transaction Alert!</span>
         </div>
+        @role('admin')
+        <p class="mt-2 text-sm">There are pending transactions awaiting your approval. Please check the transactions page to review and process these payments.</p>
+        @endrole
+        @role('user')
         <p class="mt-2 text-sm">There is a pending transaction awaiting admin approval. Please ensure you attach a photo/Pdf of
             the payment/transfer notification and the transfer number to the transactions page.</p>
+        @endrole
     </div>
     @endif
 

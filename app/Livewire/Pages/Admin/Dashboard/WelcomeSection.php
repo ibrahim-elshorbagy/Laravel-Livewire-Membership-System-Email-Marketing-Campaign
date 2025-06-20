@@ -40,10 +40,21 @@ class WelcomeSection extends Component
 
         $subscription = $user->subscription;
 
-        $showWarning = Payment::where('user_id', $user->id)
-            ->where('status','pending')
-            ->latest()
-            ->first();
+        // For regular users, check their own pending payments
+        if ($user->hasRole('user')) {
+            $showWarning = Payment::where('user_id', $user->id)
+                ->where('status', 'pending')
+                ->latest()
+                ->first();
+        } 
+        // For admins, check if there are any pending payments from any user
+        else if ($user->hasRole('admin')) {
+            $showWarning = Payment::where('status', 'pending')
+                ->latest()
+                ->first();
+        } else {
+            $showWarning = null;
+        }
 
         $subscriptionData = null;
         if ($subscription) {
