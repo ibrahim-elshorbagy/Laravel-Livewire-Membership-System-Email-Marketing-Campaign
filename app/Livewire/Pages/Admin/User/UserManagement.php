@@ -212,7 +212,7 @@ class UserManagement extends Component
     #[Computed]
     public function verifiedUsers()
     {
-        return User::whereNotNull('email_verified_at')
+        return User::role('user')->whereNotNull('email_verified_at')
             ->when($this->verifiedSearch != '', function ($query) {
                 $query->where(function ($q) {
                     $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$this->verifiedSearch%")
@@ -228,7 +228,7 @@ class UserManagement extends Component
     #[Computed]
     public function unverifiedUsers()
     {
-        return User::whereNull('email_verified_at')
+        return User::role('user')->whereNull('email_verified_at')
             ->when($this->unverifiedSearch != '', function ($query) {
                 $query->where(function ($q) {
                     $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$this->unverifiedSearch%")

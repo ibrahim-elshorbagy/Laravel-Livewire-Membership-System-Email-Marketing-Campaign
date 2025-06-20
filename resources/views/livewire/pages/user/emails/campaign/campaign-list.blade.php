@@ -1,6 +1,6 @@
 <div
-    class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
-    <header class="flex flex-col justify-between items-center mb-6 md:flex-row">
+    class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+    <header class="flex flex-col items-center justify-between mb-6 md:flex-row">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
             My Campaigns
         </h2>
@@ -26,8 +26,8 @@
     @endphp
     @if(!$unusedServers->isEmpty())
     <div
-        class="p-4 mb-4 text-blue-800 bg-blue-50 rounded-lg border border-blue-200 dark:bg-blue-900/10 dark:border-blue-300/10 dark:text-blue-300">
-        <div class="flex gap-2 items-center">
+        class="p-4 mb-4 text-blue-800 border border-blue-200 rounded-lg bg-blue-50 dark:bg-blue-900/10 dark:border-blue-300/10 dark:text-blue-300">
+        <div class="flex items-center gap-2">
             <svg class="size-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                 <path fill-rule="evenodd"
                     d="M12 1.5c-1.921 0-3.816.111-5.68.327-1.497.174-2.57 1.46-2.57 2.93V21.75a.75.75 0 001.029.696l3.471-1.388 3.472 1.388a.75.75 0 00.556 0l3.472-1.388 3.471 1.388a.75.75 0 001.029-.696V4.757c0-1.47-1.073-2.756-2.57-2.93A49.255 49.255 0 0012 1.5zm3.53 7.28a.75.75 0 00-1.06-1.06l-2.47 2.47-.97-.97a.75.75 0 00-1.06 1.06l1.5 1.5a.75.75 0 001.06 0l3-3z"
@@ -48,7 +48,7 @@
                 @if($remainingCount > 0)
                 <div class="flex items-center p-2 space-x-2 rounded-lg bg-blue-100/50 dark:bg-blue-900/50">
                     <i class="fas fa-ellipsis-h"></i>
-                    <span>+{{ $remainingCount }} more</span>
+                    <a href="{{ route('user.servers') }}" wire:navigate>+{{ $remainingCount }} more</span>
                 </div>
                 @endif
             </div>
@@ -60,8 +60,8 @@
         <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
             <div class="relative flex-1">
                 <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search campaigns..."
-                    class="pl-10 w-full" />
-                <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                    class="w-full pl-10" />
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </div>
             </div>
@@ -95,17 +95,17 @@
     </div>
 
     <!-- Table -->
-    <div class="overflow-hidden overflow-x-auto w-full rounded-lg">
+    <div class="w-full overflow-hidden overflow-x-auto rounded-lg">
         <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
             <thead
                 class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
                 <tr>
-                    <th scope="col" class="p-4 w-8">#</th>
-                    <th scope="col" class="p-4 w-48">Message</th>
-                    <th scope="col" class="p-4 w-64">Sending bots</th>
-                    <th scope="col" class="p-4 w-64">Email Lists</th>
-                    <th scope="col" class="p-4 w-48">Progress</th>
-                    <th scope="col" class="p-4 w-48">Created At</th>
+                    <th scope="col" class="w-8 p-4">#</th>
+                    <th scope="col" class="w-48 p-4">Message</th>
+                    <th scope="col" class="w-64 p-4">Sending bots</th>
+                    <th scope="col" class="w-64 p-4">Email Lists</th>
+                    <th scope="col" class="w-48 p-4">Progress</th>
+                    <th scope="col" class="w-48 p-4">Created At</th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
             </thead>
@@ -220,7 +220,7 @@
                                         x-transition:leave="transition ease-in duration-150"
                                         x-transition:leave-start="opacity-100 translate-y-0"
                                         x-transition:leave-end="opacity-0 translate-y-1"
-                                        class="absolute bottom-full left-1/2 z-10 px-3 py-2 mb-2 w-max text-sm text-white rounded-lg shadow-lg -translate-x-1/2 bg-neutral-900"
+                                        class="absolute z-10 px-3 py-2 mb-2 text-sm text-white -translate-x-1/2 rounded-lg shadow-lg bottom-full left-1/2 w-max bg-neutral-900"
                                         role="tooltip">
                                         <div class="flex items-center space-x-1">
                                             <i class="text-blue-500 fas fa-check-circle"></i>
@@ -228,7 +228,7 @@
                                         </div>
                                         <!-- Arrow -->
                                         <div
-                                            class="absolute top-full left-1/2 w-0 h-0 border-t-8 border-r-8 border-l-8 -translate-x-1/2 border-l-transparent border-r-transparent border-neutral-900">
+                                            class="absolute w-0 h-0 -translate-x-1/2 border-t-8 border-l-8 border-r-8 top-full left-1/2 border-l-transparent border-r-transparent border-neutral-900">
                                         </div>
                                     </div>
                                     @elseif(!$campaign->canBeActive())
@@ -240,7 +240,7 @@
                                         x-transition:leave="transition ease-in duration-150"
                                         x-transition:leave-start="opacity-100 translate-y-0"
                                         x-transition:leave-end="opacity-0 translate-y-1"
-                                        class="absolute bottom-full left-1/2 z-10 px-3 py-2 mb-2 w-max text-sm text-white rounded-lg shadow-lg -translate-x-1/2 bg-neutral-900"
+                                        class="absolute z-10 px-3 py-2 mb-2 text-sm text-white -translate-x-1/2 rounded-lg shadow-lg bottom-full left-1/2 w-max bg-neutral-900"
                                         role="tooltip">
                                         <div class="flex items-center space-x-1">
                                             <i class="text-yellow-500 fas fa-exclamation-triangle"></i>
@@ -257,7 +257,7 @@
                                         </div>
                                         <!-- Arrow -->
                                         <div
-                                            class="absolute top-full left-1/2 w-0 h-0 border-t-8 border-r-8 border-l-8 -translate-x-1/2 border-l-transparent border-r-transparent border-neutral-900">
+                                            class="absolute w-0 h-0 -translate-x-1/2 border-t-8 border-l-8 border-r-8 top-full left-1/2 border-l-transparent border-r-transparent border-neutral-900">
                                         </div>
                                     </div>
                                     @elseif($campaign->status != 'Sending' && $campaign->status != 'Completed')
@@ -269,7 +269,7 @@
                                         x-transition:leave="transition ease-in duration-150"
                                         x-transition:leave-start="opacity-100 translate-y-0"
                                         x-transition:leave-end="opacity-0 translate-y-1"
-                                        class="absolute bottom-full left-1/2 z-10 px-3 py-2 mb-2 w-max text-sm text-white rounded-lg shadow-lg -translate-x-1/2 bg-neutral-900"
+                                        class="absolute z-10 px-3 py-2 mb-2 text-sm text-white -translate-x-1/2 rounded-lg shadow-lg bottom-full left-1/2 w-max bg-neutral-900"
                                         role="tooltip">
                                         <div class="flex items-center space-x-1">
                                             <i class="text-green-500 fas fa-play-circle"></i>
@@ -277,7 +277,7 @@
                                         </div>
                                         <!-- Arrow -->
                                         <div
-                                            class="absolute top-full left-1/2 w-0 h-0 border-t-8 border-r-8 border-l-8 -translate-x-1/2 border-l-transparent border-r-transparent border-neutral-900">
+                                            class="absolute w-0 h-0 -translate-x-1/2 border-t-8 border-l-8 border-r-8 top-full left-1/2 border-l-transparent border-r-transparent border-neutral-900">
                                         </div>
                                     </div>
                                     @endif
