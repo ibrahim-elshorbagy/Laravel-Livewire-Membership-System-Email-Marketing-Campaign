@@ -25,6 +25,7 @@ class UserManagement extends Component
     public $search = '';
     public $adminSearch = '';
     public $trashedSearch = ''; // New search for trashed users
+    public $verifiedSearch = '';
     public $perPage = 10;
     public $selectedTab = 'users';
 
@@ -35,6 +36,7 @@ class UserManagement extends Component
         'search' => ['except' => ''],
         'adminSearch' => ['except' => ''],
         'trashedSearch' => ['except' => ''],
+        'verifiedSearch' => ['except' => ''],
         'selectedTab' => ['except' => 'users'],
     ];
 
@@ -49,6 +51,11 @@ class UserManagement extends Component
     }
 
     public function updatingTrashedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingVerifiedSearch()
     {
         $this->resetPage();
     }
@@ -190,6 +197,22 @@ class UserManagement extends Component
                         ->orWhere('email', 'like', '%' . $this->trashedSearch . '%')
                         ->orWhere('username', 'like', '%' . $this->trashedSearch . '%')
                         ->orWhere('company', 'like', '%' . $this->trashedSearch . '%');
+                });
+            })
+            ->latest()
+            ->paginate($this->perPage);
+    }
+
+    #[Computed]
+    public function verifiedUsers()
+    {
+        return User::whereNotNull('email_verified_at')
+            ->when($this->verifiedSearch != '', function ($query) {
+                $query->where(function ($q) {
+                    $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%$this->verifiedSearch%")
+                        ->orWhere('email', 'like', '%' . $this->verifiedSearch . '%')
+                        ->orWhere('username', 'like', '%' . $this->verifiedSearch . '%')
+                        ->orWhere('company', 'like', '%' . $this->verifiedSearch . '%');
                 });
             })
             ->latest()
