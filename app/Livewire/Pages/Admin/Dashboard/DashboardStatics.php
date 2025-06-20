@@ -31,6 +31,7 @@ class DashboardStatics extends Component
             ->count();
 
         $totalCampaigns = Campaign::count();
+        $sendingCampaigns = Campaign::where('status', Campaign::STATUS_SENDING)->count();
 
         $paymentCount = Payment::where('status', 'approved')->count();
         $totalPayments = Payment::where('status', 'approved')->sum('amount');
@@ -45,6 +46,7 @@ class DashboardStatics extends Component
             'totalUsers' => $totalUsers,
             'activeSubscriptions' => $activeSubscriptions,
             'totalCampaigns' => $totalCampaigns,
+            'sendingCampaigns' => $sendingCampaigns,
             'totalPayments' => $totalPayments,
             'serverCount' => $serverCount,
             'paymentCount' => $paymentCount,

@@ -73,15 +73,18 @@
                     </div>
                     <div class="flex items-center mt-4">
                         <div class="flex-1">
-                            <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400"> Campaigns</p>
-                            <p class="font-bold text-yellow-600 md:text-2xl dark:text-yellow-400">{{$totalCampaigns}}
-                            </p>
+                            <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Total</p>
+                            <p class="font-bold text-yellow-600 md:text-2xl dark:text-yellow-400">{{$totalCampaigns}}</p>
                         </div>
-                        <div class="mx-4 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
+                        <div class="mx-2 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Sending</p>
+                            <p class="font-bold text-yellow-600 md:text-2xl dark:text-yellow-400">{{$sendingCampaigns}}</p>
+                        </div>
+                        <div class="mx-2 w-px h-16 bg-neutral-200 dark:bg-neutral-700"></div>
                         <div class="flex-1">
                             <p class="text-sm font-medium text-neutral-600 dark:text-neutral-400">Messages</p>
-                            <p class="font-bold text-yellow-600 md:text-2xl dark:text-yellow-400">{{$storedMessages}}
-                            </p>
+                            <p class="font-bold text-yellow-600 md:text-2xl dark:text-yellow-400">{{$storedMessages}}</p>
                         </div>
                     </div>
                 </div>
