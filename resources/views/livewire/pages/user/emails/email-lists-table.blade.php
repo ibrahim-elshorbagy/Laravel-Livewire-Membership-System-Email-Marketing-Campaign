@@ -121,6 +121,14 @@
                 @if(!$hasActiveJobsFlag)
                 <div class="flex flex-col gap-2 mt-2 sm:flex-row flex-wrap">
 
+                    <!-- Export Button -->
+                    @if($selectedList)
+                    <x-primary-info-button class="text-xs sm:text-sm" wire:click="exportToExcel">
+                        <div class="flex gap-2 items-center">
+                            <i class="mr-1 fas fa-file-excel"></i> Export Excel
+                        </div>
+                    </x-primary-info-button>
+                    @endif
 
                     <!-- Delete Button  -->
                     <div class="relative">

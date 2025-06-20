@@ -13,6 +13,7 @@ use App\Models\JobProgress;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Validation\Rule;
@@ -269,16 +270,12 @@ class EmailListsTable extends Component
             return 0;
         }
 
-        // Get the list ID from the name
-        $list = $this->lists->firstWhere('name', $this->selectedList);
-        if (!$list) {
-            return 0;
-        }
-
         // Count hard bounce emails in this list
         return EmailList::where('user_id', Auth::id())
             ->where('is_hard_bounce', true)
-            ->where('list_id', $list->id)
+            ->whereHas('emailListName', function($query) {
+                $query->where('name', $this->selectedList);
+            })
             ->count();
     }
 
@@ -466,6 +463,79 @@ class EmailListsTable extends Component
         }
     }
 
+    /**
+     * Export the emails from the selected list to Excel (CSV)
+     */
+    public function exportToExcel()
+    {
+        if (!$this->selectedList) {
+            $this->alert('error', 'Please select a list first!', ['position' => 'bottom-end']);
+            return;
+        }
+
+        try {
+            // Get the list name for the file name
+            $listName = $this->selectedList;
+
+            if (!$listName) {
+                $listName = "email-list";
+            }
+
+            // Sanitize filename
+            $fileName = preg_replace('/[^a-z0-9_\-]/i', '_', $listName) . '_export_' . date('Y-m-d') . '.csv';
+
+            // Create CSV content
+            $headers = [
+                'Content-Type' => 'text/csv; charset=UTF-8',
+                'Content-Disposition' => "attachment; filename=\"$fileName\"",
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0',
+            ];
+
+            // Get emails from the selected list with required columns only
+            $emails = EmailList::select('email', 'name', 'soft_bounce_counter', 'is_hard_bounce')
+                ->where('user_id', Auth::id())
+                ->whereHas('emailListName', function($query) {
+                    $query->where('name', $this->selectedList);
+                })
+                ->orderBy($this->orderBy, $this->sortDirection)
+                ->get();
+
+            // Create and return the CSV
+            $callback = function() use ($emails) {
+                $file = fopen('php://output', 'w');
+
+                // Add BOM for Excel to recognize UTF-8
+                fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+                // Use semicolon as delimiter
+                $delimiter = ';';
+                $enclosure = '"';
+
+                // Add headers
+                fputcsv($file, ['Email', 'Name', 'Soft Bounce Counter', 'Hard Bounce'], $delimiter, $enclosure);
+
+                // Add data
+                foreach ($emails as $email) {
+                    fputcsv($file, [
+                        $email->email,
+                        $email->name ?: '',
+                        (string)$email->soft_bounce_counter, // Cast to string
+                        $email->is_hard_bounce ? 'Yes' : 'No'
+                    ], $delimiter, $enclosure);
+                }
+
+                fclose($file);
+            };
+
+            $this->alert('success', 'Export started!', ['position' => 'bottom-end']);
+            return Response::stream($callback, 200, $headers);
+
+        } catch (\Exception $e) {
+            $this->alert('error', 'Export failed: ' . $e->getMessage(), ['position' => 'bottom-end']);
+        }
+    }
 
 
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------
