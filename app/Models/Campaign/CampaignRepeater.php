@@ -14,6 +14,7 @@ class CampaignRepeater extends Model
 
     protected $casts = [
         'active' => 'boolean',
+        'next_run_at' => 'datetime',
     ];
 
     /**

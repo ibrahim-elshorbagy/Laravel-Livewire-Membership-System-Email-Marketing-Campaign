@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Config;
 use App\Services\Notification\SubscriptionNotifier;
+use App\Services\CampaignRepeaterService;
 
 
 
@@ -27,6 +28,24 @@ Schedule::call(function () {
     })
     ->then(function () {
         Log::channel('worker')->info('SubscriptionNotifier Closed...');
+    });
+
+Schedule::call(function () {
+    (new CampaignRepeaterService())->checkAndActivateScheduledCampaigns();
+})
+    ->hourly()
+    // ->everyMinute()
+    ->before(function () {
+        Log::channel('repeater')->info('CampaignRepeaterService work...');
+    })
+    ->after(function () {
+        Log::channel('repeater')->info('CampaignRepeaterService completed successfully....');
+    })
+    ->onFailure(function () {
+        Log::channel('repeater')->error('CampaignRepeaterService failed...');
+    })
+    ->then(function () {
+        Log::channel('repeater')->info('CampaignRepeaterService Closed...');
     });
 
 

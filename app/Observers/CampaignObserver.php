@@ -17,6 +17,9 @@ class CampaignObserver
         if ($campaign->isDirty('status') && $campaign->status === Campaign::STATUS_COMPLETED) {
             $this->handleCampaignCompletion($campaign);
         }
+
+        // Always check for scheduled campaigns that are ready to start
+        $this->checkScheduledCampaigns();
     }
 
     /**
@@ -39,6 +42,19 @@ class CampaignObserver
 
         } catch (\Exception $e) {
             Log::error("Error processing campaign completion for campaign {$campaign->id}: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Check for scheduled campaigns that are ready to start
+     */
+    private function checkScheduledCampaigns()
+    {
+        try {
+            $campaignRepeaterService = new CampaignRepeaterService();
+            $campaignRepeaterService->checkAndActivateScheduledCampaigns();
+        } catch (\Exception $e) {
+            Log::error("Error checking scheduled campaigns in observer: " . $e->getMessage());
         }
     }
 }

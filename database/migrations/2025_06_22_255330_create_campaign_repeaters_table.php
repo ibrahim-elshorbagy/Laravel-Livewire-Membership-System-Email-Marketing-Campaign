@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('total_repeats')->default(1);
             $table->integer('completed_repeats')->default(0);
             $table->boolean('active')->default(true);
+            $table->timestamp('next_run_at')->nullable();
             $table->timestamps();
         });
     }

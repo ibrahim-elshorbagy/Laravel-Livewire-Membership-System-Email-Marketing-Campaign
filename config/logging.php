@@ -139,6 +139,12 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'repeater' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/repeater.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
         'null' => [
             'driver' => 'monolog',
             'handler' => NullHandler::class,

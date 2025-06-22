@@ -28,6 +28,25 @@ class RepeaterList extends Component
         'statusFilter' => ['except' => ''],
     ];
 
+    public function mount()
+    {
+        // Check for scheduled campaigns that are ready to start
+        $this->checkScheduledCampaigns();
+    }
+
+    /**
+     * Check for scheduled campaigns that are ready to start
+     */
+    private function checkScheduledCampaigns()
+    {
+        try {
+            $campaignRepeaterService = new \App\Services\CampaignRepeaterService();
+            $campaignRepeaterService->checkAndActivateScheduledCampaigns();
+        } catch (\Exception $e) {
+            // Silent fail - don't disrupt user experience
+        }
+    }
+
     public function toggleActive($repeaterId)
     {
         // Validate input using Laravel validator
