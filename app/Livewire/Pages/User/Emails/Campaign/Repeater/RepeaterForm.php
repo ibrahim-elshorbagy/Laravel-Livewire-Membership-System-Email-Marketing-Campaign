@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class RepeaterForm extends Component
 {
@@ -42,6 +43,15 @@ class RepeaterForm extends Component
     public function mount($campaign = null, $repeater = null)
     {
         if ($repeater) {
+            // Validate repeater ID using Laravel validator
+            $validator = Validator::make(['repeater' => $repeater], [
+                'repeater' => 'required|integer|min:1|exists:campaign_repeaters,id'
+            ]);
+
+            if ($validator->fails()) {
+                return redirect()->route('user.campaigns.repeaters.list');
+            }
+
             $this->repeaterId = $repeater;
             $repeaterModel = CampaignRepeater::with('campaign')->findOrFail($repeater);
 
@@ -66,6 +76,15 @@ class RepeaterForm extends Component
             $this->active = $repeaterModel->active;
         }
         elseif ($campaign) {
+            // Validate campaign ID using Laravel validator
+            $validator = Validator::make(['campaign' => $campaign], [
+                'campaign' => 'required|integer|min:1|exists:campaigns,id'
+            ]);
+
+            if ($validator->fails()) {
+                return redirect()->route('user.campaigns.list');
+            }
+
             $this->campaignId = $campaign;
             $this->campaign = Campaign::findOrFail($campaign);
 

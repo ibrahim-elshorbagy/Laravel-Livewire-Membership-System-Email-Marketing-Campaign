@@ -9,6 +9,7 @@ use Livewire\WithPagination;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class RepeaterList extends Component
 {
@@ -29,8 +30,16 @@ class RepeaterList extends Component
 
     public function toggleActive($repeaterId)
     {
+        // Validate input using Laravel validator
+        $validator = Validator::make(['repeaterId' => $repeaterId], [
+            'repeaterId' => 'required|integer|min:1|exists:campaign_repeaters,id'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('user.campaigns.repeaters.list');
+        }
+
         try {
-            
             $repeater = CampaignRepeater::where('user_id', Auth::id())
                 ->findOrFail($repeaterId);
 
@@ -57,6 +66,18 @@ class RepeaterList extends Component
 
     public function deleteRepeater($repeaterId)
     {
+
+        // Validate input using Laravel validator
+        $validator = Validator::make(['repeaterId' => $repeaterId], [
+            'repeaterId' => 'required|integer|min:1|exists:campaign_repeaters,id'
+        ]);
+
+        if ($validator->fails()) {
+
+            return redirect()->route('user.campaigns.repeaters.list');
+        }
+
+
         try {
             $repeater = CampaignRepeater::where('user_id', Auth::id())
                 ->findOrFail($repeaterId);
