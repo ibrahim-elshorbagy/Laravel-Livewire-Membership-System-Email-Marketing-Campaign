@@ -81,7 +81,9 @@
                     <th scope="col" class="w-8 p-4">#</th>
                     <th scope="col" class="w-48 p-4">Campaign</th>
                     <th scope="col" class="p-4">Interval</th>
+                    <th scope="col" class="p-4">Next Run At</th>
                     <th scope="col" class="p-4">Repeats</th>
+                    <th scope="col" class="p-4">Created At</th>
                     <th scope="col" class="p-4">Actions</th>
                 </tr>
             </thead>
@@ -118,10 +120,17 @@
                             {{ $interval }} {{ $unit }}
                         </span>
                     </td>
-                    <td class="p-4">
+                    <td class="p-4 text-nowrap">
+                            {{ $repeater->next_run_at?->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i A') }} -
+                            {{ $repeater->next_run_at?->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->diffForHumans() }}
+                    </td>
+                    <td class="p-4 text-nowrap">
                         <span class="px-2 py-1 text-xs text-blue-500 rounded-full bg-blue-500/10">
                             {{ $repeater->completed_repeats }}/{{ $repeater->total_repeats }}
                         </span>
+                    </td>
+                    <td class="p-4 text-nowrap">
+                            {{ $repeater->created_at?->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i A') }}
                     </td>
                     <td class="p-4">
                         <div class="flex space-x-2">

@@ -194,7 +194,9 @@
                             </button>
                         </div>
                     </td>
-                    <td class="p-4 text-nowrap">{{ $campaign->created_at->format('d/m/Y h:i A') }}</td>
+                    <td class="p-4 text-nowrap">
+                            {{ $campaign->created_at?->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i A') }}
+                    </td>
                     <td class="p-4">
                         <div class="flex space-x-2">
                             <div class="flex items-center space-x-2">
