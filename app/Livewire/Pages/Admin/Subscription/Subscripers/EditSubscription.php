@@ -95,7 +95,11 @@ class EditSubscription extends Component
             $subscriber = $this->subscription->subscriber;
 
             // Switch to new plan (this will suppress current subscription and create new one)
-            $subscriber->switchTo($newPlan);
+            if(!$subscriber->subscribtion){
+                $subscriber->subscribeTo($newPlan); 
+            }else{
+                $subscriber->switchTo($newPlan);
+            }
 
             // Get the new subscription
             $newSubscription = $subscriber->subscription;

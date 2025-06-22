@@ -13,6 +13,12 @@
                 </div>
 
             </x-primary-info-button>
+            <x-primary-info-button href="{{ route('user.campaigns.repeaters.list') }}" wire:navigate>
+                <div class='flex items-center'>
+                    <i class="mr-1 fas fa-clock"></i>
+                    Repeaters
+                </div>
+            </x-primary-info-button>
             <x-primary-info-button href="{{ route('user.campaigns.form') }}" wire:navigate>
                 New Campaign
             </x-primary-info-button>
@@ -287,6 +293,14 @@
                                 <a href="{{ route('user.campaigns.form', $campaign->id) }}" wire:navigate
                                     class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
                                     <i class="mr-1 fas fa-edit"></i>
+                                </a>
+                                @endif
+
+                                <!-- Show repeater button only for non-completed campaigns -->
+                                @if($campaign->status != 'Completed')
+                                <a href="{{ route('user.campaigns.repeaters.campaign.form', ['campaign' => $campaign->id]) }}" wire:navigate
+                                    class="inline-flex items-center px-2 py-1 text-xs text-purple-500 rounded-md bg-purple-500/10 hover:bg-purple-500/20">
+                                    <i class="mr-1 fas fa-clock"></i>
                                 </a>
                                 @endif
 

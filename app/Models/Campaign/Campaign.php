@@ -8,6 +8,10 @@ use App\Models\Server;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Observers\CampaignObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+
+#[ObservedBy([CampaignObserver::class])]
 class Campaign extends Model
 {
     protected $guarded = ['id'];
@@ -54,5 +58,10 @@ class Campaign extends Model
     public function emailHistories()
     {
         return $this->hasMany(EmailHistory::class);
+    }
+
+    public function repeater()
+    {
+        return $this->hasOne(CampaignRepeater::class);
     }
 }

@@ -2,6 +2,9 @@
 
 use App\Livewire\Pages\User\Emails\Campaign\CampaignForm;
 use App\Livewire\Pages\User\Emails\Campaign\CampaignList;
+use App\Livewire\Pages\User\Emails\Campaign\Progress;
+use App\Livewire\Pages\User\Emails\Campaign\Repeater\RepeaterForm;
+use App\Livewire\Pages\User\Emails\Campaign\Repeater\RepeaterList;
 use App\Livewire\Pages\User\Support\Support;
 use App\Livewire\Pages\User\Emails\MessageForm;
 use App\Livewire\Pages\User\Emails\MessageList;
@@ -71,8 +74,12 @@ Route::middleware(['auth','role:user'])->group(function () {
     //Campaigns
     Route::get('/campaigns', CampaignList::class)->name('user.campaigns.list');
     Route::get('/campaigns/form/{campaign?}', CampaignForm::class)->name('user.campaigns.form');
-    Route::get('/campaigns/{campaign}/progress', App\Livewire\Pages\User\Emails\Campaign\Progress::class)
+    Route::get('/campaigns/{campaign}/progress', Progress::class)
         ->name('user.campaigns.progress');
+
+    Route::get('/repeaters', RepeaterList::class)->name('user.campaigns.repeaters.list');
+    Route::get('/repeaters/form/campaign/{campaign}', RepeaterForm::class)->name('user.campaigns.repeaters.campaign.form');
+    Route::get('/repeaters/form/{repeater}', RepeaterForm::class)->name('user.campaigns.repeaters.form');
 
 
     //Support
