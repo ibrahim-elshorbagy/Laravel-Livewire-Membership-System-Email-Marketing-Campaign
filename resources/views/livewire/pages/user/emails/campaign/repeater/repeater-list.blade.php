@@ -162,7 +162,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="p-4 text-center">
+                    <td colspan="7" class="p-4 text-center">
                         <div class="flex flex-col items-center justify-center py-6">
 
                             <i class="fa-regular fa-clock w-12 h-12 text-gray-400 text-[48px]"></i>
