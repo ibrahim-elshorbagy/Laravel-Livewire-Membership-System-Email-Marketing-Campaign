@@ -40,10 +40,10 @@
 
         <!-- Mobile sidebar -->
         <nav x-cloak
-            class="flex fixed left-0 z-30 flex-col p-4 w-60 border-r transition-transform duration-300 h-svh shrink-0 border-neutral-300 bg-neutral-50 lg:hidden lg:w-64 lg:translate-x-0 dark:border-neutral-700 dark:bg-neutral-900"
+            class="fixed left-0 z-30 flex flex-col p-4 transition-transform duration-300 border-r w-60 h-svh shrink-0 border-neutral-300 bg-neutral-50 lg:hidden lg:w-64 lg:translate-x-0 dark:border-neutral-700 dark:bg-neutral-900"
             x-bind:class="sidebarIsOpen ? 'translate-x-0' : '-translate-x-60'">
             <a href="{{ route('main-site') }}"
-                class="mb-4 ml-2 w-24 text-2xl font-bold text-neutral-900 dark:text-white">
+                class="w-24 mb-4 ml-2 text-2xl font-bold text-neutral-900 dark:text-white">
                 <x-application-logo />
             </a>
 
@@ -231,17 +231,17 @@
         <div class="flex flex-col flex-1 min-h-screen bg-white dark:bg-neutral-950">
             <!-- Top navigation -->
             <nav
-                class="flex sticky top-0 z-10 justify-evenly items-center py-1 border-b border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900">
-                <div class="container flex justify-between items-center mx-3 h-14">
+                class="sticky top-0 z-10 flex items-center py-1 border-b justify-evenly border-neutral-300 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900">
+                <div class="container flex items-center justify-between mx-3 h-14">
                     <!-- Site name + Logo -->
-                    <div class="flex gap-4 items-center">
-                        <a href="{{ route('main-site') }}" class="w-24 text-neutral-600 dark:text-neutral-300">
+                    <div class="flex items-center gap-4">
+                        <a href="{{ route('main-site') }}" class="w-32 text-neutral-600 dark:text-neutral-300">
                             <x-application-logo />
                         </a>
                     </div>
 
                     <!-- Desktop navigation -->
-                    <div class="hidden gap-2 items-center lg:flex">
+                    <div class="items-center hidden gap-2 lg:flex">
                         @auth
                         <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}"
                             wire:navigate>
@@ -372,7 +372,7 @@
                     </div>
 
                     <!-- Right section -->
-                    <div class="flex gap-2 items-center">
+                    <div class="flex items-center gap-2">
 
                         @auth
                         <livewire:megaphone />
@@ -390,14 +390,14 @@
                             @guest
                             <!-- Guest user options -->
                             <button @click="userDropdownIsOpen = !userDropdownIsOpen"
-                                class="flex gap-2 items-center p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/5 dark:text-white">
+                                class="flex items-center gap-2 p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/5 dark:text-white">
                                 <i class="fa-solid fa-user"></i>
                             </button>
                             @endguest
 
                             <!-- Dropdown menu -->
                             <div x-cloak x-show="userDropdownIsOpen" @click.outside="userDropdownIsOpen = false"
-                                class="absolute right-0 z-20 mt-2 w-48 bg-white rounded-md border shadow-lg dark:bg-neutral-900 dark:border-neutral-700">
+                                class="absolute right-0 z-20 w-48 mt-2 bg-white border rounded-md shadow-lg dark:bg-neutral-900 dark:border-neutral-700">
                                 <div class="py-1">
                                     @auth
                                     <a href="{{ route('profile') }}" wire:navigate
