@@ -1,10 +1,10 @@
 <div
-    class="flex flex-col p-3 rounded-md border md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
-    <header class="flex flex-col justify-between items-center mb-6 md:flex-row">
+    class="flex flex-col p-3 border rounded-md md:p-6 group border-neutral-300 bg-neutral-50 text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300">
+    <header class="flex flex-col items-center justify-between mb-6 md:flex-row">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 dark:text-gray-100 sm:text-3xl sm:truncate">
             Sending bots Management
         </h2>
-        <div class="flex flex-wrap gap-2 justify-center mt-2 md:justify-normal">
+        <div class="flex flex-wrap justify-center gap-2 mt-2 md:justify-normal">
 
             <x-primary-info-link href="{{ route('admin.orphan-servers') }}" wire:navigate>
                 Orphan Sending bots Report
@@ -21,8 +21,8 @@
         <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4 md:items-center">
             <div class="relative flex-1">
                 <x-text-input wire:model.live.debounce.300ms="search" placeholder="Search Sending bots, Users with any info"
-                    class="pl-10 w-full" />
-                <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+                    class="w-full pl-10" />
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <i class="text-gray-400 fas fa-search"></i>
                 </div>
             </div>
@@ -50,7 +50,7 @@
     </div>
 
     <!-- Bulk Actions -->
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex items-center justify-between mb-4">
         <div class="flex items-center space-x-4">
             @if(count($selectedServers) > 0)
             <span class="text-sm font-medium">{{ count($selectedServers) }} items selected</span>
@@ -58,12 +58,16 @@
                 class="px-3 py-1 text-sm text-white bg-red-500 rounded-md hover:bg-red-600">
                 Delete Selected
             </button>
+            <button type="button" x-on:click="$dispatch('open-modal', 'bulk-emails-count-modal')"
+                class="px-3 py-1 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600">
+                Update Emails Count
+            </button>
             @endif
         </div>
     </div>
 
     <!-- Table Container with Relative Positioning -->
-    <div class="overflow-hidden overflow-x-auto relative w-full rounded-lg">
+    <div class="relative w-full overflow-hidden overflow-x-auto rounded-lg">
         <table class="w-full text-sm text-left text-neutral-600 dark:text-neutral-400">
             <thead
                 class="text-xs font-medium uppercase bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">
@@ -163,9 +167,9 @@
                     <td class="p-4">
                         <div x-data="{ open: false }" class="relative">
                             <button type="button" @click="open = !open"
-                                class="px-4 py-2 w-full text-left rounded-md border shadow-sm dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                                class="w-full px-4 py-2 text-left border rounded-md shadow-sm dark:border-neutral-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
                                 @if($server->assignedUser)
-                                <div class="flex gap-2 items-center w-max">
+                                <div class="flex items-center gap-2 w-max">
                                     <img class="object-cover rounded-full size-10"
                                         src="{{ $server->assignedUser->image_url ?? asset('default-avatar.png') }}"
                                         alt="{{ $server->assignedUser->first_name }} {{ $server->assignedUser->last_name }}" />
@@ -217,7 +221,7 @@
                                 })">
                                 <div class="p-2">
                                     <input type="text" wire:model.live.debounce.300ms="userSearch"
-                                        class="px-3 py-2 w-full rounded-md border dark:bg-neutral-700 dark:border-neutral-600"
+                                        class="w-full px-3 py-2 border rounded-md dark:bg-neutral-700 dark:border-neutral-600"
                                         placeholder="Search users...">
 
                                     <div class="overflow-y-auto mt-2 max-h-[300px]">
@@ -229,7 +233,7 @@
                                         <div class="px-3 py-2 cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700
                                             {{ $server->assigned_to_user_id == $user->id ? 'bg-sky-50 dark:bg-sky-900' : '' }}"
                                             wire:click="assignUser({{ $server->id }}, {{ $user->id }}); open = false">
-                                            <div class="flex gap-2 items-center w-max">
+                                            <div class="flex items-center gap-2 w-max">
                                                 <img class="object-cover rounded-full size-10"
                                                     src="{{ $user->image_url ?? asset('default-avatar.png') }}"
                                                     alt="{{ $user->first_name }} {{ $user->last_name }}" />
@@ -324,7 +328,7 @@
                     </td>
                     <td class="p-4">
                         <div class="flex space-x-2">
-                            <div class="flex gap-2 items-center">
+                            <div class="flex items-center gap-2">
                                 <button type="button"
                                     x-on:click="$dispatch('open-modal', 'edit-note-modal'); $wire.selectedServerId = {{ $server->id }}; $wire.edit_admin_notes = `{{ $server->admin_notes ?? '' }}`"
                                     class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
@@ -332,7 +336,7 @@
                                 </button>
                             </div>
                             <a href="{{ route('admin.site-api-requests') }}?search={{ $server->name }}" wire:navigate
-                                class="inline-flex gap-2 items-center px-2 py-1 text-xs text-purple-500 rounded-md text-nowrap bg-purple-500/10 hover:bg-purple-500/20">
+                                class="inline-flex items-center gap-2 px-2 py-1 text-xs text-purple-500 rounded-md text-nowrap bg-purple-500/10 hover:bg-purple-500/20">
                                 API Requests
                             </a>
                             <a href="{{ route('admin.servers.form', $server->id) }}"
@@ -362,7 +366,7 @@
                     <div>
                         <x-input-label for="edit_admin_notes" value="Admin Note" />
                         <x-textarea-input wire:model="edit_admin_notes" id="edit_admin_notes" type="text"
-                            class="block mt-1 w-full" />
+                            class="block w-full mt-1" />
                         <x-input-error :messages="$errors->get('editEmail')" class="mt-2" />
                     </div>
                 </div>
@@ -377,6 +381,35 @@
             </form>
         </div>
     </x-modal>
+
+    <!-- Bulk Update Emails Count Modal -->
+    <x-modal name="bulk-emails-count-modal" maxWidth="md">
+        <div class="p-6">
+            <h2 class="text-lg font-medium">Update Emails Count for Selected Servers</h2>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                This will update the emails count for {{ count($selectedServers) }} selected server(s).
+            </p>
+            <form wire:submit.prevent="bulkUpdateEmailsCount" class="mt-4">
+                <div class="space-y-4">
+                    <div>
+                        <x-input-label for="bulkEmailsCount" value="Emails Count" />
+                        <x-text-input wire:model="bulkEmailsCount" id="bulkEmailsCount" type="number" min="1" max="255"
+                            class="block w-full mt-1" placeholder="Enter emails count" />
+                        <x-input-error :messages="$errors->get('bulkEmailsCount')" class="mt-2" />
+                    </div>
+                </div>
+                <div class="flex justify-end mt-6 space-x-3">
+                    <x-secondary-button x-on:click="$dispatch('close-modal', 'bulk-emails-count-modal')">
+                        Cancel
+                    </x-secondary-button>
+                    <x-primary-create-button type="submit">
+                        Update All Selected
+                    </x-primary-create-button>
+                </div>
+            </form>
+        </div>
+    </x-modal>
+
     <!-- Pagination -->
     <div class="mt-4">
         {{ $servers->links() }}

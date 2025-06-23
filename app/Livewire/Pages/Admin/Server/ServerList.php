@@ -34,6 +34,10 @@ class ServerList extends Component
     public $tempEmailsCount = null;
     public $selectedEmailsCountServerId = null;
 
+    // Bulk email count update properties
+    public $bulkEmailsCount = null;
+    public $showBulkEmailModal = false;
+
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -53,6 +57,7 @@ class ServerList extends Component
             'selectPage' => 'boolean',
             'serverId' => 'nullable|integer|exists:servers,id',
             'selectedUserId' => 'nullable|exists:users,id',
+            'bulkEmailsCount' => 'nullable|integer|min:1|max:255',
 
 
 
@@ -171,14 +176,13 @@ class ServerList extends Component
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
 
-        // Add orphan status after retrieving the results
+        // Add orphan status to each server
         $servers->getCollection()->transform(function ($server) {
             // Check if there are no requests within the last 24 hours
             $server->is_orphan = $server->apiRequests->isEmpty(); // Check if no requests exist
             return $server;
         });
 
-        // Return paginated results
         return $servers;
     }
 
@@ -248,6 +252,30 @@ class ServerList extends Component
         } catch (\Exception $e) {
             DB::rollBack();
             $this->alert('error', 'Failed to update user assignment: ' . $e->getMessage(), ['position' => 'bottom-end']);
+        }
+    }
+
+    public function bulkUpdateEmailsCount()
+    {
+        $this->validate([
+            'selectedServers' => 'required|array|min:1',
+            'selectedServers.*' => 'integer|exists:servers,id',
+            'bulkEmailsCount' => 'required|integer',
+        ]);
+
+        try {
+            Server::whereIn('id', $this->selectedServers)
+                ->update(['emails_count' => $this->bulkEmailsCount]);
+
+            $this->reset(['bulkEmailsCount']);
+            $this->selectedServers = [];
+            $this->selectPage = false;
+
+            $this->alert('success', 'Emails count updated for selected servers successfully!', ['position' => 'bottom-end']);
+            $this->dispatch('close-modal', 'bulk-emails-count-modal');
+
+        } catch (\Exception $e) {
+            $this->alert('error', 'Failed to update emails count: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
     }
 
