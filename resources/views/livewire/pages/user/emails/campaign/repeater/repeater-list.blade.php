@@ -121,8 +121,13 @@
                         </span>
                     </td>
                     <td class="p-4 text-nowrap">
+                        @if($repeater->completed_repeats < $repeater->total_repeats)
                             {{ $repeater->next_run_at?->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i A') }} -
                             {{ $repeater->next_run_at?->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->diffForHumans() }}
+                        @else
+                        -
+                        @endif
+
                     </td>
                     <td class="p-4 text-nowrap">
                         <span class="px-2 py-1 text-xs text-blue-500 rounded-full bg-blue-500/10">
