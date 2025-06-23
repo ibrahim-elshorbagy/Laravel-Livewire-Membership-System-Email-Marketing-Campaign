@@ -23,6 +23,7 @@ class RepeaterForm extends Component
     public $intervalType = 'days';
     public $totalRepeats = 1;
     public $active = true;
+    public $repeaterModel;
 
     /**
      * Define validation rules for repeater form inputs
@@ -59,6 +60,10 @@ class RepeaterForm extends Component
                 return redirect()->route('user.campaigns.repeaters.list');
             }
 
+            if ($repeaterModel->total_repeats == $repeaterModel->completed_repeats) {
+                return redirect()->route('user.campaigns.repeaters.list');
+            }
+            $this->repeaterModel = $repeaterModel;
             $this->campaignId = $repeaterModel->campaign_id;
             $this->campaign = $repeaterModel->campaign;
 
@@ -158,7 +163,7 @@ class RepeaterForm extends Component
                 $repeater = CampaignRepeater::create($repeaterData);
             }
 
-            
+
             $campaignRepeaterService = new \App\Services\CampaignRepeaterService();
             $campaignRepeaterService->checkAndActivateScheduledCampaigns();
 

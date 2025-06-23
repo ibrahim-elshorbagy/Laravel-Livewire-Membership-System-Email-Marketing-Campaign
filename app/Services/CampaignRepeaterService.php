@@ -257,7 +257,7 @@ class CampaignRepeaterService
                 }
             }
 
-            Log::channel('repeater')->info('Completed checkAndActivateScheduledCampaigns');
+            // Log::channel('repeater')->info('Completed checkAndActivateScheduledCampaigns');
 
         } catch (\Exception $e) {
             Log::channel('repeater')->error("Error checking scheduled campaigns: " . $e->getMessage());

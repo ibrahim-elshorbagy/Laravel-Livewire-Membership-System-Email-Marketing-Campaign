@@ -61,21 +61,18 @@
                 This will run the campaign {{ $safeTotalRepeats }} time(s) total (original + {{ $safeTotalRepeats - 1 }} repeats).
             </p>
 
-            @if($repeaterId)
-                @php
-                    $repeater = \App\Models\Campaign\CampaignRepeater::find($repeaterId);
-                    $completedRepeats = $repeater ? $repeater->completed_repeats : 0;
-                @endphp
-                @if($completedRepeats > 0)
+            @if($repeaterModel)
+
+                @if($repeaterModel?->completed_repeats > 0)
                 <div class="p-3 mt-2 border border-green-200 rounded-md bg-green-50 dark:bg-green-900/10 dark:border-green-300/10">
                     <div class="flex items-center gap-2 text-green-800 dark:text-green-300">
                         <i class="fa-solid fa-check-circle"></i>
                         <span class="font-medium">Current Progress</span>
                     </div>
                     <p class="mt-1 text-sm text-green-700 dark:text-green-400">
-                        {{ $completedRepeats }} out of {{ $repeater->total_repeats }} repeats completed.
-                        @if($completedRepeats < $repeater->total_repeats)
-                            {{ $repeater->total_repeats - $completedRepeats }} more repeat(s) remaining.
+                        {{ $repeaterModel->completed_repeats }} out of {{ $repeaterModel->total_repeats }} repeats completed.
+                        @if($repeaterModel->completed_repeats < $repeaterModel->total_repeats)
+                            {{ $repeaterModel->total_repeats - $repeaterModel->completed_repeats }} more repeat(s) remaining.
                         @else
                             All repeats completed!
                         @endif
