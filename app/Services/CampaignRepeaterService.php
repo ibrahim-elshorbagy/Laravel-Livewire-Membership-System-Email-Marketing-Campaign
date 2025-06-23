@@ -108,7 +108,7 @@ class CampaignRepeaterService
 
             // Get server IDs from the original campaign
             $serverIds = $originalCampaign->servers()->pluck('servers.id')->toArray();
-            Log::channel('repeater')->info("Original campaign {$originalCampaign->id} has servers: " . implode(', ', $serverIds ?: ['none']));
+            // Log::channel('repeater')->info("Original campaign {$originalCampaign->id} has servers: " . implode(', ', $serverIds ?: ['none']));
 
             if (empty($serverIds)) {
                 // Log::channel('repeater')->warning("No servers found in original campaign {$originalCampaign->id} to transfer");
@@ -205,28 +205,28 @@ class CampaignRepeaterService
             // Log::channel('repeater')->info('Starting checkAndActivateScheduledCampaigns');
 
             // First, let's see all repeaters in the system
-            $allRepeaters = CampaignRepeater::with('campaign')->get();
+            // $allRepeaters = CampaignRepeater::with('campaign')->get();
             // Log::channel('repeater')->info('Total repeaters in system: ' . $allRepeaters->count());
 
             // Let's see active repeaters
-            $activeRepeaters = CampaignRepeater::with('campaign')->where('active', true)->get();
+            // $activeRepeaters = CampaignRepeater::with('campaign')->where('active', true)->get();
             // Log::channel('repeater')->info('Active repeaters: ' . $activeRepeaters->count());
 
             // Let's see repeaters with next_run_at set
-            $scheduledRepeaters = CampaignRepeater::with('campaign')
-                ->where('active', true)
-                ->whereNotNull('next_run_at')
-                ->get();
+            // $scheduledRepeaters = CampaignRepeater::with('campaign')
+            //     ->where('active', true)
+            //     ->whereNotNull('next_run_at')
+            //     ->get();
             // Log::channel('repeater')->info('Scheduled repeaters (with next_run_at): ' . $scheduledRepeaters->count());
 
             // Log each scheduled repeater details
-            foreach ($scheduledRepeaters as $repeater) {
-                Log::channel('repeater')->info("Repeater {$repeater->id}: next_run_at = {$repeater->next_run_at}, campaign_id = {$repeater->campaign_id}, campaign_status = {$repeater->campaign->status}");
-            }
+            // foreach ($scheduledRepeaters as $repeater) {
+            //     Log::channel('repeater')->info("Repeater {$repeater->id}: next_run_at = {$repeater->next_run_at}, campaign_id = {$repeater->campaign_id}, campaign_status = {$repeater->campaign->status}");
+            // }
 
             // Now check which ones are ready to activate
             $currentTime = now();
-            Log::channel('repeater')->info('Current time: ' . $currentTime);
+            // Log::channel('repeater')->info('Current time: ' . $currentTime);
 
             // Get all active repeaters with next_run_at in the past
             $readyRepeaters = CampaignRepeater::with('campaign')
@@ -262,6 +262,30 @@ class CampaignRepeaterService
         } catch (\Exception $e) {
             Log::channel('repeater')->error("Error checking scheduled campaigns: " . $e->getMessage());
             Log::channel('repeater')->error("Stack trace: " . $e->getTraceAsString());
+        }
+    }
+
+    /**
+     * Create a new clone when user increases total_repeats for a completed repeater
+     */
+    public function createNewCloneForIncreasedRepeats(CampaignRepeater $repeater)
+    {
+        try {
+            // Log::channel('repeater')->info("User increased total_repeats for completed repeater {$repeater->id}. Creating new clone.");
+
+            // Get the last completed campaign from this repeater
+            $lastCampaign = $repeater->campaign;
+
+            // Create new campaign based on the last one
+            $newCampaign = $this->cloneCampaign($lastCampaign, $repeater->completed_repeats + 1);
+
+
+            // Log::channel('repeater')->info("Created new clone campaign {$newCampaign->id} for increased repeater {$repeater->id}, scheduled to start at {$nextRunAt}");
+
+        } catch (\Exception $e) {
+            Log::channel('repeater')->error("Error creating new clone for increased repeater {$repeater->id}: " . $e->getMessage());
+            Log::channel('repeater')->error("Stack trace: " . $e->getTraceAsString());
+            throw $e;
         }
     }
 }

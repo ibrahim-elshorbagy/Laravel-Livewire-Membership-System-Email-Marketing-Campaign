@@ -12,9 +12,9 @@
                     Refresh
                 </div>
             </x-primary-info-button>
-            <x-primary-info-button href="{{ route('user.campaigns.list') }}" wire:navigate>
+            <x-primary-info-link href="{{ route('user.campaigns.list') }}" wire:navigate>
                 Campaigns
-            </x-primary-info-button>
+            </x-primary-info-link>
         </div>
     </header>
 
@@ -142,13 +142,13 @@
                                 <i class="mr-1 fas {{ $repeater->active ? 'fa-play-circle' : 'fa-pause-circle' }}"></i>
                                 {{ $repeater->active ? 'Active' : 'Inactive' }}
                             </button>
+                            @endif
 
                             <a href="{{ route('user.campaigns.repeaters.form', ['repeater' => $repeater->id]) }}" wire:navigate
                                 class="inline-flex items-center px-2 py-1 text-xs text-blue-500 rounded-md bg-blue-500/10 hover:bg-blue-500/20">
                                 <i class="mr-1 fas fa-edit"></i>
                                 Edit
                             </a>
-                            @endif
 
                             <button wire:click="deleteRepeater({{ $repeater->id }})"
                                 wire:confirm="Are you sure you want to delete this repeater?"

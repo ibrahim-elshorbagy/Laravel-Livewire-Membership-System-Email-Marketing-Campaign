@@ -33,8 +33,8 @@ Schedule::call(function () {
 Schedule::call(function () {
     (new CampaignRepeaterService())->checkAndActivateScheduledCampaigns();
 })
-    ->hourly()
-    // ->everyMinute()
+    // ->hourly()
+    ->everyMinute()
     ->before(function () {
         Log::channel('repeater')->info('CampaignRepeaterService work...');
     })

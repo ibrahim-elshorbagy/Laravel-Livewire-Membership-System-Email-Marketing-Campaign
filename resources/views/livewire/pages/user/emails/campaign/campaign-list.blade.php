@@ -13,15 +13,15 @@
                 </div>
 
             </x-primary-info-button>
-            <x-primary-info-button href="{{ route('user.campaigns.repeaters.list') }}" wire:navigate>
+            <x-primary-info-link href="{{ route('user.campaigns.repeaters.list') }}" wire:navigate>
                 <div class='flex items-center'>
                     <i class="mr-1 fas fa-clock"></i>
                     Repeaters
                 </div>
-            </x-primary-info-button>
-            <x-primary-info-button href="{{ route('user.campaigns.form') }}" wire:navigate>
+            </x-primary-info-link>
+            <x-primary-info-link href="{{ route('user.campaigns.form') }}" wire:navigate>
                 New Campaign
-            </x-primary-info-button>
+            </x-primary-info-link>
         </div>
     </header>
 
@@ -307,7 +307,7 @@
                                 @endif
 
                                 <button wire:click="deleteCampaign({{ $campaign->id }})"
-                                    wire:confirm="Are you sure you want to delete this campaign?"
+                                    wire:confirm="Are you sure you want to delete this campaign? It will also delete all associated email histories. And It's Repeater "
                                     class="inline-flex items-center px-2 py-1 text-xs text-red-500 rounded-md bg-red-500/10 hover:bg-red-500/20">
                                     <i class="mr-1 fas fa-trash"></i>
                                 </button>

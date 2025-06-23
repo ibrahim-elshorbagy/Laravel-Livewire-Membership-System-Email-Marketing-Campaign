@@ -64,11 +64,11 @@ class RepeaterForm extends Component
 
             // Convert interval hours to appropriate unit
             if ($repeaterModel->interval_type === 'hours') {
-                $this->intervalValue = $repeaterModel->interval_hours;
+                $this->intervalValue = (int) $repeaterModel->interval_hours;
             } elseif ($repeaterModel->interval_type === 'days') {
-                $this->intervalValue = $repeaterModel->interval_hours / 24;
+                $this->intervalValue = (int) ($repeaterModel->interval_hours / 24);
             } else { // weeks
-                $this->intervalValue = $repeaterModel->interval_hours / (24 * 7);
+                $this->intervalValue = (int) ($repeaterModel->interval_hours / (24 * 7));
             }
 
             $this->intervalType = $repeaterModel->interval_type;
@@ -135,16 +135,32 @@ class RepeaterForm extends Component
                 'interval_hours' => $intervalHours,
                 'interval_type' => $this->intervalType,
                 'total_repeats' => $this->totalRepeats,
-                'completed_repeats' => 0,
                 'active' => $this->active,
             ];
 
             if ($this->repeaterId) {
+                // When updating existing repeater, don't reset completed_repeats
                 $repeater = CampaignRepeater::findOrFail($this->repeaterId);
+                $oldTotalRepeats = $repeater->total_repeats;
+                $completedRepeats = $repeater->completed_repeats;
+
                 $repeater->update($repeaterData);
+
+                // Check if user increased total_repeats for a completed repeater
+                if ($this->totalRepeats > $oldTotalRepeats && $completedRepeats >= $oldTotalRepeats) {
+                    // Repeater was completed but user increased total repeats, create new clone
+                    $campaignRepeaterService = new \App\Services\CampaignRepeaterService();
+                    $campaignRepeaterService->createNewCloneForIncreasedRepeats($repeater);
+                }
             } else {
+                // Only set completed_repeats to 0 for new repeaters
+                $repeaterData['completed_repeats'] = 0;
                 $repeater = CampaignRepeater::create($repeaterData);
             }
+
+            
+            $campaignRepeaterService = new \App\Services\CampaignRepeaterService();
+            $campaignRepeaterService->checkAndActivateScheduledCampaigns();
 
             DB::commit();
 
