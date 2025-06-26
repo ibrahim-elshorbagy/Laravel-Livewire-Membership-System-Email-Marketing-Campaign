@@ -110,7 +110,7 @@
 
         <div class="no-tailwindcss-support-display">
           <x-input-label for="message_plain_text">Message Plain Text</x-input-label>
-          <x-primary-textarea wire:model="message_plain_text" id="message_plain_text" rows="16"
+          <x-primary-textarea wire:model="message_plain_text" id="message_plain_text" rows="16" dir='auto'
             class="block mt-1 w-full"> </x-primary-textarea>
           {{--
           <x-input-error :messages="$errors->get('message_plain_text')" class="mt-2" /> --}}
@@ -231,13 +231,6 @@
 
       <form wire:submit.prevent="generateAIMessage" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Product Name -->
-          <div>
-            <x-input-label for="ai_product_name" value="Product Name *" />
-            <x-text-input wire:model="ai_product_name" id="ai_product_name" type="text" class="block mt-1 w-full"
-              placeholder="e.g., Marketing Tool, Software, Food Product" />
-            <x-input-error :messages="$errors->get('ai_product_name')" class="mt-2" />
-          </div>
 
           <!-- Company Name -->
           <div>
@@ -246,6 +239,16 @@
               placeholder="Your company or brand name" />
             <x-input-error :messages="$errors->get('ai_company_name')" class="mt-2" />
           </div>
+
+          <!-- Product Name -->
+          <div>
+            <x-input-label for="ai_product_name" value="Product Name *" />
+            <x-text-input wire:model="ai_product_name" id="ai_product_name" type="text" class="block mt-1 w-full"
+              placeholder="e.g., Marketing Tool, Software, Food Product" />
+            <x-input-error :messages="$errors->get('ai_product_name')" class="mt-2" />
+          </div>
+
+
 
           <!-- Target Audience -->
           <div>
@@ -263,6 +266,21 @@
             <x-input-error :messages="$errors->get('ai_message_goal')" class="mt-2" />
           </div>
 
+          <!-- Product Advantages -->
+          <div class="col-span-1 md:col-span-2">
+            <x-input-label for="ai_product_advantages" value="Main Product Advantages *" />
+            <x-primary-textarea wire:model="ai_product_advantages" id="ai_product_advantages" rows="3"
+              class="block mt-1 w-full border-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 focus:border-primary-500 dark:focus:border-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 rounded-md shadow-sm"
+              placeholder="What makes your product special? List the key benefits and advantages..."/>
+            <x-input-error :messages="$errors->get('ai_product_advantages')" class="mt-2" />
+          </div>
+          <!-- Special Offer -->
+          <div>
+            <x-input-label for="ai_special_offer" value="Special Offer/Discount (Optional)" />
+            <x-text-input wire:model="ai_special_offer" id="ai_special_offer" type="text" class="block mt-1 w-full"
+              placeholder="e.g., 20% off, Free trial, Limited time offer" />
+            <x-input-error :messages="$errors->get('ai_special_offer')" class="mt-2" />
+          </div>
           <!-- Contact Link -->
           <div>
             <x-input-label for="ai_contact_link" value="Contact Link/Website" />
@@ -274,8 +292,13 @@
           <!-- Tone -->
           <div>
             <x-input-label for="ai_tone" value="Email Tone *" />
-            <x-text-input wire:model="ai_tone" id="ai_tone" type="text" class="block mt-1 w-full"
-              placeholder="Email Tone" />
+            <x-primary-select-input wire:model="ai_tone" id="ai_tone"
+              class="block w-full border-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 focus:border-primary-500 dark:focus:border-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 rounded-md shadow-sm">
+              <option value="formal">Formal</option>
+              <option value="enthusiastic">Enthusiastic Marketing</option>
+              <option value="friendly">Friendly and Simple</option>
+            </x-primary-select-input>
+
             <x-input-error :messages="$errors->get('ai_tone')" class="mt-2" />
 
           </div>
@@ -283,31 +306,18 @@
           <!-- Language -->
           <div>
             <x-input-label for="ai_language" value="Language *" />
-            <select wire:model="ai_language" id="ai_language"
+            <x-primary-select-input wire:model="ai_language" id="ai_language"
               class="block mt-1 w-full border-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 focus:border-primary-500 dark:focus:border-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 rounded-md shadow-sm">
               <option value="english">English</option>
               <option value="arabic">Arabic</option>
-            </select>
+            </x-primary-select-input>
             <x-input-error :messages="$errors->get('ai_language')" class="mt-2" />
           </div>
 
-          <!-- Special Offer -->
-          <div>
-            <x-input-label for="ai_special_offer" value="Special Offer/Discount (Optional)" />
-            <x-text-input wire:model="ai_special_offer" id="ai_special_offer" type="text" class="block mt-1 w-full"
-              placeholder="e.g., 20% off, Free trial, Limited time offer" />
-            <x-input-error :messages="$errors->get('ai_special_offer')" class="mt-2" />
-          </div>
+
         </div>
 
-        <!-- Product Advantages -->
-        <div>
-          <x-input-label for="ai_product_advantages" value="Main Product Advantages *" />
-          <textarea wire:model="ai_product_advantages" id="ai_product_advantages" rows="3"
-            class="block mt-1 w-full border-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 focus:border-primary-500 dark:focus:border-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 rounded-md shadow-sm"
-            placeholder="What makes your product special? List the key benefits and advantages..."></textarea>
-          <x-input-error :messages="$errors->get('ai_product_advantages')" class="mt-2" />
-        </div>
+
 
         <div class="flex justify-end space-x-3 pt-4 border-t border-neutral-200 dark:border-neutral-700">
           <x-secondary-button x-on:click="$dispatch('close-modal', 'ai-generation-modal')" type="button">

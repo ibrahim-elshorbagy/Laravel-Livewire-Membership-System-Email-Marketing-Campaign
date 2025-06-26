@@ -186,11 +186,11 @@ class MessageForm extends Component
                 ],
             ]);
 
-            Log::info('AI generation result', [
-                'prompt' => $prompt,
-                'result' => $result ?? '',
-                'response' => $result->choices[0]->message->content ?? '',
-            ]);
+            // Log::info('AI generation result', [
+            //     'prompt' => $prompt,
+            //     'result' => $result ?? '',
+            //     'response' => $result->choices[0]->message->content ?? '',
+            // ]);
             
             $generatedContent = trim($result->choices[0]->message->content ?? '');
 
