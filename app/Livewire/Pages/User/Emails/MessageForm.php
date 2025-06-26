@@ -153,7 +153,7 @@ class MessageForm extends Component
 
         try {
             // Get AI prompt from settings
-            $basePrompt = SiteSetting::getValue('prompt', 'Generate a html email template with the following conditions');
+            $basePrompt = SiteSetting::getValue('prompt', 'Generate a Email Message  Plain Text with the following conditions');
             
             // Define variable mappings for admin prompt
             $variables = [
@@ -192,22 +192,12 @@ class MessageForm extends Component
                 'response' => $result->choices[0]->message->content ?? '',
             ]);
             
-            $generatedHtml = trim($result->choices[0]->message->content ?? '');
+            $generatedContent = trim($result->choices[0]->message->content ?? '');
 
-            if ($generatedHtml) {
-                // Update the message HTML with generated content
-                $this->message_html = $generatedHtml;
+            if ($generatedContent) {
+                // Update the plain text with generated content
+                $this->message_plain_text = $generatedContent;
                 
-                // Also generate a title if empty
-                if (empty($this->message_title)) {
-                    $this->message_title = $this->ai_product_name . ' - Email Campaign';
-                }
-                
-                // Generate email subject if empty
-                if (empty($this->email_subject)) {
-                    $this->email_subject = 'Discover ' . $this->ai_product_name;
-                }
-
                 $this->alert('success', 'AI email template generated successfully!');
                 
                 // Close the modal

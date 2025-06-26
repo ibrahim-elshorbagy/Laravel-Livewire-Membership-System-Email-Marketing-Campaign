@@ -167,7 +167,7 @@
           <div class="mt-3 p-3 bg-blue-100 dark:bg-blue-800 rounded text-xs">
             <strong>Example:</strong><br>
             <code class="text-blue-900 dark:text-blue-200">
-              Generate a professional HTML email template for $product_name targeting $target_audience. 
+              Generate a professional Message Plain Text for $product_name targeting $target_audience. 
               The goal is to $message_goal. Use a $tone tone and write in $language. 
               Highlight these advantages: $product_advantages. 
               Include contact link: $contact_link from $company_name.
