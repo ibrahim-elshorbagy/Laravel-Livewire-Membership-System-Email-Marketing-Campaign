@@ -38,7 +38,7 @@ class AiSettings extends Component
         $this->openai_organization = SiteSetting::getValue('openai_organization', config('services.openai.organization'));
         $this->openai_project = SiteSetting::getValue('openai_project', config('services.openai.project'));
         $this->openai_role = SiteSetting::getValue('openai_role', config('services.openai.role', 'user'));
-        $this->prompt = SiteSetting::getValue('prompt', 'Generate a html email template with the following conditions');
+        $this->prompt = SiteSetting::getValue('prompt', 'Generate a professional HTML email template for $product_name targeting $target_audience. The goal is to $message_goal. Use a $tone tone and write in $language. Highlight these advantages: $product_advantages. Include contact link: $contact_link from $company_name. Special offer: $special_offer. Make sure the email is responsive, well-structured with proper HTML markup, and visually appealing.');
     }
 
     public function updateAiSettings()

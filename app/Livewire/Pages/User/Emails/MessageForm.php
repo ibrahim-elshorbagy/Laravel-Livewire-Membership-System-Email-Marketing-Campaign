@@ -14,6 +14,8 @@ use App\Services\HtmlPurifierService;
 use HTMLPurifier;
 use App\Rules\Base64ImageSize;
 use App\Rules\HtmlSize;
+use Illuminate\Support\Facades\Log;
+use OpenAI;
 
 class MessageForm extends Component
 {
@@ -31,6 +33,18 @@ class MessageForm extends Component
     public $activeEditor = 'advanced'; // 'advanced' for TinyMCE, 'code' for Code Editor
     public $html_size_limit ;
     public $base64_image_size_limit ;
+
+    // AI Generation properties
+    public $ai_product_name = '';
+    public $ai_product_advantages = '';
+    public $ai_target_audience = '';
+    public $ai_message_goal = '';
+    public $ai_contact_link = '';
+    public $ai_company_name = '';
+    public $ai_tone = 'professional';
+    public $ai_special_offer = '';
+    public $ai_language = 'english';
+    public $is_generating = false;
 
     public function rules(): array
     {
@@ -106,6 +120,123 @@ class MessageForm extends Component
         } catch (\Exception $e) {
             $this->alert('error', 'Failed to save message: ' . $e->getMessage(), ['position' => 'bottom-end']);
         }
+    }
+
+    public function getAiValidationRules(): array
+    {
+        return [
+            'ai_product_name' => 'required|string|max:255',
+            'ai_product_advantages' => 'required|string|max:500',
+            'ai_target_audience' => 'required|string|max:255',
+            'ai_message_goal' => 'required|string|max:255',
+            'ai_contact_link' => 'nullable|string|max:255',
+            'ai_company_name' => 'required|string|max:255',
+            'ai_tone' => 'required|string',
+            'ai_special_offer' => 'nullable|string|max:255',
+            'ai_language' => 'required|in:english,arabic',
+        ];
+    }
+
+    public function generateAIMessage()
+    {
+        // Check if AI is active
+        $openai_active = SiteSetting::getValue('openai_active', false);
+        if (!$openai_active) {
+            $this->alert('error', 'AI integration is not active. Please contact administrator.');
+            return;
+        }
+
+        // Validate AI form data
+        $this->validate($this->getAiValidationRules());
+
+        $this->is_generating = true;
+
+        try {
+            // Get AI prompt from settings
+            $basePrompt = SiteSetting::getValue('prompt', 'Generate a html email template with the following conditions');
+            
+            // Define variable mappings for admin prompt
+            $variables = [
+                '$product_name' => $this->ai_product_name,
+                '$product_advantages' => $this->ai_product_advantages,
+                '$target_audience' => $this->ai_target_audience,
+                '$message_goal' => $this->ai_message_goal,
+                '$contact_link' => $this->ai_contact_link,
+                '$company_name' => $this->ai_company_name,
+                '$tone' => $this->ai_tone,
+                '$special_offer' => $this->ai_special_offer,
+                '$language' => $this->ai_language,
+            ];
+            
+            // Replace variables in the admin prompt
+            $prompt = $basePrompt;
+            foreach ($variables as $variable => $value) {
+                $prompt = str_replace($variable, $value, $prompt);
+            }
+
+            $openAi = OpenAI::client(SiteSetting::getValue('openai_api_key', config('services.openai.api_key')));
+
+            $result = $openAi->chat()->create([
+                'model' => SiteSetting::getValue('openai_model', config('services.openai.model', 'gpt-4o')),
+                'messages' => [
+                    [
+                        'role' => SiteSetting::getValue('openai_role', config('services.openai.role', 'user')), 
+                        'content' => $prompt
+                    ],
+                ],
+            ]);
+
+            Log::info('AI generation result', [
+                'prompt' => $prompt,
+                'result' => $result ?? '',
+                'response' => $result->choices[0]->message->content ?? '',
+            ]);
+            
+            $generatedHtml = trim($result->choices[0]->message->content ?? '');
+
+            if ($generatedHtml) {
+                // Update the message HTML with generated content
+                $this->message_html = $generatedHtml;
+                
+                // Also generate a title if empty
+                if (empty($this->message_title)) {
+                    $this->message_title = $this->ai_product_name . ' - Email Campaign';
+                }
+                
+                // Generate email subject if empty
+                if (empty($this->email_subject)) {
+                    $this->email_subject = 'Discover ' . $this->ai_product_name;
+                }
+
+                $this->alert('success', 'AI email template generated successfully!');
+                
+                // Close the modal
+                $this->dispatch('close-modal', 'ai-generation-modal');
+                
+                // Reset AI form
+                $this->resetAIForm();
+            } else {
+                $this->alert('error', 'Failed to generate content. Please try again.');
+            }
+
+        } catch (\Exception $e) {
+            $this->alert('error', 'AI generation failed: ' . $e->getMessage());
+        } finally {
+            $this->is_generating = false;
+        }
+    }
+
+    public function resetAIForm()
+    {
+        $this->ai_product_name = '';
+        $this->ai_product_advantages = '';
+        $this->ai_target_audience = '';
+        $this->ai_message_goal = '';
+        $this->ai_contact_link = '';
+        $this->ai_company_name = '';
+        $this->ai_tone = 'professional';
+        $this->ai_special_offer = '';
+        $this->ai_language = 'english';
     }
 
     public function render()

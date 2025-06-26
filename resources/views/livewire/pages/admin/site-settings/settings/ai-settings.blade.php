@@ -144,15 +144,46 @@
           Email Template Prompt
         </h3>
 
+        <div class="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+          <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-2">How to Build Your Prompt with Variables</h4>
+          <p class="text-sm text-blue-700 dark:text-blue-300 mb-3">
+            You can use variables in your prompt that will be automatically replaced with user answers. Use these exact variable names:
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+            <div class="flex flex-col space-y-1">
+              <span><code class="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">$product_name</code> - Product Name</span>
+              <span><code class="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">$product_advantages</code> - Main Product Advantages</span>
+              <span><code class="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">$target_audience</code> - Who it's for</span>
+              <span><code class="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">$message_goal</code> - What action to take</span>
+              <span><code class="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">$contact_link</code> - URL or contact info</span>
+            </div>
+            <div class="flex flex-col space-y-1">
+              <span><code class="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">$company_name</code> - Company/Brand Name</span>
+              <span><code class="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">$tone</code> - professional/enthusiastic/friendly</span>
+              <span><code class="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">$special_offer</code> - Discounts/promotions</span>
+              <span><code class="bg-blue-100 dark:bg-blue-800 px-2 py-1 rounded">$language</code> - english/arabic</span>
+            </div>
+          </div>
+          <div class="mt-3 p-3 bg-blue-100 dark:bg-blue-800 rounded text-xs">
+            <strong>Example:</strong><br>
+            <code class="text-blue-900 dark:text-blue-200">
+              Generate a professional HTML email template for $product_name targeting $target_audience. 
+              The goal is to $message_goal. Use a $tone tone and write in $language. 
+              Highlight these advantages: $product_advantages. 
+              Include contact link: $contact_link from $company_name.
+              @if(@$special_offer) Add this special offer: $special_offer @endif
+            </code>
+          </div>
+        </div>
+
         <div>
-          <x-input-label for="prompt" :value="__('Default Prompt')" />
-          <textarea wire:model="prompt" id="prompt" rows="4"
+          <x-input-label for="prompt" :value="__('Base Prompt')" />
+          <textarea wire:model="prompt" id="prompt" rows="6"
             class="block mt-1 w-full border-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 focus:border-primary-500 dark:focus:border-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 rounded-md shadow-sm"
-            placeholder="Generate a html email template with the following conditions"></textarea>
+            placeholder="Generate a professional HTML email template for $product_name targeting $target_audience. The goal is to $message_goal. Use a $tone tone and write in $language. Highlight these advantages: $product_advantages. Include contact link: $contact_link from $company_name. Special offer: $special_offer"></textarea>
           <x-input-error :messages="$errors->get('prompt')" class="mt-2" />
           <p class="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-            This prompt will be used as the base instruction for generating email templates. Users can add specific
-            conditions after this.
+            Write your custom prompt using the variables above. The system will replace each variable with the actual user input when generating emails.
           </p>
         </div>
       </div>
