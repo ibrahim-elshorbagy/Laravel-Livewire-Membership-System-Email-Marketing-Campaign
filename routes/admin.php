@@ -15,6 +15,7 @@ use App\Livewire\Pages\Admin\Server\ServerList;
 
 use App\Livewire\Pages\Admin\SiteSettings\ApiRequests;
 use App\Livewire\Pages\Admin\SiteSettings\ProhibitedWords;
+use App\Livewire\Pages\Admin\SiteSettings\Settings\AiSettings;
 use App\Livewire\Pages\Admin\SiteSettings\SiteSettings;
 use App\Livewire\Pages\Admin\SiteSettings\System\SystemEmails\SystemEmailsForm;
 use App\Livewire\Pages\Admin\SiteSettings\System\SystemEmails\SystemEmailsList;
@@ -58,6 +59,7 @@ use Livewire\Volt\Volt;
 
         // Site Settings
         Route::get('/site/site-settings', SiteSettings::class)->name('admin.site-settings');
+        Route::get('/site/ai-settings', AiSettings::class)->name('admin.ai-settings');
         Route::get('/site/api-requests', ApiRequests::class)->name('admin.site-api-requests');
         Route::get('/site/prohibited-words', ProhibitedWords::class)->name('admin.site-prohibited-words');
 

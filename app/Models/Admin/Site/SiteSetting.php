@@ -15,8 +15,8 @@ class SiteSetting extends Model
         $setting = self::where('property', $property)->first();
         $value = $setting ? $setting->value : $default;
 
-        // Special handling for maintenance mode
-        if ($property === 'maintenance' || $property === 'our_devices') {
+        // Special handling for boolean properties
+        if ($property === 'maintenance' || $property === 'our_devices' || $property === 'openai_active') {
             return filter_var($value, FILTER_VALIDATE_BOOLEAN);
         }
 

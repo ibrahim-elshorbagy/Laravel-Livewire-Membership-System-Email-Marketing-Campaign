@@ -197,6 +197,12 @@
                         </x-nav-link>
                     </li>
                     <li class="px-1 py-0.5">
+                        <x-nav-link :active="request()->routeIs('admin.ai-settings')"
+                            href="{{ route('admin.ai-settings') }}" wire:navigate>
+                            <span>AI Settings</span>
+                        </x-nav-link>
+                    </li>
+                    <li class="px-1 py-0.5">
                         <x-nav-link :active="request()->routeIs('admin.site-prohibited-words')"
                             href="{{ route('admin.site-prohibited-words') }}" wire:navigate>
                             <span>Prohibited Words</span>
@@ -347,6 +353,10 @@
                             <x-nav-link :active="request()->routeIs('admin.site-settings')"
                                 href="{{ route('admin.site-settings') }}" wire:navigate>
                                 <span>Site Settings</span>
+                            </x-nav-link>
+                            <x-nav-link :active="request()->routeIs('admin.ai-settings')"
+                                href="{{ route('admin.ai-settings') }}" wire:navigate>
+                                <span>Ai Settings</span>
                             </x-nav-link>
                             <x-nav-link :active="request()->routeIs('admin.site-prohibited-words')"
                                 href="{{ route('admin.site-prohibited-words') }}" wire:navigate>

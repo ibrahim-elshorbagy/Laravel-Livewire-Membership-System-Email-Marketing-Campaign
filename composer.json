@@ -17,6 +17,7 @@
         "lucasdotvin/laravel-soulbscription": "^4.2",
         "mbarlow/megaphone": "^2.2",
         "mews/purifier": "^3.4",
+        "openai-php/client": "^0.14.0",
         "phpoffice/phpspreadsheet": "^3.9",
         "spatie/laravel-permission": "^6.10",
         "spatie/laravel-webhook-client": "^3.4",

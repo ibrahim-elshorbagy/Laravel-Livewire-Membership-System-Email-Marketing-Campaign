@@ -35,4 +35,20 @@ return [
         ],
     ],
 
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Open AI API Key
+    |--------------------------------------------------------------------------
+    */
+
+    'openai' => [
+        'active'       => env('OPENAI_ACTIVE', false),
+        'api_key'      => env('OPENAI_API_KEY'),
+        'model'        => env('OPENAI_MODEL', 'gpt-4o'),
+        'organization' => env('OPENAI_ORGANIZATION'),
+        'project'      => env('OPENAI_PROJECT'),
+        'role'         => env('OPENAI_ROLE', 'user'),
+    ],
+
 ];
