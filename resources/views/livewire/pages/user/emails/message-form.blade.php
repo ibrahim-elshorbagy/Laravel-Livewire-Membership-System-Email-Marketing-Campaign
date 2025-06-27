@@ -106,11 +106,13 @@
             <x-input-label for="message_plain_text">Message Plain Text</x-input-label>
             <!-- AI Generation Button -->
             @if(App\Models\Admin\Site\SiteSetting::getValue('openai_active', false))
-            <button type="button" x-on:click="$dispatch('open-modal', 'ai-generation-modal')"
-              class="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-md hover:from-purple-600 hover:to-blue-600 transition-all flex items-center space-x-2">
-              <i class="fas fa-magic"></i>
-              <span>Generate with AI</span>
-            </button>
+              @if($canGenerateWithAI)
+              <button type="button" x-on:click="$dispatch('open-modal', 'ai-generation-modal')"
+                class="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-md hover:from-purple-600 hover:to-blue-600 transition-all flex items-center space-x-2">
+                <i class="fas fa-magic"></i>
+                <span>Generate with AI</span>
+              </button>
+              @endif
             @endif
 
           </div>

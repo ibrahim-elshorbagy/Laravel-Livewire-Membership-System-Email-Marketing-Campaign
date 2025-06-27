@@ -16,6 +16,7 @@ use App\Rules\Base64ImageSize;
 use App\Rules\HtmlSize;
 use Illuminate\Support\Facades\Log;
 use OpenAI;
+use LucasDotVin\Soulbscription\Models\Feature;
 
 class MessageForm extends Component
 {
@@ -35,6 +36,10 @@ class MessageForm extends Component
     public $base64_image_size_limit ;
 
     // AI Generation properties
+
+    public $aiGeneratingFeatureName = '';
+    public bool $canGenerateWithAI =false;
+
     public $ai_product_name = '';
     public $ai_product_advantages = '';
     public $ai_target_audience = '';
@@ -44,7 +49,7 @@ class MessageForm extends Component
     public $ai_tone = 'professional';
     public $ai_special_offer = '';
     public $ai_language = 'english';
-    public $ai_include_icons = false; // New property for icons preference
+    public $ai_include_icons = false;
 
     public function rules(): array
     {
@@ -76,6 +81,11 @@ class MessageForm extends Component
         }
         $this->html_size_limit = SiteSetting::getValue('html_size_limit')?? 1500 ;
         $this->base64_image_size_limit = SiteSetting::getValue('base64_image_size_limit')?? 150 ;
+
+        $feature = Feature::find(3);
+        $this->aiGeneratingFeatureName = $feature?->name;
+        $this->canGenerateWithAI = Auth::user()->canConsume($this->aiGeneratingFeatureName, 1);
+
     }
 
     public function togglePreview()
@@ -146,6 +156,15 @@ class MessageForm extends Component
             'ai_include_icons' => 'boolean',
         ]);
 
+        $feature = Feature::find(3);
+        $aiGeneratingFeatureName = $feature?->name;
+        $user = Auth::user();
+
+        if(!$user->canConsume($aiGeneratingFeatureName, 1))
+        {
+            $this->alert('error', 'You do not have enough quota to generate AI content. Please upgrade your plan or contact support.');
+            return;
+        }
 
         try {
             // Get AI prompt from settings
@@ -192,6 +211,27 @@ class MessageForm extends Component
             //     'result' => $result ?? '',
             //     'response' => $result->choices[0]->message->content ?? '',
             // ]);
+
+
+            $aiGeneratingFeature = $user->subscription->plan->features->firstWhere('name', $aiGeneratingFeatureName);
+
+            // Retrieve the total quota (limit) from the feature's pivot table
+            $aiGeneratingFeatureTotalQuota = $aiGeneratingFeature->pivot->charges;
+
+            // Retrieve the User's feature Remaining balance
+            $aiGeneratingUserBalance = $user->balance($this->aiGeneratingFeatureName);
+
+            // Calculate the amount the user has consumed (total quota - remaining balance)
+            $oldConsumed = $aiGeneratingFeatureTotalQuota - $aiGeneratingUserBalance;
+
+            // Add the amount the user is about to consume (count of emails to send)
+            $newTotalConsumed = $oldConsumed + 1;
+
+            // Set the new consumed quota
+            $user->setConsumedQuota($this->aiGeneratingFeatureName, $newTotalConsumed);
+
+
+
             
             $generatedContent = trim($result->choices[0]->message->content ?? '');
 

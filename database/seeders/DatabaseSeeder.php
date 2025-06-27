@@ -15,12 +15,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(PlansSeeder::class);
-        $this->call(SettingSeeder::class);
+        // $this->call(PlansSeeder::class);
+        $this->call(AiFeatureSeeder::class);
+        // $this->call(SettingSeeder::class);
 
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $userRole = Role::firstOrCreate(['name' => 'user']);
-        $this->call([PermissionSeeder::class]);
+        // $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        // $userRole = Role::firstOrCreate(['name' => 'user']);
+        // $this->call([PermissionSeeder::class]);
 
         // User::factory(10000)->create()->each(function ($user) use ($userRole) {
         //     $user->assignRole($userRole);
@@ -29,35 +30,35 @@ class DatabaseSeeder extends Seeder
 
 
 
-         $user = User::factory()->create([
-            'first_name' => 'Administrator',
-            'last_name' => 'admin',
-            'username' => 'a',
-            'email' => 'a@a.a',
-            'password' => bcrypt('a'),
-            'image_url'=>'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
-            'active' => true
-        ]);
-        $user->assignRole($adminRole);
+        //  $user = User::factory()->create([
+        //     'first_name' => 'Administrator',
+        //     'last_name' => 'admin',
+        //     'username' => 'a',
+        //     'email' => 'a@a.a',
+        //     'password' => bcrypt('a'),
+        //     'image_url'=>'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+        //     'active' => true
+        // ]);
+        // $user->assignRole($adminRole);
 
-        $user = User::factory()->create([
-            'first_name' => 'ibrahim',
-            'last_name' => 'elshorbagy',
-            'username' => 'u',
-            'email' => 'ibrahim.elshorbagy47@gmail.com',
-            'password' => bcrypt('u'),
-            'image_url'=>'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
-            'active' => true
-        ]);
-        $user->assignRole($userRole);
-        $user->graceSubscribeTo(Plan::find(1));
+        // $user = User::factory()->create([
+        //     'first_name' => 'ibrahim',
+        //     'last_name' => 'elshorbagy',
+        //     'username' => 'u',
+        //     'email' => 'ibrahim.elshorbagy47@gmail.com',
+        //     'password' => bcrypt('u'),
+        //     'image_url'=>'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+        //     'active' => true
+        // ]);
+        // $user->assignRole($userRole);
+        // $user->graceSubscribeTo(Plan::find(1));
 
-        $this->call(EmailMessageSeeder::class);
-        $this->call(ServerSeeder::class);
+        // $this->call(EmailMessageSeeder::class);
+        // $this->call(ServerSeeder::class);
 
 
-        // $this->call([EmailListSeeder::class]);
-        $this->call([EmailSystemSeeder::class]);
+        // // $this->call([EmailListSeeder::class]);
+        // $this->call([EmailSystemSeeder::class]);
 
     }
 }
