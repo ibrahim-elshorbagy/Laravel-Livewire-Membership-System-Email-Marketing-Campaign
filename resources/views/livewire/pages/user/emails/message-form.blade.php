@@ -32,14 +32,7 @@
           <div class="flex justify-between items-center mb-4">
             <x-input-label>HTML Template</x-input-label>
             <div class="flex items-center space-x-4">
-              <!-- AI Generation Button -->
-              @if(App\Models\Admin\Site\SiteSetting::getValue('openai_active', false))
-              <button type="button" x-on:click="$dispatch('open-modal', 'ai-generation-modal')"
-                class="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-md hover:from-purple-600 hover:to-blue-600 transition-all flex items-center space-x-2">
-                <i class="fas fa-magic"></i>
-                <span>Generate with AI</span>
-              </button>
-              @endif
+
 
               <button type="button"
                 @click="$wire.set('activeEditor', 'advanced'); $dispatch('editor-changed', { editor: 'advanced' })"
@@ -109,7 +102,18 @@
 
 
         <div class="no-tailwindcss-support-display">
-          <x-input-label for="message_plain_text">Message Plain Text</x-input-label>
+          <div class="flex justify-between items-center py-2">
+            <x-input-label for="message_plain_text">Message Plain Text</x-input-label>
+            <!-- AI Generation Button -->
+            @if(App\Models\Admin\Site\SiteSetting::getValue('openai_active', false))
+            <button type="button" x-on:click="$dispatch('open-modal', 'ai-generation-modal')"
+              class="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-md hover:from-purple-600 hover:to-blue-600 transition-all flex items-center space-x-2">
+              <i class="fas fa-magic"></i>
+              <span>Generate with AI</span>
+            </button>
+            @endif
+
+          </div>
           <x-primary-textarea wire:model="message_plain_text" id="message_plain_text" rows="16" dir='auto'
             class="block mt-1 w-full"> </x-primary-textarea>
           {{--
@@ -271,7 +275,7 @@
             <x-input-label for="ai_product_advantages" value="Main Product Advantages *" />
             <x-primary-textarea wire:model="ai_product_advantages" id="ai_product_advantages" rows="3"
               class="block mt-1 w-full border-neutral-300 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 focus:border-primary-500 dark:focus:border-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 rounded-md shadow-sm"
-              placeholder="What makes your product special? List the key benefits and advantages..."/>
+              placeholder="What makes your product special? List the key benefits and advantages..." />
             <x-input-error :messages="$errors->get('ai_product_advantages')" class="mt-2" />
           </div>
           <!-- Special Offer -->
@@ -314,6 +318,17 @@
             <x-input-error :messages="$errors->get('ai_language')" class="mt-2" />
           </div>
 
+          <!-- Include Icons Checkbox -->
+          <div class="col-span-1 md:col-span-2">
+            <div class="flex items-center p-4 bg-neutral-50 dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700">
+              <input wire:model="ai_include_icons" type="checkbox" id="ai_include_icons" 
+                class="w-5 h-5 rounded border-neutral-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 dark:border-neutral-700 dark:bg-neutral-900 dark:focus:border-primary-600 dark:focus:ring-primary-600">
+              <label for="ai_include_icons" class="ml-3 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                Include creative icons in the content to make it more engaging 
+                <span class="ml-2 text-lg">✅ 🧠 🔥 🤖 🚀 💯 ⭐</span>
+              </label>
+            </div>
+          </div>
 
         </div>
 

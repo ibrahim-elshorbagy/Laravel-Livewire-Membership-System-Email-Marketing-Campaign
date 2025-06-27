@@ -44,6 +44,7 @@ class MessageForm extends Component
     public $ai_tone = 'professional';
     public $ai_special_offer = '';
     public $ai_language = 'english';
+    public $ai_include_icons = false; // New property for icons preference
 
     public function rules(): array
     {
@@ -142,12 +143,13 @@ class MessageForm extends Component
             'ai_tone' => 'required|string',
             'ai_special_offer' => 'nullable|string|max:255',
             'ai_language' => 'required|in:english,arabic',
+            'ai_include_icons' => 'boolean',
         ]);
 
 
         try {
             // Get AI prompt from settings
-            $basePrompt = SiteSetting::getValue('prompt', 'Generate a Email Message  Plain Text with the following conditions');
+            $basePrompt = SiteSetting::getValue('prompt', 'Generate a Email Message Plain Text with the following conditions');
             
             // Define variable mappings for admin prompt
             $variables = [
@@ -166,6 +168,11 @@ class MessageForm extends Component
             $prompt = $basePrompt;
             foreach ($variables as $variable => $value) {
                 $prompt = str_replace($variable, $value, $prompt);
+            }
+            
+            // Add icon instructions if the option is checked
+            if ($this->ai_include_icons) {
+                $prompt .= "\n\nPlease include creative and engaging icons/emojis in the content such as ✅ 🧠 🔥 🤖 🚀 💯 ⭐ 🌟 💪 📈 🎯 🎁 💼 📱 💡 and other relevant emojis to emphasize key points and make the email more visually appealing and engaging.";
             }
 
             $openAi = OpenAI::client(SiteSetting::getValue('openai_api_key', config('services.openai.api_key')));
