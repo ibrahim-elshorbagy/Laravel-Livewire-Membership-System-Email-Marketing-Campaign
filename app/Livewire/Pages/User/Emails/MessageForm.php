@@ -44,7 +44,6 @@ class MessageForm extends Component
     public $ai_tone = 'professional';
     public $ai_special_offer = '';
     public $ai_language = 'english';
-    public $is_generating = false;
 
     public function rules(): array
     {
@@ -122,20 +121,6 @@ class MessageForm extends Component
         }
     }
 
-    public function getAiValidationRules(): array
-    {
-        return [
-            'ai_product_name' => 'required|string|max:255',
-            'ai_product_advantages' => 'required|string|max:500',
-            'ai_target_audience' => 'required|string|max:255',
-            'ai_message_goal' => 'required|string|max:255',
-            'ai_contact_link' => 'nullable|string|max:255',
-            'ai_company_name' => 'required|string|max:255',
-            'ai_tone' => 'required|string',
-            'ai_special_offer' => 'nullable|string|max:255',
-            'ai_language' => 'required|in:english,arabic',
-        ];
-    }
 
     public function generateAIMessage()
     {
@@ -147,9 +132,18 @@ class MessageForm extends Component
         }
 
         // Validate AI form data
-        $this->validate($this->getAiValidationRules());
+        $this->validate([
+            'ai_product_name' => 'required|string|max:255',
+            'ai_product_advantages' => 'required|string|max:500',
+            'ai_target_audience' => 'required|string|max:255',
+            'ai_message_goal' => 'required|string|max:255',
+            'ai_contact_link' => 'nullable|string|max:255',
+            'ai_company_name' => 'required|string|max:255',
+            'ai_tone' => 'required|string',
+            'ai_special_offer' => 'nullable|string|max:255',
+            'ai_language' => 'required|in:english,arabic',
+        ]);
 
-        $this->is_generating = true;
 
         try {
             // Get AI prompt from settings
@@ -203,31 +197,15 @@ class MessageForm extends Component
                 // Close the modal
                 $this->dispatch('close-modal', 'ai-generation-modal');
                 
-                // Reset AI form
-                $this->resetAIForm();
             } else {
                 $this->alert('error', 'Failed to generate content. Please try again.');
             }
 
         } catch (\Exception $e) {
             $this->alert('error', 'AI generation failed: ' . $e->getMessage());
-        } finally {
-            $this->is_generating = false;
-        }
+        } 
     }
 
-    public function resetAIForm()
-    {
-        $this->ai_product_name = '';
-        $this->ai_product_advantages = '';
-        $this->ai_target_audience = '';
-        $this->ai_message_goal = '';
-        $this->ai_contact_link = '';
-        $this->ai_company_name = '';
-        $this->ai_tone = 'professional';
-        $this->ai_special_offer = '';
-        $this->ai_language = 'english';
-    }
 
     public function render()
     {
