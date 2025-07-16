@@ -8,8 +8,9 @@
                 :class="selectedTab === 'all' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">All</button>
             <button x-on:click="selectedTab = 'active'"
-                        :class="selectedTab === 'active' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
-                        class="px-4 py-2 text-sm h-min" role="tab">Active</button>
+                :class="selectedTab === 'active' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
+                class="px-4 py-2 text-sm h-min" role="tab">Active</button>
+
             <button x-on:click="selectedTab = 'canceled'"
                 :class="selectedTab === 'canceled' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">Canceled</button>
@@ -19,9 +20,12 @@
             <button x-on:click="selectedTab = 'suppressed'"
                 :class="selectedTab === 'suppressed' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
                 class="px-4 py-2 text-sm h-min" role="tab">Suppressed</button>
-            <button x-on:click="selectedTab = 'expired'"
+            <button x-on:click="selectedTab = 'graceEnded'"
+                :class="selectedTab === 'graceEnded' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
+                class="px-4 py-2 text-sm h-min" role="tab">Grace Ended</button>
+            {{-- <button x-on:click="selectedTab = 'expired'"
                 :class="selectedTab === 'expired' ? 'font-bold text-black border-b-2 border-black dark:border-orange-500 dark:text-orange-500' : 'text-neutral-600'"
-                class="px-4 py-2 text-sm h-min" role="tab">Expired</button>
+                class="px-4 py-2 text-sm h-min" role="tab">Expired</button> --}}
         </div>
 
         <!-- All Tab Content -->
@@ -33,12 +37,22 @@
             ])
         </div>
 
+        <!-- Active Tab Content -->
         <div x-show="selectedTab === 'active'">
-                @include('livewire.pages.admin.subscription.partials.table', [
-                'items' => $this->activeSubscriptions,
-                'search' => 'searchActive',
-                'searchPlaceholder' => 'Search active subscriptions...'
-                ])
+            @include('livewire.pages.admin.subscription.partials.table', [
+            'items' => $this->activeSubscriptions,
+            'search' => 'searchActive',
+            'searchPlaceholder' => 'Search active subscriptions...'
+            ])
+        </div>
+
+        <!-- Grace Ended Tab Content -->
+        <div x-show="selectedTab === 'graceEnded'">
+            @include('livewire.pages.admin.subscription.partials.table', [
+            'items' => $this->graceEndedSubscriptions,
+            'search' => 'searchGraceEnded',
+            'searchPlaceholder' => 'Search grace ended subscriptions...'
+            ])
         </div>
 
         <!-- Canceled Tab Content -->
@@ -58,6 +72,7 @@
             'searchPlaceholder' => 'Search deleted subscriptions...'
             ])
         </div>
+
         <!-- Suppressed Tab Content -->
         <div x-show="selectedTab === 'suppressed'">
             @include('livewire.pages.admin.subscription.partials.table', [
@@ -68,12 +83,12 @@
         </div>
 
         <!-- Expired Tab Content -->
-        <div x-show="selectedTab === 'expired'">
+        {{-- <div x-show="selectedTab === 'expired'">
             @include('livewire.pages.admin.subscription.partials.table', [
             'items' => $this->expiredSubscriptions,
             'search' => 'searchExpired',
             'searchPlaceholder' => 'Search expired subscriptions...'
             ])
-        </div>
+        </div> --}}
     </div>
 </div>

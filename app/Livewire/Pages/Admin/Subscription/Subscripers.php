@@ -26,6 +26,7 @@ class Subscripers extends Component
     public $searchDeleted = '';
     public $searchSuppressed = '';
     public $searchExpired = '';
+    public $searchGraceEnded = '';
     public $perPage = 10;
     public $selectedTab = 'all';
     public $selectedSubscriptionId = null;
@@ -37,6 +38,7 @@ class Subscripers extends Component
         'searchCanceled' => ['except' => ''],
         'searchSuppressed' => ['except' => ''],
         'searchExpired' => ['except' => ''],
+        'searchGraceEnded' => ['except' => ''],
         'selectedTab' => ['except' => 'all'],
     ];
 
@@ -61,6 +63,11 @@ class Subscripers extends Component
     }
 
     public function updatingSearchExpired()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSearchGraceEnded()
     {
         $this->resetPage();
     }
@@ -128,9 +135,41 @@ class Subscripers extends Component
             ->paginate($this->perPage);
     }
 
+    #[Computed]
+    public function graceEndedSubscriptions()
+    {
+        // Use the same query approach that works in the console task
+        return Subscription::withoutGlobalScopes()
+            ->whereNotNull('grace_days_ended_at')
+            ->where('grace_days_ended_at', '<', now())
+            ->with([
+                'plan.features' => function($query) {
+                    $query->withPivot('charges');
+                },
+                'subscriber' => function($query) {
+                    $query->withTrashed()
+                        ->with(['featureConsumptions' => function($q) {
+                            $q->with(['feature']);
+                        }]);
+                },
+                'payments' => function($query) {
+                    $query->latest();
+                },
+                'note'
+            ])
+            ->when(!in_array('graceEnded', ['all', 'deleted']), function($query) {
+                $query->whereHas('subscriber', function($q) {
+                    $q->whereNull('deleted_at');
+                });
+            })
+            ->when($this->searchGraceEnded, $this->searchCallback())
+            ->latest()
+            ->paginate($this->perPage);
+    }
+
     protected function baseQuery(string $status = 'all')
     {
-        $query =  Subscription::with([
+        $query = Subscription::with([
                 'plan.features' => function($query) {
                     $query->withPivot('charges');
                 },
@@ -159,7 +198,9 @@ class Subscripers extends Component
                 $q->onlyTrashed();
             }),
             'suppressed' => $query->whereNotNull('suppressed_at'),
-            'expired' => $query->whereNotNull('expired_at'),
+            'expired' => $query->whereNotNull('expired_at')->where('expired_at', '<', now()),
+            'graceEnded' => $query->whereNotNull('grace_days_ended_at')
+                                ->where('grace_days_ended_at', '<', now()),
             'active' => $query->whereNull('canceled_at')
                             ->whereNull('suppressed_at')
                             ->where(function($q) {
@@ -178,6 +219,7 @@ class Subscripers extends Component
                 'deleted' => 'searchDeleted',
                 'suppressed' => 'searchSuppressed',
                 'expired' => 'searchExpired',
+                'graceEnded' => 'searchGraceEnded',
                 'active' => 'searchActive',
                 default => 'searchAll',
             }};

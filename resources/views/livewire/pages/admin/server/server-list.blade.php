@@ -328,13 +328,13 @@
                     </td>
                     <td class="p-4">
                         <div class="flex space-x-2">
-                            <div class="flex items-center gap-2">
+                            {{-- <div class="flex items-center gap-2">
                                 <button type="button"
                                     x-on:click="$dispatch('open-modal', 'edit-note-modal'); $wire.selectedServerId = {{ $server->id }}; $wire.edit_admin_notes = `{{ $server->admin_notes ?? '' }}`"
                                     class="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
                                     <i class="fa-solid fa-note-sticky"></i>
                                 </button>
-                            </div>
+                            </div> --}}
                             <a href="{{ route('admin.site-api-requests') }}?search={{ $server->name }}" wire:navigate
                                 class="inline-flex items-center gap-2 px-2 py-1 text-xs text-purple-500 rounded-md text-nowrap bg-purple-500/10 hover:bg-purple-500/20">
                                 API Requests

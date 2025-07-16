@@ -56,7 +56,7 @@ class EditPayment extends Component
         $this->user = $payment->user;
         $this->plan = $payment->plan;
         if($payment->subscription_id){
-            $this->subscription = Subscription::with(['plan'])->withoutGlobalScopes([SuppressingScope::class, StartingScope::class])
+            $this->subscription = Subscription::with(['plan'])->withoutGlobalScopes()
             ->find($payment->subscription_id);
         }
         $this->offlinePaymentMethods = OfflinePaymentMethod::select('id', 'name','slug')->get();

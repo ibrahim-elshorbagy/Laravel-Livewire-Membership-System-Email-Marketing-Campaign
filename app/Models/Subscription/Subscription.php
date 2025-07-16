@@ -4,6 +4,8 @@ namespace App\Models\Subscription;
 
 use App\Models\Payment\Payment;
 use LucasDotVin\Soulbscription\Models\Subscription as BaseSubscription;
+use LucasDotVin\Soulbscription\Models\Scopes\SuppressingScope;
+use LucasDotVin\Soulbscription\Models\Scopes\StartingScope;
 
 class Subscription extends BaseSubscription
 {
@@ -39,4 +41,15 @@ class Subscription extends BaseSubscription
         });
     }
 
+    /**
+     * Find subscriptions with expired grace periods
+     * This scope explicitly disables global scopes that might filter out records
+     */
+    public static function findWithExpiredGracePeriod()
+    {
+        // Use exactly the same query that works in the direct DB approach
+        return static::withoutGlobalScopes()  // Disable ALL global scopes, not just specific ones
+            ->whereNotNull('grace_days_ended_at')
+            ->where('grace_days_ended_at', '<', now());
+    }
 }
