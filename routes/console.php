@@ -38,8 +38,8 @@ Schedule::call(function () {
     }
   }
 })
-  ->everyMinute()
-  // ->daily()
+  // ->everyMinute()
+  ->daily()
   ->before(function () {
     Log::channel('worker')->info('Starting expired grace period server cleanup...');
   })
