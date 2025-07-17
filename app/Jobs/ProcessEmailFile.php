@@ -67,6 +67,8 @@ class ProcessEmailFile implements ShouldQueue
 
             if (in_array($extension, ['xlsx', 'xls'])) {
                 $this->processExcelFile($remainingSpace, $targetTotal, $currentCount);
+            } elseif ($extension === 'csv') {
+                $this->processCsvFile($remainingSpace, $targetTotal, $currentCount);
             } else {
                 $this->processTextFile($remainingSpace, $targetTotal, $currentCount);
             }
@@ -228,17 +230,146 @@ class ProcessEmailFile implements ShouldQueue
         $fileSize = Storage::size($this->filePath);
         $extension = strtolower(pathinfo($this->filePath, PATHINFO_EXTENSION));
 
-        if (in_array($extension, ['xlsx', 'xls'])) {
+        if (in_array($extension, ['xlsx', 'xls', 'csv'])) {
             try {
                 $reader = IOFactory::createReaderForFile(Storage::path($this->filePath));
                 $reader->setReadDataOnly(true);
                 $worksheetInfo = $reader->listWorksheetInfo(Storage::path($this->filePath));
                 return $worksheetInfo[0]['totalRows'];
             } catch (\Exception $e) {
+                Log::warning('Failed to get worksheet info', ['error' => $e->getMessage()]);
                 return (int) ceil($fileSize / 100);
             }
         }
         return (int) ceil($fileSize / 30);
+    }
+
+    protected function processCsvFile($remainingSpace, $targetTotal, $currentCount)
+    {
+        $fullPath = Storage::path($this->filePath);
+        // Log::info('Processing CSV file', ['file' => $this->filePath, 'fullPath' => $fullPath]);
+
+        try {
+
+            $tempPath = $fullPath . '_utf8.csv';
+            $in = fopen($fullPath, 'r');
+            $out = fopen($tempPath, 'w');
+
+            while (($line = fgets($in)) !== false) {
+                $utf8Line = iconv('CP1256', 'UTF-8//IGNORE', $line);
+                fwrite($out, $utf8Line);
+            }
+
+            fclose($in);
+            fclose($out);
+
+            // Now use $tempPath for PhpSpreadsheet
+            $reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
+            $reader->setInputEncoding('UTF-8');
+            $reader->setEnclosure('"');
+            $reader->setEscapeCharacter('\\');
+
+            $spreadsheet = $reader->load($tempPath);
+
+            // Load the CSV file
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            // Log::info('CSV file loaded successfully', ['worksheet' => $worksheet->getTitle()]);
+
+            $batch = [];
+            $processedCount = 0;
+            $rowCount = 0;
+
+            // Get the highest row and column indexes
+            $highestRow = $worksheet->getHighestRow();
+            $highestColumn = $worksheet->getHighestColumn();
+
+            // Log::info('CSV dimensions', ['rows' => $highestRow, 'columns' => $highestColumn]);
+
+            // Skip header row if exists
+            $startRow = 2; // Assuming first row is header
+
+            // Iterate through rows
+            for ($row = $startRow; $row <= $highestRow; $row++) {
+                if ($processedCount >= $remainingSpace) {
+                    // Log::info('Reached quota limit', ['processed' => $processedCount, 'quota' => $remainingSpace]);
+                    break;
+                }
+
+                $rowData = [];
+
+                // Get email from column A
+                $emailValue = $worksheet->getCell('A' . $row)->getValue();
+                // Get name from column B if exists
+                $nameValue = $worksheet->getCell('B' . $row)->getValue();
+
+                // Clean and validate email
+                if ($emailValue) {
+                    // Extract email if it's in a format like "email@example.com,"Name""
+                    if (strpos($emailValue, ',') !== false) {
+                        $parts = explode(',', $emailValue, 2);
+                        $emailValue = trim($parts[0], '"');
+                        // If name wasn't in column B, use the second part of the split
+                        if (empty($nameValue) && isset($parts[1])) {
+                            $nameValue = trim($parts[1], '"');
+                        }
+                    }
+
+                    // Validate email
+                    if (filter_var($emailValue, FILTER_VALIDATE_EMAIL)) {
+                        $rowData['email'] = $emailValue;
+
+                        // Validate and sanitize name
+                        if ($nameValue && is_string($nameValue) && strlen($nameValue) <= 255) {
+                            $rowData['name'] = strip_tags(trim($nameValue));
+                        }
+
+                        // Log::debug('Extracted data', ['row' => $row, 'email' => $rowData['email'], 'name' => $rowData['name'] ?? 'null']);
+
+                        $batch[] = [
+                            'user_id' => $this->userId,
+                            'list_id' => $this->listId,
+                            'email' => $rowData['email'],
+                            'name' => $rowData['name'] ?? null,
+                        ];
+
+                        if (count($batch) >= $this->batchSize) {
+                            $inserted = $this->insertBatchAndUpdateProgress($batch, $remainingSpace, $currentCount, $processedCount);
+                            $processedCount += $inserted;
+                            // Log::info('Batch inserted', ['count' => $inserted, 'total_processed' => $processedCount]);
+                            $batch = [];
+                        }
+                    } else {
+                        Log::warning('Invalid email found', ['row' => $row, 'value' => $emailValue]);
+                    }
+                }
+
+                $rowCount++;
+            }
+
+            // Insert any remaining records
+            if (!empty($batch)) {
+                $inserted = $this->insertBatchAndUpdateProgress($batch, $remainingSpace, $currentCount, $processedCount);
+                $processedCount += $inserted;
+                // Log::info('Final batch inserted', ['count' => $inserted, 'total_processed' => $processedCount]);
+            }
+
+            // Log::info('CSV processing completed', ['total_rows' => $rowCount, 'processed' => $processedCount]);
+
+            // Clean up
+            $spreadsheet->disconnectWorksheets();
+            unset($spreadsheet);
+
+            return $processedCount;
+
+        } catch (\Exception $e) {
+            Log::error('CSV processing failed', [
+                'error' => $e->getMessage(),
+                'file' => $this->filePath,
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
     }
 
     private function updateQuota(int $totalCount): void

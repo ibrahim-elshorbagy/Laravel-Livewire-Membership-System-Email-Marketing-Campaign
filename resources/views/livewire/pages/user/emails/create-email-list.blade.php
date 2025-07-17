@@ -103,38 +103,35 @@
                 </h3>
             </div>
             <!-- Content -->
-            <div class="mt-2 sm:mt-0">
-                <div class="mt-2 space-y-2 text-yellow-700 text-md dark:text-neutral-300">
-                    <p >
-                        - Importing will start immediately when importing from  ( file text or Excel file )
-                    </p>
-                    <p>
-                        - You Can Import Email And Name with Excel file only
-                    </p>
-                    <p >
-                        - Enter one email per line or separate emails with commas.
-                    </p>
-                    <p >
-                        - Press <kbd class="text-red-500">Enter</kbd> For new line.
-                    </p>
-                    <p >
-                        - Invalid emails will appear in <span class="text-red-500">red</span>.
-                    </p>
-                    <p >
-                        - Maximum displayed: <span class="font-bold" x-text="maxDisplayEmails"></span> emails
-                    </p>
-                    <p >
-                        - Example of accepted text file format:
-                    </p>
-                    <p class="my-4 text-sm text-gray-600 dark:text-gray-300">
-                        test1@outlook.com -> test1@outlook.com <br>
-                        1. test@outlook.com -> test@outlook.com <br>
-                        2- test@outlook.com -> test@outlook.com <br>
-                        3: test@example.com -> test@example.com <br>
-                        4) test1@email.com -> test1@email.com <br>
-                    </p>
-                </div>
-            </div>
+           <div class="mt-4 space-y-6 text-md text-yellow-700 dark:text-neutral-300">
+
+              <!-- Upload Info Section -->
+              <div class="border border-yellow-300 rounded-xl p-4 bg-yellow-50 dark:bg-neutral-800">
+                  <h2 class="text-lg font-bold mb-2">📁 Upload Instructions</h2>
+                  <p>- You can only upload <strong>.txt</strong>, <strong>.csv</strong>, or <strong>Excel</strong> files.</p>
+                  <p>- Files must include columns named <strong>"email"</strong> and <strong>"name"</strong>.</p>
+                  <p>- Importing will start immediately after uploading the file.</p>
+              </div>
+
+              <!-- Manual Entry Info Section -->
+              <div class="border border-yellow-300 rounded-xl p-4 bg-yellow-50 dark:bg-neutral-800">
+                  <h2 class="text-lg font-bold mb-2">✍️ Manual Entry Instructions</h2>
+                  <p>- Enter one email per line or separate emails with commas.</p>
+                  <p>- Press <kbd class="text-red-500">Enter</kbd> for a new line.</p>
+                  <p>- Invalid emails will appear in <span class="text-red-500">red</span>.</p>
+                  <p>- Maximum displayed: <span class="font-bold" x-text="maxDisplayEmails"></span> emails</p>
+                  <p>- Example of accepted text format:</p>
+                  <div class="my-3 text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                      test1@outlook.com → test1@outlook.com <br>
+                      1. test@outlook.com → test@outlook.com <br>
+                      2- test@outlook.com → test@outlook.com <br>
+                      3: test@example.com → test@example.com <br>
+                      4) test1@email.com → test1@email.com
+                  </div>
+              </div>
+              
+          </div>
+
 
         </div>
     </div>

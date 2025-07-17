@@ -1,0 +1,28 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-BBR9UsA8.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/AdvanceTinyMCE.js": {
+    "file": "assets/AdvanceTinyMCE-CiCdJ6HO.js",
+    "name": "AdvanceTinyMCE",
+    "src": "resources/js/AdvanceTinyMCE.js",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-CyHb26dM.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "css": [
+      "assets/app-CksuuEqD.css"
+    ]
+  },
+  "resources/js/codeEditor.js": {
+    "file": "assets/codeEditor-BqrW3QjV.js",
+    "name": "codeEditor",
+    "src": "resources/js/codeEditor.js",
+    "isEntry": true
+  }
+}

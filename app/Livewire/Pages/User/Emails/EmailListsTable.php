@@ -199,21 +199,17 @@ class EmailListsTable extends Component
 
     public function updateJobStatus($status)
     {
-        // Micro-debug to see how long it takes
-        $start = microtime(true);
-
-        // Only update & re-render if the status actually changed
-        if ($this->hasActiveJobsFlag === $status) {
-            $this->skipRender(); // <— prevents re-running queries
-            // Log::info('No change to hasActiveJobsFlag, skipping render.');
+        // Skip if no actual change
+        if ($this->hasActiveJobsFlag === (bool)$status) {
+            $this->skipRender();
             return;
         }
 
-        // Otherwise, update as normal
-        $this->hasActiveJobsFlag = $status;
+        // Force update the property
+        $this->hasActiveJobsFlag = (bool)$status;
 
-        $elapsed = microtime(true) - $start;
-        // Log::info('updateJobStatus changed flag to '.($status ? 'true' : 'false').', took '.$elapsed.' seconds');
+        // Add this to ensure Livewire knows to update
+        $this->dispatch('refresh-action-buttons');
     }
 
 

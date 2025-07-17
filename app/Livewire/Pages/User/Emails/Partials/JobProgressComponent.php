@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages\User\Emails\Partials;
 
+use App\Livewire\Pages\User\Emails\EmailListsTable;
 use Livewire\Component;
 use App\Models\JobProgress;
 use Illuminate\Support\Facades\DB;
@@ -30,14 +31,12 @@ class JobProgressComponent extends Component
      */
     public function refreshProgress()
     {
-        // $start = microtime(true);
-
         $activeJobsExist = $this->checkActiveJobs();
-        // If there's no change in job status, no need to dispatch anything
+
         if ($activeJobsExist != session('active_jobs_flag')) {
             session(['active_jobs_flag' => $activeJobsExist]);
-            // Tell the parent if anything changed
-            $this->dispatch('jobStatusUpdated', $activeJobsExist);
+            // Add this line to ensure the event is properly dispatched
+            $this->dispatch('jobStatusUpdated', status: $activeJobsExist)->to(EmailListsTable::class);
         }
 
         // If active jobs remain true, keep poll at 1s; otherwise slow it to 10s

@@ -2,6 +2,7 @@
 namespace App\Jobs;
 
 use App\Models\EmailList;
+use App\Models\EmailListName;
 use App\Models\JobProgress;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -53,9 +54,29 @@ class DeleteEmails implements ShouldQueue
     public function handle()
     {
         try {
-            // Get initial count and setup progress
+            Log::info("Starting DeleteEmails Job", [
+                'user_id' => $this->userId,
+                'list_id_input' => $this->listId,
+                'isPageAction' => $this->isPageAction,
+                'selectedEmails' => $this->selectedEmails
+            ]);
+
+            // Resolve list_id from name
+            $list = EmailListName::where('name', $this->listId)
+                ->where('user_id', $this->userId)
+                ->first();
+
+            if (!$list) {
+                $this->initializeProgress(0);
+                $this->completeProgress("Email list not found.");
+                return;
+            }
+
+            $realListId = $list->id;
+
+            // Build query to select emails
             $query = EmailList::where('user_id', $this->userId)
-                            ->where('list_id', $this->listId);
+                              ->where('list_id', $realListId);
 
             if ($this->isPageAction && !empty($this->selectedEmails)) {
                 $query->whereIn('id', $this->selectedEmails);
@@ -65,30 +86,31 @@ class DeleteEmails implements ShouldQueue
 
             if ($totalCount === 0) {
                 $this->initializeProgress(0);
-                $this->completeProgress("No emails to delete");
+                $this->completeProgress("No emails to delete.");
                 return;
             }
 
-            // Initialize progress before transaction
             $this->initializeProgress($totalCount);
 
             $processedCount = 0;
 
-            // Process deletion in chunks
-            $query->chunkById(1000, function ($chunk) use (&$processedCount) {
+            $query->chunkById(1000, function ($chunk) use (&$processedCount, $realListId) {
                 DB::beginTransaction();
                 try {
-                    // Make sure to include list_id in the deletion query
-                    EmailList::where('list_id', $this->listId)
-                            ->whereIn('id', $chunk->pluck('id'))
-                            ->delete();
+                    $idsToDelete = $chunk->pluck('id')->toArray();
 
-                    $processedCount += $chunk->count();
 
-                    // Update progress outside transaction
+
+                    $deleted = EmailList::where('user_id', $this->userId)
+                        ->where('list_id', $realListId)
+                        ->whereIn('id', $idsToDelete)
+                        ->delete();
+
+
+                    $processedCount += $deleted;
+
                     DB::commit();
 
-                    // Update progress after successful commit
                     if ($this->jobProgress) {
                         $this->jobProgress->update([
                             'processed_items' => $processedCount,
@@ -98,6 +120,7 @@ class DeleteEmails implements ShouldQueue
                     }
                 } catch (\Exception $e) {
                     DB::rollBack();
+                    Log::error("Error during chunk delete: " . $e->getMessage());
                     throw $e;
                 }
             });
@@ -110,8 +133,8 @@ class DeleteEmails implements ShouldQueue
                 $subscribersLimitName = Feature::find(1)?->name;
                 $user->forceSetConsumption($subscribersLimitName, (float) $totalEmailCount);
 
-                // Complete the progress
-                $this->completeProgress("Successfully deleted {$processedCount} emails from list {$this->listId}");
+                $this->completeProgress("Successfully deleted {$processedCount} emails from list.");
+
             });
 
         } catch (\Exception $e) {
@@ -125,6 +148,8 @@ class DeleteEmails implements ShouldQueue
             throw $e;
         }
     }
+
+
 
     protected function completeProgress($message)
     {
