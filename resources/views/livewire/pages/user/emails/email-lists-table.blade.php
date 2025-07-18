@@ -501,7 +501,7 @@
                                             </button>
                                             <button type="button"
                                                 class="ml-2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300"
-                                                x-on:click="$dispatch('open-modal', 'edit-email-modal'); $wire.selectedEmailId = {{ $email->id }}; $wire.editEmail = '{{ $email->email }}'; $wire.editName = '{{ $email->name }}'; $wire.editSoftBounceCounter = '{{ $email->soft_bounce_counter }}'; $wire.editIsHardBounce = '{{ $email->is_hard_bounce }}'">
+                                                x-on:click="$dispatch('open-modal', 'edit-email-modal'); $wire.selectedEmailId = {{ $email->id }}; $wire.editEmail = '{{ $email->email }}'; $wire.editName = '{{ addslashes($email->name) }}'; $wire.editSoftBounceCounter = '{{ $email->soft_bounce_counter }}'; $wire.editIsHardBounce = '{{ $email->is_hard_bounce }}'">
                                                 <i class="fas fa-edit"></i>
                                             </button>
                                         </div>
@@ -513,7 +513,7 @@
 
                         <!-- Pagination -->
                         @if($emails->hasPages())
-                        <div class="mt-4" wire:ignore>
+                        <div class="mt-4">
                             {{ $emails->links(data: ['scrollTo' => false]) }}
                         </div>
                         @endif
