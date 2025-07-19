@@ -69,9 +69,13 @@
                 <!-- Selected servers tags -->
                 @if(count($selectedServers) > 0)
                 <div class="flex flex-wrap gap-2 mt-2">
+                    @php
+                        $selectedServerItems = $availableServers->whereIn('id', $selectedServers);
+                        $visibleServers = $selectedServerItems->take(5);
+                        $remainingCount = $selectedServerItems->count() - 5;
+                    @endphp
 
-
-                    @foreach($availableServers->whereIn('id', $selectedServers) as $server)
+                    @foreach($visibleServers as $server)
                     <span class="inline-flex items-center px-2 py-1 text-sm bg-blue-100 rounded-full dark:bg-blue-900">
                         {{ $server->name }}
                         <button type="button"
@@ -81,6 +85,12 @@
                         </button>
                     </span>
                     @endforeach
+
+                    @if($remainingCount > 0)
+                    <span class="inline-flex items-center px-2 py-1 text-sm bg-gray-100 rounded-full dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                        +{{ $remainingCount }} more
+                    </span>
+                    @endif
                 </div>
                 @endif
 
