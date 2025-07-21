@@ -53,7 +53,7 @@ class CampaignRepeaterService
             // Log::channel('repeater')->info("Cloned campaign created with ID: {$newCampaign->id}");
 
             // Calculate when the next campaign should start based on interval
-            $nextRunAt = now()->addHours($repeater->interval_hours);
+            $nextRunAt = now()->addHours((int) $repeater->interval_hours);
             // Log::channel('repeater')->info("Next run time calculated: {$nextRunAt}");
 
             // Update repeater to point to new campaign and set next run time
