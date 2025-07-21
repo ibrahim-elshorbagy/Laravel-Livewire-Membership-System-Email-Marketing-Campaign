@@ -651,6 +651,26 @@ class EmailGatewayController extends Controller
                 : 0
         ];
 
+
+        // Check if we actually have any emails remaining according to our count
+        if ($remainingEmails <= 0) {
+
+            // If no remaining emails but campaign is not marked as completed, update it
+            if ($campaign->status !== 'Completed') {
+                DB::transaction(function() use ($campaign) {
+                    $campaign->update(['status' => 'Completed']);
+                    $campaign->servers()->detach();
+                });
+            }
+            
+            return [
+                'emails' => $emailsToSend,
+                'summary' => $processingSummary
+            ];
+        }
+
+
+
         foreach ($campaign->emailLists as $list) {
 
             if (count($emailsToSend) >= $this->batchSize) break;
