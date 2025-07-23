@@ -90,7 +90,7 @@ class CampaignList extends Component
 
     public function getCampaignsProperty()
     {
-        return Campaign::with(['message', 'servers', 'emailLists'])
+        return Campaign::with(['repeater:id,campaign_id,next_run_at','message:id,message_title,email_subject', 'servers:id,name', 'emailLists'])
             ->where('user_id', Auth::id())
             ->when($this->search, function ($query) {
                 $query->where(function($q) {

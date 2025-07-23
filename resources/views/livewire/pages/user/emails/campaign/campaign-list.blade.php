@@ -203,6 +203,14 @@
                     </td>
                     <td class="p-4 text-nowrap">
                             {{ $campaign->created_at?->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i A') }}
+                          @if ($campaign?->repeater?->next_run_at)
+                            <br>
+                            Next Run
+                            <br>
+                            {{ $campaign?->repeater?->next_run_at?->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->format('d/m/Y h:i A') }}
+                            <br>
+                            {{ $campaign?->repeater?->next_run_at?->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->diffForHumans()  }}
+                          @endif
                     </td>
                     <td class="p-4">
                         <div class="flex space-x-2">
