@@ -84,6 +84,26 @@
             <x-input-error :messages="$errors->get('totalRepeats')" class="mt-2" />
         </div>
 
+        @if ($next_run_at)
+        <div>
+            <x-input-label for="next_run_at" :value="__('Next Run At')" />
+            <x-text-input
+                x-data
+                x-init="flatpickr($el, {
+                    enableTime: true,
+                    dateFormat: 'Y-m-d H:i',
+                    defaultDate: '{{ $next_run_at }}',
+                    allowInput: true,
+                    time_24hr: true
+                })"
+                wire:model="next_run_at"
+                type="text"
+                class="block mt-1 w-full"
+                placeholder="YYYY-MM-DD HH:MM"
+            />
+            <x-input-error :messages="$errors->get('next_run_at')" class="mt-2" />
+        </div>
+        @endif
         <!-- Activate Repeater -->
         <div class="flex items-center">
             <input id="active" type="checkbox" wire:model.live="active"

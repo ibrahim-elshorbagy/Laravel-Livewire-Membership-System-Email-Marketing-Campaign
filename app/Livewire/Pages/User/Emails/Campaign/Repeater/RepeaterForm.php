@@ -23,6 +23,7 @@ class RepeaterForm extends Component
     public $intervalType = 'days';
     public $totalRepeats = 1;
     public $active = true;
+    public $next_run_at;
     public $repeaterModel;
 
     /**
@@ -79,6 +80,11 @@ class RepeaterForm extends Component
             $this->intervalType = $repeaterModel->interval_type;
             $this->totalRepeats = $repeaterModel->total_repeats;
             $this->active = $repeaterModel->active;
+
+            $userTimezone = auth()->user()->timezone ?? config('app.timezone');
+            $this->next_run_at = $repeaterModel->next_run_at
+                ? Carbon::parse($repeaterModel->next_run_at)->timezone($userTimezone)
+                : null;
         }
         elseif ($campaign) {
             // Validate campaign ID using Laravel validator
@@ -134,6 +140,18 @@ class RepeaterForm extends Component
                 $intervalHours = $this->intervalValue * 24 * 7;
             }
 
+          $fromTimezone = auth()->user()->timezone ?? config('app.timezone');
+          $toTimezone = config('app.timezone');
+
+          // Force convert to string if it's already a Carbon instance (Livewire form inputs often do this)
+          $timeString = is_string($this->next_run_at)
+              ? $this->next_run_at
+              : $this->next_run_at->format('Y-m-d H:i:s');
+
+          // Parse and convert timezone properly
+          $this->next_run_at = Carbon::createFromFormat('Y-m-d H:i:s', $timeString, $fromTimezone)
+                                    ->setTimezone($toTimezone);
+
             $repeaterData = [
                 'user_id' => Auth::id(),
                 'campaign_id' => $this->campaignId,
@@ -141,6 +159,7 @@ class RepeaterForm extends Component
                 'interval_type' => $this->intervalType,
                 'total_repeats' => $this->totalRepeats,
                 'active' => $this->active,
+                'next_run_at' => $this->next_run_at,
             ];
 
             if ($this->repeaterId) {

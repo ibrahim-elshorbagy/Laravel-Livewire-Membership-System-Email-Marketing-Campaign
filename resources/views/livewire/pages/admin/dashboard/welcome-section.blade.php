@@ -19,7 +19,8 @@
                             <p> {{ Auth::user()->first_name }} {{ Auth::user()->last_name }}!</p>
                         </h1>
                         <p class="mt-1 text-xs md:text-sm text-neutral-600 dark:text-neutral-400">
-                            {{ now()->format('l, j F Y') }}
+                            {{ now()->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->format('d-m-Y h:i:s A') }}
+
                         </p>
 
                         @role('user')
