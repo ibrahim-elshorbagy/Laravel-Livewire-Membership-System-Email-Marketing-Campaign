@@ -140,18 +140,20 @@ class RepeaterForm extends Component
                 $intervalHours = $this->intervalValue * 24 * 7;
             }
 
-          $fromTimezone = auth()->user()->timezone ?? config('app.timezone');
-          $toTimezone = config('app.timezone');
+            if(isset($this->next_run_at)) {
+              $fromTimezone = auth()->user()->timezone ?? config('app.timezone');
+              $toTimezone = config('app.timezone');
 
-          // Force convert to string if it's already a Carbon instance (Livewire form inputs often do this)
-          $timeString = is_string($this->next_run_at)
-              ? $this->next_run_at
-              : $this->next_run_at->format('Y-m-d H:i:s');
+              // Force convert to string if it's already a Carbon instance (Livewire form inputs often do this)
+              $timeString = is_string($this->next_run_at)
+                  ? $this->next_run_at
+                  : $this->next_run_at->format('Y-m-d H:i:s');
 
-          // Parse and convert timezone properly
-          $this->next_run_at = Carbon::createFromFormat('Y-m-d H:i:s', $timeString, $fromTimezone)
-                                    ->setTimezone($toTimezone);
+              // Parse and convert timezone properly
+              $this->next_run_at = Carbon::createFromFormat('Y-m-d H:i:s', $timeString, $fromTimezone)
+                                        ->setTimezone($toTimezone);
 
+            }
             $repeaterData = [
                 'user_id' => Auth::id(),
                 'campaign_id' => $this->campaignId,

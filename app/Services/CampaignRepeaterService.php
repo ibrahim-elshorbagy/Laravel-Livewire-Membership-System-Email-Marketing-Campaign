@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Mail\CampaignMail;
 use App\Models\Campaign\Campaign;
 use App\Models\Campaign\CampaignRepeater;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class CampaignRepeaterService
 {
@@ -61,6 +63,22 @@ class CampaignRepeaterService
                 'campaign_id' => $newCampaign->id,
                 'next_run_at' => $nextRunAt
             ]);
+
+
+            $user = $campaign->user;
+            // Prepare mail data
+            $mailData = [
+                'user_id' => $user->id,
+                'slug' => 'repeater-created-campaign',
+                'data' => [
+                    'campaign_name' => $newCampaign->title,
+                    // 'next_run_at' => $nextRunAt->format('d/m/Y h:i:s A')
+                ]
+            ];
+
+            // Send mail
+            Mail::to($user->email)->queue(new CampaignMail($mailData));
+
 
             // Log::channel('repeater')->info("Repeater {$repeater->id} updated - campaign_id: {$newCampaign->id}, next_run_at: {$nextRunAt}");
             // Log::channel('repeater')->info("Created new repeat campaign {$newCampaign->id} for repeater {$repeater->id}, scheduled to start at {$nextRunAt}");

@@ -519,5 +519,35 @@ The Support Team
 
         </x-primary-accordion>
 
+        <x-primary-accordion title="Campaign"
+            :isExpandedByDefault="false">
+            <div class="p-4 mb-4 rounded-lg bg-neutral-50 dark:bg-neutral-700">
+                <h4 class="mb-2 text-lg font-semibold text-neutral-800 dark:text-neutral-200">Notes:</h4>
+                <ul class="list-disc list-inside text-neutral-600 dark:text-neutral-300">
+                    <li><strong>Only Work With Campaign emails</strong>:</li>
+                    <li>repeater-create-campaign</li>
+                    <li>campaign-started</li>
+                    <li>campaign-ended</li>
+                </ul>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[500px] text-gray-600 dark:text-gray-300">
+                    <thead class="bg-neutral-50 dark:bg-neutral-700">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Variable</th>
+                            <th class="px-4 py-2 text-left">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                            <td class="px-4 py-2 font-mono">@{{ $campaign_name }}</td>
+                            <td class="px-4 py-2">Name of the Campaign</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </x-primary-accordion>
+
     </div>
 </div>

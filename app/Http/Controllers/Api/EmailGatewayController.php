@@ -16,6 +16,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CampaignMail;
 use LucasDotVin\Soulbscription\Models\Feature;
 use Exception;
 
@@ -661,6 +663,17 @@ class EmailGatewayController extends Controller
                     $campaign->update(['status' => 'Completed']);
                     $campaign->servers()->detach();
                 });
+
+                // Send campaign completion email
+                $campaignUser = $campaign->user;
+                $mailData = [
+                    'user_id' => $campaignUser->id,
+                    'slug' => 'campaign-ended',
+                    'data' => [
+                        'campaign_name' => $campaign->title,
+                    ]
+                ];
+                Mail::to($campaignUser->email)->queue(new CampaignMail($mailData));
             }
             
             return [
@@ -757,6 +770,17 @@ class EmailGatewayController extends Controller
                     // Detach all servers from the campaign
                     $campaign->servers()->detach();
                 });
+
+                // Send campaign completion email
+                $campaignUser = $campaign->user;
+                $mailData = [
+                    'user_id' => $campaignUser->id,
+                    'slug' => 'campaign-ended',
+                    'data' => [
+                        'campaign_name' => $campaign->title,
+                    ]
+                ];
+                Mail::to($campaignUser->email)->queue(new CampaignMail($mailData));
             }
         }
 
