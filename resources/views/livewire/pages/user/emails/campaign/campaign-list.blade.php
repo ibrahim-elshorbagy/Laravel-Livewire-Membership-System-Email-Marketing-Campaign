@@ -57,7 +57,7 @@
                             @if($remainingCount > 0)
                             <div class="flex items-center p-2 space-x-2 rounded-lg bg-blue-100/50 dark:bg-blue-900/50">
                                 <i class="fas fa-ellipsis-h"></i>
-                                <a href="{{ route('user.servers') }}" wire:navigate>+{{ $remainingCount }} more <i class="text-xs fa-solid fa-arrow-right fa-fade"></i></span>
+                                <a href="{{ route('user.servers') }}" wire:navigate>+{{ $remainingCount }} more <i class="text-xs fa-solid fa-arrow-right fa-fade"></i></span></a>
                             </div>
                             @endif
                         </div>
