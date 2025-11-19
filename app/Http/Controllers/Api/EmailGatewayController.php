@@ -24,7 +24,7 @@ use Exception;
 
 class EmailGatewayController extends Controller
 {
-    protected $apiPassword = '6Sb8E3cGG2bS1a';
+    protected $apiPassword;
     protected $batchSize = 4;
     protected $allowedUserAgents = [
         'Google-Apps-Script',
@@ -36,6 +36,7 @@ class EmailGatewayController extends Controller
     {
         $feature = Feature::find(2);
         $this->emailSendingFeatureName = $feature->name;
+        $this->apiPassword = config('app.api_password');
     }
     // Check user agent ----------------------------------------------------------------------------
     protected function checkUserAgent(Request $request)
@@ -675,7 +676,7 @@ class EmailGatewayController extends Controller
                 ];
                 Mail::to($campaignUser->email)->queue(new CampaignMail($mailData));
             }
-            
+
             return [
                 'emails' => $emailsToSend,
                 'summary' => $processingSummary

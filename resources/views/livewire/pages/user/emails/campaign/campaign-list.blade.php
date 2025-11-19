@@ -294,10 +294,22 @@
                                         x-transition:leave-end="opacity-0 translate-y-1"
                                         class="absolute z-10 px-3 py-2 mb-2 text-sm text-white -translate-x-1/2 rounded-lg shadow-lg bottom-full left-1/2 w-max bg-neutral-900"
                                         role="tooltip">
-                                        <div class="flex items-center space-x-1">
-                                            <i class="text-green-500 fas fa-play-circle"></i>
-                                            <span>Unpause to start sending</span>
+                                        <div class="space-y-1">
+                                            <div class="flex items-center space-x-1">
+                                                <i class="text-green-500 fas fa-play-circle"></i>
+                                                @if($campaign->repeater && $campaign->repeater->next_run_at)
+                                                <span>Will start sending {{ $campaign->repeater->next_run_at->timezone(auth()->user()->timezone ?? $globalSettings['APP_TIMEZONE'])->diffForHumans() }}</span>
+                                                @else
+                                                <span>Unpause to start sending</span>
+                                                @endif
+                                            </div>
+                                            @if($campaign->repeater && $campaign->repeater->next_run_at)
+                                            <div class="text-center">
+                                                <span>Unpause to start sending now</span>
+                                            </div>
+                                            @endif
                                         </div>
+
                                         <!-- Arrow -->
                                         <div
                                             class="absolute w-0 h-0 -translate-x-1/2 border-t-8 border-l-8 border-r-8 top-full left-1/2 border-l-transparent border-r-transparent border-neutral-900">
